@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function CTASection() {
   return (
-    <section className="py-16 bg-gradient-to-r from-[#002333] to-[#15949C] text-white">
+    <section className="py-16 bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-900 dark:to-gray-800 text-white">
       <div className="container mx-auto px-4 max-w-7xl text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">
           Ready to get started?
@@ -16,14 +16,14 @@ export default function CTASection() {
           <Link href="/post-project">
             <Button
               size="lg"
-              className="bg-white text-[#002333] hover:bg-white/90"
+              className="bg-white text-[#002333] hover:bg-white/90 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
             >
               Find Talent
             </Button>
           </Link>
           <Button
             size="lg"
-            className="bg-white text-[#002333] hover:bg-white/90"
+            className="bg-white text-[#002333] hover:bg-white/90 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
           >
             Become a Freelancer
           </Button>
