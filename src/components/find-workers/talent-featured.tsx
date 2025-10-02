@@ -80,7 +80,7 @@ export default function TalentFeatured({
       .map((_, i) => (
         <Star
           key={i}
-          className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+          className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"}`}
         />
       ))
   }
@@ -94,9 +94,9 @@ export default function TalentFeatured({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-0">
-              <div className="relative h-24 bg-gradient-to-r from-[#002333] to-[#15949C] flex items-center justify-center">
+              <div className="relative h-24 bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
                 <div className="absolute top-4 right-4">
                   <Badge className="bg-yellow-400/90 text-[#002333] font-medium">
                     <Award className="h-3 w-3 mr-1" />
@@ -109,7 +109,7 @@ export default function TalentFeatured({
                   className={`absolute top-4 left-4 h-8 w-8 rounded-full ${
                     selectedFreelancers.includes(freelancer.id)
                       ? "bg-[#15949C] text-white"
-                      : "bg-white/80 text-[#002333]"
+                      : "bg-white/80 text-[#002333] dark:bg-gray-600 dark:text-white"
                   }`}
                   onClick={() => toggleFreelancerSelection(freelancer.id)}
                 >
@@ -120,9 +120,9 @@ export default function TalentFeatured({
                   )}
                 </Button>
                 <div className="absolute -bottom-12">
-                  <Avatar className="h-24 w-24 border-4 border-white">
+                  <Avatar className="h-24 w-24 border-4 border-white dark:border-gray-800">
                     <AvatarImage src={freelancer.avatar} alt={freelancer.name} />
-                    <AvatarFallback className="bg-[#15949C]/20 text-[#15949C] text-xl">
+                    <AvatarFallback className="bg-[#15949C]/20 text-[#15949C] dark:bg-gray-600 dark:text-white text-xl">
                       {freelancer.name
                         .split(" ")
                         .map((n) => n[0])
@@ -133,20 +133,20 @@ export default function TalentFeatured({
               </div>
 
               <div className="pt-16 p-6 text-center">
-                <h3 className="font-bold text-lg text-[#002333]">{freelancer.name}</h3>
-                <p className="text-[#002333]/70 mt-1">{freelancer.title}</p>
+                <h3 className="font-bold text-lg text-[#002333] dark:text-white">{freelancer.name}</h3>
+                <p className="text-[#002333]/70 dark:text-gray-300 mt-1">{freelancer.title}</p>
 
                 <div className="flex justify-center mt-2">
                   <div className="flex mr-2">{renderStars(freelancer.rating)}</div>
-                  <span className="text-[#002333] font-medium">{freelancer.rating}</span>
-                  <span className="text-[#002333]/70 ml-1">({freelancer.reviewCount})</span>
+                  <span className="text-[#002333] dark:text-white font-medium">{freelancer.rating}</span>
+                  <span className="text-[#002333]/70 dark:text-gray-400 ml-1">({freelancer.reviewCount})</span>
                 </div>
 
-                <p className="font-bold text-[#002333] mt-3">${freelancer.hourlyRate}/hr</p>
+                <p className="font-bold text-[#002333] dark:text-white mt-3">${freelancer.hourlyRate}/hr</p>
 
                 <div className="flex flex-wrap justify-center gap-2 mt-4">
                   {freelancer.skills.map((skill) => (
-                    <Badge key={skill} variant="outline">
+                    <Badge key={skill} variant="outline" className="dark:border-gray-600 dark:text-gray-300">
                       {skill}
                     </Badge>
                   ))}
@@ -159,7 +159,7 @@ export default function TalentFeatured({
                   >
                     View Profile
                   </Button>
-                  <Button variant="outline" size="icon" className="border-[#15949C] text-[#15949C]">
+                  <Button variant="outline" size="icon" className="border-[#15949C] text-[#15949C] dark:border-gray-600 dark:text-gray-300">
                     <MessageSquare className="h-4 w-4" />
                   </Button>
                 </div>
