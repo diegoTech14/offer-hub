@@ -33,7 +33,7 @@ export function FaqAccordion({ faqs }: FaqAccordionProps) {
             delay: index * 0.1,
             ease: "easeOut",
           }}
-          className="border border-[#e4e4e4] dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
+          className="border border-[#e4e4e4] dark:border-gray-800 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
         >
           {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
           <button
@@ -84,7 +84,7 @@ export function FaqAccordion({ faqs }: FaqAccordionProps) {
                 }}
                 className="overflow-hidden"
               >
-                <div className="px-4 py-6 text-[#7a8a9a] dark:text-gray-300 leading-relaxed border-t border-[#e4e4e4] dark:border-gray-700">
+                <div className="px-4 py-6 text-[#7a8a9a] dark:text-gray-300 leading-relaxed border-t border-[#e4e4e4] dark:border-gray-800">
                   {faq.answer}
                 </div>
               </motion.div>
