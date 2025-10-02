@@ -20,6 +20,7 @@ import { Suspense } from 'react';
 import NotificationToast from '@/components/shared/NotificationToast';
 import { MessageProvider } from '@/lib/contexts/MessageContext';
 import { KeyboardShortcutsProvider } from '@/components/common/keyboard-shortcuts-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -46,31 +47,33 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TrustlessWorkProvider>
-          <ErrorBoundary>
-            <NotificationProvider>
-              <TalentProvider>
-                <MessageProvider>
-                  <OfferProvider>
-                    <WalletProvider>
-                      <EscrowProvider>
-                        <KeyboardShortcutsProvider>
-                          <Suspense fallback={null}>
-                            <main>
-                              {children}
-                            </main>
-                            <NotificationToast />
-                          </Suspense>
-                          <Toaster position="top-right" />
-                        </KeyboardShortcutsProvider>
-                      </EscrowProvider>
-                    </WalletProvider>
-                  </OfferProvider>
-                </MessageProvider>
-              </TalentProvider>
-            </NotificationProvider>
-          </ErrorBoundary>
-        </TrustlessWorkProvider>
+        <ThemeProvider>
+          <TrustlessWorkProvider>
+            <ErrorBoundary>
+              <NotificationProvider>
+                <TalentProvider>
+                  <MessageProvider>
+                    <OfferProvider>
+                      <WalletProvider>
+                        <EscrowProvider>
+                          <KeyboardShortcutsProvider>
+                            <Suspense fallback={null}>
+                              <main>
+                                {children}
+                              </main>
+                              <NotificationToast />
+                            </Suspense>
+                            <Toaster position="top-right" />
+                          </KeyboardShortcutsProvider>
+                        </EscrowProvider>
+                      </WalletProvider>
+                    </OfferProvider>
+                  </MessageProvider>
+                </TalentProvider>
+              </NotificationProvider>
+            </ErrorBoundary>
+          </TrustlessWorkProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

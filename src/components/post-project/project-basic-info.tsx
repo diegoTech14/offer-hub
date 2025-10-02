@@ -69,40 +69,41 @@ export default function ProjectBasicInfo({ projectData, updateProjectData }: Pro
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={item}>
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Basic Project Information</CardTitle>
-            <CardDescription>
+            <CardTitle className="dark:text-white">Basic Project Information</CardTitle>
+            <CardDescription className="dark:text-gray-300">
               Provide the essential details about your project to help freelancers understand what you need
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="project-title">Project Title</Label>
+              <Label htmlFor="project-title" className="dark:text-gray-300">Project Title</Label>
               <Input
                 id="project-title"
                 placeholder="e.g. Professional Website Design for Small Business"
                 value={projectData.title}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateProjectData("title", e.target.value )}
+                className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">
                 A clear title helps attract the right freelancers (50-80 characters recommended)
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category" className="dark:text-gray-300">Category</Label>
                 <Select
                   value={projectData.category}
                   onValueChange={(value: string) => updateProjectData("category", value)}
                 >
-                  <SelectTrigger id="category">
+                  <SelectTrigger id="category" className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                     {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
+                      <SelectItem key={category.id} value={category.id} className="dark:text-white dark:hover:bg-gray-600">
                         {category.name}
                       </SelectItem>
                     ))}
@@ -111,19 +112,19 @@ export default function ProjectBasicInfo({ projectData, updateProjectData }: Pro
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subcategory">Subcategory</Label>
+                <Label htmlFor="subcategory" className="dark:text-gray-300">Subcategory</Label>
                 <Select
                   value={projectData.subcategory}
                   onValueChange={(value: string) => updateProjectData("subcategory", value)}
                   disabled={!projectData.category || !subcategories[projectData.category]}
                 >
-                  <SelectTrigger id="subcategory">
+                  <SelectTrigger id="subcategory" className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <SelectValue placeholder="Select a subcategory" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                     {projectData.category &&
                       subcategories[projectData.category]?.map((subcategory) => (
-                        <SelectItem key={subcategory.id} value={subcategory.id}>
+                        <SelectItem key={subcategory.id} value={subcategory.id} className="dark:text-white dark:hover:bg-gray-600">
                           {subcategory.name}
                         </SelectItem>
                       ))}
@@ -133,64 +134,64 @@ export default function ProjectBasicInfo({ projectData, updateProjectData }: Pro
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="project-description">Project Description</Label>
+              <Label htmlFor="project-description" className="dark:text-gray-300">Project Description</Label>
               <Textarea
                 id="project-description"
                 placeholder="Describe your project in detail..."
-                className="min-h-[200px]"
+                className="min-h-[200px] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 value={projectData.description}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateProjectData("description", e.target.value)}
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">
                 Include all details about your project requirements, goals, and expectations
               </p>
             </div>
 
             <div className="space-y-4">
-              <Label>Project Type</Label>
+              <Label className="dark:text-gray-300">Project Type</Label>
               <RadioGroup
                 value={projectData.projectType}
                 onValueChange={(value: string) => updateProjectData("projectType", value)}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700">
                   <RadioGroupItem value="one-time" id="one-time" />
                   <Label htmlFor="one-time" className="flex-1 cursor-pointer">
-                    <div className="font-medium">One-time project</div>
-                    <div className="text-sm text-muted-foreground">A project with a defined scope and deliverables</div>
+                    <div className="font-medium dark:text-white">One-time project</div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">A project with a defined scope and deliverables</div>
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700">
                   <RadioGroupItem value="ongoing" id="ongoing" />
                   <Label htmlFor="ongoing" className="flex-1 cursor-pointer">
-                    <div className="font-medium">Ongoing project</div>
-                    <div className="text-sm text-muted-foreground">A long-term project that may evolve over time</div>
+                    <div className="font-medium dark:text-white">Ongoing project</div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">A long-term project that may evolve over time</div>
                   </Label>
                 </div>
               </RadioGroup>
             </div>
 
             <div className="space-y-4">
-              <Label>Project Visibility</Label>
+              <Label className="dark:text-gray-300">Project Visibility</Label>
               <RadioGroup
                 value={projectData.visibility}
                 onValueChange={(value: string) => updateProjectData("visibility", value)}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700">
                   <RadioGroupItem value="public" id="public" />
                   <Label htmlFor="public" className="flex-1 cursor-pointer">
-                    <div className="font-medium">Public</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium dark:text-white">Public</div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">
                       Visible to all freelancers who can send proposals
                     </div>
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700">
                   <RadioGroupItem value="private" id="private" />
                   <Label htmlFor="private" className="flex-1 cursor-pointer">
-                    <div className="font-medium">Private</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium dark:text-white">Private</div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">
                       Only visible to freelancers you specifically invite
                     </div>
                   </Label>
@@ -198,9 +199,9 @@ export default function ProjectBasicInfo({ projectData, updateProjectData }: Pro
               </RadioGroup>
             </div>
 
-            <Alert className="bg-[#DEEFE7]/30 border-[#15949C]">
+            <Alert className="bg-[#DEEFE7]/30 dark:bg-gray-700/50 border-[#15949C] dark:border-gray-600">
               <Info className="h-4 w-4 text-[#15949C]" />
-              <AlertDescription className="text-[#002333]/70">
+              <AlertDescription className="text-[#002333]/70 dark:text-gray-300">
                 Projects with clear, detailed descriptions receive 3x more quality proposals from freelancers.
               </AlertDescription>
             </Alert>

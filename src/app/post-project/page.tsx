@@ -13,6 +13,8 @@ import {
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { OfferHubLogo } from "@/components/ui/offerhub-logo";
 import ProjectBasicInfo from "@/components/post-project/project-basic-info";
 import ProjectRequirements from "@/components/post-project/project-requirements";
 import ProjectBudget from "@/components/post-project/project-budget";
@@ -33,19 +35,15 @@ import Loading from "./loading";
 // Simple Header component defined inline
 function SimpleHeader() {
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold text-[#15949C]">
-                Offer Hub
-              </span>
-            </Link>
+            <OfferHubLogo />
             <nav className="ml-10 hidden space-x-8 md:flex">
               <Link
                 href="/find-workers"
-                className="text-[#002333] hover:text-[#15949C]"
+                className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]"
               >
                 Find Talent
               </Link>
@@ -54,32 +52,33 @@ function SimpleHeader() {
               </Link>
               <Link
                 href="/my-chats"
-                className="text-[#002333] hover:text-[#15949C]"
+                className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]"
               >
                 Messages
               </Link>
               <Link
                 href="/payments"
-                className="text-[#002333] hover:text-[#15949C]"
+                className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]"
               >
                 Payments
               </Link>
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="text-[#002333]">
+            <ThemeToggle />
+            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-[#002333]">
+            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
               <Bell className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-[#002333]">
+            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
               <User className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-[#002333]"
+              className="md:hidden text-[#002333] dark:text-gray-300"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -93,7 +92,7 @@ function SimpleHeader() {
 // Simple Footer component defined inline
 function SimpleFooter() {
   return (
-    <footer className="bg-[#002333] text-white py-8">
+    <footer className="bg-[#002333] dark:bg-gray-900 text-white py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -163,7 +162,7 @@ function SimpleFooter() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-sm text-gray-300">
+        <div className="border-t border-gray-700 dark:border-gray-600 mt-8 pt-8 text-sm text-gray-300">
           <p>© {new Date().getFullYear()} Offer Hub. All rights reserved.</p>
         </div>
       </div>
@@ -295,11 +294,11 @@ export default function PostProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
       <SimpleHeader />
 
       <main className="flex-1">
-        <div className="bg-gradient-to-r from-[#002333] to-[#15949C] text-white py-10">
+        <div className="bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-900 dark:to-gray-800 text-white py-10">
           <div className="container mx-auto px-4 max-w-7xl">
             <h1 className="text-3xl font-bold mb-2">Post a Project</h1>
             <p className="opacity-90">
