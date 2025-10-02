@@ -125,12 +125,12 @@ export default function FaqContainer() {
   const categories = Object.keys(faqData);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+    <div className="max-w-6xl mx-auto px-4 py-12 md:py-16 bg-white dark:bg-gray-900 min-h-screen">
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 dark:text-white mb-4">
           Frequently Asked Questions
         </h1>
-        <p className="text-[#7a8a9a] max-w-2xl mx-auto">
+        <p className="text-[#7a8a9a] dark:text-gray-300 max-w-2xl mx-auto">
           Find answers to the most common questions about Offer Hub and how our
           platform works.
         </p>
@@ -174,7 +174,7 @@ export default function FaqContainer() {
               <Settings size={20} className="text-primary-500" />
             </div>
           )}
-          <h2 className="text-2xl font-bold text-secondary-500">
+          <h2 className="text-2xl font-bold text-secondary-500 dark:text-white">
             {activeCategory}
           </h2>
         </div>
