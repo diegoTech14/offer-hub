@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function HelpHeader() {
   return (
@@ -11,13 +12,16 @@ export default function HelpHeader() {
             OFFER HUB
           </span>
         </div>
-        <Link
-          href="/"
-          className="text-sm text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1"
-        >
-          <span className="text-lg">←</span>
-          Back to Home
-        </Link>
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          <Link
+            href="/"
+            className="text-sm text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1"
+          >
+            <span className="text-lg">←</span>
+            Back to Home
+          </Link>
+        </div>
       </div>
 
       <div className="bg-gradient-to-r from-teal-900 to-teal-600 dark:from-gray-900 dark:to-gray-800 text-white py-16 px-4 text-center">

@@ -22,6 +22,7 @@ import Link from "next/link"
 import { useServicesApi } from "@/hooks/api-connections/use-services-api"
 import { ServiceFilters, FreelancerDisplay } from "@/types/service.types"
 import { useSearchParams } from "next/navigation"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 // Simple Header component defined inline
 function SimpleHeader() {
@@ -49,6 +50,7 @@ function SimpleHeader() {
             </nav>
           </div>
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
               <Search className="h-5 w-5" />
             </Button>

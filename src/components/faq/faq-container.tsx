@@ -4,6 +4,8 @@ import { useState } from "react";
 import { FaqCategories } from "./faq-categories";
 import { FaqAccordion } from "./faq-accordion";
 import { FaqSupport } from "./faq-support";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import Link from "next/link";
 import {
   HelpCircle,
   CreditCard,
@@ -125,8 +127,27 @@ export default function FaqContainer() {
   const categories = Object.keys(faqData);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 md:py-16 bg-white dark:bg-gray-900 min-h-screen">
-      <div className="text-center mb-12">
+    <div className="bg-white dark:bg-gray-900 min-h-screen">
+      {/* Header con ThemeToggle */}
+      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center">
+            <span className="text-xl font-bold text-[#15949C]">Offer Hub</span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Link
+              href="/"
+              className="text-sm text-blue-700 dark:text-blue-400 hover:underline"
+            >
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+        <div className="text-center mb-12">
         <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 dark:text-white mb-4">
           Frequently Asked Questions
         </h1>
@@ -182,7 +203,8 @@ export default function FaqContainer() {
         <FaqAccordion faqs={faqData[activeCategory as keyof typeof faqData]} />
       </div>
 
-      <FaqSupport />
+        <FaqSupport />
+      </div>
     </div>
   );
 }
