@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { OfferHubLogo } from "@/components/ui/offerhub-logo"
 import { Search, Menu, X } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import offerHubLogo from "../../../public/dark_logo.svg"
 
 interface HeaderProps {
     isSidebarOpen: boolean
@@ -21,7 +23,8 @@ export function Header({ isSidebarOpen, setIsSidebarOpen }: HeaderProps) {
                     >
                         {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </Button>
-                    <OfferHubLogo />
+                    <Image src={offerHubLogo} alt="OfferHub Logo" width={40} height={40} className="w-10 h-10" />
+                    <span className="text-xl font-semibold text-gray-900 dark:text-white">OfferHub</span>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-4">
                     <div className="relative">
@@ -31,6 +34,13 @@ export function Header({ isSidebarOpen, setIsSidebarOpen }: HeaderProps) {
                             className="pl-10 w-20 sm:w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                         />
                     </div>
+                    <Link
+                        href="/"
+                        className="text-sm text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1"
+                    >
+                        <span className="text-lg">←</span>
+                        Back to Home
+                    </Link>
                 </div>
             </div>
         </div>

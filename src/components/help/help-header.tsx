@@ -1,11 +1,17 @@
-import { OfferHubLogo } from "@/components/ui/offerhub-logo";
+import Image from "next/image";
+import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function HelpHeader() {
   return (
     <header className="bg-white dark:bg-gray-900 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-4">
-        <OfferHubLogo size="sm" />
+        <div className="flex items-center gap-2">
+          <Image src="/logo.svg" alt="Offer Hub Logo" width={32} height={32} />
+          <span className="text-sm font-semibold text-gray-900 dark:text-white tracking-wide">
+            OFFER HUB
+          </span>
+        </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <Link
