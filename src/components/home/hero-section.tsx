@@ -7,7 +7,7 @@ import { popularTags } from "@/data/landing-data";
 
 export default function HeroSection() {
   return (
-    <section className="bg-gradient-to-r from-[#002333] to-[#15949C] text-white py-16 md:py-24">
+    <section className="bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-900 dark:to-gray-800 text-white py-16 md:py-24">
       <div className="container mx-auto px-4 max-w-7xl grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
@@ -16,10 +16,10 @@ export default function HeroSection() {
           <p className="text-lg md:text-xl opacity-90">
             Connect with skilled professionals ready to bring your ideas to life
           </p>
-          <div className="bg-white rounded-lg p-2 flex items-center shadow-lg">
+          <div className="bg-white dark:bg-gray-100 rounded-lg p-2 flex items-center shadow-lg">
             <Input
               placeholder="What service are you looking for?"
-              className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-gray-100 dark:text-gray-900"
             />
             <Button className="bg-[#15949C] hover:bg-[#15949C]/90 ml-2">
               <Search className="h-4 w-4 mr-2" />
@@ -30,7 +30,7 @@ export default function HeroSection() {
             {popularTags.map((tag, index) => (
               <Badge
                 key={index}
-                className="bg-white/20 hover:bg-white/30 text-white"
+                className="bg-white/20 hover:bg-white/30 text-white dark:bg-gray-700/50 dark:hover:bg-gray-700/70"
               >
                 {tag}
               </Badge>
