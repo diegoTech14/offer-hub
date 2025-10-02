@@ -138,10 +138,9 @@ export default function FaqContainer() {
             <ThemeToggle />
             <Link
               href="/"
-              className="text-sm text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1 transition-colors hover:text-blue-800 dark:hover:text-blue-300"
+              className="text-sm text-blue-700 dark:text-blue-400 hover:underline"
             >
-              <span className="text-lg">←</span>
-              Back to Home
+              ← Back to Home
             </Link>
           </div>
         </div>
