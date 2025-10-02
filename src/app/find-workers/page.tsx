@@ -349,22 +349,22 @@ export default function FindWorkersPage() {
 
                 <div className="flex items-center gap-2">
                   <Select defaultValue="relevance">
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px] bg-white dark:bg-gray-100 border-gray-300 dark:border-gray-400 text-gray-900 dark:text-gray-900">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="relevance">Relevance</SelectItem>
-                      <SelectItem value="rating">Highest Rating</SelectItem>
-                      <SelectItem value="reviews">Most Reviews</SelectItem>
-                      <SelectItem value="newest">Newest</SelectItem>
+                    <SelectContent className="bg-white dark:bg-gray-100 border-gray-300 dark:border-gray-400">
+                      <SelectItem value="relevance" className="text-gray-900 dark:text-gray-900">Relevance</SelectItem>
+                      <SelectItem value="rating" className="text-gray-900 dark:text-gray-900">Highest Rating</SelectItem>
+                      <SelectItem value="reviews" className="text-gray-900 dark:text-gray-900">Most Reviews</SelectItem>
+                      <SelectItem value="newest" className="text-gray-900 dark:text-gray-900">Newest</SelectItem>
                     </SelectContent>
                   </Select>
 
-                  <div className="border rounded-md p-1 flex">
+                  <div className="border border-gray-300 dark:border-gray-400 rounded-md p-1 flex bg-white dark:bg-gray-100">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "grid" ? "bg-[#DEEFE7] text-[#15949C]" : ""}`}
+                      className={`h-8 w-8 ${viewMode === "grid" ? "bg-[#DEEFE7] text-[#15949C]" : "text-gray-700 dark:text-gray-700"}`}
                       onClick={() => setViewMode("grid")}
                     >
                       <Grid className="h-4 w-4" />
@@ -372,7 +372,7 @@ export default function FindWorkersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "list" ? "bg-[#DEEFE7] text-[#15949C]" : ""}`}
+                      className={`h-8 w-8 ${viewMode === "list" ? "bg-[#DEEFE7] text-[#15949C]" : "text-gray-700 dark:text-gray-700"}`}
                       onClick={() => setViewMode("list")}
                     >
                       <List className="h-4 w-4" />
@@ -380,7 +380,7 @@ export default function FindWorkersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "map" ? "bg-[#DEEFE7] text-[#15949C]" : ""}`}
+                      className={`h-8 w-8 ${viewMode === "map" ? "bg-[#DEEFE7] text-[#15949C]" : "text-gray-700 dark:text-gray-700"}`}
                       onClick={() => setViewMode("map")}
                     >
                       <Map className="h-4 w-4" />
