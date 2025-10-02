@@ -285,7 +285,7 @@ export default function PaymentOverview() {
             </div>
             <Button
               variant="outline"
-              className="border-[#15949C] dark:border-gray-600 text-[#15949C] dark:text-white hover:bg-[#DEEFE7] dark:hover:bg-gray-700"
+              className="border-[#15949C] dark:border-gray-600 text-[#15949C] dark:text-white hover:bg-[#DEEFE7] dark:hover:bg-gray-700 bg-transparent dark:bg-gray-800"
             >
               View All
             </Button>
