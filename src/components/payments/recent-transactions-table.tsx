@@ -78,23 +78,23 @@ export default function RecentTransactionsTable() {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-gray-100">
-            <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+          <tr className="border-b border-gray-100 dark:border-gray-700">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
               Transaction
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
               Date
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
               Client
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
               Amount
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
               Status
             </th>
-            <th className="text-right py-3 px-4 text-[#002333]/70 font-medium">
+            <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
               Actions
             </th>
           </tr>
@@ -106,7 +106,7 @@ export default function RecentTransactionsTable() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="border-b border-gray-100 hover:bg-gray-50"
+              className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
               onMouseEnter={() => setHoveredRow(transaction.id)}
               onMouseLeave={() => setHoveredRow(null)}
             >
@@ -115,8 +115,8 @@ export default function RecentTransactionsTable() {
                   <div
                     className={`h-8 w-8 rounded-full flex items-center justify-center mr-3 ${
                       transaction.type === "income"
-                        ? "bg-green-100"
-                        : "bg-red-100"
+                        ? "bg-green-100 dark:bg-green-900/30"
+                        : "bg-red-100 dark:bg-red-900/30"
                     }`}
                   >
                     {transaction.type === "income" ? (
@@ -126,23 +126,23 @@ export default function RecentTransactionsTable() {
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-[#002333]">
+                    <p className="font-medium text-[#002333] dark:text-white">
                       {transaction.description}
                     </p>
-                    <p className="text-xs text-[#002333]/70">
+                    <p className="text-xs text-[#002333]/70 dark:text-gray-400">
                       {transaction.id}
                     </p>
                   </div>
                 </div>
               </td>
-              <td className="py-4 px-4 text-[#002333]">
+              <td className="py-4 px-4 text-[#002333] dark:text-gray-300">
                 {new Date(transaction.date).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
                 })}
               </td>
-              <td className="py-4 px-4 text-[#002333]">{transaction.client}</td>
+              <td className="py-4 px-4 text-[#002333] dark:text-gray-300">{transaction.client}</td>
               <td className="py-4 px-4">
                 <span
                   className={`font-medium ${
@@ -159,8 +159,8 @@ export default function RecentTransactionsTable() {
                 <Badge
                   className={`${
                     transaction.status === "completed"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-amber-100 text-amber-800"
+                      ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                      : "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
                   }`}
                 >
                   {transaction.status === "completed" ? "Completed" : "Pending"}
@@ -169,26 +169,26 @@ export default function RecentTransactionsTable() {
               <td className="py-4 px-4 text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-gray-300">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuContent align="end" className="dark:bg-gray-700 dark:border-gray-600">
+                    <DropdownMenuLabel className="dark:text-white">Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator className="dark:bg-gray-600" />
+                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
                       <Eye className="h-4 w-4 mr-2" />
                       View Details
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
                       <FileText className="h-4 w-4 mr-2" />
                       View Invoice
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
                       <Download className="h-4 w-4 mr-2" />
                       Download Receipt
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
                       <Copy className="h-4 w-4 mr-2" />
                       Copy Transaction ID
                     </DropdownMenuItem>

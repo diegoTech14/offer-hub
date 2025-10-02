@@ -56,12 +56,12 @@ export default function PaymentTabs({
   return (
     <div className="relative">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 bg-gray-100 dark:bg-gray-800">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
               value={tab.id}
-              className="relative flex items-center justify-center"
+              className="relative flex items-center justify-center dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-300"
             >
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
