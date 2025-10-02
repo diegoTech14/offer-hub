@@ -34,16 +34,16 @@ export default function HelpCategoryCards() {
       {categories.map((cat, idx) => (
         <div
           key={idx}
-          className="border rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow"
+          className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md dark:hover:shadow-gray-900/20 transition-shadow"
         >
-          <div className="mb-4 bg-teal-50 w-fit p-3 rounded-full">
+          <div className="mb-4 bg-teal-50 dark:bg-gray-700 w-fit p-3 rounded-full">
             {cat.icon}
           </div>
-          <h3 className="text-lg font-semibold mb-1">{cat.title}</h3>
-          <p className="text-sm text-gray-600 mb-3">{cat.description}</p>
+          <h3 className="text-lg font-semibold mb-1 text-gray-900 dark:text-white">{cat.title}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{cat.description}</p>
           <Link
             href={cat.linkHref}
-            className="text-sm text-teal-600 font-medium hover:underline"
+            className="text-sm text-teal-600 dark:text-teal-400 font-medium hover:underline"
           >
             {cat.linkText} →
           </Link>

@@ -5,12 +5,12 @@ import ContactSupport from "@/components/help/contact-support";
 import CommunityResources from "@/components/help/community-resources";
 export default function HelpPage() {
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       <HelpHeader />
       <HelpCategoryCards />
       <HelpTopicsTabs />
       <ContactSupport />
       <CommunityResources />
-    </>
+    </div>
   );
 }

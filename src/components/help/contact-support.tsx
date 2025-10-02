@@ -29,26 +29,26 @@ const supportOptions = [
 
 export default function ContactSupport() {
   return (
-    <section className="bg-gray-50 py-16 px-4">
+    <section className="bg-gray-50 dark:bg-gray-800 py-16 px-4">
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-2xl font-bold mb-2">Contact Support</h2>
-        <p className="text-gray-600 mb-10">
-          Can’t find what you’re looking for? Our support team is here to help.
+        <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Contact Support</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-10">
+          Can't find what you're looking for? Our support team is here to help.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
           {supportOptions.map((option, idx) => (
             <div
               key={idx}
-              className="bg-white border rounded-lg p-6 flex flex-col items-start shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-start shadow-sm hover:shadow-md dark:hover:shadow-gray-900/20 transition-shadow"
             >
-              <div className="bg-teal-50 p-3 rounded-full mb-4">
+              <div className="bg-teal-50 dark:bg-gray-700 p-3 rounded-full mb-4">
                 {option.icon}
               </div>
-              <h3 className="font-semibold text-lg text-gray-900 mb-1">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-1">
                 {option.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-4">{option.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{option.description}</p>
               <a
                 href={option.href}
                 className={`text-sm font-medium px-4 py-2 rounded-md transition-colors ${option.buttonStyle}`}
