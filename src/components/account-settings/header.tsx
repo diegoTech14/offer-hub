@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Menu, X } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import offerHubLogo from "../../../public/dark_logo.svg"
 
 interface HeaderProps {
@@ -33,6 +34,13 @@ export function Header({ isSidebarOpen, setIsSidebarOpen }: HeaderProps) {
                             className="pl-10 w-20 sm:w-64 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                         />
                     </div>
+                    <Link
+                        href="/"
+                        className="text-sm text-blue-700 dark:text-blue-400 hover:underline flex items-center gap-1"
+                    >
+                        <span className="text-lg">←</span>
+                        Back to Home
+                    </Link>
                 </div>
             </div>
         </div>
