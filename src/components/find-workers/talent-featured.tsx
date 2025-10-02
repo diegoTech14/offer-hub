@@ -94,8 +94,8 @@ export default function TalentFeatured({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="overflow-hidden dark:bg-gray-800 dark:border-gray-700">
-            <CardContent className="p-0">
+          <Card className="overflow-hidden dark:bg-gray-800 dark:border-gray-700 h-full">
+            <CardContent className="p-0 h-full flex flex-col">
               <div className="relative h-24 bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-700 dark:to-gray-600 flex items-center justify-center">
                 <div className="absolute top-4 right-4">
                   <Badge className="bg-yellow-400/90 text-[#002333] font-medium">
@@ -132,29 +132,31 @@ export default function TalentFeatured({
                 </div>
               </div>
 
-              <div className="pt-16 p-6 text-center">
-                <h3 className="font-bold text-lg text-[#002333] dark:text-white">{freelancer.name}</h3>
-                <p className="text-[#002333]/70 dark:text-gray-300 mt-1">{freelancer.title}</p>
+              <div className="pt-16 p-6 text-center flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-bold text-lg text-[#002333] dark:text-white">{freelancer.name}</h3>
+                  <p className="text-[#002333]/70 dark:text-gray-300 mt-1">{freelancer.title}</p>
 
-                <div className="flex justify-center mt-2">
-                  <div className="flex mr-2">{renderStars(freelancer.rating)}</div>
-                  <span className="text-[#002333] dark:text-white font-medium">{freelancer.rating}</span>
-                  <span className="text-[#002333]/70 dark:text-gray-400 ml-1">({freelancer.reviewCount})</span>
-                </div>
+                  <div className="flex justify-center mt-2">
+                    <div className="flex mr-2">{renderStars(freelancer.rating)}</div>
+                    <span className="text-[#002333] dark:text-white font-medium">{freelancer.rating}</span>
+                    <span className="text-[#002333]/70 dark:text-gray-400 ml-1">({freelancer.reviewCount})</span>
+                  </div>
 
-                <p className="font-bold text-[#002333] dark:text-white mt-3">${freelancer.hourlyRate}/hr</p>
+                  <p className="font-bold text-[#002333] dark:text-white mt-3">${freelancer.hourlyRate}/hr</p>
 
-                <div className="flex flex-wrap justify-center gap-2 mt-4">
-                  {freelancer.skills.map((skill) => (
-                    <Badge key={skill} variant="outline" className="dark:border-gray-600 dark:text-gray-300">
-                      {skill}
-                    </Badge>
-                  ))}
+                  <div className="flex flex-wrap justify-center gap-2 mt-4">
+                    {freelancer.skills.map((skill) => (
+                      <Badge key={skill} variant="outline" className="dark:border-gray-600 dark:text-gray-300">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="mt-6 flex gap-2">
                   <Button
-                    className="flex-1 bg-[#15949C] hover:bg-[#15949C]/90"
+                    className="flex-1 bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200"
                     onClick={() => openFreelancerDetail(freelancer)}
                   >
                     View Profile
