@@ -161,7 +161,7 @@ export default function TalentFeatured({
                   >
                     View Profile
                   </Button>
-                  <Button variant="outline" size="icon" className="border-[#15949C] text-[#15949C] dark:border-gray-600 dark:text-gray-300">
+                  <Button variant="outline" size="icon" className="border-[#15949C] text-[#15949C] bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:border-gray-300 dark:hover:bg-gray-200">
                     <MessageSquare className="h-4 w-4" />
                   </Button>
                 </div>
