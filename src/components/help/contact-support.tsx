@@ -14,7 +14,7 @@ const supportOptions = [
     title: "Live Chat",
     description: "Chat with our support team during business hours.",
     buttonLabel: "Start Chat",
-    buttonStyle: "border border-teal-600 text-teal-600 hover:bg-teal-50",
+    buttonStyle: "bg-teal-600 text-white hover:bg-teal-700",
     href: "#",
   },
   {
@@ -22,7 +22,7 @@ const supportOptions = [
     title: "Phone Support",
     description: "Call us directly for urgent matters and premium support.",
     buttonLabel: "Call Support",
-    buttonStyle: "border border-teal-600 text-teal-600 hover:bg-teal-50",
+    buttonStyle: "bg-teal-600 text-white hover:bg-teal-700",
     href: "#",
   },
 ];
