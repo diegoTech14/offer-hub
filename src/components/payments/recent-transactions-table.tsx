@@ -119,11 +119,11 @@ export default function RecentTransactionsTable() {
                         : "bg-red-100 dark:bg-red-900/30"
                     }`}
                   >
-                    {transaction.type === "income" ? (
-                      <ArrowUpRight className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <ArrowDownRight className="h-4 w-4 text-red-600" />
-                    )}
+                     {transaction.type === "income" ? (
+                       <ArrowUpRight className="h-4 w-4 text-green-600 dark:text-green-400" />
+                     ) : (
+                       <ArrowDownRight className="h-4 w-4 text-red-600 dark:text-red-400" />
+                     )}
                   </div>
                   <div>
                     <p className="font-medium text-[#002333] dark:text-white">
@@ -144,13 +144,13 @@ export default function RecentTransactionsTable() {
               </td>
               <td className="py-4 px-4 text-[#002333] dark:text-gray-300">{transaction.client}</td>
               <td className="py-4 px-4">
-                <span
-                  className={`font-medium ${
-                    transaction.type === "income"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
+                 <span
+                   className={`font-medium ${
+                     transaction.type === "income"
+                       ? "text-green-600 dark:text-green-400"
+                       : "text-red-600 dark:text-red-400"
+                   }`}
+                 >
                   {transaction.type === "income" ? "+" : "-"}$
                   {transaction.amount.toFixed(2)}
                 </span>
