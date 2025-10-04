@@ -266,7 +266,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
   )
 
   return (
-    <Card className="h-full dark:bg-gray-800 dark:border-gray-700">
+    <Card className="h-fit dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-[#002333] dark:text-white">Filters</h2>

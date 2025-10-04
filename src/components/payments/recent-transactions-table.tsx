@@ -75,7 +75,7 @@ export default function RecentTransactionsTable() {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto bg-white dark:bg-gray-700 rounded-lg">
       <table className="w-full">
         <thead>
           <tr className="border-b border-gray-100 dark:border-gray-700">

@@ -311,26 +311,26 @@ export default function PaymentMethods() {
                     <motion.div
                       key={method.id}
                       variants={item}
-                      className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50"
+                      className="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 dark:bg-gray-800"
                     >
                       <div className="flex items-center">
                         {getCardIcon(method.brand)}
                         <div className="ml-4">
-                          <p className="font-medium text-[#002333]">
+                          <p className="font-medium text-[#002333] dark:text-white">
                             {method.name}
                           </p>
                           {method.type === "credit_card" && (
-                            <p className="text-xs text-[#002333]/70">
+                            <p className="text-xs text-[#002333]/70 dark:text-gray-400">
                               Expires {method.expiry}
                             </p>
                           )}
                           {method.type === "paypal" && (
-                            <p className="text-xs text-[#002333]/70">
+                            <p className="text-xs text-[#002333]/70 dark:text-gray-400">
                               {method.email}
                             </p>
                           )}
                           {method.type === "bank_account" && (
-                            <p className="text-xs text-[#002333]/70">
+                            <p className="text-xs text-[#002333]/70 dark:text-gray-400">
                               Bank Account
                             </p>
                           )}
@@ -367,10 +367,10 @@ export default function PaymentMethods() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle>Payment Security</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Payment Security</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Information about how we protect your payment data
                 </CardDescription>
               </CardHeader>
@@ -380,10 +380,10 @@ export default function PaymentMethods() {
                     <Lock className="h-5 w-5 text-[#15949C]" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-[#002333] mb-1">
+                    <h3 className="font-medium text-[#002333] dark:text-white mb-1">
                       Secure Payment Processing
                     </h3>
-                    <p className="text-sm text-[#002333]/70">
+                    <p className="text-sm text-[#002333]/70 dark:text-gray-300">
                       All payment information is encrypted using
                       industry-standard SSL technology. We never store your full
                       card details on our servers.

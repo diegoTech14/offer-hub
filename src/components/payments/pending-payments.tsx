@@ -179,12 +179,12 @@ export default function PendingPayments() {
       <div className="grid grid-cols-1 gap-6">
         {pendingPayments.map((payment, index) => (
           <motion.div key={payment.id} variants={item}>
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>{payment.projectName}</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="dark:text-white">{payment.projectName}</CardTitle>
+                    <CardDescription className="dark:text-gray-300">
                       Project with {payment.client}
                     </CardDescription>
                   </div>
@@ -194,18 +194,18 @@ export default function PendingPayments() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <div className="flex flex-col">
-                    <span className="text-sm text-[#002333]/70 mb-1">
+                    <span className="text-sm text-[#002333]/70 dark:text-gray-300 mb-1">
                       Amount Due
                     </span>
-                    <span className="text-2xl font-bold text-[#002333]">
+                    <span className="text-2xl font-bold text-[#002333] dark:text-white">
                       ${payment.amount.toFixed(2)}
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm text-[#002333]/70 mb-1">
+                    <span className="text-sm text-[#002333]/70 dark:text-gray-300 mb-1">
                       Due Date
                     </span>
-                    <span className="text-lg font-medium text-[#002333] flex items-center">
+                    <span className="text-lg font-medium text-[#002333] dark:text-white flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-[#15949C]" />
                       {new Date(payment.dueDate).toLocaleDateString("en-US", {
                         year: "numeric",
