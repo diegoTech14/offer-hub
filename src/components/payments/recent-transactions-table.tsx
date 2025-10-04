@@ -75,26 +75,26 @@ export default function RecentTransactionsTable() {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   return (
-    <div className="overflow-x-auto bg-white dark:bg-gray-700 rounded-lg">
+    <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg">
       <table className="w-full">
         <thead>
           <tr className="border-b border-gray-100 dark:border-gray-700">
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-200 font-medium">
               Transaction
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-200 font-medium">
               Date
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-200 font-medium">
               Client
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-200 font-medium">
               Amount
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-200 font-medium">
               Status
             </th>
-            <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-gray-200 font-medium">
               Actions
             </th>
           </tr>
@@ -135,14 +135,14 @@ export default function RecentTransactionsTable() {
                   </div>
                 </div>
               </td>
-              <td className="py-4 px-4 text-[#002333] dark:text-gray-300">
-                {new Date(transaction.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </td>
-              <td className="py-4 px-4 text-[#002333] dark:text-gray-300">{transaction.client}</td>
+               <td className="py-4 px-4 text-[#002333] dark:text-white">
+                 {new Date(transaction.date).toLocaleDateString("en-US", {
+                   year: "numeric",
+                   month: "short",
+                   day: "numeric",
+                 })}
+               </td>
+               <td className="py-4 px-4 text-[#002333] dark:text-white">{transaction.client}</td>
               <td className="py-4 px-4">
                  <span
                    className={`font-medium ${
@@ -169,7 +169,7 @@ export default function RecentTransactionsTable() {
               <td className="py-4 px-4 text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-gray-300">
+                     <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-gray-200">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
