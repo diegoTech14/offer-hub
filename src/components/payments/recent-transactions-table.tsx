@@ -75,26 +75,26 @@ export default function RecentTransactionsTable() {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   return (
-    <div className="overflow-x-auto bg-white dark:bg-gray-700 rounded-lg">
+    <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg">
       <table className="w-full">
         <thead>
           <tr className="border-b border-gray-100 dark:border-gray-700">
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
               Transaction
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
               Date
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
               Client
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
               Amount
             </th>
-            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
               Status
             </th>
-            <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+            <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
               Actions
             </th>
           </tr>
@@ -129,20 +129,20 @@ export default function RecentTransactionsTable() {
                     <p className="font-medium text-[#002333] dark:text-white">
                       {transaction.description}
                     </p>
-                    <p className="text-xs text-[#002333]/70 dark:text-gray-400">
+                    <p className="text-xs text-[#002333]/70 dark:text-gray-300">
                       {transaction.id}
                     </p>
                   </div>
                 </div>
               </td>
-               <td className="py-4 px-4 text-[#002333] dark:text-gray-300">
+               <td className="py-4 px-4 text-[#002333] dark:text-white">
                  {new Date(transaction.date).toLocaleDateString("en-US", {
                    year: "numeric",
                    month: "short",
                    day: "numeric",
                  })}
                </td>
-               <td className="py-4 px-4 text-[#002333] dark:text-gray-300">{transaction.client}</td>
+               <td className="py-4 px-4 text-[#002333] dark:text-white">{transaction.client}</td>
               <td className="py-4 px-4">
                  <span
                    className={`font-medium ${
@@ -169,26 +169,26 @@ export default function RecentTransactionsTable() {
               <td className="py-4 px-4 text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                     <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-gray-300">
+                     <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-white">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="dark:bg-gray-700 dark:border-gray-600">
                     <DropdownMenuLabel className="dark:text-white">Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator className="dark:bg-gray-600" />
-                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
+                    <DropdownMenuItem className="cursor-pointer dark:text-white dark:hover:bg-gray-600">
                       <Eye className="h-4 w-4 mr-2" />
                       View Details
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
+                    <DropdownMenuItem className="cursor-pointer dark:text-white dark:hover:bg-gray-600">
                       <FileText className="h-4 w-4 mr-2" />
                       View Invoice
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
+                    <DropdownMenuItem className="cursor-pointer dark:text-white dark:hover:bg-gray-600">
                       <Download className="h-4 w-4 mr-2" />
                       Download Receipt
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer dark:text-gray-300 dark:hover:bg-gray-600">
+                    <DropdownMenuItem className="cursor-pointer dark:text-white dark:hover:bg-gray-600">
                       <Copy className="h-4 w-4 mr-2" />
                       Copy Transaction ID
                     </DropdownMenuItem>

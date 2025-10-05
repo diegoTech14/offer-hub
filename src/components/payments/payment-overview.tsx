@@ -230,7 +230,7 @@ export default function PaymentOverview() {
                     <p className="font-medium text-[#002333] dark:text-white">
                       Visa ending in 4242
                     </p>
-                    <p className="text-xs text-[#002333]/70 dark:text-gray-400">Expires 12/25</p>
+                    <p className="text-xs text-[#002333]/70 dark:text-gray-300">Expires 12/25</p>
                   </div>
                 </div>
                 <Badge className="bg-[#15949C]/10 dark:bg-gray-600 text-[#15949C] dark:text-white hover:bg-[#15949C]/20 dark:hover:bg-gray-500">
@@ -260,7 +260,7 @@ export default function PaymentOverview() {
                     <p className="font-medium text-[#002333] dark:text-white">
                       Add Payment Method
                     </p>
-                    <p className="text-xs text-[#002333]/70 dark:text-gray-400">
+                    <p className="text-xs text-[#002333]/70 dark:text-gray-300">
                       Connect a new card or account
                     </p>
                   </div>
