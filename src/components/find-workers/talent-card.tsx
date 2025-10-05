@@ -200,7 +200,7 @@ export default function TalentCard({
           </div>
 
           <div className="mt-4 flex gap-2">
-            <Button className="flex-1 bg-[#15949C] hover:bg-[#15949C]/90 text-white" onClick={onViewProfile}>
+            <Button className="flex-1 bg-gray-600 hover:bg-gray-700 text-white" onClick={onViewProfile}>
               View Profile
             </Button>
             <Button variant="outline" size="icon" className="border-gray-600 bg-gray-600 text-white hover:bg-gray-700 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">

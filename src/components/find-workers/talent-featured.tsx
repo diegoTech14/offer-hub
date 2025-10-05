@@ -156,7 +156,7 @@ export default function TalentFeatured({
 
                 <div className="mt-6 flex gap-2">
                   <Button
-                    className="flex-1 bg-[#15949C] hover:bg-[#15949C]/90 text-white"
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
                     onClick={() => openFreelancerDetail(freelancer)}
                   >
                     View Profile
