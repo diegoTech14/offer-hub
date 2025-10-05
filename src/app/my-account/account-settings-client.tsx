@@ -11,7 +11,7 @@ import { NotificationSettings } from "@/components/account-settings/notification
 import { ServiceSettings } from "@/components/account-settings/service-settings";
 import { ConversionRates, Service } from "@/components/account-settings/types";
 import { useProfileApiMock as useProfileApi } from "@/hooks/api-connections/use-profile-api-mock";
-import { useFreelancerServicesApi } from "@/hooks/api-connections/use-freelancer-services-api";
+import { useFreelancerServicesApiMock as useFreelancerServicesApi } from "@/hooks/api-connections/use-freelancer-services-api-mock";
 import { User } from "@/types/user.types";
 
 const fallbackConversionRates: ConversionRates = {
