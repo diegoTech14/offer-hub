@@ -169,13 +169,13 @@ export default function FinancialDashboard({
             value={selectedTimeframe}
             onValueChange={handleTimeframeChange}
           >
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
               <Calendar className="h-4 w-4" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
               {Object.entries(dateRangePresets).map(([key, preset]) => (
-                <SelectItem key={key} value={key}>
+                <SelectItem key={key} value={key} className="dark:text-white dark:hover:bg-gray-600">
                   {preset.label}
                 </SelectItem>
               ))}

@@ -660,15 +660,15 @@ export default function RevenueAnalysis({
                       value={forecastScenario}
                       onValueChange={setForecastScenario}
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[140px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="conservative">
+                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                        <SelectItem value="conservative" className="dark:text-white dark:hover:bg-gray-600">
                           Conservative
                         </SelectItem>
-                        <SelectItem value="optimistic">Optimistic</SelectItem>
-                        <SelectItem value="pessimistic">Pessimistic</SelectItem>
+                        <SelectItem value="optimistic" className="dark:text-white dark:hover:bg-gray-600">Optimistic</SelectItem>
+                        <SelectItem value="pessimistic" className="dark:text-white dark:hover:bg-gray-600">Pessimistic</SelectItem>
                       </SelectContent>
                     </Select>
                   </CardTitle>

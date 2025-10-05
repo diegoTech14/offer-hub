@@ -351,19 +351,19 @@ export default function CustomReports({
                       }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="revenue">Revenue Analysis</SelectItem>
-                      <SelectItem value="expenses">Expense Analysis</SelectItem>
-                      <SelectItem value="profitability">
+                    <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                      <SelectItem value="revenue" className="dark:text-white dark:hover:bg-gray-600">Revenue Analysis</SelectItem>
+                      <SelectItem value="expenses" className="dark:text-white dark:hover:bg-gray-600">Expense Analysis</SelectItem>
+                      <SelectItem value="profitability" className="dark:text-white dark:hover:bg-gray-600">
                         Profitability Analysis
                       </SelectItem>
-                      <SelectItem value="transactions">
+                      <SelectItem value="transactions" className="dark:text-white dark:hover:bg-gray-600">
                         Transaction Analysis
                       </SelectItem>
-                      <SelectItem value="custom">Custom Report</SelectItem>
+                      <SelectItem value="custom" className="dark:text-white dark:hover:bg-gray-600">Custom Report</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -496,14 +496,14 @@ export default function CustomReports({
                         }))
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="quarterly">Quarterly</SelectItem>
+                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                        <SelectItem value="daily" className="dark:text-white dark:hover:bg-gray-600">Daily</SelectItem>
+                        <SelectItem value="weekly" className="dark:text-white dark:hover:bg-gray-600">Weekly</SelectItem>
+                        <SelectItem value="monthly" className="dark:text-white dark:hover:bg-gray-600">Monthly</SelectItem>
+                        <SelectItem value="quarterly" className="dark:text-white dark:hover:bg-gray-600">Quarterly</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -518,13 +518,13 @@ export default function CustomReports({
                         }))
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pdf">PDF</SelectItem>
-                        <SelectItem value="excel">Excel</SelectItem>
-                        <SelectItem value="csv">CSV</SelectItem>
+                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                        <SelectItem value="pdf" className="dark:text-white dark:hover:bg-gray-600">PDF</SelectItem>
+                        <SelectItem value="excel" className="dark:text-white dark:hover:bg-gray-600">Excel</SelectItem>
+                        <SelectItem value="csv" className="dark:text-white dark:hover:bg-gray-600">CSV</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -580,17 +580,17 @@ export default function CustomReports({
               </div>
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="revenue">Revenue</SelectItem>
-                <SelectItem value="expenses">Expenses</SelectItem>
-                <SelectItem value="profitability">Profitability</SelectItem>
-                <SelectItem value="transactions">Transactions</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                <SelectItem value="all" className="dark:text-white dark:hover:bg-gray-600">All Types</SelectItem>
+                <SelectItem value="revenue" className="dark:text-white dark:hover:bg-gray-600">Revenue</SelectItem>
+                <SelectItem value="expenses" className="dark:text-white dark:hover:bg-gray-600">Expenses</SelectItem>
+                <SelectItem value="profitability" className="dark:text-white dark:hover:bg-gray-600">Profitability</SelectItem>
+                <SelectItem value="transactions" className="dark:text-white dark:hover:bg-gray-600">Transactions</SelectItem>
+                <SelectItem value="custom" className="dark:text-white dark:hover:bg-gray-600">Custom</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -742,19 +742,19 @@ export default function CustomReports({
                     }))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="revenue">Revenue Analysis</SelectItem>
-                    <SelectItem value="expenses">Expense Analysis</SelectItem>
-                    <SelectItem value="profitability">
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                    <SelectItem value="revenue" className="dark:text-white dark:hover:bg-gray-600">Revenue Analysis</SelectItem>
+                    <SelectItem value="expenses" className="dark:text-white dark:hover:bg-gray-600">Expense Analysis</SelectItem>
+                    <SelectItem value="profitability" className="dark:text-white dark:hover:bg-gray-600">
                       Profitability Analysis
                     </SelectItem>
-                    <SelectItem value="transactions">
+                    <SelectItem value="transactions" className="dark:text-white dark:hover:bg-gray-600">
                       Transaction Analysis
                     </SelectItem>
-                    <SelectItem value="custom">Custom Report</SelectItem>
+                    <SelectItem value="custom" className="dark:text-white dark:hover:bg-gray-600">Custom Report</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

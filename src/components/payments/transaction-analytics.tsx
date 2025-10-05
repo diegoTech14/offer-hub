@@ -520,17 +520,17 @@ export default function TransactionAnalytics({
                     value={selectedCategory}
                     onValueChange={setSelectedCategory}
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="commission">Commission</SelectItem>
-                      <SelectItem value="subscription">Subscription</SelectItem>
-                      <SelectItem value="infrastructure">
+                    <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                      <SelectItem value="all" className="dark:text-white dark:hover:bg-gray-600">All Categories</SelectItem>
+                      <SelectItem value="commission" className="dark:text-white dark:hover:bg-gray-600">Commission</SelectItem>
+                      <SelectItem value="subscription" className="dark:text-white dark:hover:bg-gray-600">Subscription</SelectItem>
+                      <SelectItem value="infrastructure" className="dark:text-white dark:hover:bg-gray-600">
                         Infrastructure
                       </SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="marketing" className="dark:text-white dark:hover:bg-gray-600">Marketing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -540,14 +540,14 @@ export default function TransactionAnalytics({
                     value={selectedStatus}
                     onValueChange={setSelectedStatus}
                   >
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-[140px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="failed">Failed</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
+                    <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                      <SelectItem value="all" className="dark:text-white dark:hover:bg-gray-600">All Status</SelectItem>
+                      <SelectItem value="completed" className="dark:text-white dark:hover:bg-gray-600">Completed</SelectItem>
+                      <SelectItem value="failed" className="dark:text-white dark:hover:bg-gray-600">Failed</SelectItem>
+                      <SelectItem value="pending" className="dark:text-white dark:hover:bg-gray-600">Pending</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
