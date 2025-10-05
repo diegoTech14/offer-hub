@@ -74,7 +74,7 @@ export default function LocationSearch({
   return (
     <Card className="dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-2 space-y-1">
-        <div>
+        <div className="space-y-3">
           <Label className="text-sm font-medium text-[#002333] dark:text-white flex items-center">
             <MapPin className="h-4 w-4 mr-2 text-[#15949C]" />
             Location
@@ -223,7 +223,7 @@ export default function LocationSearch({
 
         {/* Distance Radius */}
         {currentLocation && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Separator />
             <div>
               <Label className="text-sm font-medium text-[#002333] mb-2 block">
