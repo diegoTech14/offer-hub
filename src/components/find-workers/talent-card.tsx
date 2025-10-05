@@ -144,6 +144,7 @@ export default function TalentCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="p-0 flex flex-col flex-1">
+        {/* Header Section - Fixed Height */}
         <div className="relative h-48 bg-[#DEEFE7]/30 flex items-center justify-center">
           <Avatar className="h-24 w-24">
             <AvatarImage src={freelancer.avatar} alt={freelancer.name} />
@@ -170,36 +171,47 @@ export default function TalentCard({
           </Button>
         </div>
 
-        <div className="p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="font-bold text-lg text-[#002333] dark:text-white">{freelancer.name}</h3>
-              <p className="text-[#002333]/70 dark:text-gray-300 mt-1">{freelancer.title}</p>
+        {/* Content Section - Flexible Height */}
+        <div className="flex-1 flex flex-col p-6">
+          {/* Name and Rate Section - Fixed Height */}
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-lg text-[#002333] dark:text-white truncate">{freelancer.name}</h3>
+              <p className="text-[#002333]/70 dark:text-gray-300 mt-1 text-sm line-clamp-2 h-10 overflow-hidden">{freelancer.title}</p>
             </div>
-            <div className="text-[#002333] dark:text-white font-bold">${freelancer.hourlyRate}/hr</div>
+            <div className="text-[#002333] dark:text-white font-bold ml-2 flex-shrink-0">${freelancer.hourlyRate}/hr</div>
           </div>
 
-          <div className="flex items-center mt-2">
+          {/* Rating Section - Fixed Height */}
+          <div className="flex items-center mb-4">
             <div className="flex mr-2">{renderStars(freelancer.rating)}</div>
             <span className="text-[#002333] dark:text-white font-medium">{freelancer.rating.toFixed(1)}</span>
             <span className="text-[#002333]/70 dark:text-gray-400 ml-1">({freelancer.reviewCount})</span>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-1">
-            {freelancer.skills.slice(0, VALIDATION_LIMITS.MAX_SKILLS_DISPLAY_DETAIL).map((skill: string) => (
-              <Badge key={skill} variant="outline" className="dark:border-gray-600 dark:text-gray-300">
-                {skill}
-              </Badge>
-            ))}
-            {freelancer.skills.length > VALIDATION_LIMITS.MAX_SKILLS_DISPLAY_DETAIL && <Badge variant="outline" className="dark:border-gray-600 dark:text-gray-300">+{freelancer.skills.length - VALIDATION_LIMITS.MAX_SKILLS_DISPLAY_DETAIL} more</Badge>}
+          {/* Skills Section - Fixed Height */}
+          <div className="mb-4 h-20 overflow-hidden">
+            <div className="flex flex-wrap gap-1">
+              {freelancer.skills.slice(0, VALIDATION_LIMITS.MAX_SKILLS_DISPLAY_DETAIL).map((skill: string) => (
+                <Badge key={skill} variant="outline" className="dark:border-gray-600 dark:text-gray-300 text-xs">
+                  {skill}
+                </Badge>
+              ))}
+              {freelancer.skills.length > VALIDATION_LIMITS.MAX_SKILLS_DISPLAY_DETAIL && <Badge variant="outline" className="dark:border-gray-600 dark:text-gray-300 text-xs">+{freelancer.skills.length - VALIDATION_LIMITS.MAX_SKILLS_DISPLAY_DETAIL} more</Badge>}
+            </div>
           </div>
 
-          <div className="mt-4 flex items-center text-sm text-[#002333]/70 dark:text-gray-400">
-            <MapPin className="h-4 w-4 mr-1" />
-            {freelancer.location}
+          {/* Location Section - Fixed Height */}
+          <div className="flex items-center text-sm text-[#002333]/70 dark:text-gray-400 mb-4 h-5">
+            <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+            <span className="truncate">{freelancer.location}</span>
           </div>
 
-          <div className="mt-auto p-4 flex gap-2">
+          {/* Spacer to push buttons to bottom */}
+          <div className="flex-1"></div>
+
+          {/* Buttons Section - Fixed Height */}
+          <div className="flex gap-2 pt-4">
             <Button className="flex-1 bg-[#15949C] hover:bg-[#15949C]/90 text-white" onClick={onViewProfile}>
               View Profile
             </Button>
