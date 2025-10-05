@@ -293,6 +293,10 @@ export default function PostProjectPage() {
     }
   };
 
+  const handleCloseLoading = () => {
+    setIsLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
       <SimpleHeader />
@@ -351,7 +355,7 @@ export default function PostProjectPage() {
                   className="bg-[#15949C] hover:bg-[#15949C]/90 flex items-center disabled:opacity-60"
                 >
                   {isLoading ? "Posting..." : "Post Project"}
-                  {!isLoading ? <Loading/> : <Check className="ml-2 h-4 w-4" />}
+                  {isLoading && <Check className="ml-2 h-4 w-4" />}
                 </Button>
               )}
             </div>
@@ -359,6 +363,8 @@ export default function PostProjectPage() {
         </div>
       </main>
       <SimpleFooter />
+
+      {isLoading && <Loading onClose={handleCloseLoading} />}
     </div>
   );
 }
