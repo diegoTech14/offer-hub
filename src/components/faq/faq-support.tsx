@@ -25,11 +25,11 @@ export function FaqSupport() {
             whileTap={{ scale: 0.95 }}
             className="
               inline-flex items-center justify-center
-              bg-white text-[#159A9C] font-medium
+              bg-white text-gray-600 font-medium
               px-6 py-3 rounded-lg
               shadow-lg
               transition-all duration-300
-              hover:shadow-xl
+              hover:shadow-xl hover:text-gray-800
             "
           >
             Contact Support
