@@ -266,8 +266,8 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
   )
 
   return (
-    <Card className="h-full flex flex-col dark:bg-gray-800 dark:border-gray-700">
-      <CardContent className="p-6 flex flex-col flex-1">
+    <Card className="h-fit dark:bg-gray-800 dark:border-gray-700">
+      <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-[#002333] dark:text-white">Filters</h2>
           <Button variant="ghost" size="sm" onClick={resetFilters} className="h-8 text-[#15949C] dark:text-gray-300 dark:hover:text-white">
@@ -277,14 +277,14 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
         </div>
 
         {/* Add tabs for different filter categories */}
-        <Tabs value={activeFilterTab} onValueChange={setActiveFilterTab} className="mb-4 flex flex-col flex-1">
+        <Tabs value={activeFilterTab} onValueChange={setActiveFilterTab} className="mb-4">
           <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
             <TabsTrigger value="basic" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Basic</TabsTrigger>
             <TabsTrigger value="location" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Location</TabsTrigger>
             <TabsTrigger value="timezone" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Timezone</TabsTrigger>
           </TabsList>
 
-          <ScrollArea className="flex-1">
+          <ScrollArea className="h-[calc(100vh-300px)]">
             <TabsContent value="basic" className="space-y-6 pr-4">
               <div className="space-y-6">
                 {/* Price Range - Keeping original structure */}
