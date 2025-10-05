@@ -164,8 +164,8 @@ export default function PaymentHistory() {
       className="space-y-6"
     >
       <motion.div variants={item}>
-        <Card className="dark:bg-gray-900 dark:border-gray-700 shadow-lg">
-          <CardHeader className="dark:border-gray-700">
+        <Card className="dark:bg-gray-800 dark:border-gray-600 shadow-lg">
+          <CardHeader className="dark:border-gray-600">
             <CardTitle className="dark:text-white text-xl">Payment History</CardTitle>
             <CardDescription className="dark:text-gray-300">
               View and manage all your past transactions
@@ -224,10 +224,10 @@ export default function PaymentHistory() {
               </div>
             </div>
 
-            <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg">
+            <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-lg">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                  <tr className="border-b border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
                     <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Transaction
                     </th>
@@ -256,7 +256,7 @@ export default function PaymentHistory() {
                     <motion.tr
                       key={payment.id}
                       variants={item}
-                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/70 transition-colors duration-200"
+                      className="border-b border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/70 transition-colors duration-200"
                     >
                       <td className="py-4 px-4">
                         <div className="flex items-center">

@@ -174,12 +174,12 @@ export default function PaymentMethods() {
           </TabsList>
 
           <TabsContent value="cards" className="space-y-6 mt-6">
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Your Payment Methods</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="dark:text-white">Your Payment Methods</CardTitle>
+                    <CardDescription className="dark:text-gray-300">
                       Manage your payment options
                     </CardDescription>
                   </div>
@@ -367,7 +367,7 @@ export default function PaymentMethods() {
               </CardContent>
             </Card>
 
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
                 <CardTitle className="dark:text-white">Payment Security</CardTitle>
                 <CardDescription className="dark:text-gray-300">
@@ -411,10 +411,10 @@ export default function PaymentMethods() {
           </TabsContent>
 
           <TabsContent value="history" className="space-y-6 mt-6">
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Payment History</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Payment History</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Recent transactions using your payment methods
                 </CardDescription>
               </CardHeader>
@@ -422,20 +422,20 @@ export default function PaymentMethods() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-100">
-                        <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                      <tr className="border-b border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                        <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                           Transaction ID
                         </th>
-                        <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                        <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                           Date
                         </th>
-                        <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                        <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                           Description
                         </th>
-                        <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                        <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                           Payment Method
                         </th>
-                        <th className="text-right py-3 px-4 text-[#002333]/70 font-medium">
+                        <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                           Amount
                         </th>
                       </tr>
@@ -445,12 +445,12 @@ export default function PaymentMethods() {
                         <motion.tr
                           key={transaction.id}
                           variants={item}
-                          className="border-b border-gray-100 hover:bg-gray-50"
+                          className="border-b border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/70"
                         >
-                          <td className="py-4 px-4 font-medium text-[#002333]">
+                          <td className="py-4 px-4 font-medium text-[#002333] dark:text-white">
                             {transaction.id}
                           </td>
-                          <td className="py-4 px-4 text-[#002333]">
+                          <td className="py-4 px-4 text-[#002333] dark:text-white">
                             {new Date(transaction.date).toLocaleDateString(
                               "en-US",
                               {
@@ -460,13 +460,13 @@ export default function PaymentMethods() {
                               }
                             )}
                           </td>
-                          <td className="py-4 px-4 text-[#002333]">
+                          <td className="py-4 px-4 text-[#002333] dark:text-white">
                             {transaction.description}
                           </td>
-                          <td className="py-4 px-4 text-[#002333]">
+                          <td className="py-4 px-4 text-[#002333] dark:text-white">
                             {transaction.method}
                           </td>
-                          <td className="py-4 px-4 text-right font-medium text-[#002333]">
+                          <td className="py-4 px-4 text-right font-medium text-[#002333] dark:text-white">
                             ${transaction.amount.toFixed(2)}
                           </td>
                         </motion.tr>
@@ -487,8 +487,8 @@ export default function PaymentMethods() {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6 mt-6">
-            <Card className="dark:bg-gray-900 dark:border-gray-700 shadow-lg">
-              <CardHeader className="dark:border-gray-700">
+            <Card className="dark:bg-gray-800 dark:border-gray-600 shadow-lg">
+              <CardHeader className="dark:border-gray-600">
                 <CardTitle className="dark:text-white">Payment Settings</CardTitle>
                 <CardDescription className="dark:text-gray-300">
                   Configure your payment preferences
