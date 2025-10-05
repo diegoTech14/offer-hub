@@ -329,7 +329,7 @@ export default function PostProjectPage() {
                 variant="outline"
                 onClick={handleBack}
                 disabled={currentStep === 1}
-                className="flex items-center"
+                className="flex items-center border-gray-600 bg-gray-600 text-white hover:bg-gray-700 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
