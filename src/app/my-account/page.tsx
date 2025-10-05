@@ -15,8 +15,8 @@ export default function Page() {
 
 
     return (
-        // This page is protected and set to only admin access
-        <ProtectedRoute roles={["admin"]} >
+        // This page is protected and set to user access
+        <ProtectedRoute roles={["user"]} >
             <AccountSettings />
         </ProtectedRoute>
     )
