@@ -166,33 +166,33 @@ export default function FaqContainer() {
       <div className="mt-12">
         <div className="flex items-center gap-3 mb-6">
           {activeCategory === "General Questions" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <HelpCircle size={20} className="text-primary-500" />
+            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+              <HelpCircle size={20} className="text-primary-500 dark:text-teal-400" />
             </div>
           )}
           {activeCategory === "Payments & Billing" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <CreditCard size={20} className="text-primary-500" />
+            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+              <CreditCard size={20} className="text-primary-500 dark:text-teal-400" />
             </div>
           )}
           {activeCategory === "For Clients" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Users size={20} className="text-primary-500" />
+            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+              <Users size={20} className="text-primary-500 dark:text-teal-400" />
             </div>
           )}
           {activeCategory === "For Freelancers" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Briefcase size={20} className="text-primary-500" />
+            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+              <Briefcase size={20} className="text-primary-500 dark:text-teal-400" />
             </div>
           )}
           {activeCategory === "Security & Privacy" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Shield size={20} className="text-primary-500" />
+            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+              <Shield size={20} className="text-primary-500 dark:text-teal-400" />
             </div>
           )}
           {activeCategory === "Technical Support" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Settings size={20} className="text-primary-500" />
+            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+              <Settings size={20} className="text-primary-500 dark:text-teal-400" />
             </div>
           )}
           <h2 className="text-2xl font-bold text-secondary-500 dark:text-white">
