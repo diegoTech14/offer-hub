@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import HeaderNavigation from "@/components/ui/header-navigation";
 import {
   BarChart3,
   DollarSign,
@@ -32,8 +33,11 @@ export default function FinancialDashboardDemo() {
   const [activeDemo, setActiveDemo] = useState("dashboard");
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header Navigation */}
+      <HeaderNavigation />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -49,7 +53,7 @@ export default function FinancialDashboardDemo() {
 
         {/* Feature Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="text-center dark:bg-gray-700 dark:border-gray-600">
+          <Card className="text-center dark:bg-gray-800 dark:border-gray-600">
             <CardHeader>
               <BarChart3 className="h-8 w-8 mx-auto text-blue-600" />
               <CardTitle className="text-lg dark:text-white">Financial Overview</CardTitle>
@@ -62,7 +66,7 @@ export default function FinancialDashboardDemo() {
             </CardContent>
           </Card>
 
-          <Card className="text-center dark:bg-gray-700 dark:border-gray-600">
+          <Card className="text-center dark:bg-gray-800 dark:border-gray-600">
             <CardHeader>
               <Activity className="h-8 w-8 mx-auto text-green-600" />
               <CardTitle className="text-lg dark:text-white">Transaction Analytics</CardTitle>
@@ -75,7 +79,7 @@ export default function FinancialDashboardDemo() {
             </CardContent>
           </Card>
 
-          <Card className="text-center dark:bg-gray-700 dark:border-gray-600">
+          <Card className="text-center dark:bg-gray-800 dark:border-gray-600">
             <CardHeader>
               <TrendingUp className="h-8 w-8 mx-auto text-purple-600" />
               <CardTitle className="text-lg dark:text-white">Revenue Analysis</CardTitle>
@@ -87,7 +91,7 @@ export default function FinancialDashboardDemo() {
             </CardContent>
           </Card>
 
-          <Card className="text-center dark:bg-gray-700 dark:border-gray-600">
+          <Card className="text-center dark:bg-gray-800 dark:border-gray-600">
             <CardHeader>
               <FileText className="h-8 w-8 mx-auto text-orange-600" />
               <CardTitle className="text-lg dark:text-white">Custom Reports</CardTitle>
@@ -101,7 +105,7 @@ export default function FinancialDashboardDemo() {
         </div>
 
         {/* Demo Navigation */}
-        <Card className="mb-8 dark:bg-gray-700 dark:border-gray-600">
+        <Card className="mb-8 dark:bg-gray-800 dark:border-gray-600">
           <CardHeader>
             <CardTitle className="dark:text-white">Interactive Demo</CardTitle>
             <CardDescription className="dark:text-gray-300">
@@ -114,31 +118,31 @@ export default function FinancialDashboardDemo() {
               onValueChange={setActiveDemo}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-4 dark:bg-gray-600">
+              <TabsList className="grid w-full grid-cols-4 dark:bg-gray-700">
                 <TabsTrigger
                   value="dashboard"
-                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-500 dark:data-[state=active]:text-white dark:text-gray-300"
+                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300"
                 >
                   <BarChart3 className="h-4 w-4" />
                   <span>Dashboard</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="transactions"
-                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-500 dark:data-[state=active]:text-white dark:text-gray-300"
+                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300"
                 >
                   <Activity className="h-4 w-4" />
                   <span>Transactions</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="revenue"
-                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-500 dark:data-[state=active]:text-white dark:text-gray-300"
+                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300"
                 >
                   <TrendingUp className="h-4 w-4" />
                   <span>Revenue</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="reports"
-                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-500 dark:data-[state=active]:text-white dark:text-gray-300"
+                  className="flex items-center space-x-2 dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300"
                 >
                   <FileText className="h-4 w-4" />
                   <span>Reports</span>
@@ -147,13 +151,13 @@ export default function FinancialDashboardDemo() {
 
               <div className="mt-8">
                 <TabsContent value="dashboard" className="space-y-6">
-                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-700">
+                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-800">
                     <FinancialDashboard viewMode="desktop" className="p-6" />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="transactions" className="space-y-6">
-                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-700">
+                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-800">
                     <TransactionAnalytics
                       showPatterns={true}
                       showForecasts={true}
@@ -163,7 +167,7 @@ export default function FinancialDashboardDemo() {
                 </TabsContent>
 
                 <TabsContent value="revenue" className="space-y-6">
-                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-700">
+                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-800">
                     <RevenueAnalysis
                       timeframe="30d"
                       showOptimization={true}
@@ -174,7 +178,7 @@ export default function FinancialDashboardDemo() {
                 </TabsContent>
 
                 <TabsContent value="reports" className="space-y-6">
-                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-700">
+                  <div className="border dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-800">
                     <CustomReports
                       className="p-6"
                       onReportCreate={(report) =>
@@ -195,7 +199,7 @@ export default function FinancialDashboardDemo() {
         </Card>
 
         {/* Implementation Details */}
-        <Card className="mb-8 dark:bg-gray-700 dark:border-gray-600">
+        <Card className="mb-8 dark:bg-gray-800 dark:border-gray-600">
           <CardHeader>
             <CardTitle className="dark:text-white">Implementation Features</CardTitle>
             <CardDescription className="dark:text-gray-300">
@@ -292,7 +296,7 @@ export default function FinancialDashboardDemo() {
         </Card>
 
         {/* Technical Stack */}
-        <Card className="mb-8 dark:bg-gray-700 dark:border-gray-600">
+        <Card className="mb-8 dark:bg-gray-800 dark:border-gray-600">
           <CardHeader>
             <CardTitle className="dark:text-white">Technical Implementation</CardTitle>
             <CardDescription className="dark:text-gray-300">

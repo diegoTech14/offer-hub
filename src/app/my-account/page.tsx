@@ -2,6 +2,7 @@
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import AccountSettings from "./account-settings-client"
+import HeaderNavigation from "@/components/ui/header-navigation"
 import { useEffect } from "react"
 
 export default function Page() {
@@ -17,7 +18,10 @@ export default function Page() {
     return (
         // This page is protected and set to user access
         <ProtectedRoute roles={["user"]} >
-            <AccountSettings />
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <HeaderNavigation />
+                <AccountSettings />
+            </div>
         </ProtectedRoute>
     )
 }
