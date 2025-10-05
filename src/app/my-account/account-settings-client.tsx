@@ -10,7 +10,7 @@ import { SecuritySettings } from "@/components/account-settings/security-setting
 import { NotificationSettings } from "@/components/account-settings/notification-settings";
 import { ServiceSettings } from "@/components/account-settings/service-settings";
 import { ConversionRates, Service } from "@/components/account-settings/types";
-import { useProfileApi } from "@/hooks/api-connections/use-profile-api";
+import { useProfileApiMock as useProfileApi } from "@/hooks/api-connections/use-profile-api-mock";
 import { useFreelancerServicesApi } from "@/hooks/api-connections/use-freelancer-services-api";
 import { User } from "@/types/user.types";
 

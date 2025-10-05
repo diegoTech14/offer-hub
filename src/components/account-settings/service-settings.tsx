@@ -156,7 +156,7 @@ export function ServiceSettings({
                   placeholder="Max Price"
                   value={newServiceMaxPrice}
                   onChange={(e) => setNewServiceMaxPrice(e.target.value)}
-                  className="border-gray-200 pl-10"
+                  className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 pl-10"
                   type="number"
                   step="0.001"
                   min="0"
