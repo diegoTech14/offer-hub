@@ -564,7 +564,7 @@ export default function CustomReports({
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-600">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
@@ -599,17 +599,17 @@ export default function CustomReports({
       {/* Reports Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredReports.map((report) => (
-          <Card key={report.id} className="hover:shadow-md transition-shadow">
+          <Card key={report.id} className="hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-600">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-2">
                   {getReportIcon(report.type)}
-                  <CardTitle className="text-lg">{report.name}</CardTitle>
+                  <CardTitle className="text-lg dark:text-white">{report.name}</CardTitle>
                 </div>
                 {getStatusBadge(report)}
               </div>
               {report.description && (
-                <CardDescription className="line-clamp-2">
+                <CardDescription className="line-clamp-2 dark:text-gray-300">
                   {report.description}
                 </CardDescription>
               )}
@@ -617,16 +617,16 @@ export default function CustomReports({
             <CardContent className="space-y-4">
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Type:</span>
-                  <span className="capitalize">{report.type}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Type:</span>
+                  <span className="capitalize dark:text-white">{report.type}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Metrics:</span>
-                  <span>{report.criteria.metrics.length}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Metrics:</span>
+                  <span className="dark:text-white">{report.criteria.metrics.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Created:</span>
-                  <span>
+                  <span className="text-gray-600 dark:text-gray-400">Created:</span>
+                  <span className="dark:text-white">
                     {format(
                       new Date(report.generatedAt || new Date()),
                       "MMM dd"
@@ -635,15 +635,15 @@ export default function CustomReports({
                 </div>
                 {report.schedule && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Schedule:</span>
-                    <span className="capitalize">
+                    <span className="text-gray-600 dark:text-gray-400">Schedule:</span>
+                    <span className="capitalize dark:text-white">
                       {report.schedule.frequency}
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t">
+              <div className="flex items-center justify-between pt-2 border-t dark:border-gray-600">
                 <div className="flex items-center space-x-1">
                   <Button
                     size="sm"
@@ -682,11 +682,11 @@ export default function CustomReports({
       </div>
 
       {filteredReports.length === 0 && (
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardContent className="text-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No reports found</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className="text-lg font-semibold mb-2 dark:text-white">No reports found</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               {searchTerm || filterType !== "all"
                 ? "No reports match your current filters."
                 : "Get started by creating your first custom report."}

@@ -286,68 +286,68 @@ export default function TransactionAnalytics({
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium dark:text-white">
               Total Transactions
             </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <Activity className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatNumber(analytics.totalTransactions)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               {formatCurrency(analytics.totalVolume)} total volume
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+            <CardTitle className="text-sm font-medium dark:text-white">Success Rate</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatPercentage(analytics.successRate)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               {analytics.successfulTransactions} successful,{" "}
               {analytics.failedTransactions} failed
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium dark:text-white">
               Avg Processing Time
             </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <Clock className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {analytics.avgProcessingTime.toFixed(1)}s
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Average transaction processing
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium dark:text-white">
               Processing Fees
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCurrency(analytics.totalFees)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               {formatPercentage(
                 (analytics.totalFees / analytics.totalVolume) * 100
               )}{" "}
@@ -363,20 +363,20 @@ export default function TransactionAnalytics({
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="patterns">Patterns</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="details">Details</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 dark:bg-gray-700">
+          <TabsTrigger value="overview" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Overview</TabsTrigger>
+          <TabsTrigger value="patterns" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Patterns</TabsTrigger>
+          <TabsTrigger value="performance" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Performance</TabsTrigger>
+          <TabsTrigger value="details" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Details</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Success Rate Trend */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Success Rate Trend</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Success Rate Trend</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Transaction success rate over time
                 </CardDescription>
               </CardHeader>
@@ -407,10 +407,10 @@ export default function TransactionAnalytics({
             </Card>
 
             {/* Transaction Volume by Category */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Volume by Category</CardTitle>
-                <CardDescription>Transaction distribution</CardDescription>
+                <CardTitle className="dark:text-white">Volume by Category</CardTitle>
+                <CardDescription className="dark:text-gray-300">Transaction distribution</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -447,13 +447,13 @@ export default function TransactionAnalytics({
 
         <TabsContent value="patterns" className="space-y-4">
           {showPatterns && (
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex items-center space-x-2 dark:text-white">
                   <Target className="h-5 w-5" />
                   <span>Transaction Patterns</span>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="dark:text-gray-300">
                   AI-detected patterns in transaction behavior
                 </CardDescription>
               </CardHeader>
@@ -471,10 +471,10 @@ export default function TransactionAnalytics({
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-600">
             <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
-              <CardDescription>
+              <CardTitle className="dark:text-white">Performance Metrics</CardTitle>
+              <CardDescription className="dark:text-gray-300">
                 Transaction processing performance
               </CardDescription>
             </CardHeader>
@@ -492,10 +492,10 @@ export default function TransactionAnalytics({
 
         <TabsContent value="details" className="space-y-4">
           {/* Filters */}
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-600">
             <CardHeader>
-              <CardTitle>Transaction Details</CardTitle>
-              <CardDescription>
+              <CardTitle className="dark:text-white">Transaction Details</CardTitle>
+              <CardDescription className="dark:text-gray-300">
                 Detailed transaction history and analysis
               </CardDescription>
             </CardHeader>
