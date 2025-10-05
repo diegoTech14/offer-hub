@@ -17,8 +17,7 @@ export default function FreelancersSection() {
             </p>
           </div>
           <Button
-            variant="outline"
-            className="border-[#15949C] text-[#15949C] hover:bg-[#DEEFE7] dark:border-[#15949C] dark:text-[#15949C] dark:hover:bg-gray-800"
+            className="bg-[#15949C] hover:bg-[#15949C]/90 text-white"
           >
             View All
             <ChevronRight className="h-4 w-4 ml-1" />
