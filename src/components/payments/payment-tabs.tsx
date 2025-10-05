@@ -61,7 +61,7 @@ export default function PaymentTabs({
             <TabsTrigger
               key={tab.id}
               value={tab.id}
-              className="relative flex items-center justify-center dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300"
+              className="relative flex items-center justify-center dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-300"
             >
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
