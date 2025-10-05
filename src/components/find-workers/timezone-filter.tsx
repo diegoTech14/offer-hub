@@ -256,7 +256,7 @@ export default function TimezoneFilter({
         <Separator />
 
         {/* Timezone groups */}
-        <ScrollArea className="h-[400px]">
+        <ScrollArea className="h-[500px]">
           <div className="space-y-4">
             {timezoneGroups.map((group) => {
               const visibleTimezones = group.timezones.filter(timezone => {
