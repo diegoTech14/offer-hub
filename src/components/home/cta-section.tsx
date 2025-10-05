@@ -16,14 +16,14 @@ export default function CTASection() {
           <Link href="/post-project">
             <Button
               size="lg"
-              className="bg-white text-[#002333] hover:bg-white/90 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+              className="bg-white text-[#002333] hover:bg-white/90 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               Find Talent
             </Button>
           </Link>
           <Button
             size="lg"
-            className="bg-white text-[#002333] hover:bg-white/90 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+            className="bg-white text-[#002333] hover:bg-white/90 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
           >
             Become a Freelancer
           </Button>
