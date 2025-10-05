@@ -125,7 +125,7 @@ export default function TalentCard({
                 <Button className="bg-[#15949C] hover:bg-[#15949C]/90 text-white" onClick={onViewProfile}>
                   View Profile
                 </Button>
-                <Button variant="outline" className="bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:border-gray-300 dark:hover:bg-gray-200">
+                <Button variant="outline" className="border-gray-600 bg-gray-600 text-white hover:bg-gray-700 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Contact
                 </Button>
@@ -203,7 +203,7 @@ export default function TalentCard({
             <Button className="flex-1 bg-[#15949C] hover:bg-[#15949C]/90 text-white" onClick={onViewProfile}>
               View Profile
             </Button>
-            <Button variant="outline" size="icon" className="bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:border-gray-300 dark:hover:bg-gray-200">
+            <Button variant="outline" size="icon" className="border-gray-600 bg-gray-600 text-white hover:bg-gray-700 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">
               <MessageSquare className="h-4 w-4" />
             </Button>
           </div>
