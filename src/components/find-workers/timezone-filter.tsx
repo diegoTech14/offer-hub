@@ -192,8 +192,8 @@ export default function TimezoneFilter({
   }
 
   return (
-    <Card className="dark:bg-gray-800 dark:border-gray-700 min-h-[400px]">
-      <CardContent className="p-4 space-y-4 flex flex-col h-full">
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
+      <CardContent className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-medium text-[#002333] dark:text-white flex items-center">
             <Clock className="h-4 w-4 mr-2 text-[#15949C]" />
@@ -256,7 +256,7 @@ export default function TimezoneFilter({
         <Separator />
 
         {/* Timezone groups */}
-        <ScrollArea className="flex-1">
+        <ScrollArea className="h-[400px]">
           <div className="space-y-4">
             {timezoneGroups.map((group) => {
               const visibleTimezones = group.timezones.filter(timezone => {
