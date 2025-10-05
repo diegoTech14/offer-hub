@@ -145,7 +145,7 @@ export default function TimezoneFilter({
             <div className="flex items-center gap-2">
               <Label 
                 htmlFor={timezone} 
-                className="cursor-pointer font-medium text-[#002333] truncate"
+                className="cursor-pointer font-medium text-[#002333] dark:text-white truncate"
               >
                 {formatTimezone(timezone)}
               </Label>
@@ -162,9 +162,9 @@ export default function TimezoneFilter({
               )}
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-[#002333]/70">{currentTime}</span>
+              <span className="text-sm text-[#002333]/70 dark:text-gray-300">{currentTime}</span>
               {businessHours && businessHours.overlapHours > 0 && (
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs dark:border-gray-600 dark:text-gray-300">
                   {businessHours.overlapHours}h overlap
                 </Badge>
               )}
