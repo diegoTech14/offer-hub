@@ -269,10 +269,10 @@ export default function PendingPayments() {
                         View Invoice
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="dark:bg-gray-800 dark:border-gray-700">
                       <DialogHeader>
-                        <DialogTitle>Invoice Details</DialogTitle>
-                        <DialogDescription>
+                        <DialogTitle className="dark:text-white">Invoice Details</DialogTitle>
+                        <DialogDescription className="dark:text-gray-300">
                           Invoice for {payment.projectName} with{" "}
                           {payment.client}
                         </DialogDescription>
@@ -280,14 +280,14 @@ export default function PendingPayments() {
                       <div className="space-y-4 py-4">
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="text-sm text-[#002333]/70">
+                            <p className="text-sm text-[#002333]/70 dark:text-gray-400">
                               Invoice ID
                             </p>
-                            <p className="font-medium">{payment.id}</p>
+                            <p className="font-medium dark:text-white">{payment.id}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-[#002333]/70">Date</p>
-                            <p className="font-medium">
+                            <p className="text-sm text-[#002333]/70 dark:text-gray-400">Date</p>
+                            <p className="font-medium dark:text-white">
                               {new Date().toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "long",
@@ -297,44 +297,44 @@ export default function PendingPayments() {
                           </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="dark:bg-gray-700" />
 
                         <div>
-                          <p className="text-sm text-[#002333]/70">Client</p>
+                          <p className="text-sm text-[#002333]/70 dark:text-gray-400">Client</p>
                           <div className="flex items-center mt-1">
                             <User className="h-4 w-4 mr-2 text-[#15949C]" />
-                            <p className="font-medium">{payment.client}</p>
+                            <p className="font-medium dark:text-white">{payment.client}</p>
                           </div>
                         </div>
 
                         <div>
-                          <p className="text-sm text-[#002333]/70">Project</p>
-                          <p className="font-medium">{payment.projectName}</p>
+                          <p className="text-sm text-[#002333]/70 dark:text-gray-400">Project</p>
+                          <p className="font-medium dark:text-white">{payment.projectName}</p>
                         </div>
 
-                        <Separator />
+                        <Separator className="dark:bg-gray-700" />
 
                         <div>
-                          <p className="font-medium mb-2">Milestones</p>
+                          <p className="font-medium mb-2 dark:text-white">Milestones</p>
                           <div className="space-y-2">
                             {payment.milestones.map((milestone, idx) => (
                               <div key={idx} className="flex justify-between">
-                                <span>{milestone.name}</span>
-                                <span>${milestone.amount.toFixed(2)}</span>
+                                <span className="dark:text-gray-300">{milestone.name}</span>
+                                <span className="dark:text-white">${milestone.amount.toFixed(2)}</span>
                               </div>
                             ))}
                           </div>
                         </div>
 
-                        <Separator />
+                        <Separator className="dark:bg-gray-700" />
 
                         <div className="flex justify-between font-bold">
-                          <span>Total</span>
-                          <span>${payment.amount.toFixed(2)}</span>
+                          <span className="dark:text-white">Total</span>
+                          <span className="dark:text-white">${payment.amount.toFixed(2)}</span>
                         </div>
                       </div>
                       <DialogFooter>
-                        <Button variant="outline">Download PDF</Button>
+                        <Button variant="outline" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">Download PDF</Button>
                         <Button className="bg-[#15949C] hover:bg-[#15949C]/90">
                           <CreditCard className="h-4 w-4 mr-2" />
                           Pay Now
