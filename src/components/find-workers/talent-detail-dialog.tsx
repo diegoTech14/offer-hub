@@ -76,8 +76,8 @@ export default function TalentDetailDialog({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-        <div className="flex flex-col h-full">
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 dark:bg-gray-800">
+        <div className="flex flex-col h-full dark:bg-gray-800">
           {/* Header */}
           <div className="relative h-40 bg-gradient-to-r from-[#002333] to-[#15949C]">
             <Button
@@ -102,7 +102,7 @@ export default function TalentDetailDialog({
             </div>
           </div>
 
-          <div className="pt-20 px-6 pb-6">
+          <div className="pt-20 px-6 pb-6 dark:bg-gray-800">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
