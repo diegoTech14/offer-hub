@@ -75,10 +75,10 @@ export default function RecentTransactionsTable() {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   return (
-    <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg">
+    <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-600">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-gray-100 dark:border-gray-700">
+          <tr className="border-b border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
             <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
               Transaction
             </th>
@@ -106,7 +106,7 @@ export default function RecentTransactionsTable() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+              className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/70 transition-colors duration-200"
               onMouseEnter={() => setHoveredRow(transaction.id)}
               onMouseLeave={() => setHoveredRow(null)}
             >
@@ -173,7 +173,7 @@ export default function RecentTransactionsTable() {
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="dark:bg-gray-700 dark:border-gray-600">
+                  <DropdownMenuContent align="end" className="dark:bg-gray-800 dark:border-gray-600 shadow-lg">
                     <DropdownMenuLabel className="dark:text-white">Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator className="dark:bg-gray-600" />
                     <DropdownMenuItem className="cursor-pointer dark:text-white dark:hover:bg-gray-600">
