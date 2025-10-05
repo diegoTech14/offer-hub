@@ -243,12 +243,12 @@ export default function FindWorkersPage() {
                 <Input
                   type="text"
                   placeholder="Search for skills, expertise, or job titles..."
-                  className="pl-10 pr-4 py-6 rounded-full text-[#002333] dark:text-gray-900 text-lg bg-white dark:bg-gray-100"
+                  className="pl-10 pr-4 py-6 rounded-full text-white dark:text-white text-lg bg-gray-600 dark:bg-gray-600 placeholder-gray-300 dark:placeholder-gray-300"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-gray-600 hover:bg-gray-700 px-6">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 h-5 w-5" />
+                <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-[#15949C] hover:bg-[#15949C]/90 px-6">
                   Search
                 </Button>
               </div>
