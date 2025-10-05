@@ -1,5 +1,5 @@
 'use client'
-import { useMessages } from "@/hooks/useMessages";
+import { useMessagesMock as useMessages } from "@/hooks/useMessagesMock";
 import { useState } from "react";
 import { Header } from "@/components/account-settings/header";
 import { Sidebar } from "@/components/account-settings/sidebar";
