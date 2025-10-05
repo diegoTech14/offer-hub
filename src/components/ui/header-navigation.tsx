@@ -38,12 +38,12 @@ export default function HeaderNavigation({
   };
 
   return (
-    <header className={`bg-gray-900 dark:bg-gray-900 border-b border-gray-800 dark:border-gray-700 px-6 py-4 ${className}`}>
+    <header className={`bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 ${className}`}>
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo/Title - Clickable */}
         <button
           onClick={handleLogoClick}
-          className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-50 rounded px-2 py-1"
+          className="text-2xl font-bold text-teal-600 dark:text-teal-400 hover:text-teal-500 dark:hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-50 rounded px-2 py-1"
         >
           {title}
         </button>
@@ -55,7 +55,7 @@ export default function HeaderNavigation({
             <Button
               onClick={handleBackClick}
               variant="outline"
-              className="flex items-center gap-2 bg-gray-800 dark:bg-gray-800 border-gray-700 dark:border-gray-600 text-blue-400 dark:text-blue-400 hover:bg-gray-700 dark:hover:bg-gray-700 hover:text-blue-300 dark:hover:text-blue-300 transition-colors duration-200"
+              className="flex items-center gap-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-300 transition-colors duration-200"
             >
               <ArrowLeft className="h-4 w-4" />
               {backButtonText}
