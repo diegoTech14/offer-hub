@@ -157,7 +157,7 @@ export function useServicesApi(): UseServicesApiReturn {
       params.delete('page');
     }
     
-    if (filters.limit && filters.limit !== 10) {
+    if (filters.limit && filters.limit !== 6) {
       params.set('limit', filters.limit.toString());
     } else {
       params.delete('limit');
@@ -176,7 +176,7 @@ export function useServicesApi(): UseServicesApiReturn {
   const parseURLParams = useCallback((): ServiceFilters => {
     const filters: ServiceFilters = {
       page: 1,
-      limit: 10
+      limit: 6
     };
 
     const keyword = searchParams.get('q');

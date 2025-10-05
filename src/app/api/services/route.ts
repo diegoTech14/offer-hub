@@ -2,17 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { faker } from '@faker-js/faker';
 
 // Mock freelancer data
-const mockFreelancers = Array.from({ length: 50 }, (_, i) => ({
+const mockFreelancers = Array.from({ length: 20 }, (_, i) => ({
   id: `freelancer_${i + 1}`,
   name: faker.person.fullName(),
-  reputation_score: faker.number.int({ min: 20, max: 100 }),
+  reputation_score: faker.number.int({ min: 60, max: 100 }), // Only high-quality freelancers
 }));
 
 // Mock services data
 const generateMockServices = () => {
   const categories = ['development', 'design', 'marketing', 'business', 'data', 'security', 'blockchain'];
   
-  return Array.from({ length: 100 }, (_, i) => ({
+  return Array.from({ length: 30 }, (_, i) => ({
     id: `service_${i + 1}`,
     title: faker.company.catchPhrase(),
     description: faker.lorem.paragraph(),
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     
     // Parse query parameters
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '6');
     const keyword = searchParams.get('keyword');
     const category = searchParams.get('category');
     const minPrice = searchParams.get('min');
