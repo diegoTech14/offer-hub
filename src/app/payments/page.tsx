@@ -18,7 +18,7 @@ import Link from "next/link"
 // Simple Header component defined inline
 function SimpleHeader() {
   return (
-    <header className="border-b border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800">
+    <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
@@ -62,7 +62,7 @@ function SimpleHeader() {
 // Simple Footer component defined inline
 function SimpleFooter() {
   return (
-    <footer className="bg-[#002333] dark:bg-gray-800 text-white py-8">
+    <footer className="bg-[#002333] dark:bg-gray-900 text-white py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -142,11 +142,11 @@ export default function PaymentsPage() {
   const [activeTab, setActiveTab] = useState("overview")
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-800 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
       <SimpleHeader />
 
       <main className="flex-1">
-        <div className="bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-800 dark:to-gray-700 text-white py-10">
+        <div className="bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-900 dark:to-gray-800 text-white py-10">
           <div className="container mx-auto px-4 max-w-7xl">
             <h1 className="text-3xl font-bold mb-2">Payments & Invoicing</h1>
             <p className="opacity-90">Manage your financial transactions, invoices, and payment methods</p>

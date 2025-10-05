@@ -311,7 +311,7 @@ export default function PaymentMethods() {
                     <motion.div
                       key={method.id}
                       variants={item}
-                      className="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 dark:bg-gray-800"
+                      className="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 dark:bg-gray-700"
                     >
                       <div className="flex items-center">
                         {getCardIcon(method.brand)}
