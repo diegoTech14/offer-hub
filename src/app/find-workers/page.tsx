@@ -248,7 +248,7 @@ export default function FindWorkersPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-[#15949C] hover:bg-[#15949C]/90 px-6">
+                <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-gray-600 hover:bg-gray-700 px-6">
                   Search
                 </Button>
               </div>
