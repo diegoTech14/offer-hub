@@ -146,13 +146,13 @@ export default function PaymentOverview() {
               <div className="flex items-end justify-between">
                 <div>
                   <div className="text-2xl font-bold text-[#002333] dark:text-white">24</div>
-                  <p className="text-xs text-blue-600 flex items-center mt-1">
+                  <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center mt-1">
                     <ArrowUpRight className="h-3 w-3 mr-1" />
                     <span>+4 from last {timeframe}</span>
                   </p>
                 </div>
-                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-blue-600" />
+                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-gray-600 flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-blue-600 dark:text-gray-400" />
                 </div>
               </div>
             </CardContent>
@@ -242,7 +242,7 @@ export default function PaymentOverview() {
                 <div className="flex items-center">
                   <div className="h-10 w-10 bg-blue-100 dark:bg-gray-600 rounded flex items-center justify-center mr-3">
                     <svg
-                      className="h-5 w-5 text-blue-600"
+                      className="h-5 w-5 text-blue-600 dark:text-gray-400"
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"

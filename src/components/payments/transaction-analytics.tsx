@@ -272,12 +272,12 @@ export default function TransactionAnalytics({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={refreshData}>
+          <Button variant="outline" size="sm" onClick={refreshData} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <RefreshCw className="h-4 w-4" />
             <span className="ml-2">Refresh</span>
           </Button>
 
-          <Button variant="outline" size="sm" onClick={handleExport}>
+          <Button variant="outline" size="sm" onClick={handleExport} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <Download className="h-4 w-4" />
             <span className="ml-2">Export</span>
           </Button>

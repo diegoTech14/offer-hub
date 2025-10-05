@@ -549,6 +549,7 @@ export default function CustomReports({
               <Button
                 variant="outline"
                 onClick={() => setIsCreateDialogOpen(false)}
+                className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
               >
                 Cancel
               </Button>
@@ -649,6 +650,7 @@ export default function CustomReports({
                     size="sm"
                     variant="outline"
                     onClick={() => handleGenerateReport(report.id)}
+                    className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Play className="h-3 w-3" />
                   </Button>
@@ -656,6 +658,7 @@ export default function CustomReports({
                     size="sm"
                     variant="outline"
                     onClick={() => loadReportForEdit(report)}
+                    className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Edit className="h-3 w-3" />
                   </Button>
@@ -663,15 +666,16 @@ export default function CustomReports({
                     size="sm"
                     variant="outline"
                     onClick={() => handleDeleteReport(report.id)}
+                    className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                     <Eye className="h-3 w-3" />
                   </Button>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                     <Download className="h-3 w-3" />
                   </Button>
                 </div>
@@ -810,6 +814,7 @@ export default function CustomReports({
             <Button
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}
+              className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               Cancel
             </Button>

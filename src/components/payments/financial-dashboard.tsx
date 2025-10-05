@@ -182,7 +182,7 @@ export default function FinancialDashboard({
             </SelectContent>
           </Select>
 
-          <Button variant="outline" size="sm" onClick={refreshData}>
+          <Button variant="outline" size="sm" onClick={refreshData} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <RefreshCw className="h-4 w-4" />
             {!isMobile && <span className="ml-2">Refresh</span>}
           </Button>
@@ -191,6 +191,7 @@ export default function FinancialDashboard({
             variant="outline"
             size="sm"
             onClick={() => handleExport("csv")}
+            className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
           >
             <Download className="h-4 w-4" />
             {!isMobile && <span className="ml-2">Export</span>}
@@ -206,30 +207,31 @@ export default function FinancialDashboard({
               key={alert.id}
               className={cn(
                 "flex items-center justify-between p-3 rounded-lg border",
-                alert.severity === "critical" && "bg-red-50 border-red-200",
+                alert.severity === "critical" && "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800",
                 alert.severity === "warning" &&
-                  "bg-yellow-50 border-yellow-200",
-                alert.severity === "info" && "bg-blue-50 border-blue-200"
+                  "bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800",
+                alert.severity === "info" && "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
               )}
             >
               <div className="flex items-center space-x-3">
                 <AlertTriangle
                   className={cn(
                     "h-5 w-5",
-                    alert.severity === "critical" && "text-red-500",
-                    alert.severity === "warning" && "text-yellow-500",
-                    alert.severity === "info" && "text-blue-500"
+                    alert.severity === "critical" && "text-red-500 dark:text-red-400",
+                    alert.severity === "warning" && "text-yellow-500 dark:text-yellow-400",
+                    alert.severity === "info" && "text-blue-500 dark:text-blue-400"
                   )}
                 />
                 <div>
-                  <p className="font-medium">{alert.title}</p>
-                  <p className="text-sm text-gray-600">{alert.description}</p>
+                  <p className="font-medium dark:text-white">{alert.title}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{alert.description}</p>
                 </div>
               </div>
               {!alert.acknowledged && (
                 <Button
                   size="sm"
                   variant="outline"
+                  className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   onClick={() => acknowledgeAlert(alert.id)}
                 >
                   Acknowledge

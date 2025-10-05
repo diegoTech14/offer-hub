@@ -108,7 +108,7 @@ export default function PendingPayments() {
         );
       case "awaiting_approval":
         return (
-          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">Awaiting Approval</Badge>
+          <Badge className="bg-blue-100 dark:bg-gray-600 text-blue-800 dark:text-white">Awaiting Approval</Badge>
         );
       case "in_progress":
         return (

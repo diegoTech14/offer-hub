@@ -123,8 +123,8 @@ export default function PaymentMethods() {
     switch (brand) {
       case "visa":
         return (
-          <div className="h-10 w-16 bg-blue-100 rounded flex items-center justify-center">
-            <span className="font-semibold text-blue-800">VISA</span>
+          <div className="h-10 w-16 bg-blue-100 dark:bg-gray-600 rounded flex items-center justify-center">
+            <span className="font-semibold text-blue-800 dark:text-white">VISA</span>
           </div>
         );
       case "mastercard":
@@ -135,8 +135,8 @@ export default function PaymentMethods() {
         );
       case "paypal":
         return (
-          <div className="h-10 w-16 bg-blue-100 rounded flex items-center justify-center">
-            <span className="font-semibold text-blue-800">PayPal</span>
+          <div className="h-10 w-16 bg-blue-100 dark:bg-gray-600 rounded flex items-center justify-center">
+            <span className="font-semibold text-blue-800 dark:text-white">PayPal</span>
           </div>
         );
       case "bank":
@@ -240,8 +240,8 @@ export default function PaymentMethods() {
                             className="space-y-4 mt-4"
                           >
                             <div className="text-center p-6">
-                              <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <span className="font-bold text-blue-800">
+                              <div className="h-16 w-16 bg-blue-100 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span className="font-bold text-blue-800 dark:text-white">
                                   PayPal
                                 </span>
                               </div>
@@ -249,7 +249,7 @@ export default function PaymentMethods() {
                                 You'll be redirected to PayPal to connect your
                                 account
                               </p>
-                              <Button className="bg-blue-600 hover:bg-blue-700">
+                              <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-gray-600 dark:hover:bg-gray-500">
                                 Connect with PayPal
                               </Button>
                             </div>

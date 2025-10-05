@@ -304,12 +304,12 @@ export default function RevenueAnalysis({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={refreshData}>
+          <Button variant="outline" size="sm" onClick={refreshData} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <RefreshCw className="h-4 w-4" />
             <span className="ml-2">Refresh</span>
           </Button>
 
-          <Button variant="outline" size="sm" onClick={handleExport}>
+          <Button variant="outline" size="sm" onClick={handleExport} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <Download className="h-4 w-4" />
             <span className="ml-2">Export</span>
           </Button>
@@ -487,7 +487,7 @@ export default function RevenueAnalysis({
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full text-sm font-bold text-blue-600">
+                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-gray-600 rounded-full text-sm font-bold text-blue-600 dark:text-white">
                           {index + 1}
                         </div>
                         <div>
@@ -760,7 +760,7 @@ export default function RevenueAnalysis({
                               <div className="flex items-center space-x-2">
                                 <div className="w-16 bg-gray-200 rounded-full h-2">
                                   <div
-                                    className="bg-blue-500 h-2 rounded-full"
+                                    className="bg-blue-500 dark:bg-gray-500 h-2 rounded-full"
                                     style={{
                                       width: `${forecast.confidence * 100}%`,
                                     }}
@@ -878,7 +878,7 @@ export default function RevenueAnalysis({
                             )}
                           </span>
                         </div>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                           <Zap className="h-4 w-4 mr-1" />
                           Implement
                         </Button>
@@ -887,14 +887,14 @@ export default function RevenueAnalysis({
                   ))}
                 </div>
 
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-gray-600">
                   <div className="flex items-start space-x-3">
-                    <Target className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <Target className="h-5 w-5 text-blue-600 dark:text-gray-400 mt-0.5" />
                     <div>
-                      <h4 className="font-semibold text-blue-900">
+                      <h4 className="font-semibold text-blue-900 dark:text-white">
                         Total Optimization Potential
                       </h4>
-                      <p className="text-sm text-blue-700 mb-2">
+                      <p className="text-sm text-blue-700 dark:text-gray-300 mb-2">
                         Implementing all recommendations could increase revenue
                         by{" "}
                         <span className="font-bold">
