@@ -133,7 +133,7 @@ export default function TimezoneFilter({
     return (
       <div 
         key={timezone} 
-        className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group"
+        className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg group"
       >
         <div className="flex items-center space-x-3 flex-1">
           <Checkbox
@@ -192,10 +192,10 @@ export default function TimezoneFilter({
   }
 
   return (
-    <Card>
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium text-[#002333] flex items-center">
+          <Label className="text-sm font-medium text-[#002333] dark:text-white flex items-center">
             <Clock className="h-4 w-4 mr-2 text-[#15949C]" />
             Timezone Preferences
           </Label>
@@ -270,7 +270,7 @@ export default function TimezoneFilter({
               return (
                 <div key={group.region}>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-[#002333]">{group.region}</h4>
+                    <h4 className="text-sm font-medium text-[#002333] dark:text-white">{group.region}</h4>
                     <Button
                       variant="ghost"
                       size="sm"

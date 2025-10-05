@@ -72,10 +72,10 @@ export default function LocationSearch({
   const radiusOptions = [10, 25, 50, 100, 250, 500]
 
   return (
-    <Card>
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-4 space-y-4">
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-[#002333] flex items-center">
+          <Label className="text-sm font-medium text-[#002333] dark:text-white flex items-center">
             <MapPin className="h-4 w-4 mr-2 text-[#15949C]" />
             Location
           </Label>
