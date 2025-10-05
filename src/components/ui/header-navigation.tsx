@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import OfferHubLogo from "@/components/ui/offer-hub-logo";
 
 interface HeaderNavigationProps {
   title?: string;
@@ -13,8 +12,6 @@ interface HeaderNavigationProps {
   backButtonText?: string;
   onBackClick?: () => void;
   showDarkModeToggle?: boolean;
-  showLogo?: boolean;
-  logoSize?: "sm" | "md" | "lg";
   className?: string;
 }
 
@@ -24,8 +21,6 @@ export default function HeaderNavigation({
   backButtonText = "← Back to Home",
   onBackClick,
   showDarkModeToggle = true,
-  showLogo = true,
-  logoSize = "md",
   className = "",
 }: HeaderNavigationProps) {
   const router = useRouter();
@@ -46,21 +41,12 @@ export default function HeaderNavigation({
     <header className={`bg-gray-900 dark:bg-gray-900 border-b border-gray-800 dark:border-gray-700 px-6 py-4 ${className}`}>
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo/Title - Clickable */}
-        {showLogo ? (
-          <button
-            onClick={handleLogoClick}
-            className="transition-opacity duration-200 hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-50 rounded px-2 py-1"
-          >
-            <OfferHubLogo size={logoSize} showText={true} />
-          </button>
-        ) : (
-          <button
-            onClick={handleLogoClick}
-            className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-50 rounded px-2 py-1"
-          >
-            {title}
-          </button>
-        )}
+        <button
+          onClick={handleLogoClick}
+          className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-opacity-50 rounded px-2 py-1"
+        >
+          {title}
+        </button>
 
         {/* Right side buttons */}
         <div className="flex items-center gap-3">
