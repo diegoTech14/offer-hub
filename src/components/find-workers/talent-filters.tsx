@@ -680,7 +680,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
         </Tabs>
 
         <div className="mt-6 pt-4 border-t dark:border-gray-600">
-          <Button className="w-full bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200">Apply Filters</Button>
+          <Button className="w-full bg-gray-600 text-white hover:bg-gray-700 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">Apply Filters</Button>
         </div>
       </CardContent>
     </Card>
