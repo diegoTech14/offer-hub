@@ -224,29 +224,29 @@ export default function PaymentHistory() {
               </div>
             </div>
 
-            <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-lg">
+            <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+                  <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Transaction
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Date
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Client
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Payment Method
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Amount
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Status
                     </th>
-                    <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-gray-300 font-medium">
+                    <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Actions
                     </th>
                   </tr>
@@ -256,7 +256,7 @@ export default function PaymentHistory() {
                     <motion.tr
                       key={payment.id}
                       variants={item}
-                      className="border-b border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/70 transition-colors duration-200"
                     >
                       <td className="py-4 px-4">
                         <div className="flex items-center">
@@ -274,26 +274,26 @@ export default function PaymentHistory() {
                             )}
                           </div>
                           <div>
-                            <p className="font-medium text-[#002333] dark:text-gray-300">
+                            <p className="font-medium text-[#002333] dark:text-white">
                               {payment.description}
                             </p>
-                            <p className="text-xs text-[#002333]/70 dark:text-gray-400">
+                            <p className="text-xs text-[#002333]/70 dark:text-gray-300">
                               {payment.id}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-[#002333] dark:text-gray-300">
+                      <td className="py-4 px-4 text-[#002333] dark:text-white">
                         {new Date(payment.date).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "short",
                           day: "numeric",
                         })}
                       </td>
-                      <td className="py-4 px-4 text-[#002333] dark:text-gray-300">
+                      <td className="py-4 px-4 text-[#002333] dark:text-white">
                         {payment.client}
                       </td>
-                      <td className="py-4 px-4 text-[#002333] dark:text-gray-300">
+                      <td className="py-4 px-4 text-[#002333] dark:text-white">
                         {payment.paymentMethod}
                       </td>
                       <td className="py-4 px-4">
@@ -325,7 +325,7 @@ export default function PaymentHistory() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 text-[#15949C] dark:text-gray-300 dark:hover:bg-gray-600"
+                          className="h-8 text-[#15949C] dark:text-white dark:hover:bg-gray-700"
                         >
                           <FileText className="h-4 w-4 mr-2" />
                           View
