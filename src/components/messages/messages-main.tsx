@@ -84,15 +84,15 @@ export function MessagesMain({
                 />
                 <AvatarFallback className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-600">
                   {e.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
+                    ?.split(" ")
+                    ?.map((n) => n[0])
+                    ?.join("") || "?"}
                 </AvatarFallback>
               </Avatar>
             ))}
           </div>
           <h2 className="font-medium text-gray-900 dark:text-white">
-            {activeConversation.participants?.map((e) => e.name).join(", ")}
+            {activeConversation.participants?.map((e) => e.name || "Unknown").join(", ")}
           </h2>
         </div>
       </div>
@@ -127,7 +127,7 @@ export function MessagesMain({
                           {message.file_name}
                         </p>
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          {message.file_url?.split(".").pop()?.toUpperCase()} •{" "}
+                          {message.file_url?.split(".").pop()?.toUpperCase() || "FILE"} •{" "}
                           {message.file_size
                             ? `${(message.file_size / (1024 * 1024)).toFixed(
                                 1
