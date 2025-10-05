@@ -73,8 +73,8 @@ export default function LocationSearch({
 
   return (
     <Card className="dark:bg-gray-800 dark:border-gray-700">
-      <CardContent className="p-4 space-y-2">
-        <div className="space-y-1">
+      <CardContent className="p-2 space-y-1">
+        <div>
           <Label className="text-sm font-medium text-[#002333] dark:text-white flex items-center">
             <MapPin className="h-4 w-4 mr-2 text-[#15949C]" />
             Location
