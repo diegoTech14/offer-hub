@@ -29,13 +29,13 @@ export default function HelpHeader() {
         <p className="text-lg mb-6">
           Find answers, resources, and support to make the most of Offer Hub
         </p>
-        <div className="max-w-xl mx-auto flex items-center bg-white dark:bg-gray-100 rounded-md overflow-hidden">
+        <div className="max-w-xl mx-auto flex items-center bg-white dark:bg-gray-800 rounded-md overflow-hidden border border-gray-200 dark:border-gray-600">
           <input
             type="text"
             placeholder="Search for help articles..."
-            className="flex-1 px-4 py-3 text-gray-700 dark:text-gray-900 placeholder-gray-500 dark:placeholder-gray-600 outline-none"
+            className="flex-1 px-4 py-3 text-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none bg-transparent"
           />
-          <button className="bg-teal-700 text-white px-6 py-3 hover:bg-teal-800 transition-colors">
+          <button className="bg-teal-700 dark:bg-gray-600 text-white px-6 py-3 hover:bg-teal-800 dark:hover:bg-gray-500 transition-colors">
             🔍 Search
           </button>
         </div>
