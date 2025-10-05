@@ -487,36 +487,36 @@ export default function PaymentMethods() {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Settings</CardTitle>
-                <CardDescription>
+            <Card className="dark:bg-gray-900 dark:border-gray-700 shadow-lg">
+              <CardHeader className="dark:border-gray-700">
+                <CardTitle className="dark:text-white">Payment Settings</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Configure your payment preferences
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="font-medium text-[#002333]">
+                  <h3 className="font-medium text-[#002333] dark:text-white">
                     Automatic Payments
                   </h3>
-                  <div className="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
+                  <div className="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-600 rounded-lg">
                     <div>
-                      <p className="font-medium text-[#002333]">
+                      <p className="font-medium text-[#002333] dark:text-white">
                         Enable Automatic Payments
                       </p>
-                      <p className="text-sm text-[#002333]/70">
+                      <p className="text-sm text-[#002333]/70 dark:text-gray-400">
                         Automatically process payments for recurring services
                       </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
+                  <div className="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-600 rounded-lg">
                     <div>
-                      <p className="font-medium text-[#002333]">
+                      <p className="font-medium text-[#002333] dark:text-white">
                         Payment Reminders
                       </p>
-                      <p className="text-sm text-[#002333]/70">
+                      <p className="text-sm text-[#002333]/70 dark:text-gray-400">
                         Receive email notifications before payments are
                         processed
                       </p>
@@ -525,31 +525,31 @@ export default function PaymentMethods() {
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="dark:bg-gray-600" />
 
                 <div className="space-y-4">
-                  <h3 className="font-medium text-[#002333]">
+                  <h3 className="font-medium text-[#002333] dark:text-white">
                     Currency & Locale
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="currency" className="text-[#002333]/70">
+                      <Label htmlFor="currency" className="text-[#002333]/70 dark:text-gray-300">
                         Currency
                       </Label>
                       <Select defaultValue="usd">
-                        <SelectTrigger id="currency" className="mt-1">
+                        <SelectTrigger id="currency" className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="usd">USD - US Dollar</SelectItem>
-                          <SelectItem value="eur">EUR - Euro</SelectItem>
-                          <SelectItem value="gbp">
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
+                          <SelectItem value="usd" className="dark:text-white dark:hover:bg-gray-700">USD - US Dollar</SelectItem>
+                          <SelectItem value="eur" className="dark:text-white dark:hover:bg-gray-700">EUR - Euro</SelectItem>
+                          <SelectItem value="gbp" className="dark:text-white dark:hover:bg-gray-700">
                             GBP - British Pound
                           </SelectItem>
-                          <SelectItem value="cad">
+                          <SelectItem value="cad" className="dark:text-white dark:hover:bg-gray-700">
                             CAD - Canadian Dollar
                           </SelectItem>
-                          <SelectItem value="aud">
+                          <SelectItem value="aud" className="dark:text-white dark:hover:bg-gray-700">
                             AUD - Australian Dollar
                           </SelectItem>
                         </SelectContent>
@@ -557,108 +557,108 @@ export default function PaymentMethods() {
                     </div>
 
                     <div>
-                      <Label htmlFor="locale" className="text-[#002333]/70">
+                      <Label htmlFor="locale" className="text-[#002333]/70 dark:text-gray-300">
                         Locale
                       </Label>
                       <Select defaultValue="en-us">
-                        <SelectTrigger id="locale" className="mt-1">
+                        <SelectTrigger id="locale" className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                           <SelectValue placeholder="Select locale" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="en-us">English (US)</SelectItem>
-                          <SelectItem value="en-gb">English (UK)</SelectItem>
-                          <SelectItem value="es">Spanish</SelectItem>
-                          <SelectItem value="fr">French</SelectItem>
-                          <SelectItem value="de">German</SelectItem>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
+                          <SelectItem value="en-us" className="dark:text-white dark:hover:bg-gray-700">English (US)</SelectItem>
+                          <SelectItem value="en-gb" className="dark:text-white dark:hover:bg-gray-700">English (UK)</SelectItem>
+                          <SelectItem value="es" className="dark:text-white dark:hover:bg-gray-700">Spanish</SelectItem>
+                          <SelectItem value="fr" className="dark:text-white dark:hover:bg-gray-700">French</SelectItem>
+                          <SelectItem value="de" className="dark:text-white dark:hover:bg-gray-700">German</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="dark:bg-gray-600" />
 
                 <div className="space-y-4">
-                  <h3 className="font-medium text-[#002333]">
+                  <h3 className="font-medium text-[#002333] dark:text-white">
                     Billing Address
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="name" className="text-[#002333]/70">
+                      <Label htmlFor="name" className="text-[#002333]/70 dark:text-gray-300">
                         Full Name
                       </Label>
                       <Input
                         id="name"
                         defaultValue="John Doe"
-                        className="mt-1"
+                        className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="company" className="text-[#002333]/70">
+                      <Label htmlFor="company" className="text-[#002333]/70 dark:text-gray-300">
                         Company (Optional)
                       </Label>
                       <Input
                         id="company"
                         defaultValue="Acme Inc."
-                        className="mt-1"
+                        className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="address1" className="text-[#002333]/70">
+                      <Label htmlFor="address1" className="text-[#002333]/70 dark:text-gray-300">
                         Address Line 1
                       </Label>
                       <Input
                         id="address1"
                         defaultValue="123 Main St"
-                        className="mt-1"
+                        className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="address2" className="text-[#002333]/70">
+                      <Label htmlFor="address2" className="text-[#002333]/70 dark:text-gray-300">
                         Address Line 2
                       </Label>
                       <Input
                         id="address2"
                         defaultValue="Suite 100"
-                        className="mt-1"
+                        className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="city" className="text-[#002333]/70">
+                      <Label htmlFor="city" className="text-[#002333]/70 dark:text-gray-300">
                         City
                       </Label>
                       <Input
                         id="city"
                         defaultValue="San Francisco"
-                        className="mt-1"
+                        className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="state" className="text-[#002333]/70">
+                      <Label htmlFor="state" className="text-[#002333]/70 dark:text-gray-300">
                         State/Province
                       </Label>
-                      <Input id="state" defaultValue="CA" className="mt-1" />
+                      <Input id="state" defaultValue="CA" className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" />
                     </div>
                     <div>
-                      <Label htmlFor="zip" className="text-[#002333]/70">
+                      <Label htmlFor="zip" className="text-[#002333]/70 dark:text-gray-300">
                         ZIP/Postal Code
                       </Label>
-                      <Input id="zip" defaultValue="94103" className="mt-1" />
+                      <Input id="zip" defaultValue="94103" className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" />
                     </div>
                     <div>
-                      <Label htmlFor="country" className="text-[#002333]/70">
+                      <Label htmlFor="country" className="text-[#002333]/70 dark:text-gray-300">
                         Country
                       </Label>
                       <Select defaultValue="us">
-                        <SelectTrigger id="country" className="mt-1">
+                        <SelectTrigger id="country" className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="us">United States</SelectItem>
-                          <SelectItem value="ca">Canada</SelectItem>
-                          <SelectItem value="uk">United Kingdom</SelectItem>
-                          <SelectItem value="au">Australia</SelectItem>
-                          <SelectItem value="de">Germany</SelectItem>
+                        <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
+                          <SelectItem value="us" className="dark:text-white dark:hover:bg-gray-700">United States</SelectItem>
+                          <SelectItem value="ca" className="dark:text-white dark:hover:bg-gray-700">Canada</SelectItem>
+                          <SelectItem value="uk" className="dark:text-white dark:hover:bg-gray-700">United Kingdom</SelectItem>
+                          <SelectItem value="au" className="dark:text-white dark:hover:bg-gray-700">Australia</SelectItem>
+                          <SelectItem value="de" className="dark:text-white dark:hover:bg-gray-700">Germany</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -666,7 +666,7 @@ export default function PaymentMethods() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-3">
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" className="dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">Cancel</Button>
                 <Button className="bg-[#15949C] hover:bg-[#15949C]/90">
                   Save Changes
                 </Button>
