@@ -284,8 +284,7 @@ export default function PaymentOverview() {
               </CardDescription>
             </div>
             <Button
-              variant="outline"
-              className="border-[#15949C] dark:border-gray-600 text-[#15949C] dark:text-white hover:bg-[#DEEFE7] dark:hover:bg-gray-700 bg-transparent dark:bg-gray-800"
+              className="bg-[#15949C] hover:bg-[#15949C]/90 text-white"
             >
               View All
             </Button>

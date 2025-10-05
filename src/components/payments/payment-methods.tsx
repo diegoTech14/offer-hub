@@ -477,8 +477,7 @@ export default function PaymentMethods() {
               </CardContent>
               <CardFooter className="flex justify-center">
                 <Button
-                  variant="outline"
-                  className="border-[#15949C] text-[#15949C]"
+                  className="bg-[#15949C] hover:bg-[#15949C]/90 text-white"
                 >
                   View All Transactions
                 </Button>
