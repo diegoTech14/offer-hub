@@ -12,15 +12,19 @@ import type { Metadata } from 'next';
 import { Toaster } from 'sonner';
 import { TrustlessWorkProvider } from '@/providers/TrustlessWorkProvider';
 import { WalletProvider } from '@/components/onboarding/WalletContext';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import ErrorBoundary from '@/components/common/error-boundary';
 import { NotificationProvider } from '@/lib/contexts/NotificatonContext';
 import { TalentProvider } from '@/lib/contexts/TalentContext';
 import { OfferProvider } from '@/lib/contexts/OfferContext';
 import { Suspense } from 'react';
 import NotificationToast from '@/components/shared/NotificationToast';
+import LoadingIndicator from '@/components/navigation/loading-indicator';
 import { MessageProvider } from '@/lib/contexts/MessageContext';
 import { KeyboardShortcutsProvider } from '@/components/common/keyboard-shortcuts-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+
+import { ScrollToTop } from '@/components/common/scroll-to-top';
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -57,11 +61,15 @@ export default function RootLayout({
                       <WalletProvider>
                         <EscrowProvider>
                           <KeyboardShortcutsProvider>
+                            {/* LoadingIndicator agregado según rama secundaria */}
+                            <LoadingIndicator />
                             <Suspense fallback={null}>
                               <main>
                                 {children}
                               </main>
                               <NotificationToast />
+                              {/* ScrollToTop agregado según rama secundaria */}
+                              <ScrollToTop />
                             </Suspense>
                             <Toaster position="top-right" />
                           </KeyboardShortcutsProvider>

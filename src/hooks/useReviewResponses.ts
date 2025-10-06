@@ -45,6 +45,7 @@ const apiRequest = async <T>(
 export const useReviewResponses = (reviewId: string): UseReviewResponsesReturn => {
   const [responses, setResponses] = useState<ReviewResponseWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch responses for a review
@@ -68,7 +69,7 @@ export const useReviewResponses = (reviewId: string): UseReviewResponsesReturn =
 
   // Create a new response
   const createResponse = useCallback(async (data: CreateReviewResponseRequest) => {
-    setIsLoading(true);
+    setIsMutating(true);
     setError(null);
     
     try {
@@ -85,13 +86,13 @@ export const useReviewResponses = (reviewId: string): UseReviewResponsesReturn =
       setError(err instanceof Error ? err.message : 'Failed to create response');
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsMutating(false);
     }
   }, [fetchResponses]);
 
   // Update an existing response
   const updateResponse = useCallback(async (responseId: string, data: UpdateReviewResponseRequest) => {
-    setIsLoading(true);
+    setIsMutating(true);
     setError(null);
     
     try {
@@ -112,13 +113,13 @@ export const useReviewResponses = (reviewId: string): UseReviewResponsesReturn =
       setError(err instanceof Error ? err.message : 'Failed to update response');
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsMutating(false);
     }
   }, []);
 
   // Delete a response
   const deleteResponse = useCallback(async (responseId: string) => {
-    setIsLoading(true);
+    setIsMutating(true);
     setError(null);
     
     try {
@@ -132,12 +133,13 @@ export const useReviewResponses = (reviewId: string): UseReviewResponsesReturn =
       setError(err instanceof Error ? err.message : 'Failed to delete response');
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsMutating(false);
     }
   }, []);
 
   // Vote on a response
   const voteOnResponse = useCallback(async (data: VoteResponseRequest) => {
+    setIsMutating(true);
     setError(null);
     
     try {
@@ -164,6 +166,8 @@ export const useReviewResponses = (reviewId: string): UseReviewResponsesReturn =
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to vote on response');
       throw err;
+    } finally {
+      setIsMutating(false);
     }
   }, []);
 
@@ -180,6 +184,7 @@ export const useReviewResponses = (reviewId: string): UseReviewResponsesReturn =
   return {
     responses,
     isLoading,
+    isMutating,
     error,
     createResponse,
     updateResponse,

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpIcon, UsersIcon } from "lucide-react";
+import { ArrowUpIcon, UsersIcon, Shield } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import NavItem from "../components/NavItems";
@@ -23,6 +23,11 @@ const navItems = [
     path: "/platform-monitoring",
     icon: <MdOutlineSavedSearch className="h-5 w-5" />,
     label: "Platform monitoring",
+  },
+  {
+    path: "/content-moderation",
+    icon: <Shield className="h-5 w-5" />,
+    label: "Content Moderation",
   },
   {
     path: "/dispute-resolution",

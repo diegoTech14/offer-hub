@@ -205,13 +205,13 @@ export default function PaymentHistory() {
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" size="icon" className="h-10 w-10 dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">
+                <Button variant="outline" size="icon" className="h-10 w-10 dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                   <Calendar className="h-4 w-4" />
                 </Button>
 
                 <Button
                   variant="outline"
-                  className="hidden md:flex items-center dark:border-gray-600 dark:text-white dark:hover:bg-gray-800"
+                  className="hidden md:flex items-center dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                 >
                   <Filter className="h-4 w-4 mr-2" />
                   More Filters

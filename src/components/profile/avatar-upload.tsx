@@ -210,7 +210,7 @@ export default function AvatarUpload({
                 />
               </div>
               <button
-                className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-lg font-semibold"
+                className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-lg font-semibold disabled:opacity-60"
                 style={{ maxWidth: 350 }}
                 onClick={async () => {
                   if (!croppedAreaPixels || !cropImage) return;
@@ -226,8 +226,16 @@ export default function AvatarUpload({
                   );
                   confirmCrop(croppedFile);
                 }}
+                disabled={uploading}
               >
-                Confirm Crop
+                {uploading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Uploading...
+                  </div>
+                ) : (
+                  'Confirm Crop'
+                )}
               </button>
             </div>
           </div>

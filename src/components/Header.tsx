@@ -6,6 +6,7 @@
 "use client"
 
 import Link from "next/link"
+import "@/styles/colors.css"
 import { useRouter } from "next/navigation"
 import { Menu } from "lucide-react"
 
@@ -39,16 +40,16 @@ export default function Header({ onMenuClick, showMenuButton = false }: HeaderPr
   }
 
   return (
-    <header className="bg-white border-b sticky top-0 z-10">
+    <header className="bg-[var(--color-background)] border-b border-[var(--color-border)] sticky top-0 z-10">
       <div className="flex items-center justify-between px-6 py-3">
         {/* Logo and menu button */}
         <div className="flex items-center gap-4">
           {showMenuButton && (
-            <button onClick={onMenuClick} className="md:hidden p-2 rounded-md text-gray-700">
+            <button onClick={onMenuClick} className="md:hidden p-2 rounded-md text-[var(--color-text-secondary)]">
               <Menu size={24} />
             </button>
           )}
-          <Link href="/" className="flex items-center gap-2 font-semibold text-xl">
+          <Link href="/" className="flex items-center gap-2 font-semibold text-xl text-[var(--color-text-primary)]">
             <img src="/logo.svg" alt="Offer Hub Logo" className="w-10 h-10" />
             <span>Offer Hub</span>
           </Link>
@@ -59,7 +60,7 @@ export default function Header({ onMenuClick, showMenuButton = false }: HeaderPr
           {/* User dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 hover:bg-gray-100 p-1 rounded-lg">
+              <button className="flex items-center gap-2 hover:bg-[var(--color-background-hover)] p-1 rounded-lg">
                 <Avatar className="w-8 h-8">
                   <AvatarImage src="/verificationImage.svg" alt="User" />
                 </Avatar>
@@ -73,7 +74,7 @@ export default function Header({ onMenuClick, showMenuButton = false }: HeaderPr
               </DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
+              <DropdownMenuItem onClick={handleLogout} className="text-[var(--color-destructive)] cursor-pointer">
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

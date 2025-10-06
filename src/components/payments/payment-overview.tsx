@@ -76,7 +76,7 @@ export default function PaymentOverview() {
               <SelectItem value="year" className="dark:text-white dark:hover:bg-gray-600">Last 12 months</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="icon" className="h-10 w-10 dark:border-gray-600 dark:text-gray-300">
+          <Button variant="outline" size="icon" className="h-10 w-10 dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <Calendar className="h-4 w-4" />
           </Button>
         </div>

@@ -317,7 +317,7 @@ export class SearchCache {
 
 export class SearchDebouncer {
   private timeouts = new Map<string, NodeJS.Timeout>()
-  private promises = new Map<string, { resolve: (value: any) => void; reject: (reason?: any) => void }>()
+  private promises = new Map<string, { resolve: (value: unknown) => void; reject: (reason?: unknown) => void }>()
 
   debounce<T>(key: string, fn: () => Promise<T>, delay: number): Promise<T> {
     const existingTimeout = this.timeouts.get(key)
@@ -432,7 +432,7 @@ export class ResultsOptimizer {
 
 
 export class BackgroundTaskManager {
-  private tasks = new Map<string, { promise: Promise<any>; controller: AbortController }>()
+  private tasks = new Map<string, { promise: Promise<unknown>; controller: AbortController }>()
 
 
   async executeBackground<T>(taskId: string, task: (signal: AbortSignal) => Promise<T>): Promise<T> {
@@ -466,7 +466,7 @@ export class BackgroundTaskManager {
 
 
   cancelAllTasks(): void {
-    for (const [taskId, task] of this.tasks.entries()) {
+    for (const [, task] of this.tasks.entries()) {
       task.controller.abort()
     }
     this.tasks.clear()

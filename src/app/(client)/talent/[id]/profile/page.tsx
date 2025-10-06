@@ -7,6 +7,7 @@ import { Star } from "lucide-react";
 import { useTalentData } from "@/hooks/talent/useTalentData";
 import type { TalentProfile } from "@/lib/mockData/talent-mock-data";
 import TalentLayout from "@/components/talent/talents/TalentLayout";
+import "@/styles/print.css";
 import TalentCard from "@/components/talent/TalentCard";
 import PortfolioCarousel from "@/components/talent/talents/Portfolio";
 import ReviewsCarousel from "@/components/talent/talents/Review";
@@ -136,7 +137,18 @@ const TalentProfilePage = () => {
           <div className="flex-1 text-center">
             <h1 className="text-base font-bold text-gray-900">Profile</h1>
           </div>
-          <div className="w-16" /> {/* Spacer for centering */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="print-btn no-print inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50"
+              onClick={() => {
+                if (typeof window !== "undefined" && window.print) window.print();
+              }}
+            >
+              Print
+            </button>
+            <div className="w-16" /> {/* Spacer for centering */}
+          </div>
         </div>
       </div>
 

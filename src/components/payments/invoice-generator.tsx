@@ -267,7 +267,7 @@ export default function InvoiceGenerator() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 border-[#15949C] text-[#15949C] dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+                      className="h-8 border-[#15949C] text-[#15949C] dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                       onClick={handleAddItem}
                     >
                       <Plus className="h-4 w-4 mr-1" />
@@ -397,14 +397,14 @@ export default function InvoiceGenerator() {
                 <div className="flex justify-end gap-3">
                   <Button
                     variant="outline"
-                    className="border-[#15949C] text-[#15949C] dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+                    className="border-[#15949C] text-[#15949C] dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Save as Draft
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-[#15949C] text-[#15949C] dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+                    className="border-[#15949C] text-[#15949C] dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Download PDF

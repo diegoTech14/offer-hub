@@ -9,6 +9,7 @@ import PendingPayments from "@/components/payments/pending-payments"
 import InvoiceGenerator from "@/components/payments/invoice-generator"
 import TaxDocuments from "@/components/payments/tax-documents"
 import PaymentMethods from "@/components/payments/payment-methods"
+import EscrowManager from "@/components/payments/escrow-manager"
 import { User, Bell, Menu, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
@@ -179,6 +180,10 @@ export default function PaymentsPage() {
 
             <TabsContent value="methods" className="mt-0">
               <PaymentMethods />
+            </TabsContent>
+
+            <TabsContent value="escrow" className="mt-0">
+              <EscrowManager />
             </TabsContent>
           </Tabs>
         </div>

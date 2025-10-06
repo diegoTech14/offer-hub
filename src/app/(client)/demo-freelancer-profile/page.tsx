@@ -10,7 +10,7 @@ import Link from "next/link";
 import TalentLayout from "@/components/talent/TalentLayout";
 
 export default function DemoFreelancerProfilePage() {
-  const [selectedFreelancer, setSelectedFreelancer] = useState<string | null>(null);
+  // Removed unused state
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -88,8 +88,6 @@ export default function DemoFreelancerProfilePage() {
             </Card>
           ))}
         </div>
-
-       
       </div>
     </TalentLayout>
   );

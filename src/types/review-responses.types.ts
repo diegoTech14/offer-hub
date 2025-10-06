@@ -249,6 +249,7 @@ export interface ResponsePagination {
 export interface UseReviewResponsesReturn {
   responses: ReviewResponseWithDetails[];
   isLoading: boolean;
+  isMutating?: boolean;
   error: string | null;
   createResponse: (data: CreateReviewResponseRequest) => Promise<void>;
   updateResponse: (responseId: string, data: UpdateReviewResponseRequest) => Promise<void>;

@@ -109,7 +109,11 @@ const WalletConnectPage: React.FC = () => {
               {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
             </p>
             <button
-              onClick={() => window.history.back()}
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.history.back();
+                }
+              }}
               className="bg-[#15949C] text-white px-6 py-3 rounded-full font-medium hover:bg-[#15949C]/90 transition-colors"
             >
               Continue

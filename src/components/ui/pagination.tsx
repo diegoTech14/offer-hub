@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 
@@ -79,4 +81,85 @@ export {
   PaginationNext,
   PaginationPrevious,
 }
+
+// ---------- Composite (Hook-driven) Pagination Controls ----------
+// This higher-level component is optional convenience for dynamic pagination using handlers.
+// It does not rely on anchor navigation; instead it triggers callbacks.
+
+import { Button } from "@/components/ui/button"
+import type { PaginationPageElement } from "@/hooks/use-pagination"
+
+export interface StandardPaginationControlsProps {
+  page: number
+  range: PaginationPageElement[]
+  canPrev: boolean
+  canNext: boolean
+  onPageChange: (page: number) => void
+  onPrev: () => void
+  onNext: () => void
+  className?: string
+}
+
+export const StandardPaginationControls: React.FC<StandardPaginationControlsProps> = ({
+  page,
+  range,
+  canPrev,
+  canNext,
+  onPageChange,
+  onPrev,
+  onNext,
+  className,
+}) => {
+  if (!range || range.length <= 1) return null
+
+  return (
+    <Pagination className={className}>
+      <PaginationContent>
+        <PaginationItem>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={onPrev}
+            disabled={!canPrev}
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </PaginationItem>
+        {range.map((el, idx) => (
+          <PaginationItem key={`${el}-${idx}`}>
+            {el === "ellipsis" ? (
+              <PaginationEllipsis />
+            ) : (
+              <Button
+                variant={page === el ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                aria-current={page === el ? "page" : undefined}
+                onClick={() => onPageChange(el as number)}
+              >
+                {el}
+              </Button>
+            )}
+          </PaginationItem>
+        ))}
+        <PaginationItem>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={onNext}
+            disabled={!canNext}
+            aria-label="Next page"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  )
+}
+StandardPaginationControls.displayName = "StandardPaginationControls"
+
 

@@ -1,0 +1,83 @@
+/* Accessible focus styles for keyboard navigation
+   - Uses :focus-visible so mouse focus isn't noisy
+   - Provides a utility class `.focus-ring` for explicit application
+   - Uses CSS variables with sensible fallbacks; uses !important to ensure visibility
+*/
+:root {
+  --oh-focus-width: 3px;
+  --oh-focus-offset: 3px;
+  --oh-focus-shadow-alpha: 0.12;
+  /* Primary focus color (teal) - will be used in place of global.css --ring */
+  --oh-focus-color: #15949C;
+  --oh-focus-color-rgb: 21 148 156;
+  /* used with theme color */
+}
+
+/* Keep default focus but changes outline to non on focus-visible */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Fallback focus style uses the global --ring token */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: var(--oh-focus-width) solid var(--oh-focus-color, hsl(var(--ring))) !important;
+  /*
+    outline: var(--oh-focus-width) solid var(--oh-focus-color, hsl(var(--ring))) !important; 
+  */
+  outline-offset: var(--oh-focus-offset) !important;
+  box-shadow: 0 0 0 6px rgb(var(--oh-focus-color-rgb) / var(--oh-focus-shadow-alpha, 0.12)) !important;
+}
+
+/* Variant-aware button focus rules: prefer button color tokens when available */
+button[data-variant="default"]:focus-visible,
+.btn-smooth[data-variant="default"]:focus-visible {
+  /* Use the explicit primary focus color to match button primary */
+  outline: var(--oh-focus-width) solid var(--oh-focus-color, hsl(var(--primary))) !important;
+  outline-offset: var(--oh-focus-offset) !important;
+  box-shadow: 0 0 0 6px rgb(var(--oh-focus-color-rgb) / var(--oh-focus-shadow-alpha, 0.12)) !important;
+}
+
+button[data-variant="destructive"]:focus-visible,
+.btn-smooth[data-variant="destructive"]:focus-visible {
+  outline: var(--oh-focus-width) solid hsl(var(--destructive)) !important;
+  outline-offset: var(--oh-focus-offset) !important;
+  box-shadow: 0 0 0 6px hsl(var(--destructive) / var(--oh-focus-shadow-alpha, 0.12)) !important;
+}
+
+button[data-variant="secondary"]:focus-visible,
+.btn-smooth[data-variant="secondary"]:focus-visible {
+  outline: var(--oh-focus-width) solid hsl(var(--secondary)) !important;
+  outline-offset: var(--oh-focus-offset) !important;
+  box-shadow: 0 0 0 6px hsl(var(--secondary) / var(--oh-focus-shadow-alpha, 0.12)) !important;
+}
+
+/* Outline/ghost/link variants use the ring token to avoid clashing */
+button[data-variant="outline"]:focus-visible,
+button[data-variant="ghost"]:focus-visible,
+button[data-variant="link"]:focus-visible,
+.btn-smooth[data-variant="outline"]:focus-visible,
+.btn-smooth[data-variant="ghost"]:focus-visible,
+.btn-smooth[data-variant="link"]:focus-visible {
+  outline: var(--oh-focus-width) solid var(--oh-focus-color, hsl(var(--ring))) !important;
+  outline-offset: var(--oh-focus-offset) !important;
+  box-shadow: 0 0 0 6px rgb(var(--oh-focus-color-rgb) / var(--oh-focus-shadow-alpha, 0.12)) !important;
+}
+
+/* Utility class to opt-in on elements that need the ring explicitly */
+.focus-ring:focus-visible {
+  outline: var(--oh-focus-width) solid var(--oh-focus-color, hsl(var(--ring))) !important;
+  outline-offset: var(--oh-focus-offset) !important;
+  box-shadow: 0 0 0 6px rgb(var(--oh-focus-color-rgb) / var(--oh-focus-shadow-alpha, 0.12)) !important;
+}
+
+/* Slightly smaller ring for compact controls */
+.focus-ring--sm:focus-visible {
+  outline: 2px solid var(--oh-focus-color, hsl(var(--ring))) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgb(var(--oh-focus-color-rgb) / var(--oh-focus-shadow-alpha, 0.12)) !important;
+}

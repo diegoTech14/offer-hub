@@ -1,0 +1,56 @@
+/* Print-friendly layout and visibility rules */
+@media print {
+  /* reset basic colors */
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Hide site chrome and interactive UI */
+  header, nav, footer, .sidebar, .site-header, .site-footer,
+  .no-print, .actions, .controls, button, .interactive, .map, .chat,
+  a[href^="javascript:"] {
+    display: none !important;
+  }
+
+  /* Make main content fill page */
+  main, .printable, .content, .project-details, .profile-view {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Images and media scale to container */
+  img, svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Show link destinations inline for external (absolute) links only */
+  /* Matches http and https links; excludes anchors and relative/internal paths */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.9em;
+    color: #000;
+    text-decoration: none;
+  }
+
+  /* Avoid cutting elements awkwardly */
+  table { page-break-inside: auto; }
+  tr    { page-break-inside: avoid; page-break-after: auto; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+
+  /* Prefer page breaks for long sections */
+  .page-break { page-break-after: always; }
+}
+
+/* Ensure the print button stays visible on screen (but hidden when printing) */
+.print-btn {
+  margin-left: 0.5rem;
+}
+.no-print {
+  display: inline-block;
+}

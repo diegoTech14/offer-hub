@@ -50,6 +50,8 @@ export default function ReviewResponseInterface({
     voteOnResponse,
   } = useReviewResponses(reviewId);
 
+  const isBusy = isMutating ?? isLoading;
+
   const { guidelines } = useResponseGuidelines();
 
   // Check if current user can respond to this review
@@ -191,12 +193,14 @@ export default function ReviewResponseInterface({
                   variant="outline"
                   size="sm"
                   onClick={() => setShowGuidelines(true)}
+                  disabled={isBusy}
                 >
                   Guidelines
                 </Button>
                 <Button
                   onClick={() => setShowCreateForm(true)}
                   className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isBusy}
                 >
                   Write Response
                 </Button>
@@ -213,6 +217,7 @@ export default function ReviewResponseInterface({
           onSubmit={handleCreateResponse}
           onCancel={() => setShowCreateForm(false)}
           guidelines={guidelines}
+          isLoading={isBusy}
         />
       )}
 
@@ -258,6 +263,7 @@ export default function ReviewResponseInterface({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setEditingResponse(response)}
+                                disabled={isBusy}
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -267,6 +273,7 @@ export default function ReviewResponseInterface({
                                 onClick={() =>
                                   handleDeleteResponse(response.id)
                                 }
+                                disabled={isBusy}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -311,6 +318,7 @@ export default function ReviewResponseInterface({
                           size="sm"
                           onClick={() => handleVote(response.id, "helpful")}
                           className="flex items-center gap-1"
+                          disabled={isBusy}
                         >
                           <ThumbsUp className="w-4 h-4" />
                           Helpful
@@ -320,6 +328,7 @@ export default function ReviewResponseInterface({
                           size="sm"
                           onClick={() => handleVote(response.id, "unhelpful")}
                           className="flex items-center gap-1"
+                          disabled={isBusy}
                         >
                           <ThumbsDown className="w-4 h-4" />
                           Not Helpful

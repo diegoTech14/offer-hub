@@ -167,10 +167,10 @@ export default function PaymentMethods() {
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="cards">Payment Methods</TabsTrigger>
-            <TabsTrigger value="history">Payment History</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 dark:bg-gray-800">
+            <TabsTrigger value="cards" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-300">Payment Methods</TabsTrigger>
+            <TabsTrigger value="history" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-300">Payment History</TabsTrigger>
+            <TabsTrigger value="settings" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-300">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="cards" className="space-y-6 mt-6">
@@ -665,7 +665,7 @@ export default function PaymentMethods() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-3">
-                <Button variant="outline" className="dark:border-gray-600 dark:text-white dark:hover:bg-gray-700">Cancel</Button>
+                <Button variant="outline" className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">Cancel</Button>
                 <Button className="bg-[#15949C] hover:bg-[#15949C]/90">
                   Save Changes
                 </Button>

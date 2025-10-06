@@ -52,7 +52,7 @@ cd offer-hub
 4️⃣ Install frontend dependencies:
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 5️⃣ Run the development server:

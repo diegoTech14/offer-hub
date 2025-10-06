@@ -20,7 +20,18 @@ export function MessagesSidebar({ conversations, activeConversationId, onConvers
       </div>
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="p-4 text-gray-600 dark:text-gray-300">Loading conversations...</div>
+          <div className="p-4">
+            {/* Skeleton list while loading conversations */}
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 p-4 animate-pulse">
+                <div className="h-12 w-12 rounded-full bg-gray-200" />
+                <div className="flex-1">
+                  <div className="h-4 w-3/4 bg-gray-200 rounded mb-2" />
+                  <div className="h-3 w-1/2 bg-gray-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : error ? (
           <div className="p-4 text-red-500 dark:text-red-400">{error}</div>
         ) : conversations.length === 0 ? (

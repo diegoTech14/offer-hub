@@ -263,7 +263,7 @@ export default function PendingPayments() {
                     <DialogTrigger asChild>
                       <Button
                         variant="outline"
-                        className="border-[#15949C] text-[#15949C] dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+                        className="border-[#15949C] text-[#15949C] dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                       >
                         <FileText className="h-4 w-4 mr-2" />
                         View Invoice

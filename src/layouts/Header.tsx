@@ -8,7 +8,7 @@ export default function Header() {
           <div className="text-base font-bold text-gray-900 flex items-center">
             <div className="w-7 h-7  rounded-full mr-2 flex items-center justify-center overflow-hidden">
               <Image
-                src="/oh-logo.png"
+                src="/offer_hub_logo.png"
                 alt="OH Logo"
                 width={28}
                 height={28}

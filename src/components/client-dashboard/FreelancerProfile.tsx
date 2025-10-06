@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
+import ProgressiveImage from "@/components/ui/progressive-image";
 import StarRating from "@/components/ui/star-rating";
 import { useReviewsApi } from "@/hooks/api-connections/use-reviews-api";
 
@@ -148,7 +149,7 @@ export default function FreelancerProfile() {
               key={item.id}
               className="bg-white border rounded-lg overflow-hidden shadow-sm"
             >
-              <Image
+              <ProgressiveImage
                 src={item.image}
                 alt={item.title}
                 width={400}

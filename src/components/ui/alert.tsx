@@ -1,13 +1,26 @@
 "use client";
 
 import React from "react";
-import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from "lucide-react";
-import { AlertProps, AlertVariant } from "@/types/alert-types";
+import { X, CheckCircle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Componente Alert básico reutilizable
+export type AlertVariant = "success" | "error";
+export type AlertSize = "sm" | "md" | "lg";
+
+export interface AlertProps {
+  variant?: AlertVariant;
+  size?: AlertSize;
+  title?: string;
+  message?: string;
+  dismissible?: boolean;
+  onDismiss?: () => void;
+  className?: string;
+  icon?: React.ReactNode;
+  children?: React.ReactNode;
+}
+
 export function Alert({
-  variant = "default",
+  variant = "success",
   size = "md",
   title,
   message,
@@ -16,25 +29,21 @@ export function Alert({
   className,
   icon,
   children,
-}: AlertProps & { children?: React.ReactNode }) {
+}: AlertProps) {
+  // Variant styles
   const getVariantStyles = (variant: AlertVariant) => {
     switch (variant) {
       case "success":
-        return "bg-green-50 border-green-200 text-green-800";
+        return "bg-green-50 border border-green-200 text-green-800";
       case "error":
-        return "bg-red-50 border-red-200 text-red-800";
-      case "warning":
-        return "bg-yellow-50 border-yellow-200 text-yellow-800";
-      case "info":
-        return "bg-blue-50 border-blue-200 text-blue-800";
-      case "destructive":
-        return "bg-red-50 border-red-200 text-red-800";
+        return "bg-red-50 border border-red-200 text-red-800";
       default:
-        return "bg-gray-50 border-gray-200 text-gray-800";
+        return "bg-green-50 border border-green-200 text-green-800";
     }
   };
 
-  const getSizeStyles = (size: string) => {
+  // Size styles
+  const getSizeStyles = (size: AlertSize) => {
     switch (size) {
       case "sm":
         return "p-3 text-sm";
@@ -45,6 +54,7 @@ export function Alert({
     }
   };
 
+  // Icon for each variant
   const getIcon = (variant: AlertVariant) => {
     if (icon) return icon;
     
@@ -53,38 +63,44 @@ export function Alert({
         return <CheckCircle className="w-5 h-5 text-green-600" />;
       case "error":
         return <AlertCircle className="w-5 h-5 text-red-600" />;
-      case "warning":
-        return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
-      case "info":
-        return <Info className="w-5 h-5 text-blue-600" />;
-      case "destructive":
-        return <AlertCircle className="w-5 h-5 text-red-600" />;
       default:
-        return <Info className="w-5 h-5 text-gray-600" />;
+        return <CheckCircle className="w-5 h-5 text-green-600" />;
     }
   };
 
   return (
     <div
+      role="alert"
       className={cn(
-        "border rounded-lg flex items-start gap-3",
+        "rounded-lg flex items-start gap-3",
         getVariantStyles(variant),
         getSizeStyles(size),
         className
       )}
     >
-      {getIcon(variant)}
+      <div className="flex-shrink-0 mt-0.5">
+        {getIcon(variant)}
+      </div>
+      
       <div className="flex-1">
         {title && (
-          <h4 className="font-semibold mb-1">{title}</h4>
+          <h4 className="font-semibold mb-1">
+            {title}
+          </h4>
         )}
-        {message && <p className="text-sm">{message}</p>}
+        {message && (
+          <p className="text-sm">
+            {message}
+          </p>
+        )}
         {children}
       </div>
+      
       {dismissible && (
         <button
           onClick={onDismiss}
-          className="ml-auto hover:opacity-70 transition-opacity"
+          className="flex-shrink-0 hover:opacity-70 transition-opacity focus:outline-none"
+          aria-label="Dismiss alert"
         >
           <X className="w-4 h-4" />
         </button>
@@ -93,7 +109,7 @@ export function Alert({
   );
 }
 
-// Componente AlertTitle para compatibilidad
+// Export AlertTitle and AlertDescription components for compatibility
 export function AlertTitle({ 
   children, 
   className 
@@ -108,7 +124,6 @@ export function AlertTitle({
   );
 }
 
-// Componente AlertDescription para compatibilidad
 export function AlertDescription({ 
   children, 
   className 
