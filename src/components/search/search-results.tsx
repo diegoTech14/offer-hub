@@ -5,51 +5,38 @@ import SearchLoading from "./search-loading"
 import SearchHighlight from "../common/search-highlight"
 
 interface SearchResultsProps {
-  children: React.ReactNode
+  results: { id: string; title: string; description?: string }[]
+  searchQuery: string
   showLoading?: boolean
   highlightSearch?: boolean
   searchText?: string
 }
 
-/**
- * Search results wrapper with optional highlighting capability
- */
+
+
 export default function SearchResults({ 
-  children, 
+  results,
   showLoading = true,
-  highlightSearch = false,
-  searchText
+  searchQuery = "", // ✅ This line is what you asked about
 }: SearchResultsProps) {
-  const { isLoading, searchQuery } = useSearch()
+  const { isLoading } = useSearch() // ✅ Don't extract searchQuery from the hook anymore
+
+
 
   if (isLoading && showLoading) {
     return <SearchLoading />
   }
 
-  // If highlighting is enabled, wrap children with search context
-  if (highlightSearch && searchQuery) {
-    return (
-      <div className="search-results-container">
-        {children}
-      </div>
-    )
-  }
-
-  return <>{children}</>
-}
-
-/**
- * Helper component to highlight text within search results
- */
-export function HighlightedText({ 
-  text, 
-  searchTerm 
-}: { 
-  text: string
-  searchTerm?: string 
-}) {
-  const { searchQuery } = useSearch()
-  const term = searchTerm || searchQuery
-  
-  return <SearchHighlight text={text} searchTerm={term} />
+  return (
+    <div className="search-results-container text-black">
+      {results.map((result) => (
+        <div key={result.id} className="p-2 border-b">
+          <h3>
+            <SearchHighlight text={result.title} highlight={searchQuery} />
+          </h3>
+          {result.description && <p>{result.description}</p>}
+        </div>
+      ))}
+    </div>
+  )
 }
