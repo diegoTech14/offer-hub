@@ -26,9 +26,9 @@ export default function SearchResults({
   if (isLoading && showLoading) {
     return <SearchLoading />
   }
-
+    
   return (
-    <div className="search-results-container text-black">
+    <div className="search-results- text-black dark:bg-gray-700 dark:text-white">
       {results.map((result) => (
         <div key={result.id} className="p-2 border-b">
           <h3>

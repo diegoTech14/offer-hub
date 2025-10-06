@@ -44,8 +44,18 @@ export default function HeroSection() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="What service are you looking for?"
-                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 flex-1"
+                className="
+    border border-gray-300 
+    dark:border-gray-600 
+    bg-white dark:bg-gray-700 
+    text-black dark:text-white 
+    placeholder-gray-500 dark:placeholder-gray-400 
+    focus-visible:ring-2 focus-visible:ring-[#15949C] 
+    focus-visible:ring-offset-0 rounded-md 
+    flex-1
+  "
               />
+
               <Button className="bg-[#15949C] hover:bg-[#15949C]/90 ml-2">
                 <Search className="h-4 w-4 mr-2" />
                 Search
