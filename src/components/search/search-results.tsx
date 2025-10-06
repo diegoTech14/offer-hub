@@ -8,8 +8,6 @@ interface SearchResultsProps {
   results: { id: string; title: string; description?: string }[]
   searchQuery: string
   showLoading?: boolean
-  highlightSearch?: boolean
-  searchText?: string
 }
 
 
@@ -26,9 +24,9 @@ export default function SearchResults({
   if (isLoading && showLoading) {
     return <SearchLoading />
   }
-    
+
   return (
-    <div className="search-results- text-black dark:bg-gray-700 dark:text-white">
+    <div className="search-results text-black dark:bg-gray-700 dark:text-white">
       {results.map((result) => (
         <div key={result.id} className="p-2 border-b">
           <h3>
