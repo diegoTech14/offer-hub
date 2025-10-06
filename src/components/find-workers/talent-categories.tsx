@@ -76,28 +76,28 @@ export default function TalentCategories() {
           transition={{ duration: 0.3 }}
           whileHover={{ y: -5 }}
         >
-          <Card className="h-full cursor-pointer hover:shadow-md transition-all">
+          <Card className="h-full cursor-pointer hover:shadow-md transition-all dark:bg-gray-800 dark:border-gray-700 dark:hover:shadow-gray-900/20">
             <CardContent className="p-6">
               <div className="flex items-center mb-4">
-                <div className="h-12 w-12 rounded-full bg-[#DEEFE7] flex items-center justify-center mr-3">
+                <div className="h-12 w-12 rounded-full bg-[#DEEFE7] dark:bg-gray-700 flex items-center justify-center mr-3">
                   {category.icon}
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#002333]">{category.name}</h3>
-                  <p className="text-sm text-[#002333]/70">{category.count} freelancers</p>
+                  <h3 className="font-bold text-[#002333] dark:text-white">{category.name}</h3>
+                  <p className="text-sm text-[#002333]/70 dark:text-gray-300">{category.count} freelancers</p>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {category.skills.slice(0, VALIDATION_LIMITS.MAX_TECHNOLOGIES_DISPLAY).map((skill) => (
-                  <Badge key={skill} variant="outline">
+                  <Badge key={skill} variant="outline" className="dark:border-gray-600 dark:text-gray-300">
                     {skill}
                   </Badge>
                 ))}
-                {category.skills.length > VALIDATION_LIMITS.MAX_TECHNOLOGIES_DISPLAY && <Badge variant="outline">+{category.skills.length - VALIDATION_LIMITS.MAX_TECHNOLOGIES_DISPLAY} more</Badge>}
+                {category.skills.length > VALIDATION_LIMITS.MAX_TECHNOLOGIES_DISPLAY && <Badge variant="outline" className="dark:border-gray-600 dark:text-gray-300">+{category.skills.length - VALIDATION_LIMITS.MAX_TECHNOLOGIES_DISPLAY} more</Badge>}
               </div>
 
-              <div className="flex items-center text-[#15949C] text-sm font-medium">
+              <div className="flex items-center text-[#15949C] dark:text-[#15949C] text-sm font-medium">
                 Browse {category.name}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </div>

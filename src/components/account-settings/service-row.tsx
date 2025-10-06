@@ -49,11 +49,11 @@ export function ServiceRow({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-start p-4 border border-gray-200 rounded-lg">
+    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-start p-4 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg">
       <div className="space-y-2">
-        <div className="font-medium text-gray-900">{service.title}</div>
-        <div className="text-sm text-gray-600">{service.description}</div>
-        <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded inline-block">
+        <div className="font-medium text-gray-900 dark:text-white">{service.title}</div>
+        <div className="text-sm text-gray-600 dark:text-gray-300">{service.description}</div>
+        <div className="text-xs text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block">
           {service.category}
         </div>
       </div>
@@ -65,7 +65,7 @@ export function ServiceRow({
             service.currency || "XLM"
           )}
           readOnly
-          className="text-secondary-500 border-gray-200 pl-10"
+          className="text-secondary-500 dark:text-gray-300 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 pl-10"
         />
         <Image
           width={50}
@@ -100,7 +100,7 @@ export function ServiceRow({
           );
         }}
       >
-        <SelectTrigger className="bg-gray-50 border-gray-200">
+        <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-300">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -144,7 +144,7 @@ export function ServiceRow({
       </Select>
       <Button
         variant="outline"
-        className="text-[#FF2000] border-[#FF2000] bg-red-200 hover:bg-red-400"
+        className="text-red-600 dark:text-red-400 border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30"
         onClick={() => removeService(service.id)}
       >
         Remove

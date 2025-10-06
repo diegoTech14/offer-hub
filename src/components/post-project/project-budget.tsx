@@ -76,31 +76,31 @@ export default function ProjectBudget({ projectData, updateProjectData }: Projec
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={item}>
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Project Budget</CardTitle>
-            <CardDescription>Define your budget and timeline for the project</CardDescription>
+            <CardTitle className="dark:text-white">Project Budget</CardTitle>
+            <CardDescription className="dark:text-gray-300">Define your budget and timeline for the project</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <Label>Budget Type</Label>
+              <Label className="dark:text-gray-300">Budget Type</Label>
               <RadioGroup
                 value={projectData.budgetType}
                 onValueChange={(value: string) => updateProjectData("budgetType", value )}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700">
                   <RadioGroupItem value="fixed" id="fixed" />
                   <Label htmlFor="fixed" className="flex-1 cursor-pointer">
-                    <div className="font-medium">Fixed Price</div>
-                    <div className="text-sm text-muted-foreground">Pay a fixed amount for the entire project</div>
+                    <div className="font-medium dark:text-white">Fixed Price</div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">Pay a fixed amount for the entire project</div>
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700">
                   <RadioGroupItem value="hourly" id="hourly" />
                   <Label htmlFor="hourly" className="flex-1 cursor-pointer">
-                    <div className="font-medium">Hourly Rate</div>
-                    <div className="text-sm text-muted-foreground">Pay based on the number of hours worked</div>
+                    <div className="font-medium dark:text-white">Hourly Rate</div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">Pay based on the number of hours worked</div>
                   </Label>
                 </div>
               </RadioGroup>
@@ -109,19 +109,19 @@ export default function ProjectBudget({ projectData, updateProjectData }: Projec
             {projectData.budgetType === "fixed" ? (
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="budget-amount">Project Budget</Label>
+                  <Label htmlFor="budget-amount" className="dark:text-gray-300">Project Budget</Label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
                     <Input
                       id="budget-amount"
                       type="number"
                       placeholder="Enter your budget"
-                      className="pl-10"
+                      className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                       value={projectData.budgetAmount || ""}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateProjectData("budgetAmount", Number.parseFloat(e.target.value) || 0 )}
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground dark:text-gray-400">
                     Set a realistic budget to attract qualified freelancers
                   </p>
                 </div>
@@ -129,8 +129,8 @@ export default function ProjectBudget({ projectData, updateProjectData }: Projec
                 {projectData.projectType === "one-time" && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label>Project Milestones (Optional)</Label>
-                      <p className="text-sm text-muted-foreground">Total: ${calculateTotalMilestones().toFixed(2)}</p>
+                      <Label className="dark:text-gray-300">Project Milestones (Optional)</Label>
+                      <p className="text-sm text-muted-foreground dark:text-gray-400">Total: ${calculateTotalMilestones().toFixed(2)}</p>
                     </div>
 
                     {projectData.milestones.length > 0 && (
@@ -138,17 +138,17 @@ export default function ProjectBudget({ projectData, updateProjectData }: Projec
                         {projectData.milestones.map((milestone: any) => (
                           <div
                             key={milestone.id}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                           >
                             <div className="flex-1">
-                              <p className="font-medium text-[#002333]">{milestone.title}</p>
-                              <p className="text-sm text-[#002333]/70">${milestone.amount.toFixed(2)}</p>
+                              <p className="font-medium text-[#002333] dark:text-white">{milestone.title}</p>
+                              <p className="text-sm text-[#002333]/70 dark:text-gray-400">${milestone.amount.toFixed(2)}</p>
                             </div>
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => removeMilestone(milestone.id)}
-                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -163,15 +163,16 @@ export default function ProjectBudget({ projectData, updateProjectData }: Projec
                           placeholder="Milestone title"
                           value={newMilestone.title}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewMilestone({ ...newMilestone, title: e.target.value })}
+                          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                         />
                       </div>
                       <div className="flex gap-2">
                         <div className="relative flex-1">
-                          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
                           <Input
                             type="number"
                             placeholder="Amount"
-                            className="pl-10"
+                            className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                             value={newMilestone.amount}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewMilestone({ ...newMilestone, amount: e.target.value })}
                           />
@@ -190,44 +191,44 @@ export default function ProjectBudget({ projectData, updateProjectData }: Projec
               </div>
             ) : (
               <div className="space-y-2">
-                <Label htmlFor="hourly-rate">Hourly Rate</Label>
+                <Label htmlFor="hourly-rate" className="dark:text-gray-300">Hourly Rate</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
                   <Input
                     id="hourly-rate"
                     type="number"
                     placeholder="Enter hourly rate"
-                    className="pl-10"
+                    className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     value={projectData.budgetAmount || ""}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateProjectData("budgetAmount", Number.parseFloat(e.target.value) || 0 )}
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">The hourly rate you're willing to pay for this project</p>
+                <p className="text-sm text-muted-foreground dark:text-gray-400">The hourly rate you're willing to pay for this project</p>
               </div>
             )}
 
             <Separator />
 
             <div className="space-y-2">
-              <Label htmlFor="duration">Project Duration</Label>
+              <Label htmlFor="duration" className="dark:text-gray-300">Project Duration</Label>
               <Select value={projectData.duration} onValueChange={(value: string) => updateProjectData("duration", value )}>
-                <SelectTrigger id="duration">
+                <SelectTrigger id="duration" className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                   <SelectValue placeholder="Select estimated duration" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                   {durations.map((duration) => (
-                    <SelectItem key={duration.id} value={duration.id}>
+                    <SelectItem key={duration.id} value={duration.id} className="dark:text-white dark:hover:bg-gray-600">
                       {duration.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">Estimated time needed to complete the project</p>
+              <p className="text-sm text-muted-foreground dark:text-gray-400">Estimated time needed to complete the project</p>
             </div>
 
-            <Alert className="bg-[#DEEFE7]/30 border-[#15949C]">
+            <Alert className="bg-[#DEEFE7]/30 border-[#15949C] dark:bg-gray-700/50 dark:border-gray-600">
               <AlertCircle className="h-4 w-4 text-[#15949C]" />
-              <AlertDescription className="text-[#002333]/70">
+              <AlertDescription className="text-[#002333]/70 dark:text-gray-300">
                 Setting a clear budget and timeline helps freelancers understand if they can meet your expectations.
               </AlertDescription>
             </Alert>

@@ -3,14 +3,15 @@ import HelpCategoryCards from "../../components/help/help-category-cards";
 import HelpTopicsTabs from "@/components/help/help-topics-taps";
 import ContactSupport from "@/components/help/contact-support";
 import CommunityResources from "@/components/help/community-resources";
+
 export default function HelpPage() {
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       <HelpHeader />
       <HelpCategoryCards />
       <HelpTopicsTabs />
       <ContactSupport />
       <CommunityResources />
-    </>
+    </div>
   );
 }

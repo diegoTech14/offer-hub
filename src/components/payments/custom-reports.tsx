@@ -351,19 +351,19 @@ export default function CustomReports({
                       }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="revenue">Revenue Analysis</SelectItem>
-                      <SelectItem value="expenses">Expense Analysis</SelectItem>
-                      <SelectItem value="profitability">
+                    <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                      <SelectItem value="revenue" className="dark:text-white dark:hover:bg-gray-600">Revenue Analysis</SelectItem>
+                      <SelectItem value="expenses" className="dark:text-white dark:hover:bg-gray-600">Expense Analysis</SelectItem>
+                      <SelectItem value="profitability" className="dark:text-white dark:hover:bg-gray-600">
                         Profitability Analysis
                       </SelectItem>
-                      <SelectItem value="transactions">
+                      <SelectItem value="transactions" className="dark:text-white dark:hover:bg-gray-600">
                         Transaction Analysis
                       </SelectItem>
-                      <SelectItem value="custom">Custom Report</SelectItem>
+                      <SelectItem value="custom" className="dark:text-white dark:hover:bg-gray-600">Custom Report</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -496,14 +496,14 @@ export default function CustomReports({
                         }))
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="quarterly">Quarterly</SelectItem>
+                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                        <SelectItem value="daily" className="dark:text-white dark:hover:bg-gray-600">Daily</SelectItem>
+                        <SelectItem value="weekly" className="dark:text-white dark:hover:bg-gray-600">Weekly</SelectItem>
+                        <SelectItem value="monthly" className="dark:text-white dark:hover:bg-gray-600">Monthly</SelectItem>
+                        <SelectItem value="quarterly" className="dark:text-white dark:hover:bg-gray-600">Quarterly</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -518,13 +518,13 @@ export default function CustomReports({
                         }))
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pdf">PDF</SelectItem>
-                        <SelectItem value="excel">Excel</SelectItem>
-                        <SelectItem value="csv">CSV</SelectItem>
+                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                        <SelectItem value="pdf" className="dark:text-white dark:hover:bg-gray-600">PDF</SelectItem>
+                        <SelectItem value="excel" className="dark:text-white dark:hover:bg-gray-600">Excel</SelectItem>
+                        <SelectItem value="csv" className="dark:text-white dark:hover:bg-gray-600">CSV</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -549,6 +549,7 @@ export default function CustomReports({
               <Button
                 variant="outline"
                 onClick={() => setIsCreateDialogOpen(false)}
+                className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
               >
                 Cancel
               </Button>
@@ -564,32 +565,32 @@ export default function CustomReports({
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-600">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground dark:text-gray-400" />
                 <Input
                   placeholder="Search reports..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
+                  className="pl-8 dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="revenue">Revenue</SelectItem>
-                <SelectItem value="expenses">Expenses</SelectItem>
-                <SelectItem value="profitability">Profitability</SelectItem>
-                <SelectItem value="transactions">Transactions</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+              <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                <SelectItem value="all" className="dark:text-white dark:hover:bg-gray-600">All Types</SelectItem>
+                <SelectItem value="revenue" className="dark:text-white dark:hover:bg-gray-600">Revenue</SelectItem>
+                <SelectItem value="expenses" className="dark:text-white dark:hover:bg-gray-600">Expenses</SelectItem>
+                <SelectItem value="profitability" className="dark:text-white dark:hover:bg-gray-600">Profitability</SelectItem>
+                <SelectItem value="transactions" className="dark:text-white dark:hover:bg-gray-600">Transactions</SelectItem>
+                <SelectItem value="custom" className="dark:text-white dark:hover:bg-gray-600">Custom</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -599,17 +600,17 @@ export default function CustomReports({
       {/* Reports Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredReports.map((report) => (
-          <Card key={report.id} className="hover:shadow-md transition-shadow">
+          <Card key={report.id} className="hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-600">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-2">
                   {getReportIcon(report.type)}
-                  <CardTitle className="text-lg">{report.name}</CardTitle>
+                  <CardTitle className="text-lg dark:text-white">{report.name}</CardTitle>
                 </div>
                 {getStatusBadge(report)}
               </div>
               {report.description && (
-                <CardDescription className="line-clamp-2">
+                <CardDescription className="line-clamp-2 dark:text-gray-300">
                   {report.description}
                 </CardDescription>
               )}
@@ -617,16 +618,16 @@ export default function CustomReports({
             <CardContent className="space-y-4">
               <div className="text-sm space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Type:</span>
-                  <span className="capitalize">{report.type}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Type:</span>
+                  <span className="capitalize dark:text-white">{report.type}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Metrics:</span>
-                  <span>{report.criteria.metrics.length}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Metrics:</span>
+                  <span className="dark:text-white">{report.criteria.metrics.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Created:</span>
-                  <span>
+                  <span className="text-gray-600 dark:text-gray-400">Created:</span>
+                  <span className="dark:text-white">
                     {format(
                       new Date(report.generatedAt || new Date()),
                       "MMM dd"
@@ -635,20 +636,21 @@ export default function CustomReports({
                 </div>
                 {report.schedule && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Schedule:</span>
-                    <span className="capitalize">
+                    <span className="text-gray-600 dark:text-gray-400">Schedule:</span>
+                    <span className="capitalize dark:text-white">
                       {report.schedule.frequency}
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t">
+              <div className="flex items-center justify-between pt-2 border-t dark:border-gray-600">
                 <div className="flex items-center space-x-1">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleGenerateReport(report.id)}
+                    className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Play className="h-3 w-3" />
                   </Button>
@@ -656,6 +658,7 @@ export default function CustomReports({
                     size="sm"
                     variant="outline"
                     onClick={() => loadReportForEdit(report)}
+                    className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Edit className="h-3 w-3" />
                   </Button>
@@ -663,15 +666,16 @@ export default function CustomReports({
                     size="sm"
                     variant="outline"
                     onClick={() => handleDeleteReport(report.id)}
+                    className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                     <Eye className="h-3 w-3" />
                   </Button>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                     <Download className="h-3 w-3" />
                   </Button>
                 </div>
@@ -682,11 +686,11 @@ export default function CustomReports({
       </div>
 
       {filteredReports.length === 0 && (
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardContent className="text-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No reports found</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className="text-lg font-semibold mb-2 dark:text-white">No reports found</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               {searchTerm || filterType !== "all"
                 ? "No reports match your current filters."
                 : "Get started by creating your first custom report."}
@@ -738,19 +742,19 @@ export default function CustomReports({
                     }))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="revenue">Revenue Analysis</SelectItem>
-                    <SelectItem value="expenses">Expense Analysis</SelectItem>
-                    <SelectItem value="profitability">
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                    <SelectItem value="revenue" className="dark:text-white dark:hover:bg-gray-600">Revenue Analysis</SelectItem>
+                    <SelectItem value="expenses" className="dark:text-white dark:hover:bg-gray-600">Expense Analysis</SelectItem>
+                    <SelectItem value="profitability" className="dark:text-white dark:hover:bg-gray-600">
                       Profitability Analysis
                     </SelectItem>
-                    <SelectItem value="transactions">
+                    <SelectItem value="transactions" className="dark:text-white dark:hover:bg-gray-600">
                       Transaction Analysis
                     </SelectItem>
-                    <SelectItem value="custom">Custom Report</SelectItem>
+                    <SelectItem value="custom" className="dark:text-white dark:hover:bg-gray-600">Custom Report</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -810,6 +814,7 @@ export default function CustomReports({
             <Button
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}
+              className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               Cancel
             </Button>

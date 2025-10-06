@@ -97,10 +97,10 @@ export default function HelpTopicsTabs() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-12">
-      <h2 className="text-2xl font-bold text-center mb-2">
+      <h2 className="text-2xl font-bold text-center mb-2 text-gray-900 dark:text-white">
         Browse Help Topics
       </h2>
-      <p className="text-center text-gray-600 mb-6">
+      <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
         Explore our comprehensive guides and tutorials to get the most out of
         Offer Hub
       </p>
@@ -112,8 +112,8 @@ export default function HelpTopicsTabs() {
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-md font-medium transition-colors ${
               tab === activeTab
-                ? "bg-gray-300 text-gray-900"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
             {tab}
@@ -125,22 +125,22 @@ export default function HelpTopicsTabs() {
         {content[activeTab].map((item, idx) => (
           <div
             key={idx}
-            className="bg-white shadow-sm border rounded-lg p-4 hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/20 transition-shadow"
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">{item.title}</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white">{item.title}</h3>
               {item.new && (
-                <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-semibold px-2 py-0.5 rounded-full">
                   New
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600 mt-1 mb-2">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 mb-2">
               {item.description}
             </p>
             <a
               href="#"
-              className="text-teal-600 text-sm font-medium hover:underline"
+              className="text-teal-600 dark:text-teal-400 text-sm font-medium hover:underline"
             >
               Read article →
             </a>

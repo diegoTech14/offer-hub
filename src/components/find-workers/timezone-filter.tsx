@@ -133,7 +133,7 @@ export default function TimezoneFilter({
     return (
       <div 
         key={timezone} 
-        className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg group"
+        className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg group"
       >
         <div className="flex items-center space-x-3 flex-1">
           <Checkbox
@@ -145,7 +145,7 @@ export default function TimezoneFilter({
             <div className="flex items-center gap-2">
               <Label 
                 htmlFor={timezone} 
-                className="cursor-pointer font-medium text-[#002333] truncate"
+                className="cursor-pointer font-medium text-[#002333] dark:text-white truncate"
               >
                 {formatTimezone(timezone)}
               </Label>
@@ -162,9 +162,9 @@ export default function TimezoneFilter({
               )}
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-[#002333]/70">{currentTime}</span>
+              <span className="text-sm text-[#002333]/70 dark:text-gray-300">{currentTime}</span>
               {businessHours && businessHours.overlapHours > 0 && (
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs dark:border-gray-600 dark:text-gray-300">
                   {businessHours.overlapHours}h overlap
                 </Badge>
               )}
@@ -192,10 +192,10 @@ export default function TimezoneFilter({
   }
 
   return (
-    <Card>
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium text-[#002333] flex items-center">
+          <Label className="text-sm font-medium text-[#002333] dark:text-white flex items-center">
             <Clock className="h-4 w-4 mr-2 text-[#15949C]" />
             Timezone Preferences
           </Label>
@@ -256,7 +256,7 @@ export default function TimezoneFilter({
         <Separator />
 
         {/* Timezone groups */}
-        <ScrollArea className="h-[400px]">
+        <ScrollArea className="h-[500px]">
           <div className="space-y-4">
             {timezoneGroups.map((group) => {
               const visibleTimezones = group.timezones.filter(timezone => {
@@ -270,7 +270,7 @@ export default function TimezoneFilter({
               return (
                 <div key={group.region}>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-[#002333]">{group.region}</h4>
+                    <h4 className="text-sm font-medium text-[#002333] dark:text-white">{group.region}</h4>
                     <Button
                       variant="ghost"
                       size="sm"

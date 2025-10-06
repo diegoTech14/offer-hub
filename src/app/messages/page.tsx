@@ -1,5 +1,5 @@
 'use client'
-import { useMessages } from "@/hooks/useMessages";
+import { useMessagesMock as useMessages } from "@/hooks/useMessagesMock";
 import { useState } from "react";
 import { Header } from "@/components/account-settings/header";
 import { Sidebar } from "@/components/account-settings/sidebar";
@@ -31,7 +31,7 @@ export default function MessagesPage() {
   return (
     // This page is protected and set to both admin and user access as long as they are authenticated
     <ProtectedRoute roles={["admin", "user"]} >
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
         <div className="flex">
           <Sidebar
@@ -41,7 +41,7 @@ export default function MessagesPage() {
             setIsUserActive={setIsUserActive}
           />
           <div className="flex-1 p-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-[calc(100vh-140px)] flex overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 h-[calc(100vh-140px)] flex overflow-hidden">
               <MessagesSidebar
                 conversations={conversations}
                 activeConversationId={activeConversationId}

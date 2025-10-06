@@ -255,22 +255,22 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
     <div className="flex items-center justify-between cursor-pointer py-2" onClick={() => toggleSection(section)}>
       <div className="flex items-center">
         {icon}
-        <h3 className="font-medium text-[#002333] ml-2">{title}</h3>
+        <h3 className="font-medium text-[#002333] dark:text-white ml-2">{title}</h3>
       </div>
       {collapsedSections[section] ? (
-        <ChevronUp className="h-4 w-4 text-[#002333]/70" />
+        <ChevronUp className="h-4 w-4 text-[#002333]/70 dark:text-gray-400" />
       ) : (
-        <ChevronDown className="h-4 w-4 text-[#002333]/70" />
+        <ChevronDown className="h-4 w-4 text-[#002333]/70 dark:text-gray-400" />
       )}
     </div>
   )
 
   return (
-    <Card className="h-full">
+    <Card className="h-fit dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-[#002333]">Filters</h2>
-          <Button variant="ghost" size="sm" onClick={resetFilters} className="h-8 text-[#15949C]">
+          <h2 className="text-lg font-bold text-[#002333] dark:text-white">Filters</h2>
+          <Button variant="ghost" size="sm" onClick={resetFilters} className="h-8 text-[#15949C] dark:text-gray-300 dark:hover:text-white">
             <RefreshCw className="h-3 w-3 mr-2" />
             Reset
           </Button>
@@ -278,10 +278,10 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
 
         {/* Add tabs for different filter categories */}
         <Tabs value={activeFilterTab} onValueChange={setActiveFilterTab} className="mb-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="basic">Basic</TabsTrigger>
-            <TabsTrigger value="location">Location</TabsTrigger>
-            <TabsTrigger value="timezone">Timezone</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
+            <TabsTrigger value="basic" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Basic</TabsTrigger>
+            <TabsTrigger value="location" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Location</TabsTrigger>
+            <TabsTrigger value="timezone" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Timezone</TabsTrigger>
           </TabsList>
 
           <ScrollArea className="h-[calc(100vh-300px)]">
@@ -304,8 +304,8 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                     >
                       <div className="mt-4 px-2">
                         <div className="flex justify-between mb-2">
-                          <span className="text-sm text-[#002333]/70">${priceRange[0]}</span>
-                          <span className="text-sm text-[#002333]/70">${priceRange[1]}+</span>
+                          <span className="text-sm text-[#002333]/70 dark:text-gray-300">${priceRange[0]}</span>
+                          <span className="text-sm text-[#002333]/70 dark:text-gray-300">${priceRange[1]}+</span>
                         </div>
                         <Slider
                           value={priceRange}
@@ -317,22 +317,22 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                         />
                         <div className="flex justify-between items-center gap-4">
                           <div className="relative flex-1">
-                            <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#002333]/50" />
+                            <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#002333]/50 dark:text-gray-400" />
                             <Input
                               type="number"
                               value={priceRange[0]}
                               onChange={(e) => handlePriceRangeChange([Number.parseInt(e.target.value) || 5, priceRange[1]])}
-                              className="pl-8"
+                              className="pl-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             />
                           </div>
-                          <span className="text-[#002333]/50">to</span>
+                          <span className="text-[#002333]/50 dark:text-gray-400">to</span>
                           <div className="relative flex-1">
-                            <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#002333]/50" />
+                            <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#002333]/50 dark:text-gray-400" />
                             <Input
                               type="number"
                               value={priceRange[1]}
                               onChange={(e) => handlePriceRangeChange([priceRange[0], Number.parseInt(e.target.value) || 150])}
-                              className="pl-8"
+                              className="pl-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             />
                           </div>
                         </div>
@@ -365,7 +365,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={experienceLevel.includes("entry")}
                             onCheckedChange={() => toggleExperienceLevel("entry")}
                           />
-                          <Label htmlFor="entry" className="cursor-pointer">
+                          <Label htmlFor="entry" className="cursor-pointer dark:text-gray-300">
                             Entry Level
                           </Label>
                         </div>
@@ -375,7 +375,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={experienceLevel.includes("intermediate")}
                             onCheckedChange={() => toggleExperienceLevel("intermediate")}
                           />
-                          <Label htmlFor="intermediate" className="cursor-pointer">
+                          <Label htmlFor="intermediate" className="cursor-pointer dark:text-gray-300">
                             Intermediate
                           </Label>
                         </div>
@@ -385,7 +385,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={experienceLevel.includes("expert")}
                             onCheckedChange={() => toggleExperienceLevel("expert")}
                           />
-                          <Label htmlFor="expert" className="cursor-pointer">
+                          <Label htmlFor="expert" className="cursor-pointer dark:text-gray-300">
                             Expert
                           </Label>
                         </div>
@@ -419,7 +419,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={availability.includes("hourly")}
                             onCheckedChange={() => toggleAvailability("hourly")}
                           />
-                          <Label htmlFor="hourly" className="cursor-pointer">
+                          <Label htmlFor="hourly" className="cursor-pointer dark:text-gray-300">
                             Hourly
                           </Label>
                         </div>
@@ -429,7 +429,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={availability.includes("part-time")}
                             onCheckedChange={() => toggleAvailability("part-time")}
                           />
-                          <Label htmlFor="part-time" className="cursor-pointer">
+                          <Label htmlFor="part-time" className="cursor-pointer dark:text-gray-300">
                             Part-time (20hrs/week)
                           </Label>
                         </div>
@@ -439,7 +439,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={availability.includes("full-time")}
                             onCheckedChange={() => toggleAvailability("full-time")}
                           />
-                          <Label htmlFor="full-time" className="cursor-pointer">
+                          <Label htmlFor="full-time" className="cursor-pointer dark:text-gray-300">
                             Full-time (40hrs/week)
                           </Label>
                         </div>
@@ -472,7 +472,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={languages.includes("english")}
                             onCheckedChange={() => toggleLanguage("english")}
                           />
-                          <Label htmlFor="english" className="cursor-pointer">
+                          <Label htmlFor="english" className="cursor-pointer dark:text-gray-300">
                             English
                           </Label>
                         </div>
@@ -482,7 +482,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={languages.includes("spanish")}
                             onCheckedChange={() => toggleLanguage("spanish")}
                           />
-                          <Label htmlFor="spanish" className="cursor-pointer">
+                          <Label htmlFor="spanish" className="cursor-pointer dark:text-gray-300">
                             Spanish
                           </Label>
                         </div>
@@ -492,7 +492,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={languages.includes("french")}
                             onCheckedChange={() => toggleLanguage("french")}
                           />
-                          <Label htmlFor="french" className="cursor-pointer">
+                          <Label htmlFor="french" className="cursor-pointer dark:text-gray-300">
                             French
                           </Label>
                         </div>
@@ -502,7 +502,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={languages.includes("german")}
                             onCheckedChange={() => toggleLanguage("german")}
                           />
-                          <Label htmlFor="german" className="cursor-pointer">
+                          <Label htmlFor="german" className="cursor-pointer dark:text-gray-300">
                             German
                           </Label>
                         </div>
@@ -512,7 +512,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             checked={languages.includes("chinese")}
                             onCheckedChange={() => toggleLanguage("chinese")}
                           />
-                          <Label htmlFor="chinese" className="cursor-pointer">
+                          <Label htmlFor="chinese" className="cursor-pointer dark:text-gray-300">
                             Chinese
                           </Label>
                         </div>
@@ -541,6 +541,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                             value={skillInput}
                             onChange={(e) => setSkillInput(e.target.value)}
                             onKeyDown={handleKeyDown}
+                            className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                           />
                           <Button size="sm" onClick={addSkill} className="bg-[#15949C] hover:bg-[#15949C]/90">
                             Add
@@ -565,10 +566,10 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                         )}
 
                         <div className="mt-4">
-                          <p className="text-sm text-[#002333]/70 mb-2">Popular skills:</p>
+                          <p className="text-sm text-[#002333]/70 dark:text-gray-300 mb-2">Popular skills:</p>
                           <div className="flex flex-wrap gap-2">
                             <Badge
-                              className="bg-gray-100 text-[#002333] hover:bg-gray-200 cursor-pointer"
+                              className="bg-gray-100 dark:bg-gray-700 text-[#002333] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
                               onClick={() => {
                                 if (!skills.includes("React")) {
                                   setSkills([...skills, "React"])
@@ -578,7 +579,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                               React
                             </Badge>
                             <Badge
-                              className="bg-gray-100 text-[#002333] hover:bg-gray-200 cursor-pointer"
+                              className="bg-gray-100 dark:bg-gray-700 text-[#002333] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
                               onClick={() => {
                                 if (!skills.includes("JavaScript")) {
                                   setSkills([...skills, "JavaScript"])
@@ -588,7 +589,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                               JavaScript
                             </Badge>
                             <Badge
-                              className="bg-gray-100 text-[#002333] hover:bg-gray-200 cursor-pointer"
+                              className="bg-gray-100 dark:bg-gray-700 text-[#002333] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
                               onClick={() => {
                                 if (!skills.includes("UI/UX Design")) {
                                   setSkills([...skills, "UI/UX Design"])
@@ -598,7 +599,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                               UI/UX Design
                             </Badge>
                             <Badge
-                              className="bg-gray-100 text-[#002333] hover:bg-gray-200 cursor-pointer"
+                              className="bg-gray-100 dark:bg-gray-700 text-[#002333] dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
                               onClick={() => {
                                 if (!skills.includes("Python")) {
                                   setSkills([...skills, "Python"])
@@ -629,21 +630,21 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                     >
                       <div className="space-y-4 mt-2">
                         <div className="flex items-center justify-between">
-                          <Label htmlFor="online-now" className="cursor-pointer">
+                          <Label htmlFor="online-now" className="cursor-pointer dark:text-gray-300">
                             Online now
                           </Label>
                           <Switch id="online-now" checked={isOnlineNow} onCheckedChange={setIsOnlineNow} />
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <Label htmlFor="verified-id" className="cursor-pointer">
+                          <Label htmlFor="verified-id" className="cursor-pointer dark:text-gray-300">
                             Verified ID
                           </Label>
                           <Switch id="verified-id" checked={hasVerifiedId} onCheckedChange={setHasVerifiedId} />
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <Label htmlFor="top-rated" className="cursor-pointer">
+                          <Label htmlFor="top-rated" className="cursor-pointer dark:text-gray-300">
                             Top Rated Only
                           </Label>
                           <Switch id="top-rated" checked={topRatedOnly} onCheckedChange={setTopRatedOnly} />
@@ -678,8 +679,8 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
           </ScrollArea>
         </Tabs>
 
-        <div className="mt-6 pt-4 border-t">
-          <Button className="w-full bg-[#15949C] hover:bg-[#15949C]/90">Apply Filters</Button>
+        <div className="mt-6 pt-4 border-t dark:border-gray-600">
+          <Button className="w-full bg-gray-600 text-white hover:bg-gray-700 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700">Apply Filters</Button>
         </div>
       </CardContent>
     </Card>
