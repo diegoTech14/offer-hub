@@ -109,25 +109,25 @@ export default function ProjectAttachments({ projectData, updateProjectData }: P
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={item}>
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Project Attachments</CardTitle>
-            <CardDescription>
+            <CardTitle className="dark:text-white">Project Attachments</CardTitle>
+            <CardDescription className="dark:text-gray-300">
               Upload files that will help freelancers understand your project requirements
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center ${
-                isDragging ? "border-[#15949C] bg-[#DEEFE7]/20" : "border-gray-200"
+                isDragging ? "border-[#15949C] bg-[#DEEFE7]/20 dark:bg-gray-700/20" : "border-gray-200 dark:border-gray-600"
               }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
               <FileUp className="h-10 w-10 text-[#15949C] mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-[#002333] mb-2">Drag and drop files here</h3>
-              <p className="text-sm text-[#002333]/70 mb-4">
+              <h3 className="text-lg font-medium text-[#002333] dark:text-white mb-2">Drag and drop files here</h3>
+              <p className="text-sm text-[#002333]/70 dark:text-gray-400 mb-4">
                 Upload documents, images, or any files that will help explain your project
               </p>
               <div className="relative">
@@ -139,7 +139,7 @@ export default function ProjectAttachments({ projectData, updateProjectData }: P
                 />
                 <Button className="bg-[#15949C] hover:bg-[#15949C]/90">Browse Files</Button>
               </div>
-              <p className="text-xs text-[#002333]/50 mt-4">
+              <p className="text-xs text-[#002333]/50 dark:text-gray-500 mt-4">
                 Maximum file size: 25MB. Supported formats: PDF, DOC, DOCX, JPG, PNG, GIF
               </p>
             </div>
@@ -147,25 +147,25 @@ export default function ProjectAttachments({ projectData, updateProjectData }: P
             {projectData.attachments.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label>Uploaded Files</Label>
-                  <p className="text-sm text-muted-foreground">{projectData.attachments.length} file(s)</p>
+                  <Label className="dark:text-gray-300">Uploaded Files</Label>
+                  <p className="text-sm text-muted-foreground dark:text-gray-400">{projectData.attachments.length} file(s)</p>
                 </div>
 
                 <div className="space-y-3">
                   {projectData.attachments.map((file: any) => (
-                    <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                       <div className="flex items-center">
                         {getFileIcon(file.type)}
                         <div className="ml-3">
-                          <p className="font-medium text-[#002333]">{file.name}</p>
-                          <p className="text-xs text-[#002333]/70">{formatFileSize(file.size)}</p>
+                          <p className="font-medium text-[#002333] dark:text-white">{file.name}</p>
+                          <p className="text-xs text-[#002333]/70 dark:text-gray-400">{formatFileSize(file.size)}</p>
                         </div>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => removeAttachment(file.id)}
-                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -178,8 +178,8 @@ export default function ProjectAttachments({ projectData, updateProjectData }: P
             <Separator />
 
             <div className="space-y-4">
-              <h3 className="font-medium text-[#002333]">Recommended Attachments</h3>
-              <ul className="space-y-2 text-sm text-[#002333]/70">
+              <h3 className="font-medium text-[#002333] dark:text-white">Recommended Attachments</h3>
+              <ul className="space-y-2 text-sm text-[#002333]/70 dark:text-gray-400">
                 <li className="flex items-center">
                   <FileText className="h-4 w-4 mr-2 text-[#15949C]" />
                   Project brief or detailed specifications
@@ -195,9 +195,9 @@ export default function ProjectAttachments({ projectData, updateProjectData }: P
               </ul>
             </div>
 
-            <Alert className="bg-[#DEEFE7]/30 border-[#15949C]">
+            <Alert className="bg-[#DEEFE7]/30 border-[#15949C] dark:bg-gray-700/50 dark:border-gray-600">
               <AlertCircle className="h-4 w-4 text-[#15949C]" />
-              <AlertDescription className="text-[#002333]/70">
+              <AlertDescription className="text-[#002333]/70 dark:text-gray-300">
                 Projects with detailed attachments receive 40% more accurate proposals and have a higher completion
                 rate.
               </AlertDescription>

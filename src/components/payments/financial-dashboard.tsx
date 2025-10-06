@@ -169,20 +169,20 @@ export default function FinancialDashboard({
             value={selectedTimeframe}
             onValueChange={handleTimeframeChange}
           >
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
               <Calendar className="h-4 w-4" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
               {Object.entries(dateRangePresets).map(([key, preset]) => (
-                <SelectItem key={key} value={key}>
+                <SelectItem key={key} value={key} className="dark:text-white dark:hover:bg-gray-600">
                   {preset.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Button variant="outline" size="sm" onClick={refreshData}>
+          <Button variant="outline" size="sm" onClick={refreshData} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <RefreshCw className="h-4 w-4" />
             {!isMobile && <span className="ml-2">Refresh</span>}
           </Button>
@@ -191,6 +191,7 @@ export default function FinancialDashboard({
             variant="outline"
             size="sm"
             onClick={() => handleExport("csv")}
+            className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
           >
             <Download className="h-4 w-4" />
             {!isMobile && <span className="ml-2">Export</span>}
@@ -206,30 +207,31 @@ export default function FinancialDashboard({
               key={alert.id}
               className={cn(
                 "flex items-center justify-between p-3 rounded-lg border",
-                alert.severity === "critical" && "bg-red-50 border-red-200",
+                alert.severity === "critical" && "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800",
                 alert.severity === "warning" &&
-                  "bg-yellow-50 border-yellow-200",
-                alert.severity === "info" && "bg-blue-50 border-blue-200"
+                  "bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800",
+                alert.severity === "info" && "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
               )}
             >
               <div className="flex items-center space-x-3">
                 <AlertTriangle
                   className={cn(
                     "h-5 w-5",
-                    alert.severity === "critical" && "text-red-500",
-                    alert.severity === "warning" && "text-yellow-500",
-                    alert.severity === "info" && "text-blue-500"
+                    alert.severity === "critical" && "text-red-500 dark:text-red-400",
+                    alert.severity === "warning" && "text-yellow-500 dark:text-yellow-400",
+                    alert.severity === "info" && "text-blue-500 dark:text-blue-400"
                   )}
                 />
                 <div>
-                  <p className="font-medium">{alert.title}</p>
-                  <p className="text-sm text-gray-600">{alert.description}</p>
+                  <p className="font-medium dark:text-white">{alert.title}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{alert.description}</p>
                 </div>
               </div>
               {!alert.acknowledged && (
                 <Button
                   size="sm"
                   variant="outline"
+                  className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   onClick={() => acknowledgeAlert(alert.id)}
                 >
                   Acknowledge
@@ -242,16 +244,16 @@ export default function FinancialDashboard({
 
       {/* Key Performance Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium dark:text-white">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCurrency(overview?.totalRevenue || 0)}
             </div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="flex items-center space-x-1 text-xs text-muted-foreground dark:text-gray-400">
               {overview?.revenueGrowth && overview.revenueGrowth > 0 ? (
                 <TrendingUp className="h-3 w-3 text-green-500" />
               ) : (
@@ -264,16 +266,16 @@ export default function FinancialDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium dark:text-white">Net Profit</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCurrency(overview?.netProfit || 0)}
             </div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="flex items-center space-x-1 text-xs text-muted-foreground dark:text-gray-400">
               <span>
                 Margin: {formatPercentage(overview?.profitMargin || 0)}
               </span>
@@ -281,16 +283,16 @@ export default function FinancialDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Transactions</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium dark:text-white">Transactions</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCompactNumber(overview?.transactionCount || 0)}
             </div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="flex items-center space-x-1 text-xs text-muted-foreground dark:text-gray-400">
               <CheckCircle className="h-3 w-3 text-green-500" />
               <span>
                 {formatPercentage(overview?.successRate || 0)} success rate
@@ -299,18 +301,18 @@ export default function FinancialDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium dark:text-white">
               Avg Transaction
             </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCurrency(overview?.averageTransactionValue || 0)}
             </div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="flex items-center space-x-1 text-xs text-muted-foreground dark:text-gray-400">
               <Clock className="h-3 w-3" />
               <span>Per transaction</span>
             </div>
@@ -320,13 +322,13 @@ export default function FinancialDashboard({
 
       {/* Performance Indicators */}
       {performanceIndicators.length > 0 && (
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+            <CardTitle className="flex items-center space-x-2 dark:text-white">
               <Target className="h-5 w-5" />
               <span>Performance Indicators</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-gray-300">
               Key metrics tracking against targets
             </CardDescription>
           </CardHeader>
@@ -383,20 +385,20 @@ export default function FinancialDashboard({
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          <TabsTrigger value="profitability">Profitability</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 dark:bg-gray-700">
+          <TabsTrigger value="overview" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Overview</TabsTrigger>
+          <TabsTrigger value="revenue" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Revenue</TabsTrigger>
+          <TabsTrigger value="expenses" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Expenses</TabsTrigger>
+          <TabsTrigger value="profitability" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Profitability</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Revenue vs Expenses Chart */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Revenue vs Expenses</CardTitle>
-                <CardDescription>Monthly comparison</CardDescription>
+                <CardTitle className="dark:text-white">Revenue vs Expenses</CardTitle>
+                <CardDescription className="dark:text-gray-300">Monthly comparison</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -437,10 +439,10 @@ export default function FinancialDashboard({
             </Card>
 
             {/* Cash Flow Chart */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Cash Flow Trend</CardTitle>
-                <CardDescription>Monthly cash flow analysis</CardDescription>
+                <CardTitle className="dark:text-white">Cash Flow Trend</CardTitle>
+                <CardDescription className="dark:text-gray-300">Monthly cash flow analysis</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -477,10 +479,10 @@ export default function FinancialDashboard({
         <TabsContent value="revenue" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Revenue Sources */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Revenue by Source</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Revenue by Source</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Distribution of revenue streams
                 </CardDescription>
               </CardHeader>
@@ -521,10 +523,10 @@ export default function FinancialDashboard({
             </Card>
 
             {/* Revenue Growth */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Revenue Growth</CardTitle>
-                <CardDescription>Month-over-month growth</CardDescription>
+                <CardTitle className="dark:text-white">Revenue Growth</CardTitle>
+                <CardDescription className="dark:text-gray-300">Month-over-month growth</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -553,10 +555,10 @@ export default function FinancialDashboard({
         <TabsContent value="expenses" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Expense Categories */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Expense Categories</CardTitle>
-                <CardDescription>Breakdown by category</CardDescription>
+                <CardTitle className="dark:text-white">Expense Categories</CardTitle>
+                <CardDescription className="dark:text-gray-300">Breakdown by category</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -592,10 +594,10 @@ export default function FinancialDashboard({
             </Card>
 
             {/* Expense Trends */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Expense Trends</CardTitle>
-                <CardDescription>Monthly expense tracking</CardDescription>
+                <CardTitle className="dark:text-white">Expense Trends</CardTitle>
+                <CardDescription className="dark:text-gray-300">Monthly expense tracking</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -631,10 +633,10 @@ export default function FinancialDashboard({
         <TabsContent value="profitability" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Profit Margins */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Profit Margins</CardTitle>
-                <CardDescription>Profitability by segment</CardDescription>
+                <CardTitle className="dark:text-white">Profit Margins</CardTitle>
+                <CardDescription className="dark:text-gray-300">Profitability by segment</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -659,10 +661,10 @@ export default function FinancialDashboard({
             </Card>
 
             {/* Profitability Trends */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Profitability Trends</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Profitability Trends</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Monthly profit and margin trends
                 </CardDescription>
               </CardHeader>

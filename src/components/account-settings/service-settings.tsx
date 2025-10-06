@@ -60,7 +60,7 @@ export function ServiceSettings({
 }: ServiceSettingsProps) {
   function TabTitleComponent({ label }: { label: string }) {
     return (
-      <h3 className="text-[20px] text-[#002333] font-normal mb-4">{label}</h3>
+      <h3 className="text-[20px] text-[#002333] dark:text-white font-normal mb-4">{label}</h3>
     );
   }
 
@@ -84,7 +84,7 @@ export function ServiceSettings({
   return (
     <div>
       <TabTitleComponent label="My Services" />
-      {apiError && <div className="text-sm text-red-500 mb-4">{apiError}</div>}
+      {apiError && <div className="text-sm text-red-500 dark:text-red-400 mb-4">{apiError}</div>}
       <div className="space-y-4">
         {services.map((service) => (
           <ServiceRow
@@ -103,13 +103,13 @@ export function ServiceSettings({
               placeholder="Service Title"
               value={newServiceTitle}
               onChange={(e) => setNewServiceTitle(e.target.value)}
-              className="border-gray-200"
+              className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400"
             />
             <Select
               value={newServiceCategory}
               onValueChange={setNewServiceCategory}
             >
-              <SelectTrigger className="border-gray-200">
+              <SelectTrigger className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
@@ -126,7 +126,7 @@ export function ServiceSettings({
               placeholder="Service Description"
               value={newServiceDescription}
               onChange={(e) => setNewServiceDescription(e.target.value)}
-              className="border-gray-200 min-h-[80px]"
+              className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 min-h-[80px]"
             />
           </div>
           <div className="space-y-4">
@@ -136,7 +136,7 @@ export function ServiceSettings({
                   placeholder="Min Price"
                   value={newServiceMinPrice}
                   onChange={(e) => setNewServiceMinPrice(e.target.value)}
-                  className="border-gray-200 pl-10"
+                  className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 pl-10"
                   type="number"
                   step="0.001"
                   min="0"
@@ -156,7 +156,7 @@ export function ServiceSettings({
                   placeholder="Max Price"
                   value={newServiceMaxPrice}
                   onChange={(e) => setNewServiceMaxPrice(e.target.value)}
-                  className="border-gray-200 pl-10"
+                  className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 pl-10"
                   type="number"
                   step="0.001"
                   min="0"
@@ -177,7 +177,7 @@ export function ServiceSettings({
                 value={newServiceCurrency}
                 onValueChange={setNewServiceCurrency}
               >
-                <SelectTrigger className="border-gray-200 flex-1">
+                <SelectTrigger className="border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300 flex-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -220,7 +220,7 @@ export function ServiceSettings({
                 </SelectContent>
               </Select>
               <Button
-                className="bg-teal-700 hover:bg-teal-800 text-white"
+                className="bg-teal-700 hover:bg-teal-800 dark:bg-teal-800 dark:hover:bg-teal-900 text-white"
                 onClick={addService}
                 disabled={
                   !newServiceTitle ||

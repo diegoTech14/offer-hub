@@ -15,9 +15,11 @@ export default function Page() {
 
 
     return (
-        // This page is protected and set to only admin access
-        <ProtectedRoute roles={["admin"]} >
-            <AccountSettings />
+        // This page is protected and set to user access
+        <ProtectedRoute roles={["user"]} >
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <AccountSettings />
+            </div>
         </ProtectedRoute>
     )
 }

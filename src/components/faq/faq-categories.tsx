@@ -59,15 +59,15 @@ export function FaqCategories({
           onClick={() => setActiveCategory(category)}
           className={`
             flex flex-col items-center justify-center p-6 rounded-xl cursor-pointer
-            transition-all duration-300 bg-[#f8faf9]
+            transition-all duration-300 bg-[#f8faf9] dark:bg-gray-800 dark:border dark:border-gray-700
           `}
         >
-          <div className="w-12 h-12 rounded-full bg-[#e4f7f7] flex items-center justify-center mb-3">
-            <div className="text-primary-500">
+          <div className="w-12 h-12 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center mb-3">
+            <div className="text-primary-500 dark:text-teal-400">
               {categoryIcons[category].icon}
             </div>
           </div>
-          <h3 className="text-center font-medium text-secondary-500">
+          <h3 className="text-center font-medium text-secondary-500 dark:text-white">
             {category}
           </h3>
         </motion.div>

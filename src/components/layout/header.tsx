@@ -25,6 +25,7 @@ export default function Header() {
               height={48}
               className="object-contain"
             />
+            {/* Logo text with responsive size and dark mode support */}
             <span className="text-[#002333] dark:text-white font-bold text-lg sm:text-xl">
               OFFER HUB
             </span>
@@ -34,24 +35,27 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               href="/"
+              // Usar dark:text-gray-200 para mantener consistencia con otros enlaces de navegación en dark mode
               className="text-[#002333] dark:text-gray-200 font-medium bg-[#15949C]/10 dark:bg-[#15949C]/20 px-4 py-2 rounded-md"
             >
               Home
             </Link>
             <Link
               href="/find-workers"
+              // Usar dark:text-gray-200 para mantener consistencia con otros enlaces de navegación en dark mode
               className="text-[#002333] dark:text-gray-200 hover:text-[#15949C] dark:hover:text-[#15949C] transition-colors"
             >
               Find workers
             </Link>
             <Link
               href="/messages"
-              className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               My Chats
             </Link>
             <Link
               href="/my-account"
+              // Use dark:text-gray-200 for consistency with other navigation links in dark mode
               className="text-[#002333] dark:text-gray-200 hover:text-[#15949C] dark:hover:text-[#15949C] transition-colors"
             >
               My Account
@@ -70,6 +74,7 @@ export default function Header() {
             </Link>
             <Link
               href="/financial-dashboard-demo"
+              // Usar el color correcto para dark mode según la convención del resto del archivo
               className="text-[#002333] dark:text-gray-200 hover:text-[#15949C] dark:hover:text-[#15949C] transition-colors px-3 py-1 rounded-md"
             >
              Financial Dashboard

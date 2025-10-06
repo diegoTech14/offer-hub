@@ -69,9 +69,9 @@ export default function PaymentChart({ timeframe }: PaymentChartProps) {
         onValueChange={setChartType}
         className="mb-4"
       >
-        <TabsList className="grid w-[200px] grid-cols-2">
-          <TabsTrigger value="line">Line</TabsTrigger>
-          <TabsTrigger value="bar">Bar</TabsTrigger>
+        <TabsList className="grid w-[200px] grid-cols-2 dark:bg-gray-700">
+          <TabsTrigger value="line" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Line</TabsTrigger>
+          <TabsTrigger value="bar" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Bar</TabsTrigger>
         </TabsList>
       </Tabs>
 

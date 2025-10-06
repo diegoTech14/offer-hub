@@ -164,54 +164,54 @@ export default function PaymentHistory() {
       className="space-y-6"
     >
       <motion.div variants={item}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment History</CardTitle>
-            <CardDescription>
+        <Card className="dark:bg-gray-800 dark:border-gray-600 shadow-lg">
+          <CardHeader className="dark:border-gray-600">
+            <CardTitle className="dark:text-white text-xl">Payment History</CardTitle>
+            <CardDescription className="dark:text-gray-300">
               View and manage all your past transactions
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
                 <Input
                   placeholder="Search transactions..."
-                  className="pl-10"
+                  className="pl-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   value={searchTerm}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                 />
               </div>
               <div className="flex gap-2">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className="w-[140px] dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
+                  <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
+                    <SelectItem value="all" className="dark:text-white dark:hover:bg-gray-700">All Statuses</SelectItem>
+                    <SelectItem value="completed" className="dark:text-white dark:hover:bg-gray-700">Completed</SelectItem>
+                    <SelectItem value="pending" className="dark:text-white dark:hover:bg-gray-700">Pending</SelectItem>
                   </SelectContent>
                 </Select>
 
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className="w-[140px] dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                     <SelectValue placeholder="Type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="income">Income</SelectItem>
-                    <SelectItem value="expense">Expense</SelectItem>
+                  <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
+                    <SelectItem value="all" className="dark:text-white dark:hover:bg-gray-700">All Types</SelectItem>
+                    <SelectItem value="income" className="dark:text-white dark:hover:bg-gray-700">Income</SelectItem>
+                    <SelectItem value="expense" className="dark:text-white dark:hover:bg-gray-700">Expense</SelectItem>
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" size="icon" className="h-10 w-10">
+                <Button variant="outline" size="icon" className="h-10 w-10 dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                   <Calendar className="h-4 w-4" />
                 </Button>
 
                 <Button
                   variant="outline"
-                  className="hidden md:flex items-center"
+                  className="hidden md:flex items-center dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                 >
                   <Filter className="h-4 w-4 mr-2" />
                   More Filters
@@ -224,29 +224,29 @@ export default function PaymentHistory() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 shadow-lg">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                  <tr className="border-b border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Transaction
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Date
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Client
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Payment Method
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Amount
                     </th>
-                    <th className="text-left py-3 px-4 text-[#002333]/70 font-medium">
+                    <th className="text-left py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Status
                     </th>
-                    <th className="text-right py-3 px-4 text-[#002333]/70 font-medium">
+                    <th className="text-right py-3 px-4 text-[#002333]/70 dark:text-white font-medium">
                       Actions
                     </th>
                   </tr>
@@ -256,52 +256,52 @@ export default function PaymentHistory() {
                     <motion.tr
                       key={payment.id}
                       variants={item}
-                      className="border-b border-gray-100 hover:bg-gray-50"
+                      className="border-b border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/70 transition-colors duration-200"
                     >
                       <td className="py-4 px-4">
                         <div className="flex items-center">
                           <div
                             className={`h-8 w-8 rounded-full flex items-center justify-center mr-3 ${
                               payment.type === "income"
-                                ? "bg-green-100"
-                                : "bg-red-100"
+                                ? "bg-green-100 dark:bg-green-900/30"
+                                : "bg-red-100 dark:bg-red-900/30"
                             }`}
                           >
                             {payment.type === "income" ? (
-                              <ArrowUpRight className="h-4 w-4 text-green-600" />
+                              <ArrowUpRight className="h-4 w-4 text-green-600 dark:text-green-400" />
                             ) : (
-                              <ArrowDownRight className="h-4 w-4 text-red-600" />
+                              <ArrowDownRight className="h-4 w-4 text-red-600 dark:text-red-400" />
                             )}
                           </div>
                           <div>
-                            <p className="font-medium text-[#002333]">
+                            <p className="font-medium text-[#002333] dark:text-white">
                               {payment.description}
                             </p>
-                            <p className="text-xs text-[#002333]/70">
+                            <p className="text-xs text-[#002333]/70 dark:text-gray-300">
                               {payment.id}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-[#002333]">
+                      <td className="py-4 px-4 text-[#002333] dark:text-white">
                         {new Date(payment.date).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "short",
                           day: "numeric",
                         })}
                       </td>
-                      <td className="py-4 px-4 text-[#002333]">
+                      <td className="py-4 px-4 text-[#002333] dark:text-white">
                         {payment.client}
                       </td>
-                      <td className="py-4 px-4 text-[#002333]">
+                      <td className="py-4 px-4 text-[#002333] dark:text-white">
                         {payment.paymentMethod}
                       </td>
                       <td className="py-4 px-4">
                         <span
                           className={`font-medium ${
                             payment.type === "income"
-                              ? "text-green-600"
-                              : "text-red-600"
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-red-600 dark:text-red-400"
                           }`}
                         >
                           {payment.type === "income" ? "+" : "-"}$
@@ -312,8 +312,8 @@ export default function PaymentHistory() {
                         <Badge
                           className={`${
                             payment.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-amber-100 text-amber-800"
+                              ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                              : "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
                           }`}
                         >
                           {payment.status === "completed"
@@ -325,7 +325,7 @@ export default function PaymentHistory() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 text-[#15949C]"
+                          className="h-8 text-[#15949C] dark:text-white dark:hover:bg-gray-700"
                         >
                           <FileText className="h-4 w-4 mr-2" />
                           View
@@ -338,7 +338,7 @@ export default function PaymentHistory() {
                     <tr>
                       <td
                         colSpan={7}
-                        className="py-8 text-center text-[#002333]/70"
+                        className="py-8 text-center text-[#002333]/70 dark:text-gray-400"
                       >
                         No transactions found matching your filters.
                       </td>
@@ -350,26 +350,26 @@ export default function PaymentHistory() {
 
             <div className="mt-6">
               <Pagination>
-                <PaginationContent>
+                <PaginationContent className="dark:text-white">
                   <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious href="#" className="dark:text-white dark:hover:bg-gray-800" />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#" isActive>
+                    <PaginationLink href="#" isActive className="dark:bg-gray-700 dark:text-white dark:border-gray-600">
                       1
                     </PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#">2</PaginationLink>
+                    <PaginationLink href="#" className="dark:text-white dark:hover:bg-gray-800">2</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
+                    <PaginationLink href="#" className="dark:text-white dark:hover:bg-gray-800">3</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationEllipsis />
+                    <PaginationEllipsis className="dark:text-gray-400" />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext href="#" className="dark:text-white dark:hover:bg-gray-800" />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

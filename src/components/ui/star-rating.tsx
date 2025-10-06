@@ -58,7 +58,7 @@ export default function StarRating({
             // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             key={i}
             className={`${sizeClass} ${
-              i < displayRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+              i < displayRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"
             } ${isInteractiveMode ? 'hover:text-yellow-300 transition-colors' : ''}`}
             onMouseEnter={() => handleMouseEnter(i)}
             onMouseLeave={handleMouseLeave}

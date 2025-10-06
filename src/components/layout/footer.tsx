@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#002333] text-white pt-16 pb-8">
+    <footer className="bg-[#002333] dark:bg-gray-900 text-white pt-16 pb-8">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
@@ -110,7 +110,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/20 pt-8 text-center opacity-70 text-sm">
+        <div className="border-t border-white/20 dark:border-gray-700 pt-8 text-center opacity-70 text-sm">
           <p>© {new Date().getFullYear()} Offer Hub. All rights reserved.</p>
         </div>
       </div>

@@ -157,11 +157,8 @@ export function useServicesApi(): UseServicesApiReturn {
       params.delete('page');
     }
     
-    if (filters.limit && filters.limit !== 10) {
-      params.set('limit', filters.limit.toString());
-    } else {
-      params.delete('limit');
-    }
+    // Always use 6 as limit, don't include in URL
+    params.delete('limit');
 
     const newURL = `${pathname}?${params.toString()}`;
     router.replace(newURL, { scroll: false });
@@ -176,7 +173,7 @@ export function useServicesApi(): UseServicesApiReturn {
   const parseURLParams = useCallback((): ServiceFilters => {
     const filters: ServiceFilters = {
       page: 1,
-      limit: 10
+      limit: 6
     };
 
     const keyword = searchParams.get('q');
@@ -194,8 +191,9 @@ export function useServicesApi(): UseServicesApiReturn {
     const page = searchParams.get('page');
     if (page) filters.page = parseInt(page);
 
-    const limit = searchParams.get('limit');
-    if (limit) filters.limit = parseInt(limit);
+    // Always use 6 as limit, ignore URL limit parameter
+    // const limit = searchParams.get('limit');
+    // if (limit) filters.limit = parseInt(limit);
 
     return filters;
   }, [searchParams]);
@@ -218,7 +216,8 @@ export function useServicesApi(): UseServicesApiReturn {
       if (filters.max_price !== undefined) params.append('max', filters.max_price.toString());
       if (filters.keyword) params.append('keyword', filters.keyword);
       if (filters.page) params.append('page', filters.page.toString());
-      if (filters.limit) params.append('limit', filters.limit.toString());
+      // Always send limit=6
+      params.append('limit', '6');
 
       const response = await fetch(`${API_BASE_URL}/services?${params.toString()}`, {
         method: 'GET',
