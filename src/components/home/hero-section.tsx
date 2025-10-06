@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { searchItems } from "@/data/search-items";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,20 +10,11 @@ import { popularTags } from "@/data/landing-data";
 import { useSearch } from "@/hooks/use-search";
 import SearchResults from "@/components/search/search-results";
 
-// Example items array — replace with your actual data
-const allItems = [
-  { id: "1", title: "Web Development" },
-  { id: "2", title: "Graphic Design" },
-  { id: "3", title: "SEO Optimization" },
-  { id: "4", title: "Content Writing" },
-  { id: "5", title: "Mobile App Development" },
-];
-
 export default function HeroSection() {
   const { searchQuery, setSearchQuery,isLoading } = useSearch();
 
   // Filter results based on searchQuery
-  const resultsArray = allItems.filter((item) =>
+  const resultsArray = searchItems.filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
