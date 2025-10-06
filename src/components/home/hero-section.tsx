@@ -44,6 +44,7 @@ export default function HeroSection() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="What service are you looking for?"
+                aria-label="Search services"
                 className="
     border border-gray-300 
     dark:border-gray-600 
