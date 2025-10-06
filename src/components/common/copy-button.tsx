@@ -13,6 +13,7 @@ export function CopyButton({ text, className, size = 'sm' }: CopyButtonProps) {
 
   const handleCopy = () => {
     copy(text);
+    setTimeout(() => resetCopied(), 2000);
   };
 
   const sizeClasses = {
@@ -24,7 +25,7 @@ export function CopyButton({ text, className, size = 'sm' }: CopyButtonProps) {
   return (
     <Button
       variant="ghost"
-      size="sm"
+      size={size === 'md' ? 'default' : size}
       onClick={handleCopy}
       className={`${sizeClasses[size]} ${className}`}
     >
@@ -37,3 +38,7 @@ export function CopyButton({ text, className, size = 'sm' }: CopyButtonProps) {
     </Button>
   );
 }
+function resetCopied(): void {
+  throw new Error('Function not implemented.');
+}
+
