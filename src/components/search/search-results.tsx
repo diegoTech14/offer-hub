@@ -1,12 +1,11 @@
-"use client"
-
-import { useSearch } from "@/hooks/use-search"
+"use client";
 import SearchLoading from "./search-loading"
 import SearchHighlight from "../common/search-highlight"
 
 interface SearchResultsProps {
   results: { id: string; title: string; description?: string }[]
   searchQuery: string
+  isLoading?: boolean
   showLoading?: boolean
 }
 
@@ -14,10 +13,10 @@ interface SearchResultsProps {
 
 export default function SearchResults({ 
   results,
+  isLoading = false,
   showLoading = true,
   searchQuery = "", // ✅ This line is what you asked about
 }: SearchResultsProps) {
-  const { isLoading } = useSearch() // ✅ Don't extract searchQuery from the hook anymore
 
 
 

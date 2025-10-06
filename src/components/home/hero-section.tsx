@@ -19,7 +19,7 @@ const allItems = [
 ];
 
 export default function HeroSection() {
-  const { searchQuery, setSearchQuery } = useSearch();
+  const { searchQuery, setSearchQuery,isLoading } = useSearch();
 
   // Filter results based on searchQuery
   const resultsArray = allItems.filter((item) =>
@@ -69,6 +69,7 @@ export default function HeroSection() {
                   results={resultsArray}
                   showLoading
                   searchQuery={searchQuery}
+                  isLoading={isLoading}
                 />
 
               </div>
