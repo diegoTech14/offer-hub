@@ -9,14 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { popularTags } from "@/data/landing-data";
 import { useSearch } from "@/hooks/use-search";
 import SearchResults from "@/components/search/search-results";
+import { normalizeQuery } from "@/utils/search-helpers";
 
 export default function HeroSection() {
   const { searchQuery, setSearchQuery, isLoading } = useSearch();
 
-  // Filter results based on searchQuery
-  const resultsArray = searchItems.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const normalizedQuery = searchQuery.trim();
+  const normalizedQueryLower = normalizedQuery.toLowerCase();
+
+  const resultsArray = normalizedQuery
+   ? searchItems.filter((item) =>
+    item.title.toLowerCase().includes(normalizedQueryLower)
+  )
+ :[]; 
 
   return (
     <section className="bg-gradient-to-r from-[#002333] to-[#15949C] text-white py-16 md:py-24">
@@ -56,18 +61,18 @@ export default function HeroSection() {
             </div>
 
             {/* Search Results */}
-            {searchQuery && (
+            {normalizedQuery && (
               <div className="mt-4 bg-white rounded-md p-2 text-black">
                 {resultsArray.length > 0 ? (
                   <SearchResults
                   results={resultsArray}
                   showLoading
-                  searchQuery={searchQuery}
+                  searchQuery={normalizedQuery}
                   isLoading={isLoading}
                 />
                 ):(
                  <p className="text-gray-500 text-center py-4">
-                  No results found for "{searchQuery}"
+                  No results found for "{normalizedQuery}"
                  </p> 
                 )}
               </div>
