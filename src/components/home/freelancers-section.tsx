@@ -5,20 +5,19 @@ import { freelancers } from "@/data/landing-data";
 
 export default function FreelancersSection() {
   return (
-    <section className="py-16">
+    <section className="py-16 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h2 className="text-3xl font-bold text-[#002333] mb-2">
+            <h2 className="text-3xl font-bold text-[#002333] dark:text-white mb-2">
               Top Rated Freelancers
             </h2>
-            <p className="text-[#002333]/70">
+            <p className="text-[#002333]/70 dark:text-gray-300">
               Discover our most successful professionals
             </p>
           </div>
           <Button
-            variant="outline"
-            className="border-[#15949C] text-[#15949C] hover:bg-[#DEEFE7]"
+            className="bg-[#15949C] hover:bg-[#15949C]/90 text-white"
           >
             View All
             <ChevronRight className="h-4 w-4 ml-1" />

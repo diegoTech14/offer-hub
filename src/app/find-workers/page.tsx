@@ -22,11 +22,12 @@ import Link from "next/link"
 import { useServicesApi } from "@/hooks/api-connections/use-services-api"
 import { ServiceFilters, FreelancerDisplay } from "@/types/service.types"
 import { useSearchParams } from "next/navigation"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 // Simple Header component defined inline
 function SimpleHeader() {
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
@@ -37,28 +38,29 @@ function SimpleHeader() {
               <Link href="/find-workers" className="text-[#15949C] font-medium">
                 Find Talent
               </Link>
-              <Link href="/post-project" className="text-[#002333] hover:text-[#15949C]">
+              <Link href="/post-project" className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]">
                 Post a Project
               </Link>
-              <Link href="/my-chats" className="text-[#002333] hover:text-[#15949C]">
+              <Link href="/my-chats" className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]">
                 Messages
               </Link>
-              <Link href="/payments" className="text-[#002333] hover:text-[#15949C]">
+              <Link href="/payments" className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]">
                 Payments
               </Link>
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="text-[#002333]">
+            <ThemeToggle />
+            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-[#002333]">
+            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
               <Bell className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-[#002333]">
+            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
               <User className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="md:hidden text-[#002333]">
+            <Button variant="ghost" size="icon" className="md:hidden text-[#002333] dark:text-gray-300">
               <Menu className="h-5 w-5" />
             </Button>
           </div>
@@ -71,7 +73,7 @@ function SimpleHeader() {
 // Simple Footer component defined inline
 function SimpleFooter() {
   return (
-    <footer className="bg-[#002333] text-white py-8">
+    <footer className="bg-[#002333] dark:bg-gray-900 text-white py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -139,7 +141,7 @@ function SimpleFooter() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center">
+        <div className="border-t border-gray-700 dark:border-gray-600 mt-8 pt-8 text-center">
           <p className="text-sm text-gray-300">&copy; 2024 Offer Hub. All rights reserved.</p>
         </div>
       </div>
@@ -226,11 +228,11 @@ export default function FindWorkersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
       <SimpleHeader />
 
       <main className="flex-1">
-        <div className="bg-gradient-to-r from-[#002333] to-[#15949C] text-white py-10">
+        <div className="bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-900 dark:to-gray-800 text-white py-10">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">Find Expert Freelancers for Your Project</h1>
@@ -241,21 +243,21 @@ export default function FindWorkersPage() {
                 <Input
                   type="text"
                   placeholder="Search for skills, expertise, or job titles..."
-                  className="pl-10 pr-4 py-6 rounded-full text-[#002333] text-lg"
+                  className="pl-10 pr-4 py-6 rounded-full text-white dark:text-white text-lg bg-gray-600 dark:bg-gray-600 placeholder-gray-300 dark:placeholder-gray-300"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 h-5 w-5" />
                 <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-[#15949C] hover:bg-[#15949C]/90 px-6">
                   Search
                 </Button>
               </div>
               <div className="flex flex-wrap justify-center gap-2 mt-4">
-                <Badge className="bg-white/20 hover:bg-white/30 cursor-pointer">Web Development</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 cursor-pointer">UI/UX Design</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 cursor-pointer">Mobile Development</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 cursor-pointer">Content Writing</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 cursor-pointer">Digital Marketing</Badge>
+                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Web Development</Badge>
+                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">UI/UX Design</Badge>
+                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Mobile Development</Badge>
+                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Content Writing</Badge>
+                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Digital Marketing</Badge>
               </div>
             </div>
           </div>
@@ -272,7 +274,7 @@ export default function FindWorkersPage() {
             >
               <div className="container mx-auto max-w-7xl flex items-center justify-between">
                 <div className="flex items-center">
-                  <span className="font-medium text-[#002333] mr-4">
+                  <span className="font-medium text-[#002333] dark:text-white mr-4">
                     {selectedFreelancers.length} freelancer{selectedFreelancers.length > 1 ? "s" : ""} selected
                   </span>
                   <div className="flex -space-x-2">
@@ -335,7 +337,7 @@ export default function FindWorkersPage() {
                     {isFilterOpen ? "Hide Filters" : "Show Filters"}
                   </Button>
                   <Separator orientation="vertical" className="h-6 mx-2" />
-                  <span className="text-sm text-[#002333]/70">
+                  <span className="text-sm text-[#002333]/70 dark:text-gray-300">
                     {isLoading ? "Loading..." : `${pagination?.total_services || services.length} freelancers found`}
                   </span>
                   {error && (
@@ -347,22 +349,22 @@ export default function FindWorkersPage() {
 
                 <div className="flex items-center gap-2">
                   <Select defaultValue="relevance">
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px] bg-gray-600 dark:bg-gray-600 border-gray-600 dark:border-gray-600 text-white dark:text-white">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="relevance">Relevance</SelectItem>
-                      <SelectItem value="rating">Highest Rating</SelectItem>
-                      <SelectItem value="reviews">Most Reviews</SelectItem>
-                      <SelectItem value="newest">Newest</SelectItem>
+                    <SelectContent className="bg-gray-600 dark:bg-gray-600 border-gray-600 dark:border-gray-600">
+                      <SelectItem value="relevance" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Relevance</SelectItem>
+                      <SelectItem value="rating" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Highest Rating</SelectItem>
+                      <SelectItem value="reviews" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Most Reviews</SelectItem>
+                      <SelectItem value="newest" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Newest</SelectItem>
                     </SelectContent>
                   </Select>
 
-                  <div className="border rounded-md p-1 flex">
+                  <div className="border border-gray-600 dark:border-gray-600 rounded-md p-1 flex bg-gray-600 dark:bg-gray-600">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "grid" ? "bg-[#DEEFE7] text-[#15949C]" : ""}`}
+                      className={`h-8 w-8 ${viewMode === "grid" ? "bg-gray-700 text-white" : "text-gray-300 dark:text-gray-300"}`}
                       onClick={() => setViewMode("grid")}
                     >
                       <Grid className="h-4 w-4" />
@@ -370,7 +372,7 @@ export default function FindWorkersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "list" ? "bg-[#DEEFE7] text-[#15949C]" : ""}`}
+                      className={`h-8 w-8 ${viewMode === "list" ? "bg-gray-700 text-white" : "text-gray-300 dark:text-gray-300"}`}
                       onClick={() => setViewMode("list")}
                     >
                       <List className="h-4 w-4" />
@@ -378,7 +380,7 @@ export default function FindWorkersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "map" ? "bg-[#DEEFE7] text-[#15949C]" : ""}`}
+                      className={`h-8 w-8 ${viewMode === "map" ? "bg-gray-700 text-white" : "text-gray-300 dark:text-gray-300"}`}
                       onClick={() => setViewMode("map")}
                     >
                       <Map className="h-4 w-4" />
@@ -453,19 +455,19 @@ export default function FindWorkersPage() {
 
           {/* Market Insights Section */}
           <div className="mt-16">
-            <h2 className="text-2xl font-bold text-[#002333] mb-6">Talent Market Insights</h2>
+            <h2 className="text-2xl font-bold text-[#002333] dark:text-white mb-6">Talent Market Insights</h2>
             <TalentMarketInsights />
           </div>
 
           {/* Popular Categories */}
           <div className="mt-16">
-            <h2 className="text-2xl font-bold text-[#002333] mb-6">Browse Talent by Category</h2>
+            <h2 className="text-2xl font-bold text-[#002333] dark:text-white mb-6">Browse Talent by Category</h2>
             <TalentCategories />
           </div>
 
           {/* Featured Freelancers */}
           <div className="mt-16">
-            <h2 className="text-2xl font-bold text-[#002333] mb-6">Featured Talent</h2>
+            <h2 className="text-2xl font-bold text-[#002333] dark:text-white mb-6">Featured Talent</h2>
             <TalentFeatured
               selectedFreelancers={selectedFreelancers}
               toggleFreelancerSelection={toggleFreelancerSelection}

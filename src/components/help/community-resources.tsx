@@ -22,12 +22,12 @@ const resources = [
 export default function CommunityResources() {
   return (
     <section className="max-w-6xl mx-auto px-4 py-16">
-      <h2 className="text-2xl font-bold text-center mb-2">
+      <h2 className="text-2xl font-bold text-center mb-2 text-gray-900 dark:text-white">
         Community & Resources
       </h2>
-      <p className="text-center text-gray-600 mb-10">
+      <p className="text-center text-gray-600 dark:text-gray-300 mb-10">
         Join our{" "}
-        <a href="#" className="text-teal-600 font-medium hover:underline">
+        <a href="#" className="text-teal-600 dark:text-teal-400 font-medium hover:underline">
           community
         </a>{" "}
         and access additional resources to enhance your experience
@@ -40,9 +40,9 @@ export default function CommunityResources() {
             href={res.href}
             target={res.external ? "_blank" : "_self"}
             rel="noopener noreferrer"
-            className="block bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+            className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md dark:hover:shadow-gray-900/20 transition-shadow"
           >
-            <div className="relative w-full h-40 bg-gray-100">
+            <div className="relative w-full h-40 bg-gray-100 dark:bg-gray-700">
               <Image
                 src={res.image}
                 alt={res.title}
@@ -51,11 +51,11 @@ export default function CommunityResources() {
               />
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-1">
+              <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-1">
                 {res.title}
                 {res.external && <FiExternalLink className="text-sm" />}
               </h3>
-              <p className="text-sm text-gray-600 mt-1">{res.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{res.description}</p>
             </div>
           </a>
         ))}

@@ -72,29 +72,29 @@ export default function LocationSearch({
   const radiusOptions = [10, 25, 50, 100, 250, 500]
 
   return (
-    <Card>
-      <CardContent className="p-4 space-y-4">
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-[#002333] flex items-center">
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
+      <CardContent className="p-2 space-y-1">
+        <div className="space-y-3">
+          <Label className="text-sm font-medium text-[#002333] dark:text-white flex items-center">
             <MapPin className="h-4 w-4 mr-2 text-[#15949C]" />
             Location
           </Label>
           
           <div className="relative">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#002333]/50" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-300" />
               <Input
                 ref={searchInputRef}
                 placeholder="City, state, or country..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(searchQuery.length >= 2 || recentLocations.length > 0)}
-                className="pl-10 pr-10"
+                className="pl-10 pr-10 bg-gray-600 dark:bg-gray-600 border-gray-600 dark:border-gray-600 text-white dark:text-white placeholder-gray-300 dark:placeholder-gray-300"
               />
               {searchQuery && (
                 <button
                   onClick={handleClearLocation}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#002333]/50 hover:text-[#002333]"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-300 hover:text-white"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -223,7 +223,7 @@ export default function LocationSearch({
 
         {/* Distance Radius */}
         {currentLocation && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Separator />
             <div>
               <Label className="text-sm font-medium text-[#002333] mb-2 block">

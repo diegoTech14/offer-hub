@@ -304,12 +304,12 @@ export default function RevenueAnalysis({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={refreshData}>
+          <Button variant="outline" size="sm" onClick={refreshData} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <RefreshCw className="h-4 w-4" />
             <span className="ml-2">Refresh</span>
           </Button>
 
-          <Button variant="outline" size="sm" onClick={handleExport}>
+          <Button variant="outline" size="sm" onClick={handleExport} className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
             <Download className="h-4 w-4" />
             <span className="ml-2">Export</span>
           </Button>
@@ -318,16 +318,16 @@ export default function RevenueAnalysis({
 
       {/* Key Revenue Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium dark:text-white">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCurrency(overview?.totalRevenue || 0)}
             </div>
-            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+            <div className="flex items-center space-x-1 text-xs text-muted-foreground dark:text-gray-400">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span>
                 {formatPercentage(overview?.revenueGrowth || 0)} growth
@@ -336,50 +336,50 @@ export default function RevenueAnalysis({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium dark:text-white">
               Monthly Recurring
             </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCurrency(overview?.monthlyRecurringRevenue || 0)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Predictable revenue stream
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium dark:text-white">
               Avg Transaction
             </CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <BarChart3 className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold dark:text-white">
               {formatCurrency(overview?.averageTransactionValue || 0)}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Per transaction value
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium dark:text-white">
               Revenue per User
             </CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <Star className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(485.5)}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold dark:text-white">{formatCurrency(485.5)}</div>
+            <p className="text-xs text-muted-foreground dark:text-gray-400">
               Average per active user
             </p>
           </CardContent>
@@ -392,20 +392,20 @@ export default function RevenueAnalysis({
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="sources">Sources</TabsTrigger>
-          <TabsTrigger value="forecasts">Forecasts</TabsTrigger>
-          <TabsTrigger value="optimization">Optimization</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 dark:bg-gray-700">
+          <TabsTrigger value="overview" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Overview</TabsTrigger>
+          <TabsTrigger value="sources" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Sources</TabsTrigger>
+          <TabsTrigger value="forecasts" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Forecasts</TabsTrigger>
+          <TabsTrigger value="optimization" className="dark:data-[state=active]:bg-gray-600 dark:data-[state=active]:text-white dark:text-gray-300">Optimization</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Revenue Trend */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Revenue Trend</CardTitle>
-                <CardDescription>Monthly revenue growth</CardDescription>
+                <CardTitle className="dark:text-white">Revenue Trend</CardTitle>
+                <CardDescription className="dark:text-gray-300">Monthly revenue growth</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -449,10 +449,10 @@ export default function RevenueAnalysis({
             </Card>
 
             {/* Seasonal Trends */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Seasonal Patterns</CardTitle>
-                <CardDescription>Quarterly revenue patterns</CardDescription>
+                <CardTitle className="dark:text-white">Seasonal Patterns</CardTitle>
+                <CardDescription className="dark:text-gray-300">Quarterly revenue patterns</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -472,10 +472,10 @@ export default function RevenueAnalysis({
             </Card>
 
             {/* Top Performers */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Top Performing Categories</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Top Performing Categories</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Highest revenue generating services
                 </CardDescription>
               </CardHeader>
@@ -487,7 +487,7 @@ export default function RevenueAnalysis({
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full text-sm font-bold text-blue-600">
+                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-gray-600 rounded-full text-sm font-bold text-blue-600 dark:text-white">
                           {index + 1}
                         </div>
                         <div>
@@ -523,10 +523,10 @@ export default function RevenueAnalysis({
             </Card>
 
             {/* Revenue Distribution */}
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-600">
               <CardHeader>
-                <CardTitle>Revenue Distribution</CardTitle>
-                <CardDescription>Current revenue breakdown</CardDescription>
+                <CardTitle className="dark:text-white">Revenue Distribution</CardTitle>
+                <CardDescription className="dark:text-gray-300">Current revenue breakdown</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -660,15 +660,15 @@ export default function RevenueAnalysis({
                       value={forecastScenario}
                       onValueChange={setForecastScenario}
                     >
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[140px] dark:bg-gray-600 dark:border-gray-600 dark:text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="conservative">
+                      <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+                        <SelectItem value="conservative" className="dark:text-white dark:hover:bg-gray-600">
                           Conservative
                         </SelectItem>
-                        <SelectItem value="optimistic">Optimistic</SelectItem>
-                        <SelectItem value="pessimistic">Pessimistic</SelectItem>
+                        <SelectItem value="optimistic" className="dark:text-white dark:hover:bg-gray-600">Optimistic</SelectItem>
+                        <SelectItem value="pessimistic" className="dark:text-white dark:hover:bg-gray-600">Pessimistic</SelectItem>
                       </SelectContent>
                     </Select>
                   </CardTitle>
@@ -760,7 +760,7 @@ export default function RevenueAnalysis({
                               <div className="flex items-center space-x-2">
                                 <div className="w-16 bg-gray-200 rounded-full h-2">
                                   <div
-                                    className="bg-blue-500 h-2 rounded-full"
+                                    className="bg-blue-500 dark:bg-gray-500 h-2 rounded-full"
                                     style={{
                                       width: `${forecast.confidence * 100}%`,
                                     }}
@@ -878,7 +878,7 @@ export default function RevenueAnalysis({
                             )}
                           </span>
                         </div>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" className="dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500">
                           <Zap className="h-4 w-4 mr-1" />
                           Implement
                         </Button>
@@ -887,14 +887,14 @@ export default function RevenueAnalysis({
                   ))}
                 </div>
 
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-gray-600">
                   <div className="flex items-start space-x-3">
-                    <Target className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <Target className="h-5 w-5 text-blue-600 dark:text-gray-400 mt-0.5" />
                     <div>
-                      <h4 className="font-semibold text-blue-900">
+                      <h4 className="font-semibold text-blue-900 dark:text-white">
                         Total Optimization Potential
                       </h4>
-                      <p className="text-sm text-blue-700 mb-2">
+                      <p className="text-sm text-blue-700 dark:text-gray-300 mb-2">
                         Implementing all recommendations could increase revenue
                         by{" "}
                         <span className="font-bold">

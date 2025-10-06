@@ -168,15 +168,15 @@ export default function TalentMapView({
       <Card className={`overflow-hidden transition-all duration-300 ${isFullScreen ? 'fixed inset-4 z-50' : 'h-[600px]'}`}>
         <CardContent className="p-0 h-full">
           {/* Map Header */}
-          <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-white/95 backdrop-blur-sm border-b">
+          <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <MapPin className="h-5 w-5 text-[#15949C]" />
                 <div>
-                  <h3 className="font-medium text-[#002333]">
+                  <h3 className="font-medium text-[#002333] dark:text-white">
                     {selectedLocation ? selectedLocation.name : "Global Map"}
                   </h3>
-                  <p className="text-sm text-[#002333]/70">
+                  <p className="text-sm text-[#002333]/70 dark:text-gray-300">
                     {filteredFreelancers.length} freelancers
                     {selectedLocation && searchRadius && ` within ${searchRadius}km`}
                   </p>
@@ -188,7 +188,7 @@ export default function TalentMapView({
                   variant="outline"
                   size="sm"
                   onClick={() => setClusteredView(!clusteredView)}
-                  className="h-8"
+                  className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
                 >
                   <Users className="h-4 w-4 mr-1" />
                   {clusteredView ? "Uncluster" : "Cluster"}
@@ -197,7 +197,7 @@ export default function TalentMapView({
                   variant="outline" 
                   size="sm"
                   onClick={() => setShowFilters(!showFilters)}
-                  className="h-8"
+                  className="h-8 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
                 >
                   <Filter className="h-4 w-4" />
                 </Button>
@@ -205,7 +205,7 @@ export default function TalentMapView({
                   variant="outline"
                   size="sm"
                   onClick={() => setIsFullScreen(!isFullScreen)}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
                 >
                   {isFullScreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                 </Button>
@@ -214,12 +214,12 @@ export default function TalentMapView({
           </div>
 
           {/* Map Container */}
-          <div ref={mapRef} className="relative w-full h-full bg-gradient-to-br from-blue-50 to-green-50">
+          <div ref={mapRef} className="relative w-full h-full bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-900 dark:to-gray-800">
             {/* Map Background Info */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center opacity-30">
-                <p className="text-[#002333]/70 mb-2">Interactive Map Visualization</p>
-                <p className="text-sm text-[#002333]/50">
+                <p className="text-[#002333]/70 dark:text-gray-300 mb-2">Interactive Map Visualization</p>
+                <p className="text-sm text-[#002333]/50 dark:text-gray-400">
                   Freelancers positioned based on their locations
                 </p>
               </div>
@@ -295,7 +295,7 @@ export default function TalentMapView({
                           transform: 'translate(-50%, calc(-100% - 10px))'
                         }}
                       >
-                        <Card className="shadow-xl border-2 border-[#15949C]/20">
+                        <Card className="shadow-xl border-2 border-[#15949C]/20 dark:bg-gray-800 dark:border-gray-600">
                           <CardContent className="p-4">
                             <div className="flex items-start gap-3">
                               <Avatar className="h-12 w-12 border-2 border-[#15949C]/20">
@@ -310,7 +310,7 @@ export default function TalentMapView({
 
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-1">
-                                  <h4 className="font-semibold text-[#002333] truncate">
+                                  <h4 className="font-semibold text-[#002333] dark:text-white truncate">
                                     {freelancer.name}
                                   </h4>
                                   <span className="font-bold text-[#15949C] text-lg">
@@ -318,23 +318,23 @@ export default function TalentMapView({
                                   </span>
                                 </div>
 
-                                <p className="text-sm text-[#002333]/70 mb-2 truncate">
+                                <p className="text-sm text-[#002333]/70 dark:text-gray-300 mb-2 truncate">
                                   {freelancer.title}
                                 </p>
 
                                 <div className="flex items-center mb-2">
                                   <div className="flex mr-1">{renderStars(freelancer.rating)}</div>
-                                  <span className="text-sm text-[#002333] mr-1">{freelancer.rating}</span>
-                                  <span className="text-sm text-[#002333]/70">
+                                  <span className="text-sm text-[#002333] dark:text-white mr-1">{freelancer.rating}</span>
+                                  <span className="text-sm text-[#002333]/70 dark:text-gray-400">
                                     ({freelancer.reviewCount} reviews)
                                   </span>
                                 </div>
 
-                                <div className="flex items-center mb-3 text-sm text-[#002333]/70">
+                                <div className="flex items-center mb-3 text-sm text-[#002333]/70 dark:text-gray-300">
                                   <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
                                   <span className="truncate">{freelancer.location}</span>
                                   {freelancer.timezone && (
-                                    <Badge variant="outline" className="ml-2 text-xs">
+                                    <Badge variant="outline" className="ml-2 text-xs dark:border-gray-600 dark:text-gray-300">
                                       {freelancer.timezone.split('/')[1]?.replace('_', ' ')}
                                     </Badge>
                                   )}
@@ -345,13 +345,13 @@ export default function TalentMapView({
                                     <Badge 
                                       key={skill} 
                                       variant="outline" 
-                                      className="text-xs py-0"
+                                      className="text-xs py-0 dark:border-gray-600 dark:text-gray-300"
                                     >
                                       {skill}
                                     </Badge>
                                   ))}
                                   {freelancer.skills.length > 3 && (
-                                    <Badge variant="outline" className="text-xs py-0">
+                                    <Badge variant="outline" className="text-xs py-0 dark:border-gray-600 dark:text-gray-300">
                                       +{freelancer.skills.length - 3}
                                     </Badge>
                                   )}
@@ -368,7 +368,7 @@ export default function TalentMapView({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 px-2"
+                                    className="h-8 px-2 dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                                     onClick={() => toggleFreelancerSelection(freelancer.id)}
                                   >
                                     {isChosenFreelancer ? (
@@ -380,7 +380,7 @@ export default function TalentMapView({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 px-2"
+                                    className="h-8 px-2 dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                                   >
                                     <MessageSquare className="h-3 w-3" />
                                   </Button>
@@ -400,18 +400,18 @@ export default function TalentMapView({
           {/* Map Stats */}
           <div className="absolute bottom-4 left-4 right-4 z-20">
             <div className="flex items-center justify-between">
-              <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
+              <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
                     <div className="h-2 w-2 rounded-full bg-[#15949C]"></div>
-                    <span className="text-[#002333]/70">
+                    <span className="text-[#002333]/70 dark:text-gray-300">
                       {filteredFreelancers.length} freelancers
                     </span>
                   </div>
                   {selectedFreelancers.length > 0 && (
                     <div className="flex items-center gap-1">
                       <div className="h-2 w-2 rounded-full bg-yellow-400"></div>
-                      <span className="text-[#002333]/70">
+                      <span className="text-[#002333]/70 dark:text-gray-300">
                         {selectedFreelancers.length} selected
                       </span>
                     </div>
@@ -420,8 +420,8 @@ export default function TalentMapView({
               </div>
 
               {selectedLocation && (
-                <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
-                  <div className="text-sm text-[#002333]/70">
+                <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
+                  <div className="text-sm text-[#002333]/70 dark:text-gray-300">
                     Within {searchRadius}km of {selectedLocation.name}
                   </div>
                 </div>
