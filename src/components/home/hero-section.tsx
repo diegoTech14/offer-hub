@@ -11,7 +11,7 @@ import { useSearch } from "@/hooks/use-search";
 import SearchResults from "@/components/search/search-results";
 
 export default function HeroSection() {
-  const { searchQuery, setSearchQuery,isLoading } = useSearch();
+  const { searchQuery, setSearchQuery, isLoading } = useSearch();
 
   // Filter results based on searchQuery
   const resultsArray = searchItems.filter((item) =>
@@ -56,15 +56,20 @@ export default function HeroSection() {
             </div>
 
             {/* Search Results */}
-            {searchQuery && resultsArray.length > 0 && (
+            {searchQuery && (
               <div className="mt-4 bg-white rounded-md p-2 text-black">
-                <SearchResults
+                {resultsArray.length > 0 ? (
+                  <SearchResults
                   results={resultsArray}
                   showLoading
                   searchQuery={searchQuery}
                   isLoading={isLoading}
                 />
-
+                ):(
+                 <p className="text-gray-500 text-center py-4">
+                  No results found for "{searchQuery}"
+                 </p> 
+                )}
               </div>
             )}
           </div>
