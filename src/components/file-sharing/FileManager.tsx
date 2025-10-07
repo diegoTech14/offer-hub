@@ -29,7 +29,12 @@ export const FileManager: React.FC<FileManagerProps> = ({ files, selectedIds, on
   const [view, setView] = useState<ViewMode>('grid');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<FileCategory | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'date' | 'size' | 'type'>('date');
+  type SortBy = 'date' | 'name' | 'size' | 'type';
+  const SORT_OPTIONS = ['date', 'name', 'size', 'type'] as const;
+  function isSortBy(v: string): v is SortBy {
+    return (SORT_OPTIONS as readonly string[]).includes(v);
+  }
+  const [sortBy, setSortBy] = useState<SortBy>('date');
   const deferredQuery = useDeferredValue(query);
   const [page, setPage] = useState(1);
   const pageSize = 24;
@@ -49,9 +54,9 @@ export const FileManager: React.FC<FileManagerProps> = ({ files, selectedIds, on
       case 'type':
         return [...result].sort((a, b) => a.mimeType.localeCompare(b.mimeType));
       default:
-        return [...result].sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
+        return [...result].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
     }
-  }, [files, category, query, sortBy]);
+  }, [files, category, deferredQuery, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -94,7 +99,10 @@ export const FileManager: React.FC<FileManagerProps> = ({ files, selectedIds, on
         <select
           className="rounded-md border border-neutral-400 bg-white px-2.5 py-1.5 text-sm text-neutral-800"
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as any)}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (isSortBy(val)) setSortBy(val);
+          }}
           aria-label="Sort by"
         >
           <option value="date">Sort: Date</option>
@@ -171,7 +179,17 @@ export const FileManager: React.FC<FileManagerProps> = ({ files, selectedIds, on
                   {checked ? <CheckSquare className="h-4 w-4 text-primary-600" aria-hidden /> : <Square className="h-4 w-4 text-neutral-800" aria-hidden />}
                 </button>
                 <button type="button" onClick={() => onOpen(f.id)} className="block w-full text-left">
-                  <div className="h-28 w-full overflow-hidden rounded-md bg-neutral-300" aria-hidden />
+                  <div className="h-28 w-full overflow-hidden rounded-md bg-neutral-300">
+                    {f.thumbnailUrl ? (
+                      <img
+                        src={f.thumbnailUrl}
+                        alt={f.name || `Thumbnail for ${f.id}`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full" aria-hidden />
+                    )}
+                  </div>
                   <p className="mt-2 truncate text-sm font-medium text-neutral-800">{f.name}</p>
                   <p className="text-xs text-neutral-600">{f.mimeType} • {formatFileSize(f.size)}</p>
                 </button>

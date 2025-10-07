@@ -122,6 +122,13 @@ export function sanitizeFileName(fileName: string): string {
 }
 
 export async function generateFileChecksum(file: File): Promise<string> {
+  // Guard against memory pressure: avoid loading very large files entirely into memory.
+  const MAX_CHECKSUM_SIZE = 100 * 1024 * 1024; // 100MB
+  if (typeof file.size === 'number' && file.size > MAX_CHECKSUM_SIZE) {
+    console.warn('Skipping checksum generation for large file to avoid memory pressure:', file.name);
+    return 'CHECKSUM_SKIPPED_FILE_TOO_LARGE';
+  }
+
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));

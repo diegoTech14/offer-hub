@@ -32,8 +32,9 @@ export interface FileMetadata {
   url?: string;
   thumbnailUrl?: string;
   uploadedBy: string;
-  uploadedAt: Date;
-  lastModified: Date;
+  // ISO 8601 strings for serialization across API boundaries
+  uploadedAt: string;
+  lastModified: string;
   version: number;
   tags: string[];
   description?: string;
@@ -57,7 +58,8 @@ export interface FileFolder {
   id: string;
   name: string;
   parentId?: string;
-  createdAt: Date;
+  // ISO 8601 string
+  createdAt: string;
   fileCount: number;
   color?: string;
 }
@@ -65,7 +67,8 @@ export interface FileFolder {
 export interface FileShareSettings {
   fileId: string;
   allowedUsers: string[];
-  expiresAt?: Date;
+  // ISO 8601 string
+  expiresAt?: string;
   password?: string;
   maxDownloads?: number;
   permissions: FilePermission[];
@@ -75,7 +78,8 @@ export interface FileVersion {
   id: string;
   fileId: string;
   version: number;
-  uploadedAt: Date;
+  // ISO 8601 string
+  uploadedAt: string;
   uploadedBy: string;
   size: number;
   changes?: string;

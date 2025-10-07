@@ -3,7 +3,7 @@
  * Centralized state management for file operations
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import {
@@ -61,6 +61,7 @@ export function useFileSharing(): UseFileSharingReturn {
   
   const abortControllers = useRef<Map<string, AbortController>>(new Map());
   const permissionsRef = useRef<PermissionMap>({});
+  const clearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const uploadFiles = useCallback(async (fileList: FileList) => {
     const filesToUpload = Array.from(fileList);
@@ -143,8 +144,8 @@ export function useFileSharing(): UseFileSharingReturn {
           url: URL.createObjectURL(fileToUpload),
           thumbnailUrl: thumbnailDataUrl,
           uploadedBy: 'current-user', // Replace with actual user
-          uploadedAt: new Date(),
-          lastModified: new Date(fileToUpload.lastModified),
+          uploadedAt: new Date().toISOString(),
+          lastModified: new Date(fileToUpload.lastModified).toISOString(),
           version: 1,
           tags: [],
           permissions: ['view', 'download', 'edit', 'delete'],
@@ -180,10 +181,23 @@ export function useFileSharing(): UseFileSharingReturn {
 
     setIsUploading(false);
     
-    // Clear progress after delay
-    setTimeout(() => {
+    // Clear progress after delay with cleanup safety
+    if (clearTimeoutRef.current) {
+      clearTimeout(clearTimeoutRef.current);
+    }
+    clearTimeoutRef.current = setTimeout(() => {
       setUploadProgress([]);
+      clearTimeoutRef.current = null;
     }, 3000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (clearTimeoutRef.current) {
+        clearTimeout(clearTimeoutRef.current);
+        clearTimeoutRef.current = null;
+      }
+    };
   }, []);
 
   const deleteFile = useCallback(async (fileId: string) => {
@@ -223,7 +237,7 @@ export function useFileSharing(): UseFileSharingReturn {
       id: uuidv4(),
       name,
       parentId,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       fileCount: 0,
     };
     setFolders(prev => [...prev, folder]);

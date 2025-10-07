@@ -1,3 +1,4 @@
+"use client";
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Upload, Image as ImageIcon, FileText, Film, Music, Archive, FileWarning } from 'lucide-react';
 import { useFileSharing } from '@/hooks/use-file-sharing';
@@ -27,10 +28,16 @@ export interface FileUploadProps {
   accept?: string; // input accept pattern
   disabled?: boolean;
   onFilesAdded?: (count: number) => void;
+  uploadFiles?: (files: FileList) => Promise<void>;
+  uploadProgress?: ReturnType<typeof useFileSharing>['uploadProgress'];
+  isUploading?: boolean;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ className, accept, disabled, onFilesAdded }) => {
-  const { uploadFiles, uploadProgress, isUploading } = useFileSharing();
+export const FileUpload: React.FC<FileUploadProps> = ({ className, accept, disabled, onFilesAdded, uploadFiles: uploadFilesProp, uploadProgress: uploadProgressProp, isUploading: isUploadingProp }) => {
+  const hook = useFileSharing();
+  const uploadFiles = uploadFilesProp ?? hook.uploadFiles;
+  const uploadProgress = uploadProgressProp ?? hook.uploadProgress;
+  const isUploading = isUploadingProp ?? hook.isUploading;
   const [dragState, setDragState] = useState<DragState>('idle');
   const inputRef = useRef<HTMLInputElement | null>(null);
 

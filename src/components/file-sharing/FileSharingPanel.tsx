@@ -1,3 +1,4 @@
+"use client";
 import React, { useMemo, useState } from 'react';
 import { FileUpload } from './FileUpload';
 import { FileManager } from './FileManager';
@@ -12,6 +13,7 @@ export const FileSharingPanel: React.FC = () => {
     folders,
     selectedFiles,
     isUploading,
+    uploadFiles,
     deleteFile,
     selectFile,
     deselectFile,
@@ -33,7 +35,11 @@ export const FileSharingPanel: React.FC = () => {
         <h2 className="text-base font-semibold text-neutral-800">Upload files</h2>
         <p className="mt-1 text-xs text-neutral-600">Drag and drop or click to select. Supported: images, PDFs, videos, audio, archives.</p>
         <div className="mt-3">
-          <FileUpload />
+          <FileUpload
+            uploadFiles={uploadFiles}
+            uploadProgress={uploadProgress}
+            isUploading={isUploading}
+          />
         </div>
       </div>
 
@@ -53,7 +59,9 @@ export const FileSharingPanel: React.FC = () => {
             onSelect={selectFile}
             onDeselect={deselectFile}
             onClearSelection={clearSelection}
-            onDelete={(ids) => ids.forEach(deleteFile)}
+            onDelete={async (ids) => {
+              await Promise.all(ids.map(id => deleteFile(id)));
+            }}
             onMove={(ids, folderId) => moveToFolder(ids, folderId)}
             onOpen={(id) => {
               setActiveFileId(id);
