@@ -24,6 +24,7 @@ import { KeyboardShortcutsProvider } from '@/components/common/keyboard-shortcut
 import { ThemeProvider } from '@/providers/theme-provider';
 
 import { ScrollToTop } from '@/components/common/scroll-to-top';
+import { TanStackQueryProvider } from '@/providers/query-client-provider';
 
 
 const geistSans = Geist({
@@ -52,15 +53,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <TrustlessWorkProvider>
-            <ErrorBoundary>
-              <NotificationProvider>
-                <TalentProvider>
-                  <MessageProvider>
-                    <OfferProvider>
-                      <WalletProvider>
-                        <EscrowProvider>
-                          <KeyboardShortcutsProvider>
+          <TanStackQueryProvider>
+            <TrustlessWorkProvider>
+              <ErrorBoundary>
+                <NotificationProvider>
+                  <TalentProvider>
+                    <MessageProvider>
+                      <OfferProvider>
+                        <WalletProvider>
+                          <EscrowProvider>
+                            <KeyboardShortcutsProvider>
                             {/* LoadingIndicator agregado según rama secundaria */}
                             <LoadingIndicator />
                             <Suspense fallback={null}>
@@ -72,15 +74,16 @@ export default function RootLayout({
                               <ScrollToTop />
                             </Suspense>
                             <Toaster position="top-right" />
-                          </KeyboardShortcutsProvider>
-                        </EscrowProvider>
-                      </WalletProvider>
-                    </OfferProvider>
-                  </MessageProvider>
-                </TalentProvider>
-              </NotificationProvider>
-            </ErrorBoundary>
-          </TrustlessWorkProvider>
+                            </KeyboardShortcutsProvider>
+                          </EscrowProvider>
+                        </WalletProvider>
+                      </OfferProvider>
+                    </MessageProvider>
+                  </TalentProvider>
+                </NotificationProvider>
+              </ErrorBoundary>
+            </TrustlessWorkProvider>
+          </TanStackQueryProvider>
         </ThemeProvider>
       </body>
     </html>
