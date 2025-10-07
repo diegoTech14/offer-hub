@@ -1,56 +1,632 @@
-/* Print-friendly layout and visibility rules */
+/**
+ * Print Styles for Offer Hub Platform
+ * Optimized for printing invoices, profiles, projects, contracts, and reports
+ * 
+ * Features:
+ * - Professional layout and typography
+ * - Hide interactive elements
+ * - Optimize for paper (Letter/A4)
+ * - Preserve essential branding
+ * - Smart page breaks
+ * - Link URL display for references
+ */
+
+/* ===================================
+   Base Print Styles
+   =================================== */
 @media print {
-  /* reset basic colors */
+  /* Page setup and margins */
+  @page {
+    size: letter; /* or A4 */
+    margin: 0.5in 0.75in;
+  }
+
+  /* Reset basic colors and backgrounds */
+  * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
   html, body {
     background: #fff !important;
     color: #000 !important;
+    font-size: 12pt;
+    line-height: 1.5;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  /* ===================================
+     Hide Non-Essential Elements
+     =================================== */
+  
+  /* Hide navigation and site chrome */
+  header, 
+  nav, 
+  footer, 
+  .header,
+  .footer,
+  .sidebar, 
+  .site-header, 
+  .site-footer,
+  .navbar,
+  .nav-menu,
+  .breadcrumb,
+  aside,
+  .modal,
+  .toast,
+  .notification,
+  [role="navigation"],
+  [role="banner"],
+  [role="contentinfo"] {
+    display: none !important;
+  }
+
+  /* Hide interactive elements */
+  .no-print,
+  .print-hidden,
+  .actions,
+  .action-buttons,
+  .controls,
+  .toolbar,
+  button,
+  .button,
+  .btn,
+  input,
+  textarea,
+  select,
+  .dropdown,
+  .menu,
+  .popover,
+  .tooltip,
+  .interactive,
+  .hover-card,
+  .tabs,
+  .tab-list,
+  .accordion-trigger,
+  .edit-button,
+  .delete-button,
+  .close-button,
+  a[href^="javascript:"],
+  .video-player,
+  .audio-player,
+  iframe,
+  .embed,
+  .map,
+  .chat,
+  .messaging,
+  .comments-section,
+  .social-share,
+  .rating-input,
+  .vote-buttons,
+  .filter-controls,
+  .sort-controls,
+  .pagination,
+  .load-more,
+  .scroll-to-top,
+  .cookie-banner,
+  .advertisement,
+  .ad,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  /* ===================================
+     Layout and Structure
+     =================================== */
+
+  /* Make main content fill page width */
+  main, 
+  .main-content,
+  .printable, 
+  .content, 
+  .container,
+  .wrapper,
+  .print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    display: block !important;
+  }
+
+  /* Specific layouts for different content types */
+  .project-details,
+  .profile-view,
+  .invoice-view,
+  .contract-view,
+  .report-view,
+  .proposal-view,
+  .portfolio-item,
+  [data-print="content"] {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+  }
+
+  /* ===================================
+     Typography
+     =================================== */
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+  }
+
+  h1 { 
+    font-size: 24pt; 
+    margin-top: 0;
+  }
+  h2 { font-size: 20pt; }
+  h3 { font-size: 16pt; }
+  h4 { font-size: 14pt; }
+  h5, h6 { font-size: 12pt; }
+
+  p, li {
+    orphans: 3;
+    widows: 3;
+    font-size: 11pt;
+    line-height: 1.6;
+  }
+
+  /* ===================================
+     Images and Media
+     =================================== */
+
+  img, 
+  svg,
+  .image,
+  .logo {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    display: block;
+  }
+
+  /* Logo and branding */
+  .logo,
+  .brand,
+  .company-logo,
+  [data-print="logo"] {
+    display: block !important;
+    max-width: 200px;
+    margin-bottom: 1rem;
+  }
+
+  /* Hide decorative images */
+  .background-image,
+  .hero-image,
+  .banner-image,
+  [aria-hidden="true"] img {
+    display: none !important;
+  }
+
+  /* ===================================
+     Links
+     =================================== */
+
+  /* Show URL for external links */
+  a[href^="http"]:not([href*="offerhub"]):not([href*="localhost"]):after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #555;
+    font-weight: normal;
+    text-decoration: none;
+    word-wrap: break-word;
+  }
+
+  /* Keep email and phone links clean */
+  a[href^="mailto:"]:after,
+  a[href^="tel:"]:after {
+    content: "";
+  }
+
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  /* ===================================
+     Tables
+     =================================== */
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+    break-inside: auto;
+    margin: 1em 0;
+  }
+
+  thead {
+    display: table-header-group;
+    font-weight: bold;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f5f5f5 !important;
+    font-weight: bold;
+  }
+
+  /* Invoice/Financial tables */
+  .invoice-table,
+  .payment-table,
+  .transaction-table {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .invoice-table th,
+  .payment-table th {
+    background-color: #e0e0e0 !important;
+  }
+
+  /* ===================================
+     Cards and Sections
+     =================================== */
+
+  .card,
+  .section,
+  .panel,
+  .box {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Remove shadows and rounded corners */
+  .card,
+  .section,
+  .panel,
+  .box,
+  .modal,
+  .dialog {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* ===================================
+     Page Breaks
+     =================================== */
+
+  /* Force page breaks */
+  .page-break,
+  .page-break-after,
+  [data-print="page-break"] {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .page-break-before,
+  [data-print="page-break-before"] {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Avoid page breaks */
+  .keep-together,
+  .no-page-break,
+  [data-print="keep-together"] {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Specific content sections */
+  .profile-section,
+  .project-section,
+  .invoice-section,
+  .contract-clause,
+  .milestone,
+  .skill-category,
+  blockquote,
+  pre,
+  code {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* ===================================
+     Invoice-Specific Styles
+     =================================== */
+
+  .invoice-header {
+    display: block !important;
+    margin-bottom: 2rem;
+    page-break-after: avoid;
+  }
+
+  .invoice-meta,
+  .invoice-details {
+    display: block !important;
+  }
+
+  .invoice-total,
+  .total-amount,
+  .grand-total {
+    font-size: 14pt;
+    font-weight: bold;
+    border-top: 2px solid #000;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .invoice-footer,
+  .terms-and-conditions,
+  .payment-instructions {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+    font-size: 10pt;
+  }
+
+  /* ===================================
+     Profile-Specific Styles
+     =================================== */
+
+  .profile-header {
+    display: flex !important;
+    align-items: center;
+    margin-bottom: 2rem;
+    page-break-after: avoid;
+  }
+
+  .profile-avatar,
+  .user-avatar {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 50%;
+    margin-right: 1rem;
+  }
+
+  .profile-stats,
+  .user-stats {
+    display: flex !important;
+    justify-content: space-around;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .skill-tag,
+  .badge {
+    display: inline-block;
+    border: 1px solid #000;
+    padding: 0.25rem 0.5rem;
+    margin: 0.25rem;
+    border-radius: 3px;
+  }
+
+  /* ===================================
+     Project-Specific Styles
+     =================================== */
+
+  .project-header {
+    margin-bottom: 2rem;
+    page-break-after: avoid;
+  }
+
+  .project-meta,
+  .project-details {
+    display: block !important;
+    margin-bottom: 1rem;
+  }
+
+  .milestone-list,
+  .deliverables-list {
+    list-style: decimal;
+    padding-left: 2rem;
+  }
+
+  .project-budget,
+  .budget-breakdown {
+    border: 1px solid #000;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  /* ===================================
+     Contract-Specific Styles
+     =================================== */
+
+  .contract-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    page-break-after: avoid;
+  }
+
+  .contract-parties {
+    display: block !important;
+    margin: 2rem 0;
+  }
+
+  .contract-clause,
+  .contract-section {
+    margin: 1rem 0;
+    padding-left: 1rem;
+  }
+
+  .signature-block {
+    margin-top: 3rem;
+    page-break-inside: avoid;
+  }
+
+  .signature-line {
+    border-top: 1px solid #000;
+    width: 200px;
+    margin-top: 2rem;
+    display: inline-block;
+  }
+
+  /* ===================================
+     Report-Specific Styles
+     =================================== */
+
+  .report-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    page-break-after: avoid;
+  }
+
+  .report-summary {
+    border: 2px solid #000;
+    padding: 1rem;
+    margin: 1rem 0;
+    page-break-inside: avoid;
+  }
+
+  .chart,
+  .graph,
+  .data-visualization {
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+
+  /* ===================================
+     Utility Classes
+     =================================== */
+
+  .text-center { text-align: center; }
+  .text-right { text-align: right; }
+  .text-left { text-align: left; }
+
+  .font-bold { font-weight: bold; }
+  .font-italic { font-style: italic; }
+
+  .border-top { border-top: 1px solid #ddd; }
+  .border-bottom { border-bottom: 1px solid #ddd; }
+
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mb-1 { margin-bottom: 0.5rem; }
+  .mb-2 { margin-bottom: 1rem; }
+
+  /* ===================================
+     Preserve Important Branding
+     =================================== */
+
+  .print-logo,
+  .print-header,
+  .print-footer,
+  [data-print="show"] {
+    display: block !important;
+  }
+
+  /* Company branding colors for invoices */
+  .brand-color,
+  [data-print="brand"] {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
-  /* Hide site chrome and interactive UI */
-  header, nav, footer, .sidebar, .site-header, .site-footer,
-  .no-print, .actions, .controls, button, .interactive, .map, .chat,
-  a[href^="javascript:"] {
+  /* ===================================
+     Lists
+     =================================== */
+
+  ul, ol {
+    padding-left: 2rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Nested lists */
+  ul ul, ol ol, ul ol, ol ul {
+    margin-top: 0.5rem;
+  }
+
+  /* ===================================
+     Code and Pre-formatted Text
+     =================================== */
+
+  pre, code {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 10pt;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* ===================================
+     Accessibility
+     =================================== */
+
+  /* Ensure screen reader content is hidden */
+  .sr-only,
+  .screen-reader-only,
+  [aria-hidden="true"] {
     display: none !important;
   }
 
-  /* Make main content fill page */
-  main, .printable, .content, .project-details, .profile-view {
+  /* ===================================
+     Grid and Flexbox Overrides
+     =================================== */
+
+  .grid,
+  .flex {
+    display: block !important;
+  }
+
+  .grid > *,
+  .flex > * {
     width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin-bottom: 1rem;
   }
-
-  /* Images and media scale to container */
-  img, svg {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-
-  /* Show link destinations inline for external (absolute) links only */
-  /* Matches http and https links; excludes anchors and relative/internal paths */
-  a[href^="http"]:after {
-    content: " (" attr(href) ")";
-    font-size: 0.9em;
-    color: #000;
-    text-decoration: none;
-  }
-
-  /* Avoid cutting elements awkwardly */
-  table { page-break-inside: auto; }
-  tr    { page-break-inside: avoid; page-break-after: auto; }
-  thead { display: table-header-group; }
-  tfoot { display: table-footer-group; }
-
-  /* Prefer page breaks for long sections */
-  .page-break { page-break-after: always; }
 }
 
-/* Ensure the print button stays visible on screen (but hidden when printing) */
+/* ===================================
+   Screen-Only Styles (Not Printed)
+   =================================== */
+
+/* Print button - visible on screen, hidden when printing */
 .print-btn {
   margin-left: 0.5rem;
+  cursor: pointer;
 }
-.no-print {
+
+@media print {
+  .print-btn {
+    display: none !important;
+  }
+}
+
+/* Elements that should only show on screen */
+.no-print,
+.screen-only {
   display: inline-block;
+}
+
+@media print {
+  .no-print,
+  .screen-only {
+    display: none !important;
+  }
 }
