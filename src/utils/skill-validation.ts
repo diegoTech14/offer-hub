@@ -1,6 +1,5 @@
 import { popularSkills } from "@/data/skills-categories";
 
-
 export const fuzzyMatch = (
   input: string,
   target: string,
@@ -11,6 +10,7 @@ export const fuzzyMatch = (
 
   if (inputLower === targetLower) return true;
   if (targetLower.includes(inputLower)) return true;
+  if (inputLower.includes(targetLower)) return true;
 
   const distance = levenshteinDistance(inputLower, targetLower);
   const similarity =
@@ -68,7 +68,7 @@ export const validateSkillName = (
 
   // Check for similar existing skills
   const existingSkill = popularSkills.find((skill) =>
-    fuzzyMatch(name, skill.name, 0.8)
+    fuzzyMatch(name, skill.name, 0.6)
   );
 
   if (
