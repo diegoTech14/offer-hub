@@ -1,44 +1,33 @@
-"use client"
+"use client";
 
-import React from 'react'
+import React from "react";
 
 interface SearchHighlightProps {
-  text: string
-  searchTerm: string
-  highlightClassName?: string
+  text: string;
+  highlight: string;
 }
 
-/**
- * Component that highlights search terms in text
- * Simple implementation for search result highlighting
- */
-export default function SearchHighlight({ 
-  text, 
-  searchTerm, 
-  highlightClassName = "bg-yellow-200 font-semibold" 
-}: SearchHighlightProps) {
-  // If no search term, return original text
-  if (!searchTerm.trim()) {
-    return <span>{text}</span>
-  }
+export default function SearchHighlight({ text, highlight }: SearchHighlightProps) {
+  if (!highlight?.trim()) return <>{text}</>;
 
-  // Split text by search term (case insensitive)
-  const parts = text.split(new RegExp(`(${searchTerm})`, 'gi'))
-  
+  // Escape special regex characters
+  const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(${escapedHighlight})`, "gi");
+
+  const parts = text.split(regex);
+
   return (
-    <span>
-      {parts.map((part, index) => {
-        // Check if this part matches the search term (case insensitive)
-        const isMatch = part.toLowerCase() === searchTerm.toLowerCase()
-        
-        return isMatch ? (
-          <mark key={index} className={highlightClassName}>
+    <>
+      {parts.map((part, index) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <mark key={index} className="bg-yellow-400 text-black font-semibold rounded px-1">
             {part}
           </mark>
+
         ) : (
-          <span key={index}>{part}</span>
+          <React.Fragment key={index}>{part}</React.Fragment>
         )
-      })}
-    </span>
-  )
+      )}
+    </>
+  );
 }
