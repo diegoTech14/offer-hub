@@ -239,7 +239,11 @@ export function NotificationCenter({ userId, isOpen, onClose, className }: Notif
               {notification.senderName && (
                 <div className="flex items-center space-x-2 mt-2">
                   <Avatar className="w-6 h-6">
-                    <AvatarImage src={notification.senderAvatar} />
+                    <AvatarImage 
+                      src={notification.senderAvatar}
+                      className="object-cover"
+                      progressive={false}
+                    />
                     <AvatarFallback className="text-xs">
                       {notification.senderName.charAt(0).toUpperCase()}
                     </AvatarFallback>
