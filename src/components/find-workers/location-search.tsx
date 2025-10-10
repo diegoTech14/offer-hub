@@ -82,19 +82,19 @@ export default function LocationSearch({
           
           <div className="relative">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-300" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-400" />
               <Input
                 ref={searchInputRef}
                 placeholder="City, state, or country..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(searchQuery.length >= 2 || recentLocations.length > 0)}
-                className="pl-10 pr-10 bg-gray-600 dark:bg-gray-600 border-gray-600 dark:border-gray-600 text-white dark:text-white placeholder-gray-300 dark:placeholder-gray-300"
+                className="pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-[#15949C] focus:ring-2 focus:ring-[#15949C]/20"
               />
               {searchQuery && (
                 <button
                   onClick={handleClearLocation}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-300 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -103,37 +103,32 @@ export default function LocationSearch({
 
             {/* Suggestions Dropdown */}
             {showSuggestions && (
-              <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-80">
-                <ScrollArea className="max-h-80">
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-60">
+                <ScrollArea className="max-h-60">
                   {isLoading ? (
-                    <div className="p-4 text-center">
-                      <div className="animate-spin h-5 w-5 border-2 border-[#15949C] border-t-transparent rounded-full mx-auto"></div>
-                      <p className="text-sm text-[#002333]/70 mt-2">Searching locations...</p>
+                    <div className="p-3 text-center">
+                      <div className="animate-spin h-4 w-4 border-2 border-[#15949C] border-t-transparent rounded-full mx-auto"></div>
+                      <p className="text-xs text-[#002333] dark:text-gray-300 mt-2">Searching...</p>
                     </div>
                   ) : (
-                    <div className="py-2">
+                    <div className="py-1">
                       {/* Current search results */}
                       {suggestions.length > 0 && (
                         <>
-                          <div className="px-3 py-2 text-xs font-medium text-[#002333]/70 uppercase tracking-wide">
-                            Search Results
+                          <div className="px-2 py-1 text-xs font-medium text-[#002333]/70 dark:text-gray-400 uppercase tracking-wide">
+                            Results
                           </div>
-                          {suggestions.map((location) => (
+                          {suggestions.slice(0, 5).map((location) => (
                             <button
                               key={location.id}
                               onClick={() => handleLocationSelect(location)}
-                              className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center group"
+                              className="w-full px-2 py-1.5 text-left hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center group transition-colors"
                             >
-                              <MapPin className="h-4 w-4 mr-3 text-[#15949C] flex-shrink-0" />
+                              <MapPin className="h-3 w-3 mr-2 text-[#15949C] flex-shrink-0" />
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm text-[#002333] truncate">{location.name}</p>
-                                <p className="text-xs text-[#002333]/70 truncate">{location.fullName}</p>
+                                <p className="text-xs font-medium text-[#002333] dark:text-white truncate">{location.name}</p>
+                                <p className="text-xs text-[#002333]/60 dark:text-gray-400 truncate">{location.displayName}</p>
                               </div>
-                              {location.timezone && (
-                                <Badge variant="outline" className="ml-2 text-xs">
-                                  {location.timezone}
-                                </Badge>
-                              )}
                             </button>
                           ))}
                         </>
@@ -142,20 +137,20 @@ export default function LocationSearch({
                       {/* Recent locations */}
                       {recentLocations.length > 0 && searchQuery.length < 2 && (
                         <>
-                          <Separator className="my-2" />
-                          <div className="px-3 py-2 text-xs font-medium text-[#002333]/70 uppercase tracking-wide">
-                            Recent Searches
+                          <Separator className="my-1" />
+                          <div className="px-2 py-1 text-xs font-medium text-[#002333]/70 dark:text-gray-400 uppercase tracking-wide">
+                            Recent
                           </div>
-                          {recentLocations.slice(0, 5).map((location) => (
+                          {recentLocations.slice(0, 3).map((location) => (
                             <button
                               key={`recent-${location.id}`}
                               onClick={() => handleLocationSelect(location)}
-                              className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center"
+                              className="w-full px-2 py-1.5 text-left hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center transition-colors"
                             >
-                              <Clock className="h-4 w-4 mr-3 text-[#002333]/50 flex-shrink-0" />
+                              <Clock className="h-3 w-3 mr-2 text-[#002333]/50 dark:text-gray-400 flex-shrink-0" />
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm text-[#002333] truncate">{location.name}</p>
-                                <p className="text-xs text-[#002333]/70 truncate">{location.fullName}</p>
+                                <p className="text-xs font-medium text-[#002333] dark:text-white truncate">{location.name}</p>
+                                <p className="text-xs text-[#002333]/60 dark:text-gray-400 truncate">{location.displayName}</p>
                               </div>
                             </button>
                           ))}
