@@ -48,10 +48,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="light" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  // Force light theme as default
+                  var savedTheme = localStorage.getItem('offer-hub-theme');
+                  var zustandTheme = localStorage.getItem('theme-storage');
+                  var theme = 'light';
+                  
+                  if (savedTheme === 'dark' || (zustandTheme && JSON.parse(zustandTheme).state?.theme === 'dark')) {
+                    theme = 'dark';
+                  }
+                  
+                  document.documentElement.classList.remove('light', 'dark');
+                  document.documentElement.classList.add(theme);
+                } catch (e) {
+                  document.documentElement.classList.add('light');
+                }
+              })();
+            `,
+          }}
+        />
         <ThemeProvider>
           <TanStackQueryProvider>
             <TrustlessWorkProvider>
