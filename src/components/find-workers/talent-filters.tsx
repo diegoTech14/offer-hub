@@ -103,14 +103,24 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
   // Function to notify parent of filter changes
   const notifyParentOfChanges = useCallback(() => {
     if (onFiltersChange && !isUpdatingFromParent.current) {
-      const filters: ServiceFilters & { location?: LocationData; searchRadius?: number; timezones?: string[] } = {
+      const filters: ServiceFilters & { 
+        location?: LocationData; 
+        searchRadius?: number; 
+        timezones?: string[];
+        languages?: string[];
+        skills?: string[];
+        availability?: string[];
+      } = {
         min_price: priceRange[0],
         max_price: priceRange[1],
         page: 1,
         limit: 10,
         location: selectedLocation || undefined,
         searchRadius: searchRadius,
-        timezones: selectedTimezones.length > 0 ? selectedTimezones : undefined
+        timezones: selectedTimezones.length > 0 ? selectedTimezones : undefined,
+        languages: languages.length > 0 ? languages : undefined,
+        skills: skills.length > 0 ? skills : undefined,
+        availability: availability.length > 0 ? availability : undefined
       };
       
       // Add category filter if any experience level is selected
@@ -135,7 +145,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
         isUpdatingFromParent.current = false
       }, 100)
     }
-  }, [priceRange, experienceLevel, selectedLocation, searchRadius, selectedTimezones, onFiltersChange])
+  }, [priceRange, experienceLevel, selectedLocation, searchRadius, selectedTimezones, languages, skills, availability, onFiltersChange])
 
   // Debounced version for price range changes
   const debouncedNotifyParent = useCallback(() => {
@@ -167,6 +177,11 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
     } else {
       setAvailability([...availability, option])
     }
+    
+    // Immediately notify parent of availability change
+    setTimeout(() => {
+      notifyParentOfChanges()
+    }, 0)
   }
 
   const toggleLanguage = (language: string) => {
@@ -175,17 +190,32 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
     } else {
       setLanguages([...languages, language])
     }
+    
+    // Immediately notify parent of language change
+    setTimeout(() => {
+      notifyParentOfChanges()
+    }, 0)
   }
 
   const addSkill = () => {
     if (skillInput.trim() && !skills.includes(skillInput.trim())) {
       setSkills([...skills, skillInput.trim()])
       setSkillInput("")
+      
+      // Notify parent of skill change
+      setTimeout(() => {
+        notifyParentOfChanges()
+      }, 0)
     }
   }
 
   const removeSkill = (skill: string) => {
     setSkills(skills.filter((s) => s !== skill))
+    
+    // Notify parent of skill change
+    setTimeout(() => {
+      notifyParentOfChanges()
+    }, 0)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -251,48 +281,156 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
     debouncedNotifyParent()
   }, [debouncedNotifyParent])
 
+  // Timezone groups data
+  const timezoneGroups = [
+    {
+      region: "Americas",
+      timezones: [
+        "America/New_York",
+        "America/Chicago", 
+        "America/Denver",
+        "America/Los_Angeles",
+        "America/Toronto",
+        "America/Vancouver",
+        "America/Mexico_City",
+        "America/Sao_Paulo",
+        "America/Buenos_Aires"
+      ]
+    },
+    {
+      region: "Europe & Africa",
+      timezones: [
+        "Europe/London",
+        "Europe/Paris",
+        "Europe/Berlin",
+        "Europe/Madrid",
+        "Europe/Rome",
+        "Europe/Amsterdam",
+        "Europe/Stockholm",
+        "Africa/Cairo",
+        "Africa/Lagos"
+      ]
+    },
+    {
+      region: "Asia Pacific",
+      timezones: [
+        "Asia/Tokyo",
+        "Asia/Seoul",
+        "Asia/Shanghai",
+        "Asia/Singapore",
+        "Asia/Kolkata",
+        "Asia/Dubai",
+        "Australia/Sydney",
+        "Australia/Melbourne",
+        "Pacific/Auckland"
+      ]
+    }
+  ]
+
+  // Timezone functions
+  const handleTimezoneToggle = (timezone: string) => {
+    const newSelected = selectedTimezones.includes(timezone)
+      ? selectedTimezones.filter(tz => tz !== timezone)
+      : [...selectedTimezones, timezone]
+    
+    setSelectedTimezones(newSelected)
+    handleFiltersChange({
+      ...currentFilters,
+      timezones: newSelected
+    })
+  }
+
+  const handleSelectAll = (timezones: string[]) => {
+    const newSelected = [...new Set([...selectedTimezones, ...timezones])]
+    setSelectedTimezones(newSelected)
+    handleFiltersChange({
+      ...currentFilters,
+      timezones: newSelected
+    })
+  }
+
+  const handleClearAll = () => {
+    setSelectedTimezones([])
+    handleFiltersChange({
+      ...currentFilters,
+      timezones: []
+    })
+  }
+
+  const handleFiltersChange = (filters: any) => {
+    onFiltersChange?.(filters)
+  }
+
   const SectionHeader = ({ title, section, icon }: { title: string; section: string; icon: React.ReactNode }) => (
-    <div className="flex items-center justify-between cursor-pointer py-2" onClick={() => toggleSection(section)}>
-      <div className="flex items-center">
-        {icon}
-        <h3 className="font-medium text-[#002333] dark:text-white ml-2">{title}</h3>
+    <div 
+      className="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-200 border border-transparent hover:border-gray-200 dark:hover:border-gray-600"
+      onClick={() => toggleSection(section)}
+    >
+      <div className="flex items-center gap-2">
+        <div className="p-1 bg-[#15949C]/10 rounded-sm">
+          {icon}
+        </div>
+        <h3 className="font-medium text-[#002333] dark:text-white text-sm">{title}</h3>
       </div>
       {collapsedSections[section] ? (
-        <ChevronUp className="h-4 w-4 text-[#002333]/70 dark:text-gray-400" />
+        <ChevronUp className="h-3 w-3 text-[#15949C] dark:text-gray-400 transition-transform duration-200" />
       ) : (
-        <ChevronDown className="h-4 w-4 text-[#002333]/70 dark:text-gray-400" />
+        <ChevronDown className="h-3 w-3 text-[#15949C] dark:text-gray-400 transition-transform duration-200" />
       )}
     </div>
   )
 
   return (
-    <Card className="h-fit dark:bg-gray-800 dark:border-gray-700">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-[#002333] dark:text-white">Filters</h2>
-          <Button variant="ghost" size="sm" onClick={resetFilters} className="h-8 text-[#15949C] dark:text-gray-300 dark:hover:text-white">
-            <RefreshCw className="h-3 w-3 mr-2" />
+    <Card className="h-fit bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm sticky top-4 w-72">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-[#15949C] rounded-full"></div>
+            <h2 className="text-base font-semibold text-[#002333] dark:text-white">Filters</h2>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={resetFilters} 
+            className="h-7 px-2 text-xs text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          >
+            <RefreshCw className="h-3 w-3 mr-1" />
             Reset
           </Button>
         </div>
 
-        {/* Add tabs for different filter categories */}
-        <Tabs value={activeFilterTab} onValueChange={setActiveFilterTab} className="mb-4">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
-            <TabsTrigger value="basic" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Basic</TabsTrigger>
-            <TabsTrigger value="location" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Location</TabsTrigger>
-            <TabsTrigger value="timezone" className="dark:data-[state=active]:bg-gray-600 dark:text-gray-300">Timezone</TabsTrigger>
+        {/* Compact tabs */}
+        <Tabs value={activeFilterTab} onValueChange={setActiveFilterTab} className="mb-3">
+          <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700 border-0 h-8">
+            <TabsTrigger 
+              value="basic" 
+              className="text-xs font-medium data-[state=active]:bg-[#15949C] data-[state=active]:text-white transition-all duration-200 h-6"
+            >
+              Basic
+            </TabsTrigger>
+            <TabsTrigger 
+              value="location" 
+              className="text-xs font-medium data-[state=active]:bg-[#15949C] data-[state=active]:text-white transition-all duration-200 h-6"
+            >
+              Location
+            </TabsTrigger>
+            <TabsTrigger 
+              value="timezone" 
+              className="text-xs font-medium data-[state=active]:bg-[#15949C] data-[state=active]:text-white transition-all duration-200 h-6"
+            >
+              Timezone
+            </TabsTrigger>
           </TabsList>
 
-          <ScrollArea className="h-[calc(100vh-300px)]">
-            <TabsContent value="basic" className="space-y-6 pr-4">
-              <div className="space-y-6">
-                {/* Price Range - Keeping original structure */}
-                <div className="space-y-4">
+          <ScrollArea className="h-[calc(100vh-350px)] max-h-[500px]">
+            <TabsContent value="basic" className="space-y-4 pr-2">
+              <div className="space-y-4">
+                {/* Price Range */}
+                <div className="space-y-3">
                   <SectionHeader
                     title="Hourly Rate"
                     section="price"
-                    icon={<DollarSign className="h-4 w-4 text-[#15949C]" />}
+                    icon={<DollarSign className="h-3 w-3 text-[#15949C]" />}
                   />
 
                   {!collapsedSections.price && (
@@ -302,7 +440,7 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="mt-4 px-2">
+                      <div className="mt-2 px-1">
                         <div className="flex justify-between mb-2">
                           <span className="text-sm text-[#002333]/70 dark:text-gray-300">${priceRange[0]}</span>
                           <span className="text-sm text-[#002333]/70 dark:text-gray-300">${priceRange[1]}+</span>
@@ -666,15 +804,99 @@ export default function TalentFilters({ onFiltersChange, currentFilters }: Talen
               />
             </TabsContent>
 
-            {/* New Timezone Tab */}
-            <TabsContent value="timezone" className="space-y-6 pr-4">
-              <TimezoneFilter
-                userTimezone={selectedLocation?.timezone}
-                selectedTimezones={selectedTimezones}
-                onTimezoneSelect={handleTimezoneSelect}
-                showCompatibilityOnly={showCompatibilityOnly}
-                onCompatibilityToggle={setShowCompatibilityOnly}
-              />
+            {/* Timezone Tab */}
+            <TabsContent value="timezone" className="space-y-4 pr-2">
+              <div className="space-y-4">
+                {/* Timezone Controls */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 bg-[#15949C]/10 rounded-sm">
+                      <Clock className="h-3 w-3 text-[#15949C]" />
+                    </div>
+                    <h3 className="font-medium text-[#002333] dark:text-white text-sm">Timezone Filter</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={showCompatibilityOnly}
+                      onCheckedChange={setShowCompatibilityOnly}
+                      className="scale-75"
+                    />
+                    <span className="text-xs text-[#002333]/70 dark:text-gray-300">Compatible only</span>
+                  </div>
+                </div>
+
+                {/* Timezone Selection */}
+                <div className="space-y-3 max-h-60 overflow-y-auto">
+                  {timezoneGroups.map((group) => (
+                    <div key={group.region} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-semibold text-[#002333]/80 dark:text-gray-300 uppercase tracking-wide">
+                          {group.region}
+                        </h4>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleSelectAll(group.timezones)}
+                          className="h-6 px-2 text-xs text-[#15949C] hover:bg-[#15949C]/10"
+                        >
+                          Select All
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        {group.timezones.map((timezone) => {
+                          const isSelected = selectedTimezones.includes(timezone)
+                          const currentTime = new Date().toLocaleTimeString('en-US', { 
+                            timeZone: timezone,
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                          })
+
+                          return (
+                            <div 
+                              key={timezone} 
+                              className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md group"
+                            >
+                              <div className="flex items-center space-x-2 flex-1">
+                                <Checkbox
+                                  id={timezone}
+                                  checked={isSelected}
+                                  onCheckedChange={() => handleTimezoneToggle(timezone)}
+                                  className="scale-75"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <Label 
+                                    htmlFor={timezone} 
+                                    className="cursor-pointer text-xs font-medium text-[#002333] dark:text-white truncate"
+                                  >
+                                    {timezone.split('/')[1].replace('_', ' ')}
+                                  </Label>
+                                  <div className="text-xs text-[#002333]/60 dark:text-gray-400">
+                                    {currentTime}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Clear All Button */}
+                {selectedTimezones.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleClearAll}
+                    className="w-full h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                  >
+                    Clear All Timezones
+                  </Button>
+                )}
+              </div>
             </TabsContent>
           </ScrollArea>
         </Tabs>
