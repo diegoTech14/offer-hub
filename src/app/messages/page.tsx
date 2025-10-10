@@ -1,7 +1,8 @@
 'use client'
 import { useMessagesMock as useMessages } from "@/hooks/useMessagesMock";
 import { useState } from "react";
-import { Header } from "@/components/account-settings/header";
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 import { Sidebar } from "@/components/account-settings/sidebar";
 import { MessagesSidebar } from "@/components/messages/messages-sidebar";
 import { MessagesMain } from "@/components/messages/messages-main";
@@ -31,9 +32,9 @@ export default function MessagesPage() {
   return (
     // This page is protected and set to both admin and user access as long as they are authenticated
     <ProtectedRoute roles={["admin", "user"]} >
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-        <div className="flex">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+        <Navbar />
+        <div className="flex flex-1">
           <Sidebar
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
@@ -59,6 +60,7 @@ export default function MessagesPage() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     </ProtectedRoute>
   );
