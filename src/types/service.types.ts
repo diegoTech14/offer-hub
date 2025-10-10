@@ -67,6 +67,7 @@ export interface FreelancerDisplay {
   id: string;
   name: string;
   title: string;
+  avatar?: string;
   rating: number;
   reviewCount: number;
   location: string;

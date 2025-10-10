@@ -36,28 +36,28 @@ export interface Testimonial {
 // Data for categories section
 export const categories: Category[] = [
   {
-    name: "Web & Mobile Design",
-    description: "UI/UX design for websites and mobile applications",
+    name: "Web Development",
+    description: "Full-stack developers, React, Vue.js, Node.js",
     icon: <Briefcase className="h-6 w-6 text-[#15949C]" />,
-    link: "/categories/web-design",
+    link: "/find-workers?category=Web Development",
   },
   {
-    name: "Development & IT",
-    description: "Web, mobile, and software development services",
-    icon: <TrendingUp className="h-6 w-6 text-[#15949C]" />,
-    link: "/categories/development",
+    name: "Design & Creative",
+    description: "UI/UX, graphic design, branding, illustration",
+    icon: <Users className="h-6 w-6 text-[#15949C]" />,
+    link: "/find-workers?category=Design",
   },
   {
     name: "Marketing",
-    description: "Digital marketing, SEO, and social media services",
-    icon: <Users className="h-6 w-6 text-[#15949C]" />,
-    link: "/categories/marketing",
+    description: "SEO, social media, content marketing",
+    icon: <TrendingUp className="h-6 w-6 text-[#15949C]" />,
+    link: "/find-workers?category=Marketing",
   },
   {
     name: "Writing & Translation",
-    description: "Content creation and language translation",
+    description: "Content writing, copywriting, translation",
     icon: <MessageSquare className="h-6 w-6 text-[#15949C]" />,
-    link: "/categories/writing",
+    link: "/find-workers?category=Writing & Translation",
   },
 ];
 

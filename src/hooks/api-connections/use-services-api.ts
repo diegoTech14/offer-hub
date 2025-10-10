@@ -80,6 +80,7 @@ function mapServiceToFreelancerDisplay(service: ServiceWithFreelancer): Freelanc
     id: service.id,
     name: service.freelancer.name || 'Anonymous Freelancer',
     title: service.title,
+    avatar: service.freelancer.avatar_url || undefined,
     rating,
     reviewCount,
     location,

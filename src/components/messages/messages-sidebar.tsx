@@ -48,7 +48,12 @@ export function MessagesSidebar({ conversations, activeConversationId, onConvers
             >
               <div className="relative mt-5">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={conversation.participants?.[0]?.avatar_url || "/placeholder.svg"} alt={conversation.participants?.[0]?.name || "User"} />
+                  <AvatarImage 
+                    src={conversation.participants?.[0]?.avatar_url || "/placeholder.svg"} 
+                    alt={conversation.participants?.[0]?.name || "User"}
+                    className="object-cover"
+                    progressive={false}
+                  />
                   <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300">
                     {conversation.participants?.[0]?.name?.split(" ").map((n) => n[0]).join("")}
                   </AvatarFallback>

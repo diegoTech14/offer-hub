@@ -4,8 +4,8 @@ import { useState } from "react";
 import { FaqCategories } from "./faq-categories";
 import { FaqAccordion } from "./faq-accordion";
 import { FaqSupport } from "./faq-support";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import Link from "next/link";
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 import {
   HelpCircle,
   CreditCard,
@@ -127,84 +127,72 @@ export default function FaqContainer() {
   const categories = Object.keys(faqData);
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen">
-      {/* Header con ThemeToggle */}
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <span className="text-xl font-bold text-[#15949C]">Offer Hub</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Link
-              href="/"
-              className="text-sm text-blue-700 dark:text-blue-400 hover:underline"
-            >
-              ← Back to Home
-            </Link>
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
+      <Navbar />
+
+      <main className="flex-1">
+        <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+          <div className="text-center mb-12">
+            <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 dark:text-white mb-4">
+              Frequently Asked Questions
+            </h1>
+            <p className="text-[#7a8a9a] dark:text-gray-300 max-w-2xl mx-auto">
+              Find answers to the most common questions about Offer Hub and how our
+              platform works.
+            </p>
           </div>
+
+          <FaqCategories
+            categories={categories}
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+          />
+
+          <div className="mt-12">
+            <div className="flex items-center gap-3 mb-6">
+              {activeCategory === "General Questions" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <HelpCircle size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "Payments & Billing" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <CreditCard size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "For Clients" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Users size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "For Freelancers" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Briefcase size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "Security & Privacy" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Shield size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "Technical Support" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Settings size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              <h2 className="text-2xl font-bold text-secondary-500 dark:text-white">
+                {activeCategory}
+              </h2>
+            </div>
+
+            <FaqAccordion faqs={faqData[activeCategory as keyof typeof faqData]} />
+          </div>
+
+          <FaqSupport />
         </div>
-      </header>
+      </main>
 
-      <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
-        <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 dark:text-white mb-4">
-          Frequently Asked Questions
-        </h1>
-        <p className="text-[#7a8a9a] dark:text-gray-300 max-w-2xl mx-auto">
-          Find answers to the most common questions about Offer Hub and how our
-          platform works.
-        </p>
-      </div>
-
-      <FaqCategories
-        categories={categories}
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
-
-      <div className="mt-12">
-        <div className="flex items-center gap-3 mb-6">
-          {activeCategory === "General Questions" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
-              <HelpCircle size={20} className="text-primary-500 dark:text-teal-400" />
-            </div>
-          )}
-          {activeCategory === "Payments & Billing" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
-              <CreditCard size={20} className="text-primary-500 dark:text-teal-400" />
-            </div>
-          )}
-          {activeCategory === "For Clients" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
-              <Users size={20} className="text-primary-500 dark:text-teal-400" />
-            </div>
-          )}
-          {activeCategory === "For Freelancers" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
-              <Briefcase size={20} className="text-primary-500 dark:text-teal-400" />
-            </div>
-          )}
-          {activeCategory === "Security & Privacy" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
-              <Shield size={20} className="text-primary-500 dark:text-teal-400" />
-            </div>
-          )}
-          {activeCategory === "Technical Support" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
-              <Settings size={20} className="text-primary-500 dark:text-teal-400" />
-            </div>
-          )}
-          <h2 className="text-2xl font-bold text-secondary-500 dark:text-white">
-            {activeCategory}
-          </h2>
-        </div>
-
-        <FaqAccordion faqs={faqData[activeCategory as keyof typeof faqData]} />
-      </div>
-
-        <FaqSupport />
-      </div>
+      <Footer />
     </div>
   );
 }

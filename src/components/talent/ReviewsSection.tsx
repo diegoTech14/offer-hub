@@ -46,7 +46,12 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
           <div key={review.id} className="border-b border-gray-100 pb-6 last:border-b-0 last:pb-0">
             <div className="flex items-start gap-4">
               <Avatar className="w-12 h-12">
-                <AvatarImage src={review.clientAvatar} alt={review.clientName} />
+                <AvatarImage 
+                  src={review.clientAvatar} 
+                  alt={review.clientName}
+                  className="object-cover"
+                  progressive={false}
+                />
                 <AvatarFallback className="text-sm font-semibold">
                   {review.clientName.split(" ").map(n => n[0]).join("")}
                 </AvatarFallback>

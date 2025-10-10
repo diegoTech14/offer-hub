@@ -15,139 +15,14 @@ import TalentMapView from "@/components/find-workers/talent-map-view"
 import TalentCompare from "@/components/find-workers/talent-compare"
 import TalentMarketInsights from "@/components/find-workers/talent-market-insights"
 import TalentCategories from "@/components/find-workers/talent-categories"
-import TalentFeatured from "@/components/find-workers/talent-featured"
 import TalentDetailDialog from "@/components/find-workers/talent-detail-dialog"
 import Pagination from "@/components/find-workers/pagination"
 import Link from "next/link"
 import { useServicesApi } from "@/hooks/api-connections/use-services-api"
 import { ServiceFilters, FreelancerDisplay } from "@/types/service.types"
 import { useSearchParams } from "next/navigation"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
-
-// Simple Header component defined inline
-function SimpleHeader() {
-  return (
-    <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center">
-              <span className="text-xl font-bold text-[#15949C]">Offer Hub</span>
-            </Link>
-            <nav className="ml-10 hidden space-x-8 md:flex">
-              <Link href="/find-workers" className="text-[#15949C] font-medium">
-                Find Talent
-              </Link>
-              <Link href="/post-project" className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]">
-                Post a Project
-              </Link>
-              <Link href="/my-chats" className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]">
-                Messages
-              </Link>
-              <Link href="/payments" className="text-[#002333] dark:text-gray-300 hover:text-[#15949C]">
-                Payments
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ThemeToggle />
-            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
-              <Search className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="text-[#002333] dark:text-gray-300">
-              <User className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="md:hidden text-[#002333] dark:text-gray-300">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </header>
-  )
-}
-
-// Simple Footer component defined inline
-function SimpleFooter() {
-  return (
-    <footer className="bg-[#002333] dark:bg-gray-900 text-white py-8">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <h3 className="text-lg font-bold mb-4">Offer Hub</h3>
-            <p className="text-sm text-gray-300">Connect with top freelancers and clients for your next project.</p>
-          </div>
-          <div>
-            <h4 className="font-medium mb-4">For Freelancers</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li>
-                <a href="#" className="hover:text-white">
-                  Find Work
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Create Profile
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Success Stories
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-medium mb-4">For Clients</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li>
-                <a href="#" className="hover:text-white">
-                  Post a Project
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Find Talent
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  How It Works
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-medium mb-4">Support</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li>
-                <a href="#" className="hover:text-white">
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Contact Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Privacy Policy
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-gray-700 dark:border-gray-600 mt-8 pt-8 text-center">
-          <p className="text-sm text-gray-300">&copy; 2024 Offer Hub. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
-  )
-}
+import Navbar from "@/components/layout/navbar"
+import Footer from "@/components/layout/footer"
 
 export default function FindWorkersPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid")
@@ -229,61 +104,109 @@ export default function FindWorkersPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
-      <SimpleHeader />
+      <Navbar />
 
       <main className="flex-1">
-        <div className="bg-gradient-to-r from-[#002333] to-[#15949C] dark:from-gray-900 dark:to-gray-800 text-white py-10">
-          <div className="container mx-auto px-4 max-w-7xl">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">Find Expert Freelancers for Your Project</h1>
-              <p className="text-lg opacity-90 mb-8">
+        <div className="bg-gradient-to-br from-[#002333] via-[#003d4d] to-[#15949C] dark:from-gray-900 dark:to-gray-800 text-white py-16 relative overflow-hidden">
+          {/* Background decorations */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-y-48 translate-x-48"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl translate-y-48 -translate-x-48"></div>
+          </div>
+          
+          <div className="container mx-auto px-4 max-w-7xl relative z-10">
+            <div className="max-w-4xl mx-auto text-center">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-6">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium">Find the perfect talent for your project</span>
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                Find Expert
+                <span className="block bg-gradient-to-r from-white to-[#DEEFE7] bg-clip-text text-transparent">
+                  Freelancers
+                </span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl opacity-90 mb-10 max-w-3xl mx-auto leading-relaxed">
                 Connect with skilled professionals ready to bring your ideas to life
               </p>
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search for skills, expertise, or job titles..."
-                  className="pl-10 pr-4 py-6 rounded-full text-white dark:text-white text-lg bg-gray-600 dark:bg-gray-600 placeholder-gray-300 dark:placeholder-gray-300"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 h-5 w-5" />
-                <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full bg-[#15949C] hover:bg-[#15949C]/90 px-6">
-                  Search
-                </Button>
+              
+              <div className="relative max-w-2xl mx-auto mb-8">
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Search for skills, expertise, or job titles..."
+                    className="pl-12 pr-32 py-6 rounded-2xl text-gray-900 dark:text-white text-lg bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-2 border-white/20 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 shadow-2xl focus:shadow-3xl transition-all duration-300"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 h-6 w-6" />
+                  <Button 
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-xl bg-gradient-to-r from-[#15949C] to-[#117a81] hover:from-[#117a81] hover:to-[#0d5f65] px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    onClick={() => {
+                      // Trigger search when button is clicked
+                      const filters = { ...currentFilters }
+                      if (searchQuery.trim()) {
+                        filters.keyword = searchQuery.trim()
+                      } else {
+                        delete filters.keyword
+                      }
+                      setCurrentFilters(filters)
+                      searchServices(filters)
+                    }}
+                  >
+                    Search
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
-                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Web Development</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">UI/UX Design</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Mobile Development</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Content Writing</Badge>
-                <Badge className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer">Digital Marketing</Badge>
+              
+              <div className="flex flex-wrap justify-center gap-3">
+                {["Web Development", "UI/UX Design", "Mobile Development", "Content Writing", "Digital Marketing", "Data Science"].map((skill) => (
+                  <Badge 
+                    key={skill}
+                    className="bg-white/20 hover:bg-white/30 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 cursor-pointer px-4 py-2 text-sm font-medium border border-white/20 hover:border-white/40 transition-all duration-200 hover:scale-105"
+                    onClick={() => {
+                      setSearchQuery(skill)
+                      // Trigger immediate search
+                      const filters = { ...currentFilters, keyword: skill }
+                      setCurrentFilters(filters)
+                      searchServices(filters)
+                    }}
+                  >
+                    {skill}
+                  </Badge>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 max-w-7xl space-y-8">
           {/* Compare bar */}
           {selectedFreelancers.length > 0 && (
             <motion.div
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
-              className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 py-4 px-6"
+              className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t-2 border-[#15949C]/20 dark:border-gray-600 shadow-2xl z-50 py-4 px-6 backdrop-blur-sm"
             >
               <div className="container mx-auto max-w-7xl flex items-center justify-between">
-                <div className="flex items-center">
-                  <span className="font-medium text-[#002333] dark:text-white mr-4">
-                    {selectedFreelancers.length} freelancer{selectedFreelancers.length > 1 ? "s" : ""} selected
-                  </span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-[#15949C] rounded-full animate-pulse"></div>
+                    <span className="font-semibold text-[#002333] dark:text-white">
+                      {selectedFreelancers.length} freelancer{selectedFreelancers.length > 1 ? "s" : ""} selected
+                    </span>
+                  </div>
                   <div className="flex -space-x-2">
                     {selectedFreelancers.map((id) => (
                       <div
                         key={id}
-                        className="h-10 w-10 rounded-full bg-[#DEEFE7] border-2 border-white flex items-center justify-center"
+                        className="h-10 w-10 rounded-full bg-gradient-to-br from-[#15949C] to-[#117a81] border-2 border-white dark:border-gray-800 flex items-center justify-center shadow-lg"
                       >
-                        <span className="font-medium text-[#15949C]">{id.charAt(0).toUpperCase()}</span>
+                        <span className="font-semibold text-white text-sm">{id.charAt(0).toUpperCase()}</span>
                       </div>
                     ))}
                   </div>
@@ -292,14 +215,18 @@ export default function FindWorkersPage() {
                   <Button
                     variant="outline"
                     onClick={clearSelectedFreelancers}
-                    className="border-red-500 text-red-500 hover:bg-red-50"
+                    className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
                   >
-                    Clear
+                    Clear All
                   </Button>
                   <Button
                     onClick={toggleCompare}
                     disabled={selectedFreelancers.length < 2}
-                    className={`${selectedFreelancers.length < 2 ? "bg-gray-400" : "bg-[#15949C] hover:bg-[#15949C]/90"}`}
+                    className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                      selectedFreelancers.length < 2 
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                        : "bg-gradient-to-r from-[#15949C] to-[#117a81] hover:from-[#117a81] hover:to-[#0d5f65] text-white shadow-lg hover:shadow-xl hover:scale-105"
+                    }`}
                   >
                     Compare Freelancers
                   </Button>
@@ -330,41 +257,66 @@ export default function FindWorkersPage() {
 
             {/* Main content area */}
             <div className="flex-1">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <div className="flex items-center">
-                  <Button variant="ghost" size="sm" onClick={() => setIsFilterOpen(!isFilterOpen)} className="mr-2">
-                    {isFilterOpen ? <X className="h-4 w-4 mr-2" /> : <Filter className="h-4 w-4 mr-2" />}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 p-6 bg-gradient-to-r from-gray-50 to-[#DEEFE7]/30 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-gray-200 dark:border-gray-600">
+                <div className="flex items-center gap-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setIsFilterOpen(!isFilterOpen)} 
+                    className="flex items-center gap-2 bg-white dark:bg-gray-700 border-2 border-[#15949C] text-[#15949C] hover:bg-[#15949C] hover:text-white transition-all duration-200"
+                  >
+                    {isFilterOpen ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
                     {isFilterOpen ? "Hide Filters" : "Show Filters"}
                   </Button>
-                  <Separator orientation="vertical" className="h-6 mx-2" />
-                  <span className="text-sm text-[#002333]/70 dark:text-gray-300">
-                    {isLoading ? "Loading..." : `${pagination?.total_services || services.length} freelancers found`}
-                  </span>
-                  {error && (
-                    <span className="text-sm text-red-500 ml-2">
-                      Error: {error}
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-[#15949C] rounded-full"></div>
+                    <span className="text-sm font-medium text-[#002333] dark:text-white">
+                      {isLoading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-[#15949C] border-t-transparent rounded-full animate-spin"></div>
+                          Finding talent...
+                        </span>
+                      ) : (
+                        <span className="text-[#15949C] font-semibold">
+                          {pagination?.total_services || services.length} freelancers found
+                        </span>
+                      )}
                     </span>
+                  </div>
+                  
+                  {error && (
+                    <div className="flex items-center gap-2 px-3 py-1 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-full">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span className="text-sm text-red-600 dark:text-red-400 font-medium">
+                        Error loading data
+                      </span>
+                    </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Select defaultValue="relevance">
-                    <SelectTrigger className="w-[180px] bg-gray-600 dark:bg-gray-600 border-gray-600 dark:border-gray-600 text-white dark:text-white">
+                    <SelectTrigger className="w-[180px] bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-[#002333] dark:text-white hover:border-[#15949C] transition-colors">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-600 dark:bg-gray-600 border-gray-600 dark:border-gray-600">
-                      <SelectItem value="relevance" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Relevance</SelectItem>
-                      <SelectItem value="rating" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Highest Rating</SelectItem>
-                      <SelectItem value="reviews" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Most Reviews</SelectItem>
-                      <SelectItem value="newest" className="text-white dark:text-white hover:bg-gray-700 dark:hover:bg-gray-700">Newest</SelectItem>
+                    <SelectContent className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                      <SelectItem value="relevance" className="text-[#002333] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600">Relevance</SelectItem>
+                      <SelectItem value="rating" className="text-[#002333] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600">Highest Rating</SelectItem>
+                      <SelectItem value="reviews" className="text-[#002333] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600">Most Reviews</SelectItem>
+                      <SelectItem value="newest" className="text-[#002333] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600">Newest</SelectItem>
                     </SelectContent>
                   </Select>
 
-                  <div className="border border-gray-600 dark:border-gray-600 rounded-md p-1 flex bg-gray-600 dark:bg-gray-600">
+                  <div className="bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl p-1 flex shadow-sm">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "grid" ? "bg-gray-700 text-white" : "text-gray-300 dark:text-gray-300"}`}
+                      className={`h-9 w-9 rounded-lg transition-all duration-200 ${
+                        viewMode === "grid" 
+                          ? "bg-[#15949C] text-white shadow-md" 
+                          : "text-gray-500 dark:text-gray-400 hover:text-[#15949C] hover:bg-gray-50 dark:hover:bg-gray-600"
+                      }`}
                       onClick={() => setViewMode("grid")}
                     >
                       <Grid className="h-4 w-4" />
@@ -372,7 +324,11 @@ export default function FindWorkersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "list" ? "bg-gray-700 text-white" : "text-gray-300 dark:text-gray-300"}`}
+                      className={`h-9 w-9 rounded-lg transition-all duration-200 ${
+                        viewMode === "list" 
+                          ? "bg-[#15949C] text-white shadow-md" 
+                          : "text-gray-500 dark:text-gray-400 hover:text-[#15949C] hover:bg-gray-50 dark:hover:bg-gray-600"
+                      }`}
                       onClick={() => setViewMode("list")}
                     >
                       <List className="h-4 w-4" />
@@ -380,7 +336,11 @@ export default function FindWorkersPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className={`h-8 w-8 ${viewMode === "map" ? "bg-gray-700 text-white" : "text-gray-300 dark:text-gray-300"}`}
+                      className={`h-9 w-9 rounded-lg transition-all duration-200 ${
+                        viewMode === "map" 
+                          ? "bg-[#15949C] text-white shadow-md" 
+                          : "text-gray-500 dark:text-gray-400 hover:text-[#15949C] hover:bg-gray-50 dark:hover:bg-gray-600"
+                      }`}
                       onClick={() => setViewMode("map")}
                     >
                       <Map className="h-4 w-4" />
@@ -419,9 +379,11 @@ export default function FindWorkersPage() {
                     {viewMode === "list" && (
                       <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         <TalentListView
+                          services={services}
                           selectedFreelancers={selectedFreelancers}
                           toggleFreelancerSelection={toggleFreelancerSelection}
                           openFreelancerDetail={openFreelancerDetail}
+                          isLoading={isLoading}
                         />
                       </motion.div>
                     )}
@@ -429,9 +391,11 @@ export default function FindWorkersPage() {
                     {viewMode === "map" && (
                       <motion.div key="map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         <TalentMapView
+                          services={services}
                           selectedFreelancers={selectedFreelancers}
                           toggleFreelancerSelection={toggleFreelancerSelection}
                           openFreelancerDetail={openFreelancerDetail}
+                          isLoading={isLoading}
                         />
                       </motion.div>
                     )}
@@ -454,30 +418,52 @@ export default function FindWorkersPage() {
           </div>
 
           {/* Market Insights Section */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-[#002333] dark:text-white mb-6">Talent Market Insights</h2>
-            <TalentMarketInsights />
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-[#15949C]/10 border border-[#15949C]/20 rounded-full px-4 py-2 mb-4">
+                <div className="w-2 h-2 bg-[#15949C] rounded-full"></div>
+                <span className="text-sm font-medium text-[#15949C]">Market Intelligence</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#002333] dark:text-white mb-4">
+                Talent Market Insights
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Stay ahead with real-time market trends and pricing insights
+              </p>
+            </div>
+            <TalentMarketInsights services={services} isLoading={isLoading} />
           </div>
 
           {/* Popular Categories */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-[#002333] dark:text-white mb-6">Browse Talent by Category</h2>
-            <TalentCategories />
-          </div>
-
-          {/* Featured Freelancers */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-[#002333] dark:text-white mb-6">Featured Talent</h2>
-            <TalentFeatured
-              selectedFreelancers={selectedFreelancers}
-              toggleFreelancerSelection={toggleFreelancerSelection}
-              openFreelancerDetail={openFreelancerDetail}
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-[#15949C]/10 border border-[#15949C]/20 rounded-full px-4 py-2 mb-4">
+                <div className="w-2 h-2 bg-[#15949C] rounded-full"></div>
+                <span className="text-sm font-medium text-[#15949C]">Browse by Category</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#002333] dark:text-white mb-4">
+                Explore Talent by Category
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Find specialized professionals across different industries and skill sets
+              </p>
+            </div>
+            <TalentCategories 
+              services={services} 
+              onCategoryClick={(category) => {
+                const filters = { ...currentFilters, category, page: 1 }
+                setCurrentFilters(filters)
+                searchServices(filters)
+                // Scroll to results
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+              isLoading={isLoading}
             />
           </div>
         </div>
       </main>
 
-      <SimpleFooter />
+      <Footer />
 
       {/* Compare Dialog */}
       {showCompare && (

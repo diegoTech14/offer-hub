@@ -16,6 +16,8 @@ export function ChatHeader({
           <AvatarImage
             src={avatarUrl || "/placeholder.svg"}
             alt={`${name} avatar`}
+            className="object-cover"
+            progressive={false}
           />
           <AvatarFallback>
             {name

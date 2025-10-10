@@ -54,7 +54,12 @@ export function ProjectCard({
 
             <div className="mt-2 sm:mt-3 flex items-center gap-2 sm:gap-3">
               <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
-                <AvatarImage src={displayAvatar} alt={displayPerson} />
+                <AvatarImage 
+                  src={displayAvatar} 
+                  alt={displayPerson}
+                  className="object-cover"
+                  progressive={false}
+                />
                 <AvatarFallback>
                   {displayPerson?.[0]?.toUpperCase() || "F"}
                 </AvatarFallback>

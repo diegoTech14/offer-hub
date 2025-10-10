@@ -50,6 +50,8 @@ export function UserChat({ onBack }: UserChatProps) {
           <AvatarImage
             src="/placeholder.svg?height=40&width=40"
             alt="John Doe"
+            className="object-cover"
+            progressive={false}
           />
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
