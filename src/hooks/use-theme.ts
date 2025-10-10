@@ -9,22 +9,21 @@ export function useTheme() {
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme from localStorage, default to light theme
   useEffect(() => {
     setMounted(true);
     try {
       const savedTheme = localStorage.getItem(THEME_KEY) as Theme | null;
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      const initialTheme = savedTheme || systemTheme;
+      
+      // Always default to light theme (ignore system preference)
+      const initialTheme = savedTheme || "light";
       setTheme(initialTheme);
       document.documentElement.classList.toggle("dark", initialTheme === "dark");
     } catch (error) {
       // Fallback to light theme if storage access fails
-      console.warn("Failed to access localStorage or matchMedia:", error);
+      console.warn("Failed to access localStorage:", error);
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
