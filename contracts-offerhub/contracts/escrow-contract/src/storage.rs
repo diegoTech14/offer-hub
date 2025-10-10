@@ -228,7 +228,7 @@ pub fn set_escrow_state(env: &Env, new_state: EscrowState) {
         // Emit event + keep debug log
         env.events().publish(
             (Symbol::new(env, "escrow_state_changed"), env.current_contract_address()),
-            (&prev, &data.state, now),
+            (prev.clone(), data.state.clone(), now),
         );
 
         log!(env, "Escrow state changed from {:?} to {:?}", prev, data.state);

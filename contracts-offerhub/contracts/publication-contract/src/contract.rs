@@ -37,7 +37,7 @@ impl PublicationContract {
 
     /// Publishes a new service or project on-chain.
     /// This function must be called before the data is stored in any off-chain database.
-    pub fn publish(
+    pub fn publish_internal(
         env: Env,
         user: Address,
         publication_type: Symbol,
@@ -100,13 +100,10 @@ impl PublicationContract {
     }
 
     /// This is a helper function primarily for verification and testing.
-    // pub fn get_publication(env: Env, user: Address, id: u32) -> Option<PublicationData> {
-    //     let key = DataKey::Publication(user, id);
-    //     env.storage().instance().get(&key)
-    // }
+    // Removed duplicate function to avoid compilation error
 
     /// Retrieves a specific publication for a user and checks expiration
-    pub fn get_publication(env: Env, user: Address, id: u32) -> Option<PublicationData> {
+    pub fn get_publication_internal(env: Env, user: Address, id: u32) -> Option<PublicationData> {
         let key = DataKey::Publication(user, id);
         let mut publication: PublicationData = env.storage().instance().get(&key)?;
         Self::check_expiration(&env, &mut publication);

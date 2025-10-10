@@ -184,7 +184,7 @@ impl EmergencyContract {
 
         env.storage().instance().set(&symbol_short!("REQUESTS"), &recovery_requests);
         
-        env.events().publish((Symbol::new(env, "created_recovery_req") , request_id.clone()), (user_address ,amount , reason ,env.ledger().timestamp()));
+        env.events().publish((Symbol::new(env, "created_recovery_req"), request_id.clone()), (user_address, amount, reason, env.ledger().timestamp()));
 
         request_id
     }
@@ -210,7 +210,7 @@ impl EmergencyContract {
 
         
         env.storage().instance().set(&symbol_short!("REQUESTS"), &recovery_requests);
-        env.events().publish((Symbol::new(env , "approve_recovery_request") , request_id), env.ledger().timestamp());
+        env.events().publish((Symbol::new(env, "approve_recovery_request"), request_id), env.ledger().timestamp());
 
     }
 
@@ -240,7 +240,7 @@ impl EmergencyContract {
             EMERGENCY_WITHDRAWAL,
             symbol_short!("WITHDRAW")
         );
-        env.events().publish((Symbol::new(env , "emegency_fund_withdrawal"), ), (_recipient , amount , env.ledger().timestamp()));
+        env.events().publish((Symbol::new(env, "emergency_fund_withdrawal"), ), (_recipient, amount, env.ledger().timestamp()));
 
     }
 
@@ -257,7 +257,7 @@ impl EmergencyContract {
         
         state.emergency_contacts.push_back(contact.clone());
         env.storage().instance().set(&symbol_short!("STATE"), &state);
-        env.events().publish((Symbol::new(env ,"added_emergency_contract"), contact ), env.ledger().timestamp());
+        env.events().publish((Symbol::new(env, "added_emergency_contact"), contact), env.ledger().timestamp());
 
     }
 
