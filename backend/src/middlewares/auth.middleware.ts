@@ -20,7 +20,8 @@ import {
 } from "@/types/middleware.types";
 import { authConfig, isPublicRoute } from "@/config/auth.config";
 import { UserRole, AuthUser } from "@/types/auth.types";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => require('crypto').randomUUID();
 
 /**
  * Enhanced authentication middleware with comprehensive security features

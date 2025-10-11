@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register src/index.ts",
-    "build": "tsc && tsc-alias",
+    "build": "tsc --noEmitOnError false && tsc-alias",
     "start": "node dist/index.js",
-    "postinstall": "echo 'Dependencies installed successfully' && npm list uuid || echo 'UUID not found'",
+    "postinstall": "echo 'Dependencies installed successfully'",
     "lint": "eslint --config eslint.config.js src/**/*.ts",
     "lint:fix": "eslint --config eslint.config.js src/**/*.ts --fix",
     "test": "jest",
@@ -29,7 +29,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.3.1",
     "@types/on-finished": "^2.3.5",
-    "@types/uuid": "^8.3.4",
     "axios": "^1.12.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
@@ -44,7 +43,6 @@
     "systeminformation": "^5.27.9",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
-    "uuid": "8.3.2",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
