@@ -130,16 +130,17 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       }
 
       // Fetch user from database
+      const userId = decoded.sub || decoded.user_id;
       const { data: user, error: userError } = await supabase
         .from("users")
         .select("*")
-        .eq("id", decoded.user_id)
+        .eq("id", userId)
         .single();
 
       if (userError || !user) {
         await logAuthAttempt({
           ...securityContext,
-          userId: decoded.user_id,
+          userId: userId,
           success: false,
           errorMessage: "User not found",
         });
