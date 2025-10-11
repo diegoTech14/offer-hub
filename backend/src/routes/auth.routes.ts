@@ -10,6 +10,8 @@ import {
   me,
   refresh,
   register,
+  registerWithEmail,
+  registerWithWallet,
   loginWithEmail,
   getSessions,
   deactivateSession,
@@ -23,12 +25,21 @@ import { Router } from "express";
 
 const router = Router();
 
-router.post("/register", register);
+// Registration routes
+router.post("/register", register); // Legacy wallet-based registration
+router.post("/register-with-email", authLimiter, registerWithEmail); // Email/password registration with invisible wallet
+router.post("/register-with-wallet", authLimiter, registerWithWallet); // External wallet registration with email/password
+
+// Authentication routes
 router.post("/nonce", authLimiter, getNonce);
 router.post("/login", authLimiter, login);
 router.post("/login/email", authLimiter, loginWithEmail);
+
+// Token management
 router.post("/refresh", validateRefreshToken, refresh);
 router.post("/logout", validateRefreshToken, logout);
+
+// User routes
 router.get("/me", authenticateToken, me);
 router.get("/sessions", authenticateToken, getSessions);
 router.delete("/sessions/:sessionId", authenticateToken, deactivateSession);
