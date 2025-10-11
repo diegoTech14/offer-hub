@@ -1,4 +1,4 @@
-use soroban_sdk::{contracterror, contracttype, Address, Env, String, Symbol, symbol_short};
+use soroban_sdk::{contracttype, Address, Env, String, Symbol, symbol_short};
 use crate::error::Error;
 pub type TokenId = u64;
 
