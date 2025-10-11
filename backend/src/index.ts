@@ -45,6 +45,7 @@ app.use(cors({
     'http://localhost:3000',
     'https://offer-hub-hpd4.vercel.app',
     'https://offer-hub.vercel.app',
+    'https://offer-hub-web.vercel.app',
     /https:\/\/.*\.vercel\.app$/
   ],
   credentials: true,
