@@ -1,11 +1,11 @@
 use crate::types::{
-    Feedback, FeedbackReport, IncentiveRecord, RateLimitEntry, Rating, RatingStats, UserRatingSummary,
+    Feedback, FeedbackReport, IncentiveRecord, RateLimitEntry, Rating, RatingStats,
     RatingThreshold, ADMIN, FEEDBACK, FEEDBACK_REPORTS, INCENTIVE_RECORDS, MODERATOR,
     PLATFORM_STATS, RATE_LIMITS, RATE_LIMIT_BYPASS, RATING, RATING_THRESHOLDS, REPUTATION_CONTRACT,
     TOTAL_RATING_COUNT, USER_RATING_STATS, USER_RESTRICTIONS,
 };
 use crate::error::Error;
-use soroban_sdk::{Address, Env, String, Symbol, Vec, log};
+use soroban_sdk::{Address, Env, String, Symbol, Vec};
 
 // Admin and moderator management
 pub fn save_admin(env: &Env, admin: &Address) {
@@ -187,6 +187,7 @@ pub fn save_rating_threshold(env: &Env, threshold: &RatingThreshold) {
     env.storage().persistent().set(&key, threshold);
 }
 
+#[allow(dead_code)]
 pub fn get_rating_threshold(env: &Env, threshold_type: &String) -> Result<RatingThreshold, Error> {
     let key = (RATING_THRESHOLDS, threshold_type.clone());
     env.storage()
@@ -342,6 +343,7 @@ pub fn check_rate_limit(
 }
 
 // ================= Health Check Storage =================
+#[allow(dead_code)]
 pub fn save_last_health_check(env: &Env, timestamp: u64) {
     env.storage()
         .instance()
@@ -355,12 +357,14 @@ pub fn get_last_health_check(env: &Env) -> u64 {
         .unwrap_or(0)
 }
 
+#[allow(dead_code)]
 pub fn save_health_check_issues(env: &Env, issues: &Vec<String>) {
     env.storage()
         .instance()
         .set(&Symbol::new(env, "health_issues"), issues);
 }
 
+#[allow(dead_code)]
 pub fn get_health_check_issues(env: &Env) -> Vec<String> {
     env.storage()
         .instance()
@@ -368,6 +372,7 @@ pub fn get_health_check_issues(env: &Env) -> Vec<String> {
         .unwrap_or_else(|| Vec::new(env))
 }
 
+#[allow(dead_code)]
 pub fn save_contract_version(env: &Env, version: &String) {
     env.storage()
         .instance()
