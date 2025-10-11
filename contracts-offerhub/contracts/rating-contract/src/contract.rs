@@ -29,7 +29,7 @@ use crate::types::{
     DEFAULT_TOP_RATED_THRESHOLD, RatingDataExport, UserRatingSummary, PAUSED
 };
 use crate::validation::{validate_report_feedback, validate_submit_rating};
-use soroban_sdk::{log, Address, Env, IntoVal, String, Symbol, Vec, Bytes};
+use soroban_sdk::{Address, Env, IntoVal, String, Symbol, Vec, Bytes};
 
 pub struct RatingContract;
 
