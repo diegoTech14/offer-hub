@@ -22,6 +22,7 @@ struct ContractClient {
     contract_id: Address,
 }
 
+#[allow(dead_code)]
 impl ContractClient {
     fn new(env: Env, contract_id: Address) -> Self {
         Self { env, contract_id }
@@ -1648,10 +1649,10 @@ fn test_transfer_panic() {
     client.init(admin.clone()).unwrap();
     env.mock_all_auths();
     client.add_minter(admin.clone(), admin.clone()).unwrap();
-    client.pause(admin.clone());
+    let _pause_result = client.pause(admin.clone());
 
     // Mint an NFT to user1
-    let result = client.mint(
+    let _result = client.mint(
         admin.clone(),
         user1.clone(),
         1,

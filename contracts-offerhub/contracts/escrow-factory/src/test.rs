@@ -109,6 +109,7 @@ fn test_batch_operations_structure() {
 }
 
 // Helper function to setup test environment
+#[allow(dead_code)]
 fn setup_env() -> (Env, Address, Address, Address, Address, BytesN<32>) {
     let env = Env::default();
     env.mock_all_auths();

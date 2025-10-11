@@ -19,6 +19,14 @@ export interface User {
   is_freelancer?: boolean;
   nonce?: string;
   created_at?: string;
+  verification_level?: number;
+  verified_on_blockchain?: boolean;
+  verified_at?: string;
+  verification_metadata?: {
+    transactionHash?: string;
+    verifiedAt?: string;
+    method?: string;
+  };
 }
 
 export interface UserFilters {

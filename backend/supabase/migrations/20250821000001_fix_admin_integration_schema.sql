@@ -31,17 +31,15 @@ ALTER TABLE integration_instances
 
 ALTER TABLE integration_syncs 
   ALTER COLUMN started_at TYPE TIMESTAMPTZ,
-  ALTER COLUMN completed_at TYPE TIMESTAMPTZ,
-  ALTER COLUMN created_at TYPE TIMESTAMPTZ;
+  ALTER COLUMN completed_at TYPE TIMESTAMPTZ;
 
 ALTER TABLE admin_audit_logs 
   ALTER COLUMN performed_at TYPE TIMESTAMPTZ;
 
 ALTER TABLE admin_api_logs 
-  ALTER COLUMN created_at TYPE TIMESTAMPTZ;
+  ALTER COLUMN timestamp TYPE TIMESTAMPTZ;
 
 ALTER TABLE admin_system_health 
-  ALTER COLUMN checked_at TYPE TIMESTAMPTZ,
   ALTER COLUMN created_at TYPE TIMESTAMPTZ;
 
 ALTER TABLE admin_api_rate_limits 
@@ -54,7 +52,8 @@ ALTER TABLE admin_notifications
 
 ALTER TABLE admin_api_quotas 
   ALTER COLUMN reset_time TYPE TIMESTAMPTZ,
-  ALTER COLUMN created_at TYPE TIMESTAMPTZ;
+  ALTER COLUMN created_at TYPE TIMESTAMPTZ,
+  ALTER COLUMN updated_at TYPE TIMESTAMPTZ;
 
 -- 2. Fix webhook_deliveries payload_id to be UUID with FK
 ALTER TABLE webhook_deliveries 

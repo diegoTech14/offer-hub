@@ -110,4 +110,24 @@ impl PublicationContract {
         env.storage().instance().set(&key, &publication); // Update state if changed
         Some(publication)
     }
+
+    /// Public wrapper for publish_internal
+    #[allow(dead_code)]
+    pub fn publish(
+        env: Env,
+        user: Address,
+        publication_type: Symbol,
+        title: String,
+        category: String,
+        amount: i128,
+        timestamp: u64,
+    ) -> Result<u32, ContractError> {
+        Self::publish_internal(env, user, publication_type, title, category, amount, timestamp)
+    }
+
+    /// Public wrapper for get_publication_internal
+    #[allow(dead_code)]
+    pub fn get_publication(env: Env, user: Address, id: u32) -> Option<PublicationData> {
+        Self::get_publication_internal(env, user, id)
+    }
 }

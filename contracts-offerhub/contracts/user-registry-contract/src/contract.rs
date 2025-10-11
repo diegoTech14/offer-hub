@@ -9,7 +9,7 @@ use crate::error::Error;
 use crate::validation::{
     validate_bulk_verification, validate_metadata_update, validate_user_verification,
 };
-use soroban_sdk::{Address, Env, IntoVal, String, Symbol, Vec, log};
+use soroban_sdk::{Address, Env, IntoVal, String, Symbol, Vec};
 
 pub struct UserRegistryContract;
 

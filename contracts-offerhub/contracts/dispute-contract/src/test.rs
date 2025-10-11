@@ -5,7 +5,7 @@ use crate::{
     DisputeResolutionContract, DisputeResolutionContractClient,
 };
 use soroban_sdk::{
-    log, testutils::{Address as _, Ledger}, Address, Env, String
+    testutils::{Address as _, Ledger}, Address, Env, String
 };
 
 fn setup_env() -> Env {
@@ -14,9 +14,8 @@ fn setup_env() -> Env {
     env
 }
 
-fn create_contract(env: &Env) -> (DisputeResolutionContractClient, Address, Address, Address) {
-    let contract_id = Address::generate(env);
-    env.register_contract(&contract_id, DisputeResolutionContract);
+fn create_contract(env: &Env) -> (DisputeResolutionContractClient<'_>, Address, Address, Address) {
+    let contract_id = env.register(DisputeResolutionContract, ());
     let client = DisputeResolutionContractClient::new(env, &contract_id);
     let admin = Address::generate(env);
     let escrow_contract = Address::generate(env);
@@ -32,8 +31,7 @@ fn test_initialize() {
     let env = setup_env();
     env.mock_all_auths();
 
-    let contract_id = Address::generate(&env);
-    env.register_contract(&contract_id, DisputeResolutionContract);
+    let contract_id = env.register(DisputeResolutionContract, ());
     let client = DisputeResolutionContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let escrow_contract = Address::generate(&env);
@@ -437,7 +435,7 @@ fn test_get_total_disputes() {
     let env = setup_env();
     env.mock_all_auths();
 
-    let (client, admin, _, _) = create_contract(&env);
+    let (client, _admin, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let job_id_1 = 1;
     let job_id_2 = 2;
@@ -511,7 +509,7 @@ fn test_resettotal_disputes() {
     let count_after_second = client.get_total_disputes();
     assert_eq!(count_after_second, 2);
 
-    let res = client.reset_dispute_count(&admin);
+    let _res = client.reset_dispute_count(&admin);
 
     let count_after_reset = client.get_total_disputes();
     assert_eq!(count_after_reset, 0);
@@ -524,14 +522,14 @@ fn test_reset_total_disputes_fail() {
     let env = setup_env();
     env.mock_all_auths();
 
-    let (client, admin, _, _) = create_contract(&env);
+    let (client, _admin, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let job_id_1 = 1;
     let job_id_2 = 2;
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract_addr = Some(Address::generate(&env));
-    let new_address = Address::generate(&env);
+    let _new_address = Address::generate(&env);
 
     // Check initial dispute count
     let initial_count = client.get_total_disputes();
@@ -683,8 +681,7 @@ fn test_pause_unpause() {
     env.mock_all_auths();
 
     
-    let contract_id = Address::generate(&env);
-    env.register_contract(&contract_id, DisputeResolutionContract);
+    let contract_id = env.register(DisputeResolutionContract, ());
     let client = DisputeResolutionContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let escrow_contract = Address::generate(&env);
@@ -708,8 +705,7 @@ fn test_pause_unpause_unauthorized() {
     env.mock_all_auths();
 
     
-    let contract_id = Address::generate(&env);
-    env.register_contract(&contract_id, DisputeResolutionContract);
+    let contract_id = env.register(DisputeResolutionContract, ());
     let client = DisputeResolutionContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let escrow_contract = Address::generate(&env);

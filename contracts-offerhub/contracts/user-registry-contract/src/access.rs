@@ -1,6 +1,6 @@
 use crate::storage::{get_admin, get_moderators, set_admin, set_moderators};
 use crate::error::Error;
-use soroban_sdk::{Address, Env, Vec, log};
+use soroban_sdk::{Address, Env, Vec};
 
 pub struct AccessControl;
 

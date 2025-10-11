@@ -14,7 +14,7 @@ mod error;
 
 use crate::types::{ArbitratorData, DisputeData, DisputeOutcome, Evidence, DisputeInfo};
 use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
-use crate::{error::{handle_error, Error}};
+use crate::error::Error;
 
 #[contract]
 pub struct DisputeResolutionContract;

@@ -2,7 +2,7 @@
 
 use crate::types::EscrowState;
 use crate::{EscrowContract, EscrowContractClient};
-use soroban_sdk::testutils::{Address as _, Ledger, LedgerInfo};
+use soroban_sdk::testutils::{Address as _, Ledger};
 use soroban_sdk::{contract, contractimpl, log, Address, Env, String, Symbol};
 
 #[contract]
@@ -802,21 +802,11 @@ fn test_get_contract_status() {
     let timeout = 3600; // 1 hour (minimum allowed)
 
     
-    let timestamp = 3000;
-    env.ledger().set(LedgerInfo {
-        timestamp: timestamp,
-        protocol_version: 23,
-        sequence_number: env.ledger().sequence(),
-        network_id: Default::default(),
-        base_reserve: 0,
-        min_temp_entry_ttl: 0,
-        min_persistent_entry_ttl: 0,
-        max_entry_ttl: 0,
-    });
+    env.ledger().with_mut(|l| l.timestamp = 3000);
     contract.init_contract_full(&client, &freelancer, &arbitrator, &token, &amount, &timeout);
     contract.deposit_funds(&client);
 
-    let data = env.as_contract(&contract_id, || crate::contract::get_escrow_data(&env));
+    let _data = env.as_contract(&contract_id, || crate::contract::get_escrow_data(&env));
     let summary = contract.get_contract_status(&contract_id.clone());
     assert_eq!(summary.client, client);
     assert_eq!(summary.freelancer, freelancer);
@@ -826,7 +816,7 @@ fn test_get_contract_status() {
     assert_eq!(summary.milestone_count, 0);
 
     contract.release_funds(&freelancer);
-    let data = env.as_contract(&contract_id, || crate::contract::get_escrow_data(&env));
+    let _data = env.as_contract(&contract_id, || crate::contract::get_escrow_data(&env));
     let summary = contract.get_contract_status(&contract_id.clone());
     // // Verify the EscrowSummary
     assert_eq!(summary.client, client);
@@ -984,7 +974,7 @@ fn test_pause_unpause_unauthorized() {
     let amount = 500;
     let timeout = 3600; // 1 hour (minimum allowed)
 
-    contract.init_contract_full(&client, &freelancer, &arbitrator, &token, &amount, &timeout);;
+    contract.init_contract_full(&client, &freelancer, &arbitrator, &token, &amount, &timeout);
     
     let unauthorized = Address::generate(&env);
     
