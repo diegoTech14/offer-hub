@@ -1,4 +1,4 @@
-import { Keypair } from 'stellar-sdk';
+import { Keypair } from '@stellar/stellar-sdk';
 import { supabase } from '@/lib/supabase/supabase';
 import { encrypt, decrypt } from '@/utils/crypto.utils';
 import { 
