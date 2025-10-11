@@ -1,5 +1,22 @@
 import dotenv from "dotenv";
 dotenv.config();
+
+// Validate critical environment variables
+console.log('🔍 Checking environment variables...');
+const requiredEnvVars = [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'JWT_SECRET'
+];
+
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingEnvVars.length > 0) {
+  console.error('❌ Missing required environment variables:', missingEnvVars);
+  console.error('📋 Available SUPABASE env vars:', Object.keys(process.env).filter(k => k.includes('SUPABASE')));
+} else {
+  console.log('✅ All required environment variables are set');
+}
+
 import express from "express";
 import cors from "cors";
 import serviceRequestRoutes from "@/routes/service-request.routes";

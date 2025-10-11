@@ -139,6 +139,9 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
   }
 
   try {
+    // Wallet generation disabled temporarily - using mock wallet
+    // TODO: Re-enable when Stellar integration is ready
+    /*
     // Generate invisible wallet for the user
     const { wallet, publicKey } = await walletService.generateInvisibleWallet(newUser.id);
 
@@ -150,6 +153,20 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
 
     if (updateError) {
       throw new AppError(`Failed to link wallet to user: ${updateError.message}`, 500);
+    }
+    */
+
+    // Mock wallet address for development
+    const mockWalletAddress = `MOCK_${newUser.id.substring(0, 8).toUpperCase()}`;
+    
+    // Update user with mock wallet address
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ wallet_address: mockWalletAddress })
+      .eq("id", newUser.id);
+
+    if (updateError) {
+      throw new AppError(`Failed to link mock wallet to user: ${updateError.message}`, 500);
     }
 
     // Stellar blockchain registration disabled temporarily
@@ -214,13 +231,13 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
       throw new AppError("Failed to persist refresh token", 500);
     }
 
-    const safeUser = sanitizeUser({ ...newUser, wallet_address: publicKey });
+    const safeUser = sanitizeUser({ ...newUser, wallet_address: mockWalletAddress });
 
     return {
       user: safeUser,
       wallet: {
-        address: wallet.address,
-        type: wallet.type,
+        address: mockWalletAddress,
+        type: 'invisible',
       },
       tokens: { accessToken, refreshToken },
     };
