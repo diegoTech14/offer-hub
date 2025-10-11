@@ -58,7 +58,7 @@ export default function Navbar({
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/find-workers", label: "Find Workers" },
-    { href: "/messages", label: "My Chats" },
+    { href: "/onboarding/dashboard", label: "Dashboard" },
     { href: "/faq", label: "FAQ" },
     { href: "/help", label: "Help" },
   ];
@@ -73,8 +73,12 @@ export default function Navbar({
   };
 
   const handleLogout = () => {
-    console.log("Logout clicked");
-    // Add logout logic here
+    // Clear authentication tokens
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    
+    // Redirect to sign-in page
+    router.push("/onboarding/sign-in");
   };
 
   return (
