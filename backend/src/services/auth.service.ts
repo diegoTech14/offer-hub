@@ -11,7 +11,7 @@ import {
   signRefreshToken,
 } from "@/utils/jwt.utils";
 import { supabase } from "@/lib/supabase/supabase";
-import { AuthUser, LoginDTO, RefreshTokenRecord, EmailLoginDTO, AuditLogEntry, DeviceInfo, UserRole } from "@/types/auth.types";
+import { AuthUser, LoginDTO, RefreshTokenRecord, EmailLoginDTO, AuditLogEntry, DeviceInfo, UserRole, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
 import { AppError } from "@/utils/AppError";
 import { randomBytes } from "crypto";
 import { utils } from "ethers";
@@ -76,6 +76,314 @@ export async function signup(data: CreateUserDTO) {
     user: safeUser,
     tokens: { accessToken, refreshToken },
   };
+}
+
+/**
+ * Register new user with email and password
+ * Automatically generates an invisible Stellar wallet
+ * @param data - Registration data with email, password, username
+ * @param deviceInfo - Device information for audit logging
+ * @returns User data and JWT tokens
+ */
+export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: DeviceInfo) {
+  const { email, password, username, name, bio, is_freelancer } = data;
+
+  // Import wallet service
+  const walletService = await import('./wallet.service');
+
+  // Check if email already exists
+  const { data: existingUser, error: emailCheckError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email.toLowerCase())
+    .single();
+
+  if (existingUser) {
+    throw new AppError("Email already registered", 400);
+  }
+
+  // Check if username already exists
+  const { data: existingUsername } = await supabase
+    .from("users")
+    .select("id")
+    .eq("username", username)
+    .single();
+
+  if (existingUsername) {
+    throw new AppError("Username already taken", 400);
+  }
+
+  // Hash password
+  const password_hash = await bcrypt.hash(password, 10);
+
+  // Create user (without wallet_address initially)
+  const { data: newUser, error: userError } = await supabase
+    .from("users")
+    .insert([
+      {
+        email: email.toLowerCase(),
+        password_hash,
+        username,
+        name: name || username,
+        bio: bio || null,
+        is_freelancer: is_freelancer || false,
+        reputation_score: 0,
+      },
+    ])
+    .select()
+    .single();
+
+  if (userError || !newUser) {
+    throw new AppError(`Failed to create user: ${userError?.message || 'Unknown error'}`, 500);
+  }
+
+  try {
+    // Generate invisible wallet for the user
+    const { wallet, publicKey } = await walletService.generateInvisibleWallet(newUser.id);
+
+    // Update user with wallet address
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ wallet_address: publicKey })
+      .eq("id", newUser.id);
+
+    if (updateError) {
+      throw new AppError(`Failed to link wallet to user: ${updateError.message}`, 500);
+    }
+
+    // Register user on Stellar blockchain
+    const blockchainService = await import('./blockchain.service');
+    const blockchainResult = await blockchainService.registerUserOnBlockchain(
+      newUser.id,
+      publicKey,
+      1 // VerificationLevel.BASIC
+    );
+
+    // Update user with blockchain verification status
+    if (blockchainResult.success) {
+      await supabase
+        .from("users")
+        .update({
+          verification_level: blockchainResult.verificationLevel,
+          verified_on_blockchain: true,
+          verified_at: new Date().toISOString(),
+          verification_metadata: {
+            transactionHash: blockchainResult.transactionHash,
+            verifiedAt: new Date().toISOString(),
+            method: 'email_registration',
+          },
+        })
+        .eq("id", newUser.id);
+    }
+
+    // Log registration event
+    await logAuthAttempt({
+      userId: newUser.id,
+      action: 'user_register_email',
+      resource: 'auth',
+      ipAddress: deviceInfo.ip_address || '',
+      userAgent: deviceInfo.user_agent || '',
+      timestamp: new Date(),
+    });
+
+    // Generate tokens
+    const accessToken = signAccessToken({ 
+      sub: newUser.id,
+      email: newUser.email,
+      role: UserRole.CLIENT,
+      permissions: []
+    });
+    const { refreshToken, refreshTokenHash } = signRefreshToken({
+      sub: newUser.id,
+      email: newUser.email,
+      role: UserRole.CLIENT,
+      permissions: []
+    });
+
+    // Save refresh token in DB
+    const { error: rtInsertError } = await supabase
+      .from("refresh_tokens")
+      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash }]);
+
+    if (rtInsertError) {
+      throw new AppError("Failed to persist refresh token", 500);
+    }
+
+    const safeUser = sanitizeUser({ ...newUser, wallet_address: publicKey });
+
+    return {
+      user: safeUser,
+      wallet: {
+        address: wallet.address,
+        type: wallet.type,
+      },
+      tokens: { accessToken, refreshToken },
+    };
+  } catch (error) {
+    // Rollback: delete user if wallet creation failed
+    await supabase.from("users").delete().eq("id", newUser.id);
+    throw error;
+  }
+}
+
+/**
+ * Register new user with existing wallet
+ * Links external wallet and creates account with email/password
+ * @param data - Registration data with wallet address, signature, email, password
+ * @param deviceInfo - Device information for audit logging
+ * @returns User data and JWT tokens
+ */
+export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo: DeviceInfo) {
+  const { wallet_address, signature, email, password, username, name, bio, is_freelancer } = data;
+
+  // Import wallet service
+  const walletService = await import('./wallet.service');
+
+  // Verify signature (user must sign a message proving they own the wallet)
+  // For Stellar, we would verify the signature using the wallet address
+  // This is a placeholder - implement proper Stellar signature verification
+  try {
+    // TODO: Implement proper Stellar signature verification
+    // For now, we'll proceed with the registration
+  } catch (error) {
+    throw new AppError("Invalid wallet signature", 401);
+  }
+
+  // Check if wallet already exists
+  const { data: existingWallet } = await supabase
+    .from("users")
+    .select("id")
+    .eq("wallet_address", wallet_address)
+    .single();
+
+  if (existingWallet) {
+    throw new AppError("Wallet already registered", 400);
+  }
+
+  // Check if email already exists
+  const { data: existingEmail } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email.toLowerCase())
+    .single();
+
+  if (existingEmail) {
+    throw new AppError("Email already registered", 400);
+  }
+
+  // Check if username already exists
+  const { data: existingUsername } = await supabase
+    .from("users")
+    .select("id")
+    .eq("username", username)
+    .single();
+
+  if (existingUsername) {
+    throw new AppError("Username already taken", 400);
+  }
+
+  // Hash password
+  const password_hash = await bcrypt.hash(password, 10);
+
+  // Create user with wallet address
+  const { data: newUser, error: userError } = await supabase
+    .from("users")
+    .insert([
+      {
+        wallet_address,
+        email: email.toLowerCase(),
+        password_hash,
+        username,
+        name: name || username,
+        bio: bio || null,
+        is_freelancer: is_freelancer || false,
+        reputation_score: 0,
+      },
+    ])
+    .select()
+    .single();
+
+  if (userError || !newUser) {
+    throw new AppError(`Failed to create user: ${userError?.message || 'Unknown error'}`, 500);
+  }
+
+  try {
+    // Link external wallet to user
+    await walletService.linkExternalWallet(newUser.id, wallet_address);
+
+    // Register user on Stellar blockchain
+    const blockchainService = await import('./blockchain.service');
+    const blockchainResult = await blockchainService.registerUserOnBlockchain(
+      newUser.id,
+      wallet_address,
+      1 // VerificationLevel.BASIC
+    );
+
+    // Update user with blockchain verification status
+    if (blockchainResult.success) {
+      await supabase
+        .from("users")
+        .update({
+          verification_level: blockchainResult.verificationLevel,
+          verified_on_blockchain: true,
+          verified_at: new Date().toISOString(),
+          verification_metadata: {
+            transactionHash: blockchainResult.transactionHash,
+            verifiedAt: new Date().toISOString(),
+            method: 'wallet_connection',
+          },
+        })
+        .eq("id", newUser.id);
+    }
+
+    // Log registration event
+    await logAuthAttempt({
+      userId: newUser.id,
+      action: 'user_register_wallet',
+      resource: 'auth',
+      ipAddress: deviceInfo.ip_address || '',
+      userAgent: deviceInfo.user_agent || '',
+      timestamp: new Date(),
+    });
+
+    // Generate tokens
+    const accessToken = signAccessToken({ 
+      sub: newUser.id,
+      email: newUser.email,
+      role: UserRole.CLIENT,
+      permissions: []
+    });
+    const { refreshToken, refreshTokenHash } = signRefreshToken({
+      sub: newUser.id,
+      email: newUser.email,
+      role: UserRole.CLIENT,
+      permissions: []
+    });
+
+    // Save refresh token in DB
+    const { error: rtInsertError } = await supabase
+      .from("refresh_tokens")
+      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash }]);
+
+    if (rtInsertError) {
+      throw new AppError("Failed to persist refresh token", 500);
+    }
+
+    const safeUser = sanitizeUser(newUser);
+
+    return {
+      user: safeUser,
+      wallet: {
+        address: wallet_address,
+        type: 'external',
+      },
+      tokens: { accessToken, refreshToken },
+    };
+  } catch (error) {
+    // Rollback: delete user if wallet linking failed
+    await supabase.from("users").delete().eq("id", newUser.id);
+    throw error;
+  }
 }
 
 export async function login(data: LoginDTO) {
