@@ -10,7 +10,7 @@ import { FaPlus } from "react-icons/fa6";
 
 const navItems = [
   {
-    path: "/admin",
+    path: "/admin/dashboard",
     icon: <MdDashboard className="h-5 w-5" />,
     label: "Dashboard",
   },
@@ -30,7 +30,7 @@ const navItems = [
     label: "Content Moderation",
   },
   {
-    path: "/dispute-resolution",
+    path: "/admin/dispute-resolution",
     icon: <LuFolderPen className="h-5 w-5" />,
     label: "Dispute resolution",
   },
@@ -47,12 +47,12 @@ export default function Sidebar() {
   
   // Function to check if a path is active (exact match or is a subpath)
   const isActive = (path: string) => {
-    if (path === '/admin' && pathname === '/admin') {
+    if (path === '/admin/dashboard' && pathname === '/admin/dashboard') {
       return true;
     }
     // For other paths, check if the current pathname starts with the nav item path
-    // but only if it's not the root admin path
-    return path !== '/admin' && pathname.startsWith(path);
+    // but only if it's not the dashboard path
+    return path !== '/admin/dashboard' && pathname.startsWith(path);
   };
 
   return (
@@ -60,7 +60,7 @@ export default function Sidebar() {
       <div 
         className="flex items-center gap-2 p-6 cursor-pointer" 
         onClick={() => {
-          router.push('/admin');
+          router.push('/admin/dashboard');
         }}
       >
         <Image src="/logo.svg" alt="Offer Hub Logo" width={32} height={32} />
