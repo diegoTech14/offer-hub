@@ -199,6 +199,160 @@ export function useServicesApi(): UseServicesApiReturn {
     return filters;
   }, [searchParams]);
 
+  // Mock data for freelancers - simulating database response
+  const mockFreelancers: FreelancerDisplay[] = [
+    {
+      id: "1",
+      name: "Sarah Johnson",
+      title: "Senior React Developer",
+      avatar: "/avatars/sarah.jpg",
+      rating: 4.9,
+      reviewCount: 127,
+      location: "San Francisco, USA",
+      hourlyRate: 75,
+      description: "Experienced React developer with 5+ years building scalable web applications. Specialized in modern React patterns and state management.",
+      skills: ["React", "TypeScript", "Node.js", "GraphQL", "AWS"],
+      projectsCompleted: 89,
+      responseTime: "Under 1 hour",
+      category: "development"
+    },
+    {
+      id: "2", 
+      name: "Michael Chen",
+      title: "UI/UX Designer",
+      avatar: "/avatars/michael.jpg",
+      rating: 4.8,
+      reviewCount: 95,
+      location: "New York, USA",
+      hourlyRate: 60,
+      description: "Creative UI/UX designer focused on creating intuitive and beautiful user experiences. Expert in design systems and prototyping.",
+      skills: ["Figma", "Adobe XD", "Sketch", "Prototyping", "User Research"],
+      projectsCompleted: 67,
+      responseTime: "Under 1 hour",
+      category: "design"
+    },
+    {
+      id: "3",
+      name: "Elena Rodriguez",
+      title: "Full Stack Developer",
+      avatar: "/avatars/elena.jpg",
+      rating: 4.7,
+      reviewCount: 143,
+      location: "Barcelona, Spain",
+      hourlyRate: 55,
+      description: "Passionate full-stack developer with expertise in both frontend and backend technologies. Loves clean code and modern architecture.",
+      skills: ["JavaScript", "Python", "Django", "React", "PostgreSQL"],
+      projectsCompleted: 112,
+      responseTime: "1-2 hours",
+      category: "development"
+    },
+    {
+      id: "4",
+      name: "David Kim",
+      title: "Digital Marketing Specialist",
+      avatar: "/avatars/david.jpg",
+      rating: 4.6,
+      reviewCount: 78,
+      location: "Toronto, Canada",
+      hourlyRate: 45,
+      description: "Results-driven digital marketing expert with proven track record in SEO, SEM, and social media campaigns.",
+      skills: ["SEO", "Google Ads", "Facebook Ads", "Analytics", "Content Marketing"],
+      projectsCompleted: 54,
+      responseTime: "1-2 hours",
+      category: "marketing"
+    },
+    {
+      id: "5",
+      name: "Alexandra Smith",
+      title: "Blockchain Developer",
+      avatar: "/avatars/alexandra.jpg",
+      rating: 4.9,
+      reviewCount: 91,
+      location: "London, UK",
+      hourlyRate: 85,
+      description: "Blockchain and smart contract developer with deep knowledge of Ethereum, Solidity, and DeFi protocols.",
+      skills: ["Solidity", "Web3.js", "Ethereum", "DeFi", "Smart Contracts"],
+      projectsCompleted: 43,
+      responseTime: "Under 1 hour",
+      category: "blockchain"
+    },
+    {
+      id: "6",
+      name: "James Wilson",
+      title: "Data Scientist",
+      avatar: "/avatars/james.jpg",
+      rating: 4.8,
+      reviewCount: 116,
+      location: "Berlin, Germany",
+      hourlyRate: 70,
+      description: "Data scientist specializing in machine learning and AI. Expert in Python, R, and advanced analytics.",
+      skills: ["Python", "Machine Learning", "TensorFlow", "Pandas", "Statistics"],
+      projectsCompleted: 76,
+      responseTime: "Under 1 hour",
+      category: "data"
+    },
+    {
+      id: "7",
+      name: "Maria Garcia",
+      title: "Business Consultant",
+      avatar: "/avatars/maria.jpg",
+      rating: 4.7,
+      reviewCount: 89,
+      location: "Miami, USA",
+      hourlyRate: 65,
+      description: "Strategic business consultant helping companies optimize operations and drive growth through data-driven insights.",
+      skills: ["Business Strategy", "Financial Analysis", "Process Optimization", "Consulting", "Project Management"],
+      projectsCompleted: 62,
+      responseTime: "1-2 hours",
+      category: "business"
+    },
+    {
+      id: "8",
+      name: "Ahmed Hassan",
+      title: "Cybersecurity Expert",
+      avatar: "/avatars/ahmed.jpg",
+      rating: 4.9,
+      reviewCount: 134,
+      location: "Dubai, UAE",
+      hourlyRate: 90,
+      description: "Cybersecurity specialist with extensive experience in penetration testing, security audits, and vulnerability assessments.",
+      skills: ["Penetration Testing", "Network Security", "Risk Assessment", "Compliance", "Incident Response"],
+      projectsCompleted: 98,
+      responseTime: "Under 1 hour",
+      category: "security"
+    },
+    {
+      id: "9",
+      name: "Lisa Thompson",
+      title: "Mobile App Developer",
+      avatar: "/avatars/lisa.jpg",
+      rating: 4.6,
+      reviewCount: 102,
+      location: "Tokyo, Japan",
+      hourlyRate: 65,
+      description: "Mobile app developer specializing in React Native and Flutter. Creates beautiful, performant cross-platform applications.",
+      skills: ["React Native", "Flutter", "iOS", "Android", "Firebase"],
+      projectsCompleted: 71,
+      responseTime: "1-2 hours",
+      category: "development"
+    },
+    {
+      id: "10",
+      name: "Roberto Silva",
+      title: "DevOps Engineer",
+      avatar: "/avatars/roberto.jpg",
+      rating: 4.8,
+      reviewCount: 87,
+      location: "Buenos Aires, Argentina",
+      hourlyRate: 70,
+      description: "DevOps engineer focused on automation, CI/CD, and cloud infrastructure. Expert in AWS, Docker, and Kubernetes.",
+      skills: ["AWS", "Docker", "Kubernetes", "CI/CD", "Terraform"],
+      projectsCompleted: 58,
+      responseTime: "Under 1 hour",
+      category: "development"
+    }
+  ];
+
   const searchServices = useCallback(async (filters: ServiceFilters) => {
     setIsLoading(true);
     setError(null);
@@ -209,40 +363,61 @@ export function useServicesApi(): UseServicesApiReturn {
         updateURL(filters);
       }
 
-      // Build query parameters
-      const params = new URLSearchParams();
-      
-      if (filters.category) params.append('category', filters.category);
-      if (filters.min_price !== undefined) params.append('min', filters.min_price.toString());
-      if (filters.max_price !== undefined) params.append('max', filters.max_price.toString());
-      if (filters.keyword) params.append('keyword', filters.keyword);
-      if (filters.page) params.append('page', filters.page.toString());
-      // Always send limit=6
-      params.append('limit', '6');
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-      const response = await fetch(`${API_BASE_URL}/services?${params.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // Filter mock data based on search criteria
+      let filteredFreelancers = [...mockFreelancers];
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      // Apply keyword filter
+      if (filters.keyword) {
+        const keyword = filters.keyword.toLowerCase();
+        filteredFreelancers = filteredFreelancers.filter(freelancer =>
+          freelancer.name.toLowerCase().includes(keyword) ||
+          freelancer.title.toLowerCase().includes(keyword) ||
+          freelancer.description.toLowerCase().includes(keyword) ||
+          freelancer.skills.some(skill => skill.toLowerCase().includes(keyword))
+        );
       }
 
-      const data: ServicesListResponse = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to fetch services');
+      // Apply category filter
+      if (filters.category) {
+        filteredFreelancers = filteredFreelancers.filter(freelancer =>
+          freelancer.category === filters.category
+        );
       }
 
-      // Map services to freelancer display format
-      const mappedServices = (data.data || []).map(mapServiceToFreelancerDisplay);
-      
-      setServices(mappedServices);
-      setPagination(data.pagination || null);
+      // Apply price filters
+      if (filters.min_price !== undefined) {
+        filteredFreelancers = filteredFreelancers.filter(freelancer =>
+          freelancer.hourlyRate >= filters.min_price!
+        );
+      }
+
+      if (filters.max_price !== undefined) {
+        filteredFreelancers = filteredFreelancers.filter(freelancer =>
+          freelancer.hourlyRate <= filters.max_price!
+        );
+      }
+
+      // Simulate pagination
+      const page = filters.page || 1;
+      const limit = filters.limit || 6;
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedFreelancers = filteredFreelancers.slice(startIndex, endIndex);
+
+      // Simulate pagination metadata
+      const totalPages = Math.ceil(filteredFreelancers.length / limit);
+      const mockPagination = {
+        current_page: page,
+        total_pages: totalPages,
+        total_services: filteredFreelancers.length,
+        per_page: limit
+      };
+
+      setServices(paginatedFreelancers);
+      setPagination(mockPagination);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch services';
       setError(errorMessage);
