@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { supabase } from "@/lib/supabase/supabase";
 import { AppError } from "@/utils/AppError";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => require('crypto').randomUUID();
 
 /**
  * Floor date to window start boundary

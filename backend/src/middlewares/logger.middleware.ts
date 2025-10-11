@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import onFinished from 'on-finished';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => require('crypto').randomUUID();
 import fs from 'fs';
 import path from 'path';
 

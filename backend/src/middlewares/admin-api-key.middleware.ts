@@ -268,4 +268,5 @@ export const apiRequestLoggingMiddleware = (
 
 // Import required dependencies
 import { supabase } from "@/lib/supabase/supabase";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => require('crypto').randomUUID();

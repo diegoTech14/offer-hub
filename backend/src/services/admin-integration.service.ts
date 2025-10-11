@@ -29,7 +29,8 @@ import {
   ComponentHealth,
   WebhookEventType,
 } from "@/types/admin-integration.types";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => require('crypto').randomUUID();
 import axios from "axios";
 
 /**

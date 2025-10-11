@@ -17,7 +17,8 @@ import { randomBytes } from "crypto";
 import { utils } from "ethers";
 import { sanitizeUser } from "@/utils/sanitizeUser";
 import bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => require('crypto').randomUUID();
 
 export async function getNonce(wallet_address: string) {
   const nonce = randomBytes(16).toString("hex");

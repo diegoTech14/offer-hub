@@ -7,7 +7,8 @@ import {
 } from "@/types/middleware.types";
 import { UserRole } from "@/types/auth.types";
 import { authConfig, getRequiredRole } from "@/config/auth.config";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => require('crypto').randomUUID();
 
 /**
  * Role-based access control middleware
