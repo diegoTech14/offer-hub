@@ -887,10 +887,12 @@ pub fn set_escrow_data(env: &Env, data: &EscrowData) {
 }
 
 // Logging functions
+#[allow(dead_code)]
 pub fn get_call_logs(env: &Env) -> Vec<CallLog> {
     crate::storage::get_call_logs(env)
 }
 
+#[allow(dead_code)]
 pub fn clear_call_logs(env: &Env, caller: Address) {
     caller.require_auth();
 
@@ -1009,6 +1011,7 @@ pub fn reset_transaction_count(env: &Env, admin: Address) -> Result<(), Error> {
 // ==================== DATA EXPORT FUNCTIONS ====================
 
 /// Export escrow data (client, freelancer, or arbitrator can access)
+#[allow(dead_code)]
 pub fn export_escrow_data(env: &Env, caller: Address, contract_id: String) -> EscrowDataExport {
     if is_paused(env) {
         handle_error(env, Error::ContractPaused);
