@@ -5,7 +5,7 @@ services:
     env: node
     region: oregon
     plan: free
-    nodeVersion: 18
+    nodeVersion: 20
     buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /
