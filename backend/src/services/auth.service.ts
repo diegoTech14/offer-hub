@@ -151,6 +151,9 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
       throw new AppError(`Failed to link wallet to user: ${updateError.message}`, 500);
     }
 
+    // Stellar blockchain registration disabled temporarily
+    // TODO: Re-enable when Stellar integration is ready
+    /*
     // Register user on Stellar blockchain
     const blockchainService = await import('./blockchain.service');
     const blockchainResult = await blockchainService.registerUserOnBlockchain(
@@ -175,6 +178,7 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
         })
         .eq("id", newUser.id);
     }
+    */
 
     // Log registration event
     await logAuthAttempt({
@@ -311,6 +315,9 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
     // Link external wallet to user
     await walletService.linkExternalWallet(newUser.id, wallet_address);
 
+    // Stellar blockchain registration disabled temporarily
+    // TODO: Re-enable when Stellar integration is ready
+    /*
     // Register user on Stellar blockchain
     const blockchainService = await import('./blockchain.service');
     const blockchainResult = await blockchainService.registerUserOnBlockchain(
@@ -335,6 +342,7 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
         })
         .eq("id", newUser.id);
     }
+    */
 
     // Log registration event
     await logAuthAttempt({
@@ -397,6 +405,9 @@ export async function login(data: LoginDTO) {
 
   if (error || !user) throw new AppError("User not found", 401);
 
+  // Stellar signature verification disabled temporarily
+  // TODO: Re-enable when Stellar integration is ready
+  /*
   // Verify signature
   let recoveredAddress: string;
   try {
@@ -408,6 +419,7 @@ export async function login(data: LoginDTO) {
   if (recoveredAddress.toLowerCase() !== (wallet_address || '').toLowerCase()) {
     throw new AppError("Signature does not match wallet address", 401);
   }
+  */
 
   // Clear nonce after successful login
   await supabase
