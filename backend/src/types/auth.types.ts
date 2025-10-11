@@ -511,6 +511,27 @@ export interface EmailLoginDTO {
   password: string;
 }
 
+// New registration DTOs for invisible wallet + auth flow
+export interface RegisterWithEmailDTO {
+  email: string;
+  password: string;
+  username: string;
+  name?: string;
+  bio?: string;
+  is_freelancer?: boolean;
+}
+
+export interface RegisterWithWalletDTO {
+  wallet_address: string;
+  signature: string;
+  email: string;
+  password: string;
+  username: string;
+  name?: string;
+  bio?: string;
+  is_freelancer?: boolean;
+}
+
 export interface RefreshTokenRecord {
   id: string;
   userId: string;
