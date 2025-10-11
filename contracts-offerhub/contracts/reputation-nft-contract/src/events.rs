@@ -47,6 +47,7 @@ pub fn emit_reputaion_contract_initiated(env: &Env, admin: &Address) {
 }
 
 // Preferred alias with correct spelling
+#[allow(dead_code)]
 pub fn emit_reputation_contract_initiated(env: &Env, admin: &Address) {
     emit_reputaion_contract_initiated(env, admin);
 }
