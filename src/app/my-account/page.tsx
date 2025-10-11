@@ -15,8 +15,8 @@ export default function Page() {
 
 
     return (
-        // This page is protected and set to user access
-        <ProtectedRoute roles={["user"]} >
+        // This page is protected - any authenticated user can access
+        <ProtectedRoute>
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
                 <AccountSettings />
             </div>
