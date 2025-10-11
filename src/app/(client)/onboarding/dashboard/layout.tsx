@@ -2,13 +2,15 @@
 
 import Navbar from "@/components/layout/navbar";
 import { ClientSidebar } from "@/components/client-dashboard/Sidebar";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { ReactNode, useState } from "react";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <ProtectedRoute>
+      <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Main Navbar - Same as other pages */}
       <Navbar showAuth={true} />
 
@@ -40,5 +42,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </main>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

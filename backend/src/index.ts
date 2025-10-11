@@ -28,6 +28,8 @@ import { redactSensitiveHeaders } from "@/middlewares/sensitive-data-redaction.m
 import reviewResponseRoutes from "@/routes/review-response.routes";
 import { workflowRoutes } from "@/routes/workflow.routes";
 import mediationRoutes from "@/routes/mediation.routes";
+import seedRoutes from "@/routes/seed.routes";
+import waitlistRoutes from "@/routes/waitlist.routes";
 
 
 // Setup global error handlers for uncaught exceptions and unhandled rejections
@@ -62,6 +64,11 @@ app.use(generalLimiter);
 // Route setup
 logger.debug("Setting up routes");
 
+// Seed routes (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  app.use("/api/seed", seedRoutes);
+}
+
 // Workflow routes (no authentication required for testing)
 app.use("/api/workflow", workflowRoutes);
 
@@ -70,6 +77,7 @@ app.use("/api/mediation", authenticateToken(), mediationRoutes);
 
 // Public routes (no authentication required)
 app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/waitlist", waitlistRoutes);
 
 // Protected routes (authentication required)
 app.use("/api/service-requests", authenticateToken(), serviceRequestRoutes);

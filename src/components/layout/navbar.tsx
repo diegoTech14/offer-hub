@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/providers/auth-provider";
+import { Button } from "@/components/ui/button";
 
 interface NavbarProps {
   showAuth?: boolean;
@@ -39,6 +41,7 @@ export default function Navbar({
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { isAuthenticated, user, logout } = useAuth();
 
   // Handle scroll effect
   useEffect(() => {
@@ -73,12 +76,7 @@ export default function Navbar({
   };
 
   const handleLogout = () => {
-    // Clear authentication tokens
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    
-    // Redirect to sign-in page
-    router.push("/onboarding/sign-in");
+    logout();
   };
 
   return (
@@ -166,47 +164,50 @@ export default function Navbar({
               <span>Wallet</span>
             </Link>
 
-            {/* Profile Dropdown */}
+            {/* Auth Section */}
             {showAuth && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="
-                      relative flex items-center justify-center
-                      w-10 h-10 rounded-full
-                      bg-gradient-to-br from-[#15949C] to-[#117a81]
-                      hover:from-[#117a81] hover:to-[#0d5f65]
-                      transition-all duration-200
-                      ring-2 ring-gray-200 dark:ring-gray-700
-                      hover:ring-[#15949C]/40
-                      transform hover:scale-110
-                      shadow-md hover:shadow-lg
-                    "
-                    aria-label="User menu"
-                  >
-                    <User className="w-5 h-5 text-white" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 mt-2 animate-in fade-in-0 zoom-in-95"
-                >
-                  <DropdownMenuLabel className="font-semibold">
-                    My Account
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleProfileClick}
-                    className="cursor-pointer gap-2"
-                  >
-                    <User className="w-4 h-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer gap-2">
-                    <Settings className="w-4 h-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="sm:hidden cursor-pointer gap-2">
+              <>
+                {isAuthenticated ? (
+                  /* Profile Dropdown for authenticated users */
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="
+                          relative flex items-center justify-center
+                          w-10 h-10 rounded-full
+                          bg-gradient-to-br from-[#15949C] to-[#117a81]
+                          hover:from-[#117a81] hover:to-[#0d5f65]
+                          transition-all duration-200
+                          ring-2 ring-gray-200 dark:ring-gray-700
+                          hover:ring-[#15949C]/40
+                          transform hover:scale-110
+                          shadow-md hover:shadow-lg
+                        "
+                        aria-label="User menu"
+                      >
+                        <User className="w-5 h-5 text-white" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-56 mt-2 animate-in fade-in-0 zoom-in-95"
+                    >
+                      <DropdownMenuLabel className="font-semibold">
+                        {user?.email || "My Account"}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={handleProfileClick}
+                        className="cursor-pointer gap-2"
+                      >
+                        <User className="w-4 h-4" />
+                        <span>Profile</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer gap-2">
+                        <Settings className="w-4 h-4" />
+                        <span>Settings</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="sm:hidden cursor-pointer gap-2">
                     <Wallet className="w-4 h-4" />
                     <span>Wallet</span>
                   </DropdownMenuItem>
@@ -220,6 +221,25 @@ export default function Navbar({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+                ) : (
+                  /* Sign In / Sign Up buttons for non-authenticated users */
+                  <div className="hidden sm:flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => router.push("/onboarding/sign-in")}
+                      className="font-medium"
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      onClick={() => router.push("/onboarding/sign-up")}
+                      className="bg-[#15949C] hover:bg-[#117a81] text-white font-medium"
+                    >
+                      Sign Up
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Mobile Menu Button */}

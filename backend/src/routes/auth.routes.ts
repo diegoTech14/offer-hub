@@ -40,8 +40,8 @@ router.post("/refresh", validateRefreshToken, refresh);
 router.post("/logout", validateRefreshToken, logout);
 
 // User routes
-router.get("/me", authenticateToken, me);
-router.get("/sessions", authenticateToken, getSessions);
-router.delete("/sessions/:sessionId", authenticateToken, deactivateSession);
+router.get("/me", authenticateToken(), me);
+router.get("/sessions", authenticateToken(), getSessions);
+router.delete("/sessions/:sessionId", authenticateToken(), deactivateSession);
 
 export default router;
