@@ -104,6 +104,7 @@ pub fn emit_achievement_earned(env: &Env, user: &Address, achievement: &String, 
     );
 }
 
+#[allow(dead_code)]
 pub fn emit_health_check_performed(env: &Env, is_healthy: bool, issues_count: u32, gas_used: u64) {
     env.events().publish(
         (symbol_short!("health"), symbol_short!("check")),
@@ -111,6 +112,7 @@ pub fn emit_health_check_performed(env: &Env, is_healthy: bool, issues_count: u3
     );
 }
 
+#[allow(dead_code)]
 pub fn emit_admin_health_check_performed(
     env: &Env,
     admin: &Address,
@@ -129,6 +131,7 @@ pub fn emit_admin_health_check_performed(
     );
 }
 
+#[allow(dead_code)]
 pub fn emit_health_issue_detected(env: &Env, issue: &String, severity: &String) {
     env.events().publish(
         (symbol_short!("health"), symbol_short!("issue")),
