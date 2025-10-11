@@ -38,7 +38,17 @@ const port = process.env.PORT || 4000;
 
 // Middleware setup
 logger.debug("Setting up CORS and JSON middleware");
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://offer-hub-hpd4.vercel.app',
+    'https://offer-hub.vercel.app',
+    /https:\/\/.*\.vercel\.app$/
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Request logging middleware
