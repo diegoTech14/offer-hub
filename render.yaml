@@ -5,7 +5,8 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install && npm run build
+    nodeVersion: 18
+    buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /
     rootDir: backend
