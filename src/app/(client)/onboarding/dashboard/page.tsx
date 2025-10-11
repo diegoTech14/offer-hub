@@ -14,21 +14,27 @@ import {
   DollarSign, 
   Clock,
   ArrowUpRight,
-  Plus
+  Plus,
+  Wallet
 } from "lucide-react";
 import { useState } from "react";
 import { VerificationCard } from "@/components/dashboard/verification-card";
 import { useUserVerification } from "@/hooks/use-user-verification";
+import { useDashboardStats } from "@/hooks/use-dashboard-stats";
 
 export default function DashboardPage() {
   const [hasJobsOrContracts] = useState(false);
   const { verificationStatus, loading: verificationLoading } = useUserVerification();
+  const { stats: dashboardStats, loading: statsLoading } = useDashboardStats();
 
-  // Stats data
+  // Mock balance - TODO: Connect with Stellar when ready
+  const mockBalance = "125.50 XLM";
+
+  // Stats data with real values
   const stats = [
     {
       title: "Active Projects",
-      value: "0",
+      value: statsLoading ? "..." : dashboardStats.activeProjects.toString(),
       change: "+0%",
       trend: "up",
       icon: Briefcase,
@@ -36,7 +42,7 @@ export default function DashboardPage() {
     },
     {
       title: "Total Spent",
-      value: "$0.00",
+      value: statsLoading ? "..." : `$${dashboardStats.totalSpent.toFixed(2)}`,
       change: "+0%",
       trend: "up",
       icon: DollarSign,
@@ -44,18 +50,18 @@ export default function DashboardPage() {
     },
     {
       title: "Completed",
-      value: "0",
+      value: statsLoading ? "..." : dashboardStats.completedProjects.toString(),
       change: "0%",
       trend: "neutral",
       icon: TrendingUp,
       color: "text-purple-600 bg-purple-50",
     },
     {
-      title: "Pending Tasks",
-      value: "0",
-      change: "0",
+      title: "Wallet Balance",
+      value: mockBalance,
+      change: "Mock",
       trend: "neutral",
-      icon: Clock,
+      icon: Wallet,
       color: "text-orange-600 bg-orange-50",
     },
   ];

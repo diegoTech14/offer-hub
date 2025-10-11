@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/auth-provider";
 import {
   RegisterWithEmailPayload,
   RegisterWithWalletPayload,
@@ -8,7 +10,6 @@ import {
   LoginWithEmailPayload,
   LoginResponse,
 } from "@/types/auth-register.types";
-import { useRouter } from "next/navigation";
 
 type UseRegisterReturn = {
   isLoading: boolean;
@@ -25,6 +26,7 @@ export function useRegister(): UseRegisterReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { login } = useAuth();
 
   const clearError = useCallback(() => {
     setError(null);
@@ -66,9 +68,16 @@ export function useRegister(): UseRegisterReturn {
           return false;
         }
 
-        // Save tokens
-        if (data.data?.tokens) {
+        // Save tokens and update auth context
+        if (data.data?.tokens && data.data?.user) {
           saveTokens(data.data.tokens.accessToken, data.data.tokens.refreshToken);
+          login(data.data.tokens, {
+            id: data.data.user.id,
+            email: data.data.user.email,
+            name: data.data.user.name,
+            wallet_address: data.data.user.wallet_address,
+            role: data.data.user.role,
+          });
         }
 
         // Redirect to dashboard
@@ -83,7 +92,7 @@ export function useRegister(): UseRegisterReturn {
         setIsLoading(false);
       }
     },
-    [router]
+    [router, login]
   );
 
   const registerWithWallet = useCallback(
@@ -116,9 +125,16 @@ export function useRegister(): UseRegisterReturn {
           return false;
         }
 
-        // Save tokens
-        if (data.data?.tokens) {
+        // Save tokens and update auth context
+        if (data.data?.tokens && data.data?.user) {
           saveTokens(data.data.tokens.accessToken, data.data.tokens.refreshToken);
+          login(data.data.tokens, {
+            id: data.data.user.id,
+            email: data.data.user.email,
+            name: data.data.user.name,
+            wallet_address: data.data.user.wallet_address,
+            role: data.data.user.role,
+          });
         }
 
         // Redirect to dashboard
@@ -133,7 +149,7 @@ export function useRegister(): UseRegisterReturn {
         setIsLoading(false);
       }
     },
-    [router]
+    [router, login]
   );
 
   const loginWithEmail = useCallback(
@@ -166,9 +182,16 @@ export function useRegister(): UseRegisterReturn {
           return false;
         }
 
-        // Save tokens
-        if (data.data?.tokens) {
+        // Save tokens and update auth context
+        if (data.data?.tokens && data.data?.user) {
           saveTokens(data.data.tokens.accessToken, data.data.tokens.refreshToken);
+          login(data.data.tokens, {
+            id: data.data.user.id,
+            email: data.data.user.email,
+            name: data.data.user.name,
+            wallet_address: data.data.user.wallet_address,
+            role: data.data.user.role,
+          });
         }
 
         // Redirect to dashboard
@@ -183,7 +206,7 @@ export function useRegister(): UseRegisterReturn {
         setIsLoading(false);
       }
     },
-    [router]
+    [router, login]
   );
 
   return {

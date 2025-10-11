@@ -23,6 +23,7 @@ interface VerificationCardProps {
   walletAddress?: string;
   transactionHash?: string;
   variant?: "default" | "compact" | "detailed";
+  className?: string;
 }
 
 const iconMap = {
@@ -39,6 +40,7 @@ export function VerificationCard({
   walletAddress,
   transactionHash,
   variant = "default",
+  className = "",
 }: VerificationCardProps) {
   const config = VERIFICATION_CONFIGS[level];
   const Icon = iconMap[config.icon as keyof typeof iconMap] || ShieldCheck;

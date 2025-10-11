@@ -4,31 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, DollarSign, MoreVertical, Briefcase, Plus } from "lucide-react";
+import { useDashboardStats } from "@/hooks/use-dashboard-stats";
+import { useRouter } from "next/navigation";
 
 export default function ActiveProjectPage() {
-  // Mock data - replace with real data from API
-  const activeProjects = [
-    {
-      id: 1,
-      title: "E-commerce Website Development",
-      client: "TechCorp Inc.",
-      freelancer: "Alex Johnson",
-      budget: "$5,000",
-      progress: 65,
-      dueDate: "Dec 20, 2025",
-      status: "In Progress",
-    },
-    {
-      id: 2,
-      title: "Mobile App UI/UX Design",
-      client: "StartupXYZ",
-      freelancer: "Sarah Williams",
-      budget: "$3,500",
-      progress: 40,
-      dueDate: "Dec 25, 2025",
-      status: "In Progress",
-    },
-  ];
+  const { stats, loading } = useDashboardStats();
+  const router = useRouter();
+
+  // Filter active projects
+  const activeProjects = stats.projects.filter((p) => p.status === "active");
 
   return (
     <div className="space-y-6">
@@ -44,7 +28,11 @@ export default function ActiveProjectPage() {
       </div>
 
       {/* Projects List */}
-      {activeProjects.length > 0 ? (
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#149A9B]"></div>
+        </div>
+      ) : activeProjects.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
           {activeProjects.map((project) => (
             <Card key={project.id} className="hover:shadow-lg transition-shadow">
@@ -53,7 +41,7 @@ export default function ActiveProjectPage() {
                   <div className="flex-1">
                     <CardTitle className="text-lg">{project.title}</CardTitle>
                     <CardDescription className="mt-1">
-                      Client: {project.client} • Freelancer: {project.freelancer}
+                      {project.description || "No description available"}
                     </CardDescription>
                   </div>
                   <Button variant="ghost" size="icon">
@@ -62,32 +50,23 @@ export default function ActiveProjectPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Progress Bar */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Progress</span>
-                    <span className="font-medium text-gray-900">{project.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-[#149A9B] h-2 rounded-full transition-all"
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                </div>
-
                 {/* Project Info */}
                 <div className="flex flex-wrap gap-4 text-sm">
                   <div className="flex items-center gap-2 text-gray-600">
                     <DollarSign className="w-4 h-4" />
-                    <span>{project.budget}</span>
+                    <span>${parseFloat(project.budget.toString()).toFixed(2)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-600">
                     <Clock className="w-4 h-4" />
-                    <span>Due: {project.dueDate}</span>
+                    <span>Created: {new Date(project.created_at).toLocaleDateString()}</span>
                   </div>
-                  <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
-                    {project.status}
+                  {project.category && (
+                    <Badge variant="secondary">
+                      {project.category}
+                    </Badge>
+                  )}
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                    Active
                   </Badge>
                 </div>
 
@@ -114,7 +93,10 @@ export default function ActiveProjectPage() {
             <p className="text-gray-600 text-center mb-4">
               You don't have any active projects at the moment.
             </p>
-            <Button className="bg-[#149A9B] hover:bg-[#128889] text-white">
+            <Button 
+              className="bg-[#149A9B] hover:bg-[#128889] text-white"
+              onClick={() => router.push("/client/create-project")}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Create New Project
             </Button>
