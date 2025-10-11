@@ -22,6 +22,7 @@ import LoadingIndicator from '@/components/navigation/loading-indicator';
 import { MessageProvider } from '@/lib/contexts/MessageContext';
 import { KeyboardShortcutsProvider } from '@/components/common/keyboard-shortcuts-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import { AuthProvider } from '@/providers/auth-provider';
 
 import { ScrollToTop } from '@/components/common/scroll-to-top';
 import { TanStackQueryProvider } from '@/providers/query-client-provider';
@@ -77,8 +78,9 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider>
-          <TanStackQueryProvider>
-            <TrustlessWorkProvider>
+          <AuthProvider>
+            <TanStackQueryProvider>
+              <TrustlessWorkProvider>
               <ErrorBoundary>
                 <NotificationProvider>
                   <TalentProvider>
@@ -106,8 +108,9 @@ export default function RootLayout({
                   </TalentProvider>
                 </NotificationProvider>
               </ErrorBoundary>
-            </TrustlessWorkProvider>
-          </TanStackQueryProvider>
+              </TrustlessWorkProvider>
+            </TanStackQueryProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
