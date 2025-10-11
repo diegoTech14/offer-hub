@@ -5,7 +5,7 @@
 
 import { NextFunction, Request, Response } from "express";
 import * as authService from "@/services/auth.service";
-import { DeviceInfo, EmailLoginDTO } from "@/types/auth.types";
+import { DeviceInfo, EmailLoginDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
 
 export async function getNonce(
   req: Request,
@@ -154,6 +154,166 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
       req.refreshTokenRecord?.token_hash || ''
     );
     res.status(200).json({ message });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Register new user with email and password
+ * Automatically generates an invisible wallet
+ * @route POST /api/auth/register-with-email
+ */
+export async function registerWithEmail(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = req.body as RegisterWithEmailDTO;
+
+    // Basic input validation
+    if (!data.email || !data.password || !data.username) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, password, and username are required",
+        error: {
+          code: "MISSING_FIELDS",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+        error: {
+          code: "INVALID_EMAIL_FORMAT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Password length validation
+    if (data.password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+        error: {
+          code: "PASSWORD_TOO_SHORT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Get device info for audit logging
+    const deviceInfo: DeviceInfo = {
+      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
+      os: getOSFromUserAgent(req.get('User-Agent') || ''),
+      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
+      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
+      user_agent: req.get('User-Agent') || 'unknown',
+    };
+
+    const result = await authService.registerWithEmail(data, deviceInfo);
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: result,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Register new user with existing wallet
+ * Links external wallet and creates account
+ * @route POST /api/auth/register-with-wallet
+ */
+export async function registerWithWallet(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = req.body as RegisterWithWalletDTO;
+
+    // Basic input validation
+    if (!data.wallet_address || !data.signature || !data.email || !data.password || !data.username) {
+      return res.status(400).json({
+        success: false,
+        message: "Wallet address, signature, email, password, and username are required",
+        error: {
+          code: "MISSING_FIELDS",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+        error: {
+          code: "INVALID_EMAIL_FORMAT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Password length validation
+    if (data.password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+        error: {
+          code: "PASSWORD_TOO_SHORT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Get device info for audit logging
+    const deviceInfo: DeviceInfo = {
+      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
+      os: getOSFromUserAgent(req.get('User-Agent') || ''),
+      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
+      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
+      user_agent: req.get('User-Agent') || 'unknown',
+    };
+
+    const result = await authService.registerWithWallet(data, deviceInfo);
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully with wallet",
+      data: result,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
+      },
+    });
   } catch (err) {
     next(err);
   }
