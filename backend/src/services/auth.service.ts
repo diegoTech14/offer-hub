@@ -231,13 +231,13 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
       throw new AppError("Failed to persist refresh token", 500);
     }
 
-    const safeUser = sanitizeUser({ ...newUser, wallet_address: publicKey });
+    const safeUser = sanitizeUser({ ...newUser, wallet_address: mockWalletAddress });
 
     return {
       user: safeUser,
       wallet: {
-        address: wallet.address,
-        type: wallet.type,
+        address: mockWalletAddress,
+        type: 'invisible',
       },
       tokens: { accessToken, refreshToken },
     };
