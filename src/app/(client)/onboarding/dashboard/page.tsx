@@ -72,7 +72,7 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Good Morning, Josué! 👋
+            Good Morning! 👋
           </h1>
           <p className="text-gray-600 mt-1">
             Welcome back to your dashboard. Here's what's happening today.
