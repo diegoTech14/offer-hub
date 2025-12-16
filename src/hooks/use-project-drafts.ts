@@ -135,12 +135,16 @@ export function useProjectDrafts(projectId: string, userId?: string) {
   // Auto-save effect
   useEffect(() => {
     if (!currentDraft) return;
-    autoSaveTimer.current && clearInterval(autoSaveTimer.current);
+    if (autoSaveTimer.current) {
+      clearInterval(autoSaveTimer.current);
+    }
     autoSaveTimer.current = setInterval(() => {
       saveDraft(currentDraft.data, currentDraft.meta.name, true);
     }, AUTO_SAVE_INTERVAL);
     return () => {
-      autoSaveTimer.current && clearInterval(autoSaveTimer.current);
+      if (autoSaveTimer.current) {
+        clearInterval(autoSaveTimer.current);
+      }
     };
   }, [currentDraft, saveDraft]);
 
