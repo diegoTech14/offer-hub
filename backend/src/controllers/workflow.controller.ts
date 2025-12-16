@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { WorkflowService } from '../services/workflow.service.simple';
+import { WorkflowService } from '../services/workflow.service';
 import { 
   WorkflowState,
   WorkflowStage,
