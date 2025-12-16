@@ -21,7 +21,7 @@ import RevenueTracking from "./revenue-tracking"
 import FeeManagement from "./fee-management"
 import FinancialReporting from "./financial-reporting"
 import { DashboardSkeleton } from "./skeletons/dashboard-skeleton"
-import { mockRevenueDistributionData } from "@/data/mock-financial-data"
+import { mockRevenueDistributionData } from "@/__mocks__/mock-financial-data"
 
 export default function FinancialDashboard() {
   const { metrics, paymentMetrics, profitabilityAnalysis, revenueStreams, loading, error, refreshData, exportData } =
