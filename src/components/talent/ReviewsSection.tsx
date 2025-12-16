@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Star, Calendar } from "lucide-react";
-import { Review } from "@/lib/mockData/freelancer-profile-mock";
+import { Review } from "@/__mocks__/freelancer-profile-mock";
 
 interface ReviewsSectionProps {
   reviews: Review[];
