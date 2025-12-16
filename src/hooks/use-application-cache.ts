@@ -27,7 +27,9 @@ export function useApplicationCache<T = any>(options: UseApplicationCacheOptions
   useEffect(() => {
     unsubRef.current = applicationCacheManager.addListener(() => setVersion((v) => v + 1));
     return () => {
-      unsubRef.current && unsubRef.current();
+      if (unsubRef.current) {
+        unsubRef.current();
+      }
     };
   }, []);
 

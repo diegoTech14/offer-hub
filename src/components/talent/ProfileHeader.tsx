@@ -6,7 +6,7 @@ import { Award, CheckCircle, Clock, MapPin, Send, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FreelancerProfile } from "@/lib/mockData/freelancer-profile-mock";
+import { FreelancerProfile } from "@/__mocks__/freelancer-profile-mock";
 
 interface ProfileHeaderProps {
   freelancer: FreelancerProfile;

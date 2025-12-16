@@ -26,7 +26,7 @@ import {
   mockRevenueStreams,
   mockExpenses,
   mockFinancialMetrics,
-} from "@/data/mock-financial-data";
+} from "@/__mocks__/mock-financial-data";
 import {
   calculateGrowthRate,
   calculateMargin,

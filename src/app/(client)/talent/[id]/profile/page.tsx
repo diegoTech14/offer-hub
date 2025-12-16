@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { useTalentData } from "@/hooks/talent/useTalentData";
-import type { TalentProfile } from "@/lib/mockData/talent-mock-data";
+import type { TalentProfile } from "@/__mocks__/talent-mock-data";
 import TalentLayout from "@/components/talent/talents/TalentLayout";
 import "@/styles/print.css";
 import TalentCard from "@/components/talent/TalentCard";

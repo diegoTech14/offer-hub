@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import TalentLayout from "@/components/talent/TalentLayout";
 import { OfferFormStep1 } from "@/components/send-offer/OfferFormStep1";
-import { getFreelancerProfile } from "@/lib/mockData/freelancer-profile-mock";
-import { FreelancerProfile } from "@/lib/mockData/freelancer-profile-mock";
+import { getFreelancerProfile } from "@/__mocks__/freelancer-profile-mock";
+import { FreelancerProfile } from "@/__mocks__/freelancer-profile-mock";
 
 interface Step1PageClientProps {
   id: string;

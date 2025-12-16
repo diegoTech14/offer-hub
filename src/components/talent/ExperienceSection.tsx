@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Calendar, CheckCircle } from "lucide-react";
-import { WorkExperience } from "@/lib/mockData/freelancer-profile-mock";
+import { WorkExperience } from "@/__mocks__/freelancer-profile-mock";
 
 interface ExperienceSectionProps {
   experience: WorkExperience[];

@@ -7,7 +7,7 @@ import { ProjectCard } from "@/components/projects/ProjectCard"
 import { ProjectTabs } from "@/components/projects/ProjectTabs"
 import { ProjectsList } from "@/components/projects/ProjectsList"
 
-import { getMockProjects} from "@/lib/mockData/projects-list-mock"
+import { getMockProjects} from "@/__mocks__/projects-list-mock"
 
 const TABS = [
   { key: "active", label: "Active project" },

@@ -17,7 +17,7 @@ import {
   calculateInvoiceTotal,
   isInvoiceOverdue,
 } from "@/utils/invoice-helpers"
-import { generateMockInvoices } from "@/data/mock-invoice-data"
+import { generateMockInvoices } from "@/__mocks__/mock-invoice-data"
 
 export const useInvoiceManagement = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([])

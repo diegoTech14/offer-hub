@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Skill } from "@/lib/mockData/freelancer-profile-mock";
+import { Skill } from "@/__mocks__/freelancer-profile-mock";
 
 interface SkillsSectionProps {
   skills: Skill[];
