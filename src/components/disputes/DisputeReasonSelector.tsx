@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { disputeReasons } from '@/lib/mockData/dispute-reasons-mock';
+import { disputeReasons } from '@/__mocks__/dispute-reasons-mock';
 
 interface DisputeReasonSelectorProps {
   value: string;
