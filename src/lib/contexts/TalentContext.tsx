@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useReducer, useEffect } from "react"
-import { talentProfileData as talentMockData } from "../mockData/talent-mock-data"
+import { talentProfileData as talentMockData } from "../../__mocks__/talent-mock-data"
 import { TIMEOUTS } from "@/constants/magic-numbers"
 
 // Types
