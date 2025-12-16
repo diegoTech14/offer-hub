@@ -23,6 +23,15 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['sharp'],
   },
+  webpack: (config, { isServer }) => {
+    if (process.env.NODE_ENV === 'production') {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@/__mocks__': false,
+      };
+    }
+    return config;
+  },
   async rewrites() {
     return [
       {
