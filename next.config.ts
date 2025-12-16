@@ -7,10 +7,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  eslint: {
-    // Completely ignore ESLint during builds - no warnings, no errors
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     // Completely ignore TypeScript errors during builds
     ignoreBuildErrors: true,
@@ -23,14 +19,10 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['sharp'],
   },
-  webpack: (config, { isServer }) => {
-    if (process.env.NODE_ENV === 'production') {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@/__mocks__': false,
-      };
-    }
-    return config;
+  turbopack: {
+    resolveAlias: process.env.NODE_ENV === 'production' ? {
+      '@/__mocks__': false,
+    } : undefined,
   },
   async rewrites() {
     return [
