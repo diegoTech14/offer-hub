@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { requestedPaymentsCards } from "@/lib/mockData/analytics-mock-data";
+import { requestedPaymentsCards } from "@/__mocks__/analytics-mock-data";
 import { DollarSign, TrendingUp, TrendingDown, Activity } from "lucide-react";
 
 const iconMap = {
