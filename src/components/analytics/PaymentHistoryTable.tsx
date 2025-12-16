@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { paymentHistoryMock } from "@/lib/mockData/payment-history-mock";
+import { paymentHistoryMock } from "@/__mocks__/payment-history-mock";
 import { History } from "lucide-react";
 
 export default function PaymentHistoryTable() {
