@@ -268,7 +268,7 @@ export function compareDeviceFingerprints(
   ];
   
   let matches = 0;
-  let total = features.length;
+  const total = features.length;
   
   features.forEach(feature => {
     if (fingerprint1[feature as keyof DeviceFingerprint] === fingerprint2[feature as keyof DeviceFingerprint]) {
