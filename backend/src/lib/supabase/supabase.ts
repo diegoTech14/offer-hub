@@ -1,14 +1,45 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+/**
+ * Get Supabase client instance
+ * Validates environment variables and creates configured client
+ * @throws Error if required environment variables are missing
+ */
+function createSupabaseClient(): SupabaseClient {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Log for debugging (will remove after fixing)
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ SUPABASE CONFIGURATION ERROR:');
-  console.error('SUPABASE_URL:', supabaseUrl ? 'SET' : 'MISSING');
-  console.error('SUPABASE_SERVICE_ROLE_KEY:', supabaseKey ? 'SET' : 'MISSING');
-  console.error('All env vars:', Object.keys(process.env).filter(k => k.includes('SUPABASE')));
+  if (!supabaseUrl) {
+    throw new Error(
+      'Missing SUPABASE_URL environment variable. ' +
+      'Please set it in your .env file.'
+    );
+  }
+
+  if (!supabaseKey) {
+    throw new Error(
+      'Missing SUPABASE_SERVICE_ROLE_KEY environment variable. ' +
+      'Please set it in your .env file.'
+    );
+  }
+
+  // Validate URL format
+  try {
+    new URL(supabaseUrl);
+  } catch {
+    throw new Error(
+      `Invalid SUPABASE_URL format: ${supabaseUrl}. ` +
+      'Must be a valid URL (e.g., https://your-project.supabase.co)'
+    );
+  }
+
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Export singleton instance
+export const supabase = createSupabaseClient();
