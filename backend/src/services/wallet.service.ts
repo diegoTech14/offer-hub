@@ -18,9 +18,10 @@ import { AppError } from '@/utils/AppError';
  * Generate a new invisible wallet for a user
  * Creates a Stellar keypair, encrypts the private key, and stores it in the database
  * @param userId - The user ID to associate the wallet with
- * @returns The created wallet with public and private keys
+ * @param email - User's email (optional, not used for keypair generation)
+ * @returns The created wallet with address
  */
-export async function generateInvisibleWallet(userId: string): Promise<GenerateWalletResult> {
+export async function generateInvisibleWallet(userId: string, email?: string): Promise<GenerateWalletResult> {
   try {
     // Generate a new Stellar keypair
     const keypair = Keypair.random();
@@ -56,7 +57,7 @@ export async function generateInvisibleWallet(userId: string): Promise<GenerateW
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error generating invisible wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      `Error generating regular wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
       500
     );
   }
