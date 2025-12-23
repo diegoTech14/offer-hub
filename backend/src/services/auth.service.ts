@@ -11,7 +11,7 @@ import {
   signRefreshToken,
 } from "@/utils/jwt.utils";
 import { supabase } from "@/lib/supabase/supabase";
-import { AuthUser, LoginDTO, RefreshTokenRecord, EmailLoginDTO, AuditLogEntry, DeviceInfo, UserRole, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
+import { AuthUser, LoginDTO, RefreshTokenRecord, EmailLoginDTO, AuditLogEntry, DeviceInfo, UserRole, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
 import { AppError } from "@/utils/AppError";
 import { randomBytes } from "crypto";
 import { utils } from "ethers";
@@ -39,6 +39,146 @@ export async function getNonce(wallet_address: string) {
   if (error) throw new AppError("Failed to set nonce", 500);
 
   return nonce;
+}
+
+/**
+ * Register new user with email and password
+ * Creates an invisible wallet (Stellar keypair) for the user
+ * @param data - Registration data with email and password
+ * @param deviceInfo - Device information for audit logging
+ * @returns User data and JWT tokens
+ */
+export async function register(data: RegisterDTO, deviceInfo: DeviceInfo) {
+  const { email, password } = data;
+
+  // Import wallet service
+  const walletService = await import('./wallet.service');
+  const { validateEmail } = await import('@/utils/validation');
+
+  // Validate email format
+  if (!email || typeof email !== 'string') {
+    throw new AppError('Email is required', 400);
+  }
+
+  if (!validateEmail(email)) {
+    throw new AppError('Invalid email format', 400);
+  }
+
+  // Validate password
+  if (!password || typeof password !== 'string') {
+    throw new AppError('Password is required', 400);
+  }
+
+  if (password.length < 8) {
+    throw new AppError('Password must be at least 8 characters long', 400);
+  }
+
+  // Check if email already exists
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email.toLowerCase())
+    .single();
+
+  if (existingUser) {
+    throw new AppError("Email already registered", 409);
+  }
+
+  // Hash password
+  const password_hash = await bcrypt.hash(password, 10);
+
+  // Generate a username from email (before @ symbol)
+  const username = email.split('@')[0] + '_' + Math.random().toString(36).substring(2, 8);
+
+  // Create user (without wallet_address initially)
+  const { data: newUser, error: userError } = await supabase
+    .from("users")
+    .insert([
+      {
+        email: email.toLowerCase(),
+        password_hash,
+        username,
+        name: username,
+        is_freelancer: false,
+        reputation_score: 0,
+      },
+    ])
+    .select()
+    .single();
+
+  if (userError || !newUser) {
+    throw new AppError(`Failed to create user: ${userError?.message || 'Unknown error'}`, 500);
+  }
+
+  try {
+    // Generate invisible wallet (Stellar keypair) for the user
+    const { wallet, publicKey } = await walletService.generateInvisibleWallet(newUser.id, email);
+
+    // Update user with wallet address
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ wallet_address: publicKey })
+      .eq("id", newUser.id);
+
+    if (updateError) {
+      throw new AppError(`Failed to link wallet to user: ${updateError.message}`, 500);
+    }
+
+    // Log registration event
+    await logAuthAttempt({
+      userId: newUser.id,
+      action: 'user_register',
+      resource: 'auth',
+      ipAddress: deviceInfo.ip_address || '',
+      userAgent: deviceInfo.user_agent || '',
+      timestamp: new Date(),
+    });
+
+    // Generate tokens
+    const accessToken = signAccessToken({ 
+      sub: newUser.id,
+      email: newUser.email,
+      role: UserRole.CLIENT,
+      permissions: []
+    });
+    const { refreshToken, refreshTokenHash } = signRefreshToken({
+      sub: newUser.id,
+      email: newUser.email,
+      role: UserRole.CLIENT,
+      permissions: []
+    });
+
+    // Save refresh token in DB
+    const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    // Convert hex string to BYTEA for PostgreSQL
+    const tokenHashBytes = Buffer.from(refreshTokenHash, 'hex');
+    const { error: rtInsertError } = await supabase
+      .from("refresh_tokens")
+      .insert([{ 
+        user_id: newUser.id, 
+        token_hash: tokenHashBytes,
+        expires_at: refreshTokenExpiry.toISOString()
+      }]);
+
+    if (rtInsertError) {
+      throw new AppError("Failed to persist refresh token", 500);
+    }
+
+    const safeUser = sanitizeUser({ ...newUser, wallet_address: publicKey });
+
+    return {
+      user: safeUser,
+      wallet: {
+        address: publicKey,
+        type: wallet.type,
+      },
+      tokens: { accessToken, refreshToken },
+    };
+  } catch (error) {
+    // Rollback: delete user if wallet creation failed
+    await supabase.from("users").delete().eq("id", newUser.id);
+    throw error;
+  }
 }
 
 export async function signup(data: CreateUserDTO) {
