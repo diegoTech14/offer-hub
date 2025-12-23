@@ -14,7 +14,6 @@ import { supabase } from "@/lib/supabase/supabase";
 import { AuthUser, LoginDTO, RefreshTokenRecord, EmailLoginDTO, AuditLogEntry, DeviceInfo, UserRole, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
 import { AppError } from "@/utils/AppError";
 import { randomBytes } from "crypto";
-import { utils } from "ethers";
 import { sanitizeUser } from "@/utils/sanitizeUser";
 import bcrypt from "bcryptjs";
 // import { v4 as uuidv4 } from "uuid";
