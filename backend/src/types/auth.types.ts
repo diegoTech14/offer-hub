@@ -511,6 +511,12 @@ export interface EmailLoginDTO {
   password: string;
 }
 
+// Simple registration DTO for POST /auth/register
+export interface RegisterDTO {
+  email: string;
+  password: string;
+}
+
 // New registration DTOs for invisible wallet + auth flow
 export interface RegisterWithEmailDTO {
   email: string;
