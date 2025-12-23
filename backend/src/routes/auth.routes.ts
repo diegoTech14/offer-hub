@@ -26,7 +26,7 @@ import { Router } from "express";
 const router = Router();
 
 // Registration routes
-router.post("/register", register); // Legacy wallet-based registration
+router.post("/register", authLimiter, register); // Email/password registration with invisible wallet
 router.post("/register-with-email", authLimiter, registerWithEmail); // Email/password registration with invisible wallet
 router.post("/register-with-wallet", authLimiter, registerWithWallet); // External wallet registration with email/password
 
