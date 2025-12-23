@@ -29,6 +29,8 @@ Backend API for OFFER-HUB, built with Node.js, Express, and Supabase.
    cp .env.example .env
    ```
    Fill in your Supabase credentials and other required variables.
+   
+   📖 **Need help setting up Supabase?** See [Supabase Setup Guide](docs/SUPABASE_SETUP.md)
 
 4. Run Migrations:
    Ensure your Supabase instance is up to date with the migrations in `supabase/migrations`.
@@ -70,6 +72,7 @@ backend/
 
 For detailed documentation on standards, error handling, and API formats, please check the `docs/` directory:
 
+- [Supabase Setup](docs/SUPABASE_SETUP.md) - Quick guide to configure Supabase for local development
 - [Error Handling & Validation](docs/ERROR_HANDLING_AND_VALIDATION.md)
 - [API Response Format](docs/API_RESPONSE_FORMAT.md)
 
