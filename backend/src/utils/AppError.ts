@@ -187,6 +187,7 @@ export function ErrorHandler(
 			message,
 			details,
 			code: errorCode,
+			statusCode,
 			timestamp: new Date().toISOString(),
 			...(process.env.NODE_ENV === 'development' && {
 				stack: err instanceof Error ? err.stack : undefined,

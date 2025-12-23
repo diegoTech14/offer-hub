@@ -118,15 +118,17 @@ export const loggerMiddleware = (req: Request, res: Response, next: NextFunction
   const contentType = String(req.headers['content-type'] || 'none');
   const bodySize = ['POST', 'PUT', 'PATCH'].includes(method) ? getBodySize((req as any).body) : 0;
 
-  // REQ log
+  // REQ log (user may be anonymous at this point if auth middleware hasn't run yet)
   logger.info(`${method} ${url} - reqId=${requestId} - user=${userId} - size=${bodySize}B - UA=${userAgent} - CT=${contentType}`);
 
-  // RES log (sin override de res.end → evita fugas)
+  // RES log (re-check user ID after authentication middleware has run)
   onFinished(res, (err: Error | null) => {
     const endTime = process.hrtime.bigint();
     const responseTime = Math.round(Number(endTime - startTime) / 1e6); // ms
     const statusCode = res.statusCode;
-    const base = `${method} ${url} - ${statusCode} - ${responseTime}ms - reqId=${requestId} - user=${userId}`;
+    // Get updated user ID after authentication middleware has executed
+    const finalUserId = getUserId(req);
+    const base = `${method} ${url} - ${statusCode} - ${responseTime}ms - reqId=${requestId} - user=${finalUserId}`;
 
     if (err || statusCode >= 500) {
       logger.error(`${base}${err ? ` - error=${err.message}` : ''}`);

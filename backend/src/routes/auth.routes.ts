@@ -6,6 +6,7 @@
 import {
   getNonce,
   login,
+  loginWithWallet,
   logout,
   me,
   refresh,
@@ -32,8 +33,9 @@ router.post("/register-with-wallet", authLimiter, registerWithWallet); // Extern
 
 // Authentication routes
 router.post("/nonce", authLimiter, getNonce);
-router.post("/login", authLimiter, login);
-router.post("/login/email", authLimiter, loginWithEmail);
+router.post("/login", authLimiter, login); // Email/password login
+router.post("/login/wallet", authLimiter, loginWithWallet); // Wallet login (signature)
+router.post("/login/email", authLimiter, loginWithEmail); // Alias for email/password login
 
 // Token management
 router.post("/refresh", validateRefreshToken, refresh);

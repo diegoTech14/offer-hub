@@ -143,30 +143,95 @@ export async function register(
 }
 
 /**
- * Authenticate user login
+ * Authenticate user login with Email and Password
  * @route POST /api/auth/login
  * @param req - Express request object
  * @param res - Express response object
  * @param next - Express next function
- *
- * Expected request body:
- * {
- *   "wallet_address": "string (required) - User's wallet address",
- *   "signature": "string (required) - Signed message from wallet",
- *   "nonce": "string (required) - Nonce used for signing"
- * }
- *
- * Response format:
- * {
- *   "status": "success",
- *   "user": { ... },
- *   "tokens": {
- *     "accessToken": "string",
- *     "refreshToken": "string"
- *   }
- * }
  */
 export async function login(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email, password } = req.body as EmailLoginDTO;
+
+    // Basic input validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+        error: {
+          code: "MISSING_CREDENTIALS",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+        error: {
+          code: "INVALID_EMAIL_FORMAT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Password length validation
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+        error: {
+          code: "PASSWORD_TOO_SHORT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Get device info for audit logging
+    const deviceInfo: DeviceInfo = {
+      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
+      os: getOSFromUserAgent(req.get('User-Agent') || ''),
+      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
+      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
+      user_agent: req.get('User-Agent') || 'unknown',
+    };
+
+    const result = await authService.loginWithEmail({ email, password }, deviceInfo);
+
+    // Set user ID in request for logging purposes after successful login
+    (req as any).user = { id: result.user.id };
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: result,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Authenticate user login with Wallet
+ * @route POST /api/auth/login/wallet
+ */
+export async function loginWithWallet(req: Request, res: Response, next: NextFunction) {
   try {
     const { user, tokens } = await authService.login(req.body);
     res.status(200).json({
@@ -439,6 +504,9 @@ export async function loginWithEmail(req: Request, res: Response, next: NextFunc
     };
 
     const result = await authService.loginWithEmail({ email, password }, deviceInfo);
+
+    // Set user ID in request for logging purposes after successful login
+    (req as any).user = { id: result.user.id };
 
     res.status(200).json({
       success: true,
