@@ -12,7 +12,7 @@ import {
 } from "@/utils/jwt.utils";
 import { supabase } from "@/lib/supabase/supabase";
 import { AuthUser, LoginDTO, RefreshTokenRecord, EmailLoginDTO, AuditLogEntry, DeviceInfo, UserRole, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
-import { AppError } from "@/utils/AppError";
+import { AppError, AuthenticationError, AuthorizationError } from "@/utils/AppError";
 import { randomBytes } from "crypto";
 import { sanitizeUser } from "@/utils/sanitizeUser";
 import bcrypt from "bcryptjs";
@@ -700,7 +700,7 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
       userAgent: deviceInfo.user_agent || '',
       timestamp: new Date(),
     });
-    throw new AppError("Invalid email or password", 401);
+    throw new AuthenticationError("Invalid email or password");
   }
 
   // Check if user has a password (email auth enabled)
@@ -713,7 +713,7 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
       userAgent: deviceInfo.user_agent || '',
       timestamp: new Date(),
     });
-    throw new AppError("Email authentication not enabled for this account. Please use wallet authentication.", 401);
+    throw new AuthenticationError("Email authentication not enabled for this account. Please use wallet authentication.");
   }
 
   // Verify password
@@ -727,11 +727,11 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
       userAgent: deviceInfo.user_agent || '',
       timestamp: new Date(),
     });
-    throw new AppError("Invalid email or password", 401);
+    throw new AuthenticationError("Invalid email or password");
   }
 
   // Check if user is active
-  if (user.status !== 'active') {
+  if (!user.is_active) {
     await logAuthAttempt({
       userId: user.id,
       action: 'login_failure',
@@ -740,8 +740,14 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
       userAgent: deviceInfo.user_agent || '',
       timestamp: new Date(),
     });
-    throw new AppError(`Account is ${user.status}. Please contact support.`, 403);
+    throw new AuthorizationError("Account is inactive. Please contact support.");
   }
+
+  // Update last_login_at
+  await supabase
+    .from("users")
+    .update({ last_login_at: new Date().toISOString() })
+    .eq("id", user.id);
 
   // Generate tokens
   const accessToken = signAccessToken({
@@ -757,38 +763,18 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
     permissions: user.permissions?.map((p: any) => p.name) || []
   });
 
-  // Calculate expiration times
-  const accessTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  // Calculate refresh token expiration time
   const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-  // Create session record
-  const sessionId = uuidv4();
-  const { error: sessionError } = await supabase
-    .from("user_sessions")
-    .insert([{
-      id: sessionId,
-      user_id: user.id,
-      device_info: deviceInfo,
-      created_at: new Date().toISOString(),
-      last_activity: new Date().toISOString(),
-      expires_at: accessTokenExpiry.toISOString(),
-      is_active: true,
-    }]);
-
-  if (sessionError) {
-    console.error("Failed to create session:", sessionError);
-  }
-
-  // Save refresh token
+  // Save refresh token (using schema from migration)
+  const tokenHashBytes = Buffer.from(refreshTokenHash, 'hex');
   const { error: rtInsertError } = await supabase
     .from("refresh_tokens")
     .insert([{
       user_id: user.id,
-      token_hash: refreshTokenHash,
-      created_at: new Date().toISOString(),
+      token_hash: tokenHashBytes,
       expires_at: refreshTokenExpiry.toISOString(),
-      device_info: deviceInfo,
-      is_active: true,
+      is_revoked: false,
     }]);
 
   if (rtInsertError) {
@@ -815,11 +801,6 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
       refreshToken,
       expiresIn: 24 * 60 * 60, // 24 hours in seconds
       tokenType: "Bearer",
-    },
-    session: {
-      id: sessionId,
-      created_at: new Date().toISOString(),
-      expires_at: accessTokenExpiry.toISOString(),
     },
   };
 }
