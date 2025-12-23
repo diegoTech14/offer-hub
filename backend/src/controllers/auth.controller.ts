@@ -5,7 +5,7 @@
 
 import { NextFunction, Request, Response } from "express";
 import * as authService from "@/services/auth.service";
-import { DeviceInfo, EmailLoginDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
+import { DeviceInfo, EmailLoginDTO, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
 
 export async function getNonce(
   req: Request,
@@ -29,41 +29,39 @@ export async function getNonce(
 
 
 /**
- *Register a new user
-
+ * Register a new user with email and password
+ * Creates a smart wallet (contract account) for the user
  * @route POST /api/auth/register
-
  * @param req - Express request object
-
  * @param res - Express response object
-
  * @param next - Express next function
  *
-
- *Expected request body:
-
+ * Expected request body:
  * {
-
- *   "wallet_address": "string (required) - User's wallet address",
- *   "email": "string (optional) - User's email address",
- *   "username": "string (required) - Unique username",
- *   "name": "string (optional) - User's display name",
- *   "bio": "string (optional) - User's description",
- *   "is_freelancer": "boolean (optional) - Whether user is a freelancer"
-
+ *   "email": "string (required) - User's email address",
+ *   "password": "string (required) - User's password (min 8 characters)"
  * }
  *
-
- *Response format:
-
+ * Response format:
  * {
-
- *   "status": "success",
- *   "user": { ... },
- *   "tokens": { ... }
-
+ *   "success": true,
+ *   "message": "User registered successfully",
+ *   "data": {
+ *     "user": { ... },
+ *     "wallet": {
+ *       "address": "string - Smart wallet contract address",
+ *       "type": "smart_wallet" | "invisible"
+ *     },
+ *     "tokens": {
+ *       "accessToken": "string",
+ *       "refreshToken": "string"
+ *     }
+ *   },
+ *   "metadata": {
+ *     "timestamp": "string",
+ *     "requestId": "string"
+ *   }
  * }
-
  */
 export async function register(
   req: Request,
@@ -71,11 +69,73 @@ export async function register(
   next: NextFunction
 ) {
   try {
-    const { user, tokens } = await authService.signup(req.body);
+    const data = req.body as RegisterDTO;
+
+    // Basic input validation
+    if (!data.email || !data.password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+        error: {
+          code: "MISSING_FIELDS",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+        error: {
+          code: "INVALID_EMAIL_FORMAT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Password length validation
+    if (data.password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+        error: {
+          code: "PASSWORD_TOO_SHORT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Get device info for audit logging
+    const deviceInfo: DeviceInfo = {
+      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
+      os: getOSFromUserAgent(req.get('User-Agent') || ''),
+      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
+      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
+      user_agent: req.get('User-Agent') || 'unknown',
+    };
+
+    const result = await authService.register(data, deviceInfo);
+
     res.status(201).json({
-      status: "success",
-      user,
-      tokens,
+      success: true,
+      message: "User registered successfully",
+      data: result,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
+      },
     });
   } catch (err) {
     next(err);
