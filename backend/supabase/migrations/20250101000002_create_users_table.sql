@@ -28,6 +28,9 @@ CREATE TABLE users (
   -- Tipo de usuario
   is_freelancer BOOLEAN DEFAULT false,
 
+  -- Reputación del usuario
+  reputation_score INTEGER DEFAULT 0,
+
   -- Verificación de email
   is_email_verified BOOLEAN DEFAULT false,
   email_verification_token TEXT,
@@ -68,3 +71,4 @@ COMMENT ON COLUMN users.nonce IS 'Nonce temporal para autenticación con wallet'
 COMMENT ON COLUMN users.role IS 'Rol del usuario en el sistema (admin, client, freelancer, moderator, user)';
 COMMENT ON COLUMN users.is_email_verified IS 'Indica si el email del usuario ha sido verificado';
 COMMENT ON COLUMN users.is_active IS 'Indica si la cuenta del usuario está activa';
+COMMENT ON COLUMN users.reputation_score IS 'Puntuación de reputación del usuario basada en reviews y proyectos completados';
