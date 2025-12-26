@@ -598,6 +598,11 @@ export async function login(data: LoginDTO) {
 }
 
 export async function refreshSession(tokenRecord: RefreshTokenRecord) {
+  // Validate token record has required fields
+  if (!tokenRecord.id || !tokenRecord.user_id) {
+    throw new AppError("Invalid token record", 400);
+  }
+
   const { data: user, error } = await supabase
     .from("users")
     .select("*")
@@ -608,6 +613,7 @@ export async function refreshSession(tokenRecord: RefreshTokenRecord) {
     throw new AppError("User not found", 404);
   }
 
+  // Generate new tokens
   const accessToken = signAccessToken({ 
     sub: user.id,
     email: user.email || '',
@@ -621,32 +627,65 @@ export async function refreshSession(tokenRecord: RefreshTokenRecord) {
     permissions: user.permissions?.map((p: any) => p.name) || []
   });
 
-  const { data: rotateData, error: rotateError } = await supabase
+  // Convert token hash to BYTEA format
+  const tokenHashBytes = Buffer.from(refreshTokenHash, 'hex');
+  const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  // Create new refresh token record
+  const { data: newTokenRecord, error: insertError } = await supabase
+    .from("refresh_tokens")
+    .insert([{
+      user_id: user.id,
+      token_hash: tokenHashBytes,
+      expires_at: refreshTokenExpiry.toISOString(),
+      is_revoked: false,
+    }])
+    .select("id")
+    .single();
+
+  if (insertError || !newTokenRecord) {
+    throw new AppError("Failed to create new refresh token", 500);
+  }
+
+  // Mark old token as replaced (token rotation)
+  // Use the id from the tokenRecord to update the old token
+  const { error: updateError } = await supabase
     .from("refresh_tokens")
     .update({
-      token_hash: refreshTokenHash,
-      created_at: new Date().toISOString(),
+      replaced_by_token_id: newTokenRecord.id,
     })
-    .eq("token_hash", tokenRecord.token_hash)
-    .eq("user_id", tokenRecord.user_id)
-    .eq("created_at", tokenRecord.created_at)
-    .select("id");
+    .eq("id", tokenRecord.id)
+    .eq("user_id", user.id);
 
-  if (rotateError || !rotateData || rotateData.length !== 1) {
-    throw new AppError("Failed to rotate refresh token", 500);
+  if (updateError) {
+    // If update fails, we should still return the new tokens
+    // but log the error for investigation
+    console.error("Failed to mark old token as replaced:", updateError);
+    // Continue execution as the new token is already created
   }
 
   return { accessToken, refreshToken: newRefreshToken };
 }
 
-export async function logoutUser(refreshToken: string) {
-  const refreshTokenHash = hashToken(refreshToken);
+export async function logoutUser(tokenRecord: RefreshTokenRecord) {
+  // Validate token record has required fields
+  if (!tokenRecord.id || !tokenRecord.user_id) {
+    throw new AppError("Invalid token record", 400);
+  }
+
+  // Revoke the token instead of deleting it (for audit purposes)
   const { error } = await supabase
     .from("refresh_tokens")
-    .delete()
-    .eq("token_hash", refreshTokenHash);
+    .update({
+      is_revoked: true,
+      revoked_at: new Date().toISOString(),
+    })
+    .eq("id", tokenRecord.id)
+    .eq("user_id", tokenRecord.user_id);
 
-  if (error) throw new AppError(error.message, 500);
+  if (error) {
+    throw new AppError(`Failed to revoke token: ${error.message}`, 500);
+  }
 
   return { message: "Logged out successfully" };
 }

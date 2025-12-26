@@ -244,16 +244,45 @@ export async function loginWithWallet(req: Request, res: Response, next: NextFun
   }
 }
 
+/**
+ * Refresh access and refresh tokens
+ * @route POST /api/auth/refresh
+ * @param req - Express request object with refreshTokenRecord from middleware
+ * @param res - Express response object
+ * @param next - Express next function
+ */
 export async function refresh(req: Request, res: Response, next: NextFunction) {
   try {
+    if (!req.refreshTokenRecord) {
+      return res.status(400).json({
+        success: false,
+        message: "Refresh token record is missing",
+        error: {
+          code: "MISSING_TOKEN_RECORD",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
     const { accessToken, refreshToken } = await authService.refreshSession(
       req.refreshTokenRecord
     );
+
     res.status(200).json({
-      status: "success",
-      tokens: {
-        accessToken,
-        refreshToken,
+      success: true,
+      message: "Tokens refreshed successfully",
+      data: {
+        tokens: {
+          accessToken,
+          refreshToken,
+        },
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
       },
     });
   } catch (err) {
@@ -273,12 +302,39 @@ export async function me(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+/**
+ * Logout user by revoking refresh token
+ * @route POST /api/auth/logout
+ * @param req - Express request object with refreshTokenRecord from middleware
+ * @param res - Express response object
+ * @param next - Express next function
+ */
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
-    const { message } = await authService.logoutUser(
-      req.refreshTokenRecord?.token_hash || ''
-    );
-    res.status(200).json({ message });
+    if (!req.refreshTokenRecord) {
+      return res.status(400).json({
+        success: false,
+        message: "Refresh token is required",
+        error: {
+          code: "MISSING_REFRESH_TOKEN",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    const { message } = await authService.logoutUser(req.refreshTokenRecord);
+
+    res.status(200).json({
+      success: true,
+      message,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
+      },
+    });
   } catch (err) {
     next(err);
   }

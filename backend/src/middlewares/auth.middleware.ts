@@ -492,32 +492,106 @@ export const validateRefreshToken = async (
   try {
     const decoded = verifyRefreshToken(refreshToken);
 
-    const { data: tokenRecord, error } = await supabase
+    // Query tokens by user_id first, then compare hash in memory
+    // This works around Supabase BYTEA comparison issues
+    const { data: userTokens, error: fetchError } = await supabase
       .from("refresh_tokens")
       .select("*")
-      .eq("token_hash", refreshTokenHash)
-      .single();
+      .eq("user_id", decoded.sub)
+      .eq("is_revoked", false)
+      .is("replaced_by_token_id", null);
 
-    if (error || !tokenRecord) {
+    if (fetchError || !userTokens || userTokens.length === 0) {
       return next(
         new AppError("Invalid refresh token. Please log in again", 403)
       );
     }
 
-    // Verify user ID matches between token and record
-    if (tokenRecord.user_id !== decoded.user_id) {
-      return next(new AppError("Refresh token does not match the user", 403));
+    // Find token by comparing hashes (BYTEA is returned as Buffer or hex string)
+    const tokenRecord = userTokens.find((token: any) => {
+      let tokenHashHex: string;
+      
+      // Convert BYTEA to hex string for comparison
+      if (token.token_hash instanceof Buffer) {
+        tokenHashHex = token.token_hash.toString('hex');
+      } else if (typeof token.token_hash === 'string') {
+        let processedString = token.token_hash;
+        
+        // Remove \x prefix if present (PostgreSQL BYTEA format)
+        if (processedString.startsWith('\\x')) {
+          processedString = processedString.substring(2);
+        } else if (processedString.startsWith('0x') || processedString.startsWith('0X')) {
+          processedString = processedString.substring(2);
+        }
+        
+        // Supabase may return BYTEA as hex-encoded JSON string representing a Buffer
+        // Format: hex string that decodes to "{\"type\":\"Buffer\",\"data\":[49,53,177,44...]}"
+        // First try to decode hex to string, then parse JSON
+        if (processedString.startsWith('7b2274797065223a2242756666657222')) {
+          try {
+            // Decode hex to string (JSON)
+            const jsonString = Buffer.from(processedString, 'hex').toString('utf8');
+            const bufferData = JSON.parse(jsonString);
+            if (bufferData.type === 'Buffer' && Array.isArray(bufferData.data)) {
+              tokenHashHex = Buffer.from(bufferData.data).toString('hex');
+            } else {
+              tokenHashHex = processedString;
+            }
+          } catch {
+            tokenHashHex = processedString;
+          }
+        } else if (processedString.startsWith('{') && processedString.includes('"type":"Buffer"')) {
+          // Already a JSON string (not hex-encoded)
+          try {
+            const bufferData = JSON.parse(processedString);
+            if (bufferData.type === 'Buffer' && Array.isArray(bufferData.data)) {
+              tokenHashHex = Buffer.from(bufferData.data).toString('hex');
+            } else {
+              tokenHashHex = processedString;
+            }
+          } catch {
+            tokenHashHex = processedString;
+          }
+        } else {
+          // Already a hex string without prefix (direct hash)
+          tokenHashHex = processedString;
+        }
+      } else if (token.token_hash && typeof token.token_hash === 'object') {
+        // Handle Uint8Array or other binary formats
+        tokenHashHex = Buffer.from(token.token_hash).toString('hex');
+      } else {
+        return false;
+      }
+      
+      return tokenHashHex === refreshTokenHash;
+    });
+
+    if (!tokenRecord) {
+      return next(
+        new AppError("Invalid refresh token. Please log in again", 403)
+      );
+    }
+
+    // Note: user_id, is_revoked, and replaced_by_token_id are already filtered in the query above
+
+    // Check if token has expired
+    const expiresAt = new Date(tokenRecord.expires_at);
+    if (expiresAt < new Date()) {
+      // Mark as revoked for cleanup
+      await supabase
+        .from("refresh_tokens")
+        .update({
+          is_revoked: true,
+          revoked_at: new Date().toISOString(),
+        })
+        .eq("id", tokenRecord.id);
+      return next(new AppError("Refresh token has expired", 403));
     }
 
     req.refreshTokenRecord = tokenRecord;
     next();
   } catch (err) {
     if ((err as Error).name === "TokenExpiredError") {
-      // Clean up expired refresh token
-      await supabase
-        .from("refresh_tokens")
-        .delete()
-        .eq("token_hash", refreshTokenHash);
       return next(new AppError("Refresh token has expired", 403));
     }
 
