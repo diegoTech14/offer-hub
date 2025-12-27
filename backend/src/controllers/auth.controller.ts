@@ -5,7 +5,7 @@
 
 import { NextFunction, Request, Response } from "express";
 import * as authService from "@/services/auth.service";
-import { DeviceInfo, EmailLoginDTO, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
+import { DeviceInfo, EmailLoginDTO, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO, ForgotPasswordDTO, ResetPasswordDTO } from "@/types/auth.types";
 
 export async function getNonce(
   req: Request,
@@ -671,4 +671,137 @@ function getBrowserFromUserAgent(userAgent: string): string {
   if (ua.includes('opera')) return 'Opera';
 
   return 'Unknown';
+}
+
+/**
+ * Request password reset
+ * Sends password reset email to user
+ * @route POST /api/auth/forgot-password
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next function
+ */
+export async function forgotPassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email } = req.body as ForgotPasswordDTO;
+
+    // Basic input validation
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+        error: {
+          code: "MISSING_EMAIL",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+        error: {
+          code: "INVALID_EMAIL_FORMAT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Get device info for audit logging
+    const deviceInfo: DeviceInfo = {
+      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
+      os: getOSFromUserAgent(req.get('User-Agent') || ''),
+      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
+      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
+      user_agent: req.get('User-Agent') || 'unknown',
+    };
+
+    const result = await authService.forgotPassword(email, deviceInfo);
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Reset password using reset token
+ * Validates token and updates user password
+ * @route POST /api/auth/reset-password
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next function
+ */
+export async function resetPassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { token, password } = req.body as ResetPasswordDTO;
+
+    // Basic input validation
+    if (!token || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Token and password are required",
+        error: {
+          code: "MISSING_FIELDS",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Password length validation
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+        error: {
+          code: "PASSWORD_TOO_SHORT",
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          requestId: req.headers['x-request-id'] as string || 'unknown',
+        },
+      });
+    }
+
+    // Get device info for audit logging
+    const deviceInfo: DeviceInfo = {
+      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
+      os: getOSFromUserAgent(req.get('User-Agent') || ''),
+      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
+      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
+      user_agent: req.get('User-Agent') || 'unknown',
+    };
+
+    const result = await authService.resetPassword(token, password, deviceInfo);
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] as string || 'unknown',
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 }
