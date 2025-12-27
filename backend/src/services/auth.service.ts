@@ -908,3 +908,202 @@ export async function deactivateSession(userId: string, sessionId: string) {
     throw new AppError("Failed to deactivate session", 500);
   }
 }
+
+/**
+ * Initiate password reset process
+ * Generates a reset token and sends it via email
+ * @param email - User's email address
+ * @param deviceInfo - Device information for audit logging
+ * @returns Success message
+ */
+export async function forgotPassword(email: string, deviceInfo: DeviceInfo) {
+  // Validate email format
+  const { validateEmail } = await import('@/utils/validation');
+  if (!email || !validateEmail(email)) {
+    throw new AppError('Invalid email format', 400);
+  }
+
+  // Find user by email
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("id, email, password_hash")
+    .eq("email", email.toLowerCase())
+    .single();
+
+  // For security, don't reveal if email exists or not
+  // Always return success message
+  if (error || !user) {
+    // Log the attempt even if user doesn't exist (for security monitoring)
+    await logAuthAttempt({
+      userId: '',
+      action: 'password_reset_request',
+      resource: 'auth',
+      ipAddress: deviceInfo.ip_address || '',
+      userAgent: deviceInfo.user_agent || '',
+      timestamp: new Date(),
+    });
+
+    // Return success to prevent email enumeration
+    return { message: 'If an account with that email exists, a password reset link has been sent.' };
+  }
+
+  // Check if user has password authentication enabled
+  if (!user.password_hash) {
+    // Log the attempt
+    await logAuthAttempt({
+      userId: user.id,
+      action: 'password_reset_request_failed',
+      resource: 'auth',
+      ipAddress: deviceInfo.ip_address || '',
+      userAgent: deviceInfo.user_agent || '',
+      timestamp: new Date(),
+    });
+
+    // Return success to prevent email enumeration
+    return { message: 'If an account with that email exists, a password reset link has been sent.' };
+  }
+
+  // Generate reset token (cryptographically secure random token)
+  const resetToken = randomBytes(32).toString('hex');
+  const resetTokenExpiry = new Date();
+  resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1); // Token expires in 1 hour
+
+  // Save reset token to database
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({
+      password_reset_token: resetToken,
+      password_reset_expires_at: resetTokenExpiry.toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (updateError) {
+    throw new AppError('Failed to generate password reset token', 500);
+  }
+
+  // Send password reset email
+  try {
+    const emailService = await import('./email.service');
+    await emailService.sendPasswordResetEmail(user.email, resetToken);
+  } catch (emailError: any) {
+    // Log email error but don't fail the request
+    console.error('Failed to send password reset email:', emailError);
+    // In production, you might want to throw here, but for now we'll continue
+    // The token is still saved, so the user could potentially use it if they contact support
+  }
+
+  // Log successful password reset request
+  await logAuthAttempt({
+    userId: user.id,
+    action: 'password_reset_request',
+    resource: 'auth',
+    ipAddress: deviceInfo.ip_address || '',
+    userAgent: deviceInfo.user_agent || '',
+    timestamp: new Date(),
+  });
+
+  return { message: 'If an account with that email exists, a password reset link has been sent.' };
+}
+
+/**
+ * Reset password using reset token
+ * Validates token and updates user password
+ * @param token - Password reset token
+ * @param newPassword - New password
+ * @param deviceInfo - Device information for audit logging
+ * @returns Success message
+ */
+export async function resetPassword(
+  token: string,
+  newPassword: string,
+  deviceInfo: DeviceInfo
+) {
+  // Validate inputs
+  if (!token || typeof token !== 'string') {
+    throw new AppError('Reset token is required', 400);
+  }
+
+  if (!newPassword || typeof newPassword !== 'string') {
+    throw new AppError('New password is required', 400);
+  }
+
+  if (newPassword.length < 8) {
+    throw new AppError('Password must be at least 8 characters long', 400);
+  }
+
+  // Find user by reset token
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("id, email, password_reset_token, password_reset_expires_at")
+    .eq("password_reset_token", token)
+    .single();
+
+  if (error || !user) {
+    await logAuthAttempt({
+      userId: '',
+      action: 'password_reset_failed',
+      resource: 'auth',
+      ipAddress: deviceInfo.ip_address || '',
+      userAgent: deviceInfo.user_agent || '',
+      timestamp: new Date(),
+    });
+    throw new AppError('Invalid or expired reset token', 400);
+  }
+
+  // Check if token has expired
+  if (!user.password_reset_expires_at) {
+    throw new AppError('Invalid or expired reset token', 400);
+  }
+
+  const expiryDate = new Date(user.password_reset_expires_at);
+  if (expiryDate < new Date()) {
+    // Clear expired token
+    await supabase
+      .from("users")
+      .update({
+        password_reset_token: null,
+        password_reset_expires_at: null,
+      })
+      .eq("id", user.id);
+
+    await logAuthAttempt({
+      userId: user.id,
+      action: 'password_reset_failed',
+      resource: 'auth',
+      ipAddress: deviceInfo.ip_address || '',
+      userAgent: deviceInfo.user_agent || '',
+      timestamp: new Date(),
+    });
+
+    throw new AppError('Reset token has expired. Please request a new password reset.', 400);
+  }
+
+  // Hash new password
+  const password_hash = await bcrypt.hash(newPassword, 10);
+
+  // Update password and clear reset token
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({
+      password_hash,
+      password_reset_token: null,
+      password_reset_expires_at: null,
+    })
+    .eq("id", user.id);
+
+  if (updateError) {
+    throw new AppError('Failed to reset password', 500);
+  }
+
+  // Log successful password reset
+  await logAuthAttempt({
+    userId: user.id,
+    action: 'password_reset_success',
+    resource: 'auth',
+    ipAddress: deviceInfo.ip_address || '',
+    userAgent: deviceInfo.user_agent || '',
+    timestamp: new Date(),
+  });
+
+  return { message: 'Password has been reset successfully' };
+}

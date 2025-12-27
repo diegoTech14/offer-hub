@@ -511,6 +511,15 @@ export interface EmailLoginDTO {
   password: string;
 }
 
+export interface ForgotPasswordDTO {
+  email: string;
+}
+
+export interface ResetPasswordDTO {
+  token: string;
+  password: string;
+}
+
 // Simple registration DTO for POST /auth/register
 export interface RegisterDTO {
   email: string;

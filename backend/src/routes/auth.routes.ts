@@ -16,6 +16,8 @@ import {
   loginWithEmail,
   getSessions,
   deactivateSession,
+  forgotPassword,
+  resetPassword,
 } from "@/controllers/auth.controller";
 import {
   authenticateToken,
@@ -40,6 +42,10 @@ router.post("/login/email", authLimiter, loginWithEmail); // Alias for email/pas
 // Token management
 router.post("/refresh", validateRefreshToken, refresh);
 router.post("/logout", validateRefreshToken, logout);
+
+// Password recovery routes
+router.post("/forgot-password", authLimiter, forgotPassword);
+router.post("/reset-password", authLimiter, resetPassword);
 
 // User routes
 router.get("/me", authenticateToken(), me);
