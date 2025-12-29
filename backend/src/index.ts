@@ -21,6 +21,7 @@ import express from "express";
 import cors from "cors";
 import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
+import oauthRoutes from "@/routes/oauth.routes";
 import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
 import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware";
 import { authenticateToken } from "./middlewares/auth.middleware";
@@ -49,6 +50,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // For Apple form_post
 
 // Request logging & Rate limiting
 app.use(loggerMiddleware);
@@ -76,6 +78,7 @@ app.get("/", (_req, res) => {
 
 // API Routes
 app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/oauth", oauthRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 
 // Error Handling

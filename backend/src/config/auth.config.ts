@@ -48,6 +48,7 @@ export const authConfig = {
     "/api/auth/refresh",
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
+    "/api/oauth",
     "/api/health",
     "/api/docs",
     "/api/public",

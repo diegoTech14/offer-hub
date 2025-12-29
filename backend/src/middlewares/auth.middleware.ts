@@ -48,10 +48,11 @@ const uuidv4 = () => require('crypto').randomUUID();
  */
 export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
   return async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction
   ) => {
+    const authReq = req as AuthenticatedRequest;
     const startTime = Date.now();
     const requestId = uuidv4();
     
@@ -70,7 +71,7 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       // Check if route is public
       if (isPublicRoute(req.url)) {
         securityContext.isAuthenticated = false;
-        req.securityContext = securityContext;
+        authReq.securityContext = securityContext;
         return next();
       }
 
@@ -170,8 +171,8 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       };
 
       // Attach user and token info to request
-      req.user = authUser;
-      req.tokenInfo = {
+      authReq.user = authUser;
+      authReq.tokenInfo = {
         token,
         expiresAt: expiresAt || 0,
         needsRefresh,
@@ -180,7 +181,7 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       // Update security context
       securityContext.isAuthenticated = true;
       securityContext.userRole = user.role;
-      req.securityContext = securityContext;
+      authReq.securityContext = securityContext;
 
       // Log successful authentication
       if (authConfig.logging.logSuccessfulAuth) {
@@ -258,24 +259,26 @@ export const verifyToken = authenticateToken();
  * ```
  */
 export function authorizeRoles(...roles: UserRole[]) {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    if (!req.user) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const authReq = req as AuthenticatedRequest;
+    
+    if (!authReq.user) {
       return next(new AppError("Authentication required", 401));
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(authReq.user.role)) {
       // Log unauthorized access attempt
       if (authConfig.logging.logRoleAccess) {
         logAuthAttempt({
-          requestId: req.securityContext?.requestId || uuidv4(),
+          requestId: authReq.securityContext?.requestId || uuidv4(),
           ipAddress: req.ip || 'unknown',
           userAgent: req.get('User-Agent') || 'unknown',
           timestamp: Date.now(),
           endpoint: req.url,
           method: req.method,
           isAuthenticated: true,
-          userId: req.user.id,
-          userRole: req.user.role,
+          userId: authReq.user.id,
+          userRole: authReq.user.role,
           success: false,
           errorMessage: `Insufficient permissions. Required roles: ${roles.join(', ')}`,
         });
