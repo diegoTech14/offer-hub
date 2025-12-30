@@ -4,11 +4,68 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
+import { createHash, randomBytes } from 'crypto';
 import { getOAuthService } from '@/services/oauth/oauth-factory.service';
 import { OAuthProvider } from '@/types/oauth.types';
 import { generateOAuthState } from '@/utils/oauth.utils';
 import { supabase } from '@/lib/supabase/supabase';
 import { AppError } from '@/utils/AppError';
+
+/**
+ * Validate redirect URL against whitelist to prevent open redirect attacks
+ */
+function validateRedirectUrl(url: string | undefined): string {
+  if (!url) {
+    return process.env.FRONTEND_URL || 'http://localhost:3000';
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+
+    // Check protocol
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      console.warn(`Invalid protocol in redirect URL: ${parsedUrl.protocol}`);
+      return process.env.FRONTEND_URL || 'http://localhost:3000';
+    }
+
+    // Define allowed domains
+    const allowedDomains = [
+      'localhost:3000',
+      'localhost:3001',
+      process.env.FRONTEND_URL?.replace(/^https?:\/\//, '') || '',
+    ].filter(Boolean);
+
+    const requestedHost = parsedUrl.host;
+
+    // Check if host is in whitelist
+    const isAllowed = allowedDomains.some((domain) => {
+      // Exact match
+      if (requestedHost === domain) return true;
+      // Pattern match for wildcard subdomains (e.g., *.example.com)
+      if (domain.startsWith('*.')) {
+        const pattern = domain.replace('*', '.*');
+        return new RegExp(`^${pattern}$`).test(requestedHost);
+      }
+      return false;
+    });
+
+    if (!isAllowed) {
+      console.warn(`Redirect URL not in whitelist: ${url}`);
+      return process.env.FRONTEND_URL || 'http://localhost:3000';
+    }
+
+    // Additional security: check for encoded redirects in path
+    if (url.includes('%2F%2F') || url.match(/\/\/.*\/\//)) {
+      console.warn(`Potential open redirect in path: ${url}`);
+      return process.env.FRONTEND_URL || 'http://localhost:3000';
+    }
+
+    return url;
+  } catch (error) {
+    console.error(`Invalid redirect URL: ${error}`);
+    return process.env.FRONTEND_URL || 'http://localhost:3000';
+  }
+}
 
 /**
  * Initiate OAuth flow - redirects to provider
@@ -20,24 +77,45 @@ export async function initiateOAuth(
 ): Promise<void> {
   try {
     const provider = (req as any).oauthProvider as OAuthProvider;
-    const redirectUrl = (req.query.redirect_url as string) || undefined;
+    const redirectUrl = validateRedirectUrl(req.query.redirect_url as string);
 
     // Generate state for CSRF protection
     const state = generateOAuthState();
+    const stateHash = createHash('sha256').update(state).digest('hex');
 
-    // Store state in session or return in response
-    // For now, we'll include it in the redirect URL
+    // Get or create session ID
+    const sessionId = randomBytes(16).toString('hex');
+
+    // Store state in database with expiration (10 minutes)
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    const { error: stateError } = await supabase
+      .from('oauth_state')
+      .insert({
+        state_hash: stateHash,
+        session_id: sessionId,
+        redirect_url: redirectUrl || null,
+        provider: provider,
+        expires_at: expiresAt.toISOString(),
+        used: false,
+      });
+
+    if (stateError) {
+      throw new AppError(`Failed to store OAuth state: ${stateError.message}`, 500);
+    }
+
+    // Store session ID in cookie for later retrieval
+    res.cookie('_oauth_session', sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 10 * 60 * 1000, // 10 minutes
+      path: '/',
+    });
+
     const service = getOAuthService(provider);
     const authUrl = service.getAuthorizationUrl(state);
-
-    // If redirectUrl is provided, append it to state
-    if (redirectUrl) {
-      const stateWithRedirect = `${state}:${Buffer.from(redirectUrl).toString('base64')}`;
-      const authUrlWithState = service.getAuthorizationUrl(stateWithRedirect);
-      res.redirect(authUrlWithState);
-    } else {
-      res.redirect(authUrl);
-    }
+    res.redirect(authUrl);
   } catch (error) {
     next(error);
   }
@@ -72,12 +150,12 @@ export async function handleOAuthCallback(
       return;
     }
 
-    if (!code) {
+    if (!code || !state) {
       res.status(400).json({
         success: false,
-        message: 'Authorization code is required',
+        message: 'Authorization code and state are required',
         error: {
-          code: 'MISSING_CODE',
+          code: 'MISSING_PARAMS',
         },
         metadata: {
           timestamp: new Date().toISOString(),
@@ -86,6 +164,33 @@ export async function handleOAuthCallback(
       });
       return;
     }
+
+    // CRITICAL: Validate state parameter against database
+    const stateHash = createHash('sha256').update(state as string).digest('hex');
+    const sessionId = req.cookies._oauth_session;
+
+    if (!sessionId) {
+      throw new AppError('OAuth session not found. Possible CSRF attack.', 403);
+    }
+
+    const { data: stateRecord, error: stateError } = await supabase
+      .from('oauth_state')
+      .select('*')
+      .eq('state_hash', stateHash)
+      .eq('session_id', sessionId)
+      .eq('used', false)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+
+    if (stateError || !stateRecord) {
+      throw new AppError('Invalid or expired state parameter. Possible CSRF attack.', 403);
+    }
+
+    // Mark state as used (prevent replay attacks)
+    await supabase
+      .from('oauth_state')
+      .update({ used: true })
+      .eq('state_hash', stateHash);
 
     const service = getOAuthService(provider);
 
@@ -96,52 +201,56 @@ export async function handleOAuthCallback(
         req.body.id_token
       );
 
-      // Extract redirect URL from state if present
-      let redirectUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      if (state) {
-        const stateParts = (state as string).split(':');
-        if (stateParts.length > 1) {
-          try {
-            redirectUrl = Buffer.from(stateParts[1], 'base64').toString('utf8');
-          } catch {
-            // Invalid state, use default
-          }
-        }
-      }
+      // Get redirect URL from stored state
+      const redirectUrl = stateRecord.redirect_url || process.env.FRONTEND_URL || 'http://localhost:3000';
 
-      // Redirect to frontend with tokens
-      const tokenParams = new URLSearchParams({
-        accessToken: result.tokens.accessToken,
-        refreshToken: result.tokens.refreshToken,
-        isNewUser: result.isNewUser.toString(),
+      // Set HTTP-only cookies (secure, not accessible via JavaScript)
+      res.cookie('accessToken', result.tokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        path: '/',
       });
-      res.redirect(`${redirectUrl}/auth/callback?${tokenParams.toString()}`);
+
+      res.cookie('refreshToken', result.tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/',
+      });
+
+      // Redirect with only non-sensitive flag
+      res.redirect(`${redirectUrl}/auth/callback?isNewUser=${result.isNewUser}`);
       return;
     }
 
     // Standard OAuth callback flow
     const result = await service.handleCallback(code as string);
 
-    // Extract redirect URL from state if present
-    let redirectUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    if (state) {
-      const stateParts = (state as string).split(':');
-      if (stateParts.length > 1) {
-        try {
-          redirectUrl = Buffer.from(stateParts[1], 'base64').toString('utf8');
-        } catch {
-          // Invalid state, use default
-        }
-      }
-    }
+    // Get redirect URL from stored state
+    const redirectUrl = stateRecord.redirect_url || process.env.FRONTEND_URL || 'http://localhost:3000';
 
-    // Redirect to frontend with tokens
-    const tokenParams = new URLSearchParams({
-      accessToken: result.tokens.accessToken,
-      refreshToken: result.tokens.refreshToken,
-      isNewUser: result.isNewUser.toString(),
+    // Set HTTP-only cookies (secure, not accessible via JavaScript)
+    res.cookie('accessToken', result.tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: '/',
     });
-    res.redirect(`${redirectUrl}/auth/callback?${tokenParams.toString()}`);
+
+    res.cookie('refreshToken', result.tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    // Redirect with only non-sensitive flag
+    res.redirect(`${redirectUrl}/auth/callback?isNewUser=${result.isNewUser}`);
   } catch (error) {
     next(error);
   }

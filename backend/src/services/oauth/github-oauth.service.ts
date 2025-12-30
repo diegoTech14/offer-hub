@@ -5,7 +5,7 @@
 
 import { BaseOAuthService } from './oauth-base.service';
 import { OAuthProvider, OAuthProfile, OAuthTokenData } from '@/types/oauth.types';
-import axios from 'axios';
+import { oauthAxios } from '@/config/axios.config';
 
 /**
  * GitHub OAuth service
@@ -39,7 +39,7 @@ export class GitHubOAuthService extends BaseOAuthService {
    */
   async exchangeCodeForTokens(code: string): Promise<OAuthTokenData> {
     try {
-      const response = await axios.post(
+      const response = await oauthAxios.post(
         this.tokenUrl,
         {
           client_id: this.config.clientId,
@@ -70,7 +70,7 @@ export class GitHubOAuthService extends BaseOAuthService {
   async getUserProfile(accessToken: string): Promise<OAuthProfile> {
     try {
       // Get user info
-      const userResponse = await axios.get(this.userInfoUrl, {
+      const userResponse = await oauthAxios.get(this.userInfoUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           Accept: 'application/vnd.github.v3+json',
@@ -84,7 +84,7 @@ export class GitHubOAuthService extends BaseOAuthService {
       let emailVerified = false;
 
       try {
-        const emailsResponse = await axios.get(this.userEmailsUrl, {
+        const emailsResponse = await oauthAxios.get(this.userEmailsUrl, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             Accept: 'application/vnd.github.v3+json',

@@ -9,7 +9,7 @@ import { normalizeOAuthProfile, validateOAuthEmail } from '@/utils/oauth.utils';
 import { signAccessToken, signRefreshToken } from '@/utils/jwt.utils';
 import { UserRole } from '@/types/auth.types';
 import { sanitizeUser } from '@/utils/sanitizeUser';
-import axios from 'axios';
+import { oauthAxios } from '@/config/axios.config';
 import jwt from 'jsonwebtoken';
 
 /**
@@ -75,7 +75,7 @@ export class AppleOAuthService extends BaseOAuthService {
     try {
       const clientSecret = this.generateClientSecret();
 
-      const response = await axios.post(
+      const response = await oauthAxios.post(
         this.tokenUrl,
         {
           client_id: this.config.clientId,
@@ -207,7 +207,7 @@ export class AppleOAuthService extends BaseOAuthService {
     try {
       const clientSecret = this.generateClientSecret();
 
-      const response = await axios.post(
+      const response = await oauthAxios.post(
         this.tokenUrl,
         {
           client_id: this.config.clientId,
