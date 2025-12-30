@@ -6,7 +6,7 @@
 import { BaseOAuthService } from './oauth-base.service';
 import { OAuthProvider, OAuthProfile, OAuthTokenData } from '@/types/oauth.types';
 import { getProviderConfig } from '@/config/oauth.config';
-import axios from 'axios';
+import { oauthAxios } from '@/config/axios.config';
 
 /**
  * Google OAuth service
@@ -42,7 +42,7 @@ export class GoogleOAuthService extends BaseOAuthService {
    */
   async exchangeCodeForTokens(code: string): Promise<OAuthTokenData> {
     try {
-      const response = await axios.post(this.tokenUrl, {
+      const response = await oauthAxios.post(this.tokenUrl, {
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
         code,
@@ -70,7 +70,7 @@ export class GoogleOAuthService extends BaseOAuthService {
    */
   async getUserProfile(accessToken: string): Promise<OAuthProfile> {
     try {
-      const response = await axios.get(this.userInfoUrl, {
+      const response = await oauthAxios.get(this.userInfoUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -99,7 +99,7 @@ export class GoogleOAuthService extends BaseOAuthService {
    */
   async refreshAccessToken(refreshToken: string): Promise<OAuthTokenData> {
     try {
-      const response = await axios.post(this.tokenUrl, {
+      const response = await oauthAxios.post(this.tokenUrl, {
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
         refresh_token: refreshToken,
