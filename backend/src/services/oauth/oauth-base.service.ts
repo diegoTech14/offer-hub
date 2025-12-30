@@ -100,6 +100,9 @@ export abstract class BaseOAuthService implements IOAuthService {
 
   /**
    * Create or update user from OAuth profile
+   * NOTE: Race condition risk - Concurrent logins may create duplicates
+   * Solution: Use atomic database function via RPC (see migration 20250101000009)
+   * The RPC function 'create_or_link_oauth_user' uses database-level locking
    */
   protected async createOrUpdateUser(
     profile: OAuthProfile,
