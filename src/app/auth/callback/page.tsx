@@ -4,6 +4,8 @@ import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+
 function OAuthCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -12,55 +14,96 @@ function OAuthCallbackContent() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Extract tokens from URL
-        const accessToken = searchParams.get("accessToken");
-        const refreshToken = searchParams.get("refreshToken");
         const isNewUser = searchParams.get("isNewUser") === "true";
+        const error = searchParams.get("error");
 
-        if (!accessToken || !refreshToken) {
-          console.error("Missing tokens in callback");
-          router.push("/onboarding/sign-in?error=missing_tokens");
+        // Handle OAuth errors
+        if (error) {
+          console.error("OAuth error:", error);
+          router.push(`/onboarding/sign-in?error=${error}`);
           return;
         }
 
-        // Save tokens to localStorage
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        // First, try to get tokens from URL (legacy support)
+        const accessTokenFromUrl = searchParams.get("accessToken");
+        const refreshTokenFromUrl = searchParams.get("refreshToken");
 
-        // Get user info from backend
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        if (accessTokenFromUrl && refreshTokenFromUrl) {
+          // Legacy flow: tokens in URL
+          localStorage.setItem("accessToken", accessTokenFromUrl);
+          localStorage.setItem("refreshToken", refreshTokenFromUrl);
+          localStorage.setItem("authMethod", "token");
+
+          // Get user info from backend
+          const response = await fetch(`${API_BASE_URL}/auth/me`, {
+            headers: {
+              Authorization: `Bearer ${accessTokenFromUrl}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch user info");
+          }
+
+          const data = await response.json();
+          const userData = data.data || data.user || data;
+
+          login(
+            { accessToken: accessTokenFromUrl, refreshToken: refreshTokenFromUrl },
+            {
+              id: userData.id,
+              email: userData.email,
+              name: userData.name || userData.username,
+              wallet_address: userData.wallet_address,
+              role: userData.role,
+            }
+          );
+
+          router.push(isNewUser ? "/onboarding/dashboard" : "/onboarding/dashboard");
+          return;
+        }
+
+        // Cookie-based auth flow (current implementation)
+        // Tokens are in HTTP-only cookies, call /auth/me with credentials
+        const meResponse = await fetch(`${API_BASE_URL}/auth/me`, {
+          credentials: "include",
           headers: {
-            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user info");
-        }
+        if (meResponse.ok) {
+          const meData = await meResponse.json();
+          const userData = meData.data || meData.user || meData;
 
-        const data = await response.json();
-        const userData = data.data || data.user || data;
+          if (userData?.id) {
+            // IMPORTANT: Set authMethod FIRST, before anything else
+            // This ensures all subsequent API calls use cookie-based auth
+            localStorage.setItem("authMethod", "cookie");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
 
-        // Update auth context
-        login(
-          { accessToken, refreshToken },
-          {
-            id: userData.id,
-            email: userData.email,
-            name: userData.name || userData.username,
-            wallet_address: userData.wallet_address,
-            role: userData.role,
+            // Update auth context with user data (no tokens needed for cookie auth)
+            login(
+              { accessToken: "", refreshToken: "" },
+              {
+                id: userData.id,
+                email: userData.email,
+                name: userData.name || userData.username,
+                wallet_address: userData.wallet_address,
+                role: userData.role,
+              }
+            );
+
+            router.push(isNewUser ? "/onboarding/dashboard" : "/onboarding/dashboard");
+            return;
           }
-        );
-
-        // Redirect based on user status
-        if (isNewUser) {
-          router.push("/onboarding/dashboard");
-        } else {
-          router.push("/onboarding/dashboard");
         }
+
+        // Authentication failed
+        console.error("OAuth callback: Could not authenticate");
+        router.push("/onboarding/sign-in?error=oauth_failed");
       } catch (error) {
         console.error("OAuth callback error:", error);
         router.push("/onboarding/sign-in?error=oauth_failed");
@@ -101,4 +144,3 @@ export default function OAuthCallbackPage() {
     </Suspense>
   );
 }
-

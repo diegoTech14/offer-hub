@@ -19,6 +19,7 @@ if (missingEnvVars.length > 0) {
 
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
 import oauthRoutes from "@/routes/oauth.routes";
@@ -49,6 +50,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.use(cookieParser()); // Parse cookies for OAuth session handling
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For Apple form_post
 
