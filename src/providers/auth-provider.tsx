@@ -32,23 +32,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check authentication status
   const checkAuth = useCallback(async (): Promise<boolean> => {
+    const authMethod = localStorage.getItem("authMethod");
     const accessToken = localStorage.getItem("accessToken");
-    
-    if (!accessToken) {
+
+    // If no auth method set and no token, not authenticated
+    if (!authMethod && !accessToken) {
       setUser(null);
       setIsLoading(false);
       return false;
     }
 
     try {
-      // Verify token with backend
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+
+      // For cookie-based auth, use credentials: include (no Authorization header)
+      // For token-based auth, send Authorization header
+      const fetchOptions: RequestInit = {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-      });
+      };
+
+      if (authMethod === "cookie") {
+        // Cookie-based auth: include cookies, no Authorization header
+        fetchOptions.credentials = "include";
+      } else if (accessToken && accessToken !== "cookie-auth") {
+        // Token-based auth: send Authorization header
+        (fetchOptions.headers as Record<string, string>).Authorization = `Bearer ${accessToken}`;
+      } else {
+        // No valid auth method
+        setUser(null);
+        setIsLoading(false);
+        return false;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/me`, fetchOptions);
 
       if (!response.ok) {
         throw new Error("Token validation failed");
@@ -56,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
       const userData = data.data || data.user || data;
-      
+
       setUser({
         id: userData.id,
         email: userData.email,
@@ -71,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Auth check failed:", error);
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("authMethod");
       setUser(null);
       setIsLoading(false);
       return false;
@@ -79,8 +98,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Login function
   const login = useCallback((tokens: { accessToken: string; refreshToken: string }, userData: User) => {
-    localStorage.setItem("accessToken", tokens.accessToken);
-    localStorage.setItem("refreshToken", tokens.refreshToken);
+    // Only store tokens if they are real tokens (not empty or placeholder)
+    if (tokens.accessToken && tokens.accessToken !== "" && tokens.accessToken !== "cookie-auth") {
+      localStorage.setItem("accessToken", tokens.accessToken);
+      localStorage.setItem("refreshToken", tokens.refreshToken);
+      localStorage.setItem("authMethod", "token");
+    }
+    // For cookie-based auth, authMethod is set before calling login
     setUser(userData);
   }, []);
 
@@ -88,6 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("authMethod");
     setUser(null);
     router.push("/onboarding/sign-in");
   }, [router]);
