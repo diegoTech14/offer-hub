@@ -1,14 +1,11 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { AuthHeader } from "@/components/auth/AuthHeader";
-import { EmailPasswordForm } from "@/components/auth/email-password-form";
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import { useRegister } from "@/hooks/auth/use-register";
 import { useOAuth } from "@/hooks/auth/use-oauth";
-import { RegisterFormState } from "@/types/auth-register.types";
-import Link from "next/link";
 
 function GoogleIcon() {
   return (
@@ -66,107 +63,415 @@ function LoadingSpinner() {
   );
 }
 
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+    },
+  },
+};
+
+const logoVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+    },
+  },
+};
+
+const rightPanelVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 80,
+      damping: 20,
+      delay: 0.3,
+    },
+  },
+};
+
+const floatingAnimation = {
+  y: [-10, 10, -10],
+  transition: {
+    duration: 6,
+    repeat: Infinity,
+    ease: "easeInOut",
+  },
+};
+
 export default function SignUpPage() {
   const { registerWithEmail, isLoading, error, clearError } = useRegister();
   const { initiateOAuth, isLoading: isOAuthLoading, loadingProvider } = useOAuth();
 
-  const handleEmailRegister = async (data: RegisterFormState) => {
-    clearError();
-    await registerWithEmail({
-      email: data.email,
-      password: data.password,
-      username: data.username,
-      name: data.name,
-      bio: data.bio,
-      is_freelancer: data.is_freelancer,
-    });
-  };
-
-  const handleGoogleSignUp = () => {
-    initiateOAuth("google");
-  };
-
-  const handleGithubSignUp = () => {
-    initiateOAuth("github");
-  };
+  const [formData, setFormData] = useState({
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const isDisabled = isLoading || isOAuthLoading;
 
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setValidationError(null);
+    clearError();
+  };
+
+  const validateForm = (): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.email.trim()) {
+      setValidationError("Email is required");
+      return false;
+    }
+    if (!emailRegex.test(formData.email)) {
+      setValidationError("Please enter a valid email");
+      return false;
+    }
+    if (!formData.username.trim()) {
+      setValidationError("Username is required");
+      return false;
+    }
+    if (formData.username.length < 3) {
+      setValidationError("Username must be at least 3 characters");
+      return false;
+    }
+    if (!formData.password) {
+      setValidationError("Password is required");
+      return false;
+    }
+    if (formData.password.length < 8) {
+      setValidationError("Password must be at least 8 characters");
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setValidationError("Passwords do not match");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    await registerWithEmail({
+      email: formData.email,
+      username: formData.username,
+      password: formData.password,
+    });
+  };
+
+  const handleGoogleSignUp = () => initiateOAuth("google");
+  const handleGithubSignUp = () => initiateOAuth("github");
+
   return (
-    <div className="min-h-screen bg-muted flex flex-col">
-      <AuthHeader />
-      <div className="flex flex-col items-center justify-start flex-1 px-4 pt-8 pb-8">
-        <Card className="w-full max-w-md p-8 shadow-lg">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Create your account
-            </h1>
-            <p className="text-sm text-gray-500">
-              Join thousands of professionals on OfferHub
-            </p>
-          </div>
+    <div className="min-h-screen flex">
+      {/* Left Panel - Form */}
+      <div className="w-full lg:w-1/2 flex flex-col p-6 lg:p-8 bg-white overflow-y-auto">
+        {/* Logo Header */}
+        <motion.div
+          variants={logoVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <Link href="/" className="flex items-center gap-2 mb-6">
+            <Image
+              src="/dark_logo.svg"
+              alt="OfferHub"
+              width={28}
+              height={28}
+            />
+            <span className="text-lg font-semibold text-gray-900">OFFER-HUB</span>
+          </Link>
+        </motion.div>
+
+        {/* Form Content */}
+        <motion.div
+          className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="mb-4" variants={itemVariants}>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-1">Sign up now</h1>
+            <p className="text-gray-500 text-sm">Create a free account</p>
+          </motion.div>
 
           {/* OAuth Buttons */}
-          <div className="space-y-3 mb-6">
-            <Button
+          <motion.div className="space-y-2 mb-4" variants={itemVariants}>
+            <motion.button
               type="button"
-              variant="outline"
-              className="w-full py-6 text-base font-medium border-gray-300 hover:bg-gray-50 transition-colors"
               onClick={handleGoogleSignUp}
               disabled={isDisabled}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {loadingProvider === "google" ? (
-                <LoadingSpinner />
-              ) : (
-                <GoogleIcon />
-              )}
-              <span className="ml-3">Continue with Google</span>
-            </Button>
+              {loadingProvider === "google" ? <LoadingSpinner /> : <GoogleIcon />}
+              <span className="text-gray-700 font-medium text-sm">Sign up with Google</span>
+            </motion.button>
 
-            <Button
+            <motion.button
               type="button"
-              className="w-full py-6 text-base font-medium bg-[#24292e] hover:bg-[#1b1f23] text-white transition-colors"
               onClick={handleGithubSignUp}
               disabled={isDisabled}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-[#24292e] text-white rounded-lg hover:bg-[#1b1f23] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {loadingProvider === "github" ? (
-                <LoadingSpinner />
-              ) : (
-                <GithubIcon />
-              )}
-              <span className="ml-3">Continue with GitHub</span>
-            </Button>
-          </div>
+              {loadingProvider === "github" ? <LoadingSpinner /> : <GithubIcon />}
+              <span className="font-medium text-sm">Sign up with GitHub</span>
+            </motion.button>
+          </motion.div>
 
           {/* Divider */}
-          <div className="relative mb-6">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-sm text-gray-500">
-              or
-            </span>
-          </div>
+          <motion.div className="relative my-4" variants={itemVariants}>
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">or</span>
+            </div>
+          </motion.div>
 
           {/* Email/Password Form */}
-          <EmailPasswordForm
-            onSubmit={handleEmailRegister}
-            isLoading={isLoading}
-            error={error}
-            mode="register"
-          />
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Email */}
+            <motion.div variants={itemVariants}>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                disabled={isDisabled}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#149A9B] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 text-sm transition-shadow"
+                placeholder="Email address"
+              />
+            </motion.div>
+
+            {/* Username */}
+            <motion.div variants={itemVariants}>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                value={formData.username}
+                onChange={(e) => handleInputChange("username", e.target.value)}
+                disabled={isDisabled}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#149A9B] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 text-sm transition-shadow"
+                placeholder="Username"
+              />
+            </motion.div>
+
+            {/* Password */}
+            <motion.div variants={itemVariants}>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  disabled={isDisabled}
+                  className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#149A9B] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 text-sm transition-shadow"
+                  placeholder="Password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Confirm Password */}
+            <motion.div variants={itemVariants}>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                Repeat password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                  disabled={isDisabled}
+                  className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#149A9B] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 text-sm transition-shadow"
+                  placeholder="Repeat password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+
+            {/* Error message */}
+            {(validationError || error) && (
+              <motion.div
+                className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 100 }}
+              >
+                <p className="text-sm text-red-600">{validationError || error}</p>
+              </motion.div>
+            )}
+
+            {/* Submit Button */}
+            <motion.button
+              type="submit"
+              disabled={isDisabled}
+              className="w-full bg-[#002333] text-white py-2.5 px-4 rounded-lg font-medium hover:bg-[#003344] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {isLoading && <LoadingSpinner />}
+              Sign up
+            </motion.button>
+          </form>
 
           {/* Sign In Link */}
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <motion.p
+            className="mt-4 text-center text-sm text-gray-600"
+            variants={itemVariants}
+          >
             Already have an account?{" "}
-            <Link
-              href="/onboarding/sign-in"
-              className="text-[#149A9B] font-medium hover:underline"
-            >
+            <Link href="/onboarding/sign-in" className="text-[#149A9B] font-medium hover:underline">
               Sign in
             </Link>
-          </div>
-        </Card>
+          </motion.p>
+        </motion.div>
       </div>
+
+      {/* Right Panel - Branding */}
+      <motion.div
+        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#149A9B] to-[#0d7377] flex-col items-center justify-center p-12 relative overflow-hidden"
+        variants={rightPanelVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
+
+        {/* Content - Logo only with floating animation */}
+        <motion.div
+          className="relative z-10"
+          animate={floatingAnimation}
+        >
+          <Image
+            src="/OFFER-HUB-light.png"
+            alt="OfferHub"
+            width={300}
+            height={300}
+            className="mx-auto"
+          />
+        </motion.div>
+
+        {/* Decorative circles with animations */}
+        <motion.div
+          className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 w-48 h-48 bg-white/10 rounded-full blur-xl"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.1, 0.15, 0.1],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 right-10 w-24 h-24 bg-white/5 rounded-full blur-lg"
+          animate={{
+            y: [-20, 20, -20],
+            x: [-10, 10, -10],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </motion.div>
     </div>
   );
 }

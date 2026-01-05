@@ -78,9 +78,9 @@ const OnboardingContent = () => {
 
   const handleLandingAction = (action: "sign-up" | "sign-in") => {
     if (action === "sign-up") {
-      navigateToStep("connect-wallet");
+      router.push("/onboarding/sign-up");
     } else {
-      navigateToStep("sign-in");
+      router.push("/onboarding/sign-in");
     }
   };
 
