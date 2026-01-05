@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { AuthHeader } from "@/components/auth/AuthHeader";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import { useRegister } from "@/hooks/auth/use-register";
 import { useOAuth } from "@/hooks/auth/use-oauth";
 import { LoginWithEmailPayload } from "@/types/auth-register.types";
-import Link from "next/link";
 
 function GoogleIcon() {
   return (
@@ -66,9 +64,71 @@ function LoadingSpinner() {
   );
 }
 
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+    },
+  },
+};
+
+const logoVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+    },
+  },
+};
+
+const rightPanelVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 80,
+      damping: 20,
+      delay: 0.3,
+    },
+  },
+};
+
+const floatingAnimation = {
+  y: [-10, 10, -10],
+  transition: {
+    duration: 6,
+    repeat: Infinity,
+    ease: "easeInOut",
+  },
+};
+
 export function SignInPage() {
   const { loginWithEmail, isLoading, error, clearError } = useRegister();
   const { initiateOAuth, isLoading: isOAuthLoading, loadingProvider } = useOAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -76,144 +136,137 @@ export function SignInPage() {
 
   const isDisabled = isLoading || isOAuthLoading;
 
+  const handleInputChange = (field: "email" | "password", value: string) => {
+    if (field === "email") setEmail(value);
+    else setPassword(value);
+    setValidationError(null);
+    clearError();
+  };
+
   const validateForm = (): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!email.trim()) {
       setValidationError("Email is required");
       return false;
-    } else if (!emailRegex.test(email)) {
-      setValidationError("Invalid email format");
+    }
+    if (!emailRegex.test(email)) {
+      setValidationError("Please enter a valid email");
       return false;
     }
-
     if (!password) {
       setValidationError("Password is required");
       return false;
-    } else if (password.length < 8) {
+    }
+    if (password.length < 8) {
       setValidationError("Password must be at least 8 characters");
       return false;
     }
-
-    setValidationError(null);
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
-
     if (!validateForm()) return;
 
-    const payload: LoginWithEmailPayload = {
-      email,
-      password,
-    };
-
+    const payload: LoginWithEmailPayload = { email, password };
     await loginWithEmail(payload);
   };
 
-  const handleGoogleSignIn = () => {
-    initiateOAuth("google");
-  };
-
-  const handleGithubSignIn = () => {
-    initiateOAuth("github");
-  };
-
-  const EyeIcon = () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-
-  const EyeOffIcon = () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-      <line x1="1" y1="1" x2="23" y2="23" />
-    </svg>
-  );
+  const handleGoogleSignIn = () => initiateOAuth("google");
+  const handleGithubSignIn = () => initiateOAuth("github");
 
   return (
-    <div className="min-h-screen bg-muted flex flex-col">
-      <AuthHeader />
-      <div className="flex flex-col items-center justify-start flex-1 px-4 pt-8 pb-8">
-        <Card className="w-full max-w-md p-8 shadow-lg">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Welcome back
-            </h1>
-            <p className="text-sm text-gray-500">
-              Sign in to your account
-            </p>
-          </div>
+    <div className="min-h-screen flex">
+      {/* Left Panel - Form */}
+      <div className="w-full lg:w-1/2 flex flex-col p-6 lg:p-8 bg-white overflow-y-auto">
+        {/* Logo Header */}
+        <motion.div
+          variants={logoVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <Link href="/" className="flex items-center gap-2 mb-6">
+            <Image
+              src="/dark_logo.svg"
+              alt="OfferHub"
+              width={28}
+              height={28}
+            />
+            <span className="text-lg font-semibold text-gray-900">OFFER-HUB</span>
+          </Link>
+        </motion.div>
+
+        {/* Form Content */}
+        <motion.div
+          className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="mb-4" variants={itemVariants}>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-1">Welcome back</h1>
+            <p className="text-gray-500 text-sm">Sign in to your account</p>
+          </motion.div>
 
           {/* OAuth Buttons */}
-          <div className="space-y-3 mb-6">
-            <Button
+          <motion.div className="space-y-2 mb-4" variants={itemVariants}>
+            <motion.button
               type="button"
-              variant="outline"
-              className="w-full py-6 text-base font-medium border-gray-300 hover:bg-gray-50 transition-colors"
               onClick={handleGoogleSignIn}
               disabled={isDisabled}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {loadingProvider === "google" ? (
-                <LoadingSpinner />
-              ) : (
-                <GoogleIcon />
-              )}
-              <span className="ml-3">Continue with Google</span>
-            </Button>
+              {loadingProvider === "google" ? <LoadingSpinner /> : <GoogleIcon />}
+              <span className="text-gray-700 font-medium text-sm">Sign in with Google</span>
+            </motion.button>
 
-            <Button
+            <motion.button
               type="button"
-              className="w-full py-6 text-base font-medium bg-[#24292e] hover:bg-[#1b1f23] text-white transition-colors"
               onClick={handleGithubSignIn}
               disabled={isDisabled}
+              className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-[#24292e] text-white rounded-lg hover:bg-[#1b1f23] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              {loadingProvider === "github" ? (
-                <LoadingSpinner />
-              ) : (
-                <GithubIcon />
-              )}
-              <span className="ml-3">Continue with GitHub</span>
-            </Button>
-          </div>
+              {loadingProvider === "github" ? <LoadingSpinner /> : <GithubIcon />}
+              <span className="font-medium text-sm">Sign in with GitHub</span>
+            </motion.button>
+          </motion.div>
 
           {/* Divider */}
-          <div className="relative mb-6">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-sm text-gray-500">
-              or
-            </span>
-          </div>
+          <motion.div className="relative my-4" variants={itemVariants}>
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">or</span>
+            </div>
+          </motion.div>
 
           {/* Email/Password Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#344054] mb-2">
-                Email
+            <motion.div variants={itemVariants}>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email address
               </label>
               <input
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setValidationError(null);
-                }}
+                onChange={(e) => handleInputChange("email", e.target.value)}
                 disabled={isDisabled}
-                className="w-full px-4 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-[#19213D] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-[#667085]"
-                placeholder="you@example.com"
-                required
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#149A9B] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 text-sm transition-shadow"
+                placeholder="Email address"
               />
-            </div>
+            </motion.div>
 
             {/* Password */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#344054] mb-2">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -221,64 +274,146 @@ export function SignInPage() {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setValidationError(null);
-                  }}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
                   disabled={isDisabled}
-                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-md focus:ring-2 focus:ring-[#19213D] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-[#667085]"
-                  placeholder="Enter your password"
-                  required
+                  className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#149A9B] focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 text-sm transition-shadow"
+                  placeholder="Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  disabled={isDisabled}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
                 </button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Forgot Password Link */}
-            <div className="text-right">
+            <motion.div className="text-right" variants={itemVariants}>
               <Link
                 href="/onboarding/password"
                 className="text-sm text-[#149A9B] hover:underline"
               >
                 Forgot password?
               </Link>
-            </div>
+            </motion.div>
 
             {/* Error message */}
             {(validationError || error) && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+              <motion.div
+                className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 100 }}
+              >
                 <p className="text-sm text-red-600">{validationError || error}</p>
-              </div>
+              </motion.div>
             )}
 
-            {/* Submit button */}
-            <button
+            {/* Submit Button */}
+            <motion.button
               type="submit"
               disabled={isDisabled}
-              className="w-full bg-[#002333] text-white py-3 px-4 rounded-full font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#19213D] focus:ring-offset-2 flex items-center justify-center gap-2"
+              className="w-full bg-[#002333] text-white py-2.5 px-4 rounded-lg font-medium hover:bg-[#003344] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               {isLoading && <LoadingSpinner />}
-              Sign In
-            </button>
+              Sign in
+            </motion.button>
           </form>
 
           {/* Sign Up Link */}
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <motion.p
+            className="mt-4 text-center text-sm text-gray-600"
+            variants={itemVariants}
+          >
             Don&apos;t have an account?{" "}
             <Link href="/onboarding/sign-up" className="text-[#149A9B] font-medium hover:underline">
               Sign up
             </Link>
-          </div>
-        </Card>
+          </motion.p>
+        </motion.div>
       </div>
+
+      {/* Right Panel - Branding */}
+      <motion.div
+        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#149A9B] to-[#0d7377] flex-col items-center justify-center p-12 relative overflow-hidden"
+        variants={rightPanelVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
+
+        {/* Content - Logo only with floating animation */}
+        <motion.div
+          className="relative z-10"
+          animate={floatingAnimation}
+        >
+          <Image
+            src="/OFFER-HUB-light.png"
+            alt="OfferHub"
+            width={300}
+            height={300}
+            className="mx-auto"
+          />
+        </motion.div>
+
+        {/* Decorative circles with animations */}
+        <motion.div
+          className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 w-48 h-48 bg-white/10 rounded-full blur-xl"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.1, 0.15, 0.1],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 right-10 w-24 h-24 bg-white/5 rounded-full blur-lg"
+          animate={{
+            y: [-20, 20, -20],
+            x: [-10, 10, -10],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </motion.div>
     </div>
   );
 }
