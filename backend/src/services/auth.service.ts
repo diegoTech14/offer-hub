@@ -331,13 +331,13 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
     });
 
     // Generate tokens
-    const accessToken = signAccessToken({ 
+    const accessToken = signAccessToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
       permissions: []
     });
-    const { refreshToken, refreshTokenHash } = signRefreshToken({
+    const { refreshToken, refreshTokenHash, expiresAt } = signRefreshToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
@@ -347,7 +347,7 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
     // Save refresh token in DB
     const { error: rtInsertError } = await supabase
       .from("refresh_tokens")
-      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash }]);
+      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash, expires_at: expiresAt.toISOString() }]);
 
     if (rtInsertError) {
       throw new AppError("Failed to persist refresh token", 500);
@@ -495,13 +495,13 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
     });
 
     // Generate tokens
-    const accessToken = signAccessToken({ 
+    const accessToken = signAccessToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
       permissions: []
     });
-    const { refreshToken, refreshTokenHash } = signRefreshToken({
+    const { refreshToken, refreshTokenHash, expiresAt } = signRefreshToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
@@ -511,7 +511,7 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
     // Save refresh token in DB
     const { error: rtInsertError } = await supabase
       .from("refresh_tokens")
-      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash }]);
+      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash, expires_at: expiresAt.toISOString() }]);
 
     if (rtInsertError) {
       throw new AppError("Failed to persist refresh token", 500);
@@ -568,13 +568,13 @@ export async function login(data: LoginDTO) {
     .eq("wallet_address", wallet_address);
 
   // Issue tokens
-  const accessToken = signAccessToken({ 
+  const accessToken = signAccessToken({
     sub: user.id,
     email: user.email || '',
     role: user.role || UserRole.CLIENT,
     permissions: user.permissions?.map((p: any) => p.name) || []
   });
-  const { refreshToken, refreshTokenHash } = signRefreshToken({
+  const { refreshToken, refreshTokenHash, expiresAt } = signRefreshToken({
     sub: user.id,
     email: user.email || '',
     role: user.role || UserRole.CLIENT,
@@ -583,7 +583,7 @@ export async function login(data: LoginDTO) {
 
   const { error: rtInsertError } = await supabase
     .from("refresh_tokens")
-    .insert([{ user_id: user.id, token_hash: refreshTokenHash }]);
+    .insert([{ user_id: user.id, token_hash: refreshTokenHash, expires_at: expiresAt.toISOString() }]);
 
   if (rtInsertError) {
     throw new AppError("Failed to persist refresh token", 500);
