@@ -5,7 +5,7 @@
 
 import { BaseOAuthService } from './oauth-base.service';
 import { OAuthProvider, OAuthProfile, OAuthTokenData } from '@/types/oauth.types';
-import axios from 'axios';
+import { oauthAxios } from '@/config/axios.config';
 
 /**
  * Microsoft OAuth service
@@ -40,7 +40,7 @@ export class MicrosoftOAuthService extends BaseOAuthService {
    */
   async exchangeCodeForTokens(code: string): Promise<OAuthTokenData> {
     try {
-      const response = await axios.post(
+      const response = await oauthAxios.post(
         this.tokenUrl,
         {
           client_id: this.config.clientId,
@@ -76,7 +76,7 @@ export class MicrosoftOAuthService extends BaseOAuthService {
    */
   async getUserProfile(accessToken: string): Promise<OAuthProfile> {
     try {
-      const response = await axios.get(this.userInfoUrl, {
+      const response = await oauthAxios.get(this.userInfoUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -110,7 +110,7 @@ export class MicrosoftOAuthService extends BaseOAuthService {
    */
   async refreshAccessToken(refreshToken: string): Promise<OAuthTokenData> {
     try {
-      const response = await axios.post(
+      const response = await oauthAxios.post(
         this.tokenUrl,
         {
           client_id: this.config.clientId,

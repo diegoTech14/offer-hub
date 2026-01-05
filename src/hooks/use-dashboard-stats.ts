@@ -45,10 +45,12 @@ export function useDashboardStats(): UseDashboardStatsReturn {
     setError(null);
 
     try {
+      const authMethod = localStorage.getItem("authMethod");
       const accessToken = localStorage.getItem("accessToken");
-      
-      if (!accessToken) {
-        // No token - set empty stats and finish loading
+
+      // Check if user is authenticated
+      if (!authMethod && !accessToken) {
+        // No auth - set empty stats and finish loading
         setStats({
           activeProjects: 0,
           completedProjects: 0,
@@ -60,12 +62,22 @@ export function useDashboardStats(): UseDashboardStatsReturn {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/projects`, {
+      // Build fetch options based on auth method
+      const fetchOptions: RequestInit = {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-      });
+      };
+
+      if (authMethod === "cookie") {
+        // Cookie-based auth: include cookies
+        fetchOptions.credentials = "include";
+      } else if (accessToken && accessToken !== "cookie-auth") {
+        // Token-based auth: add Authorization header
+        (fetchOptions.headers as Record<string, string>).Authorization = `Bearer ${accessToken}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/projects`, fetchOptions);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

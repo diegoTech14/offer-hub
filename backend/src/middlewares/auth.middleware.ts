@@ -75,9 +75,16 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
         return next();
       }
 
-      // Extract token from Authorization header
-      const token = extractTokenFromHeader(req.headers.authorization);
-      
+      // Extract token from Authorization header or cookies
+      let token = extractTokenFromHeader(req.headers.authorization);
+
+      // If no token in header, check cookies (for OAuth flow)
+      // Note: cookie-parser populates req.cookies
+      const cookieToken = req.cookies?.accessToken;
+      if (!token && cookieToken) {
+        token = cookieToken;
+      }
+
       if (!token) {
         await logAuthAttempt({
           ...securityContext,

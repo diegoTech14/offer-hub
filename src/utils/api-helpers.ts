@@ -20,12 +20,46 @@ export function getErrorMessage(err: unknown): string {
 export function withAuth(
   headers?: Record<string, string>
 ): Record<string, string> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+  if (typeof window === "undefined") {
+    return { "Content-Type": "application/json", ...(headers || {}) };
+  }
+
+  const authMethod = localStorage.getItem("authMethod");
+
+  // For cookie-based auth, don't add Authorization header
+  // The cookies will be sent automatically with withCredentials
+  if (authMethod === "cookie") {
+    return { "Content-Type": "application/json", ...(headers || {}) };
+  }
+
+  // Token-based auth: check both possible token keys
+  const token = localStorage.getItem("accessToken") || localStorage.getItem("auth_token");
+
+  // Don't send placeholder token
+  if (token && token !== "cookie-auth") {
+    return {
+      "Content-Type": "application/json",
+      ...(headers || {}),
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
+  return { "Content-Type": "application/json", ...(headers || {}) };
+}
+
+/**
+ * Check if using cookie-based authentication
+ */
+export function isCookieAuth(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem("authMethod") === "cookie";
+}
+
+function getAxiosConfig(config?: AxiosRequestConfig): AxiosRequestConfig {
   return {
-    "Content-Type": "application/json",
-    ...(headers || {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(config || {}),
+    headers: withAuth(config?.headers as Record<string, string> | undefined),
+    withCredentials: isCookieAuth(),
   };
 }
 
@@ -33,10 +67,7 @@ export async function httpGet<T>(
   endpoint: string,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const res = await axios.get<T>(`${API_BASE_URL}${endpoint}`, {
-    ...(config || {}),
-    headers: withAuth(config?.headers as Record<string, string> | undefined),
-  });
+  const res = await axios.get<T>(`${API_BASE_URL}${endpoint}`, getAxiosConfig(config));
   return res.data as T;
 }
 
@@ -45,10 +76,7 @@ export async function httpPost<T>(
   body?: unknown,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const res = await axios.post<T>(`${API_BASE_URL}${endpoint}`, body, {
-    ...(config || {}),
-    headers: withAuth(config?.headers as Record<string, string> | undefined),
-  });
+  const res = await axios.post<T>(`${API_BASE_URL}${endpoint}`, body, getAxiosConfig(config));
   return res.data as T;
 }
 
@@ -57,10 +85,7 @@ export async function httpPut<T>(
   body?: unknown,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const res = await axios.put<T>(`${API_BASE_URL}${endpoint}`, body, {
-    ...(config || {}),
-    headers: withAuth(config?.headers as Record<string, string> | undefined),
-  });
+  const res = await axios.put<T>(`${API_BASE_URL}${endpoint}`, body, getAxiosConfig(config));
   return res.data as T;
 }
 
@@ -69,10 +94,7 @@ export async function httpPatch<T>(
   body?: unknown,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const res = await axios.patch<T>(`${API_BASE_URL}${endpoint}`, body, {
-    ...(config || {}),
-    headers: withAuth(config?.headers as Record<string, string> | undefined),
-  });
+  const res = await axios.patch<T>(`${API_BASE_URL}${endpoint}`, body, getAxiosConfig(config));
   return res.data as T;
 }
 
@@ -80,10 +102,7 @@ export async function httpDelete<T>(
   endpoint: string,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  const res = await axios.delete<T>(`${API_BASE_URL}${endpoint}`, {
-    ...(config || {}),
-    headers: withAuth(config?.headers as Record<string, string> | undefined),
-  });
+  const res = await axios.delete<T>(`${API_BASE_URL}${endpoint}`, getAxiosConfig(config));
   return res.data as T;
 }
 
