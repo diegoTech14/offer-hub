@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -64,6 +64,33 @@ function LoadingSpinner() {
   );
 }
 
+function CheckIcon() {
+  return (
+    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fillRule="evenodd"
+        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function CircleIcon() {
+  return (
+    <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" strokeWidth={2} />
+    </svg>
+  );
+}
+
+interface PasswordCriteria {
+  isLengthValid: boolean;
+  hasUpperLower: boolean;
+  hasNumber: boolean;
+  hasSpecialChar: boolean;
+}
+
 export default function SignUpPage() {
   const { registerWithEmail, isLoading, error, errorDetails, clearError } = useRegister();
   const { initiateOAuth, isLoading: isOAuthLoading, loadingProvider } = useOAuth();
@@ -79,6 +106,24 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const isDisabled = isLoading || isOAuthLoading;
+
+  // Password strength criteria
+  const criteria: PasswordCriteria = useMemo(
+    () => ({
+      isLengthValid: formData.password.length >= 8,
+      hasUpperLower: /[a-z]/.test(formData.password) && /[A-Z]/.test(formData.password),
+      hasNumber: /\d/.test(formData.password),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password),
+    }),
+    [formData.password]
+  );
+
+  const passwordsMatch = formData.password === formData.confirmPassword && formData.password.length > 0;
+  const allCriteriaMet =
+    criteria.isLengthValid &&
+    criteria.hasUpperLower &&
+    criteria.hasNumber &&
+    criteria.hasSpecialChar;
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -109,8 +154,8 @@ export default function SignUpPage() {
       setValidationError("Password is required");
       return false;
     }
-    if (formData.password.length < 8) {
-      setValidationError("Password must be at least 8 characters");
+    if (!allCriteriaMet) {
+      setValidationError("Password does not meet all requirements");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -277,6 +322,35 @@ export default function SignUpPage() {
                     )}
                   </button>
                 </div>
+
+                {/* Password strength criteria */}
+                {formData.password.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mt-3 space-y-2"
+                  >
+                    <p className="text-xs font-medium text-gray-600">Password requirements:</p>
+                    <ul className="space-y-1">
+                      <li className={`flex items-center gap-2 text-xs ${criteria.isLengthValid ? "text-green-600" : "text-gray-500"}`}>
+                        {criteria.isLengthValid ? <CheckIcon /> : <CircleIcon />}
+                        At least 8 characters
+                      </li>
+                      <li className={`flex items-center gap-2 text-xs ${criteria.hasUpperLower ? "text-green-600" : "text-gray-500"}`}>
+                        {criteria.hasUpperLower ? <CheckIcon /> : <CircleIcon />}
+                        Uppercase and lowercase letters
+                      </li>
+                      <li className={`flex items-center gap-2 text-xs ${criteria.hasNumber ? "text-green-600" : "text-gray-500"}`}>
+                        {criteria.hasNumber ? <CheckIcon /> : <CircleIcon />}
+                        At least one number
+                      </li>
+                      <li className={`flex items-center gap-2 text-xs ${criteria.hasSpecialChar ? "text-green-600" : "text-gray-500"}`}>
+                        {criteria.hasSpecialChar ? <CheckIcon /> : <CircleIcon />}
+                        At least one special character
+                      </li>
+                    </ul>
+                  </motion.div>
+                )}
               </div>
 
               {/* Confirm Password */}
@@ -291,7 +365,13 @@ export default function SignUpPage() {
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                     disabled={isDisabled}
-                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#149A9B]/20 focus:border-[#149A9B] outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 transition-all"
+                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-[#149A9B]/20 focus:border-[#149A9B] outline-none disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 transition-all ${
+                      formData.confirmPassword && !passwordsMatch
+                        ? "border-red-300"
+                        : formData.confirmPassword && passwordsMatch
+                        ? "border-green-300"
+                        : "border-gray-200"
+                    }`}
                     placeholder="Confirm your password"
                   />
                   <button
@@ -311,6 +391,14 @@ export default function SignUpPage() {
                     )}
                   </button>
                 </div>
+                {formData.confirmPassword && !passwordsMatch && (
+                  <p className="mt-1.5 text-xs text-red-500">Passwords do not match</p>
+                )}
+                {formData.confirmPassword && passwordsMatch && (
+                  <p className="mt-1.5 text-xs text-green-500 flex items-center gap-1">
+                    <CheckIcon /> Passwords match
+                  </p>
+                )}
               </div>
 
               {/* Error message */}
@@ -349,10 +437,10 @@ export default function SignUpPage() {
               {/* Submit Button */}
               <motion.button
                 type="submit"
-                disabled={isDisabled}
+                disabled={isDisabled || !allCriteriaMet || !passwordsMatch}
                 className="w-full bg-[#149A9B] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#0d7377] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
+                whileHover={{ scale: allCriteriaMet && passwordsMatch ? 1.01 : 1 }}
+                whileTap={{ scale: allCriteriaMet && passwordsMatch ? 0.99 : 1 }}
               >
                 {isLoading && <LoadingSpinner />}
                 Create account
