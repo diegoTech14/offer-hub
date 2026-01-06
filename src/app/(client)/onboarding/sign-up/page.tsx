@@ -66,7 +66,7 @@ function LoadingSpinner() {
 
 function CheckIcon() {
   return (
-    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+    <svg className="w-3 h-3 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
       <path
         fillRule="evenodd"
         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -78,7 +78,7 @@ function CheckIcon() {
 
 function CircleIcon() {
   return (
-    <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-3 h-3 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="10" strokeWidth={2} />
     </svg>
   );
@@ -328,25 +328,24 @@ export default function SignUpPage() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="mt-3 space-y-2"
+                    className="mt-2"
                   >
-                    <p className="text-xs font-medium text-gray-600">Password requirements:</p>
-                    <ul className="space-y-1">
-                      <li className={`flex items-center gap-2 text-xs ${criteria.isLengthValid ? "text-green-600" : "text-gray-500"}`}>
+                    <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                      <li className={`flex items-center gap-1 text-[10px] ${criteria.isLengthValid ? "text-green-600" : "text-gray-400"}`}>
                         {criteria.isLengthValid ? <CheckIcon /> : <CircleIcon />}
-                        At least 8 characters
+                        8+ characters
                       </li>
-                      <li className={`flex items-center gap-2 text-xs ${criteria.hasUpperLower ? "text-green-600" : "text-gray-500"}`}>
+                      <li className={`flex items-center gap-1 text-[10px] ${criteria.hasUpperLower ? "text-green-600" : "text-gray-400"}`}>
                         {criteria.hasUpperLower ? <CheckIcon /> : <CircleIcon />}
-                        Uppercase and lowercase letters
+                        Upper & lowercase
                       </li>
-                      <li className={`flex items-center gap-2 text-xs ${criteria.hasNumber ? "text-green-600" : "text-gray-500"}`}>
+                      <li className={`flex items-center gap-1 text-[10px] ${criteria.hasNumber ? "text-green-600" : "text-gray-400"}`}>
                         {criteria.hasNumber ? <CheckIcon /> : <CircleIcon />}
-                        At least one number
+                        One number
                       </li>
-                      <li className={`flex items-center gap-2 text-xs ${criteria.hasSpecialChar ? "text-green-600" : "text-gray-500"}`}>
+                      <li className={`flex items-center gap-1 text-[10px] ${criteria.hasSpecialChar ? "text-green-600" : "text-gray-400"}`}>
                         {criteria.hasSpecialChar ? <CheckIcon /> : <CircleIcon />}
-                        At least one special character
+                        One special char
                       </li>
                     </ul>
                   </motion.div>
