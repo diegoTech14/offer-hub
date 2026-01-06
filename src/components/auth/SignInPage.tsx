@@ -218,7 +218,7 @@ export function SignInPage() {
                     Password
                   </label>
                   <Link
-                    href="/onboarding/password"
+                    href="/onboarding/forgot-password"
                     className="text-sm text-[#149A9B] hover:text-[#0d7377] transition-colors"
                   >
                     Forgot?
