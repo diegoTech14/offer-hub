@@ -135,7 +135,7 @@ export async function sendPasswordResetEmail(
   resetUrl?: string
 ): Promise<void> {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-  const resetLink = resetUrl || `${frontendUrl}/reset-password?token=${resetToken}`;
+  const resetLink = resetUrl || `${frontendUrl}/onboarding/reset-password?token=${resetToken}`;
 
   const html = `
     <!DOCTYPE html>
