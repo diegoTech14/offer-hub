@@ -82,37 +82,43 @@ export default function RootLayout({
             `,
           }}
         />
-        <ThemeProvider>
-          <TrustlessWorkProvider>
-            <ErrorBoundary>
-              <NotificationProvider>
-                <TalentProvider>
-                  <MessageProvider>
-                    <OfferProvider>
-                      <WalletProvider>
-                        <EscrowProvider>
-                          <KeyboardShortcutsProvider>
-                            {/* LoadingIndicator agregado según rama secundaria */}
-                            <LoadingIndicator />
-                            <Suspense fallback={null}>
-                              <main>
-                                {children}
-                              </main>
-                              <NotificationToast />
-                              {/* ScrollToTop agregado según rama secundaria */}
-                              <ScrollToTop />
-                            </Suspense>
-                            <Toaster position="top-right" />
-                          </KeyboardShortcutsProvider>
-                        </EscrowProvider>
-                      </WalletProvider>
-                    </OfferProvider>
-                  </MessageProvider>
-                </TalentProvider>
-              </NotificationProvider>
-            </ErrorBoundary>
-          </TrustlessWorkProvider>
-        </ThemeProvider>
+        <TanStackQueryProvider>
+          <AuthProvider>
+            <RoleProvider>
+              <ThemeProvider>
+                <TrustlessWorkProvider>
+                  <ErrorBoundary>
+                    <NotificationProvider>
+                      <TalentProvider>
+                        <MessageProvider>
+                          <OfferProvider>
+                            <WalletProvider>
+                              <EscrowProvider>
+                                <KeyboardShortcutsProvider>
+                                  {/* LoadingIndicator agregado según rama secundaria */}
+                                  <LoadingIndicator />
+                                  <Suspense fallback={null}>
+                                    <main>
+                                      {children}
+                                    </main>
+                                    <NotificationToast />
+                                    {/* ScrollToTop agregado según rama secundaria */}
+                                    <ScrollToTop />
+                                  </Suspense>
+                                  <Toaster position="top-right" />
+                                </KeyboardShortcutsProvider>
+                              </EscrowProvider>
+                            </WalletProvider>
+                          </OfferProvider>
+                        </MessageProvider>
+                      </TalentProvider>
+                    </NotificationProvider>
+                  </ErrorBoundary>
+                </TrustlessWorkProvider>
+              </ThemeProvider>
+            </RoleProvider>
+          </AuthProvider>
+        </TanStackQueryProvider>
       </body>
     </html>
   );
