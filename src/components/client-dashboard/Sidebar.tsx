@@ -8,6 +8,7 @@ import {
   Wallet,
   MessageSquare,
   LogOut,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -44,6 +45,11 @@ const navigationItems = [
     icon: MessageSquare,
     href: "/dashboard/messages",
   },
+  {
+    title: "Profile",
+    icon: Star,
+    href: "/onboarding/dashboard/profile",
+  },
 ];
 
 export function ClientSidebar() {
@@ -53,6 +59,11 @@ export function ClientSidebar() {
     <div className="w-[252px] bg-white border-r border-gray-200 flex-col h-screen hidden md:flex">
       <nav className="flex-1 px-4 py-8">
         <ul className="space-y-4">
+          <div className="px-4 mb-4">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              Client Menu
+            </span>
+          </div>
           {navigationItems.map((item) => {
             const isActive = pathname === item.href;
             return (
