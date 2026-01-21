@@ -1,41 +1,51 @@
-/**
- * @fileoverview Client dashboard page for managing user projects and activities
- * @author Offer Hub Team
- */
-
 "use client";
 
-import { DashboardEmptyState } from "@/components/client-dashboard/DashboardEmptyState.tsx";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ClientDashboard } from "@/components/dashboard/ClientDashboard";
+import { FreelancerDashboard } from "@/components/dashboard/FreelancerDashboard";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function DashboardPage() {
-  const [hasJobsOrContracts] = useState(false);
+  const [isFreelancer, setIsFreelancer] = useState(false);
+
+  // Sync with localStorage so the Layout can also see it
+  useEffect(() => {
+    const savedRole = localStorage.getItem("userRole");
+    setIsFreelancer(savedRole === "freelancer");
+  }, []);
+
+  const handleToggle = (checked: boolean) => {
+    setIsFreelancer(checked);
+    localStorage.setItem("userRole", checked ? "freelancer" : "client");
+    // Reload to let the Layout update its sidebar
+    window.location.reload();
+  };
 
   return (
-    <>
-      <div className="w-full border-b border-gray-200 bg-white py-3 text-center mb-6">
-        <h1 className="text-sm font-semibold text-gray-800">Dashboard</h1>
-      </div>
-
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium text-gray-800">
-          Good Morning John Doe
-        </h2>
-        <Button className="bg-teal-600 hover:bg-teal-700 text-white">
-          <Plus className="w-4 h-4 mr-2" />
-          Post Job
-        </Button>
-      </div>
-
-      {hasJobsOrContracts ? (
-        <div className="p-6 rounded-md bg-white shadow-sm">
-          <p>Dashboard content with jobs/contracts would go here</p>
+    <div className="max-w-[1600px] mx-auto p-4 md:p-8">
+      {/* Role Switcher for Development Preview */}
+      <div className="mb-8 flex items-center space-x-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm w-fit transition-all hover:shadow-md">
+        <div className={`p-2 rounded-lg ${isFreelancer ? 'bg-indigo-50 text-indigo-600' : 'bg-teal-50 text-teal-600'}`}>
+          <Label htmlFor="role-mode" className="text-xs font-bold uppercase tracking-wider">
+            {isFreelancer ? "Freelancer Mode" : "Client Mode"}
+          </Label>
         </div>
-      ) : (
-        <DashboardEmptyState />
-      )}
-    </>
+        <Switch
+          id="role-mode"
+          checked={isFreelancer}
+          onCheckedChange={handleToggle}
+          className="data-[state=checked]:bg-indigo-600"
+        />
+      </div>
+
+      <div className="animate-in fade-in duration-700">
+        {isFreelancer ? (
+          <FreelancerDashboard />
+        ) : (
+          <ClientDashboard />
+        )}
+      </div>
+    </div>
   );
 }
