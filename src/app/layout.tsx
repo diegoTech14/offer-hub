@@ -22,6 +22,7 @@ import LoadingIndicator from '@/components/navigation/loading-indicator';
 import { MessageProvider } from '@/lib/contexts/MessageContext';
 import { KeyboardShortcutsProvider } from '@/components/common/keyboard-shortcuts-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import { RoleProvider } from '@/lib/contexts/RoleContext';
 
 import { ScrollToTop } from '@/components/common/scroll-to-top';
 
@@ -52,35 +53,37 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <TrustlessWorkProvider>
-            <ErrorBoundary>
-              <NotificationProvider>
-                <TalentProvider>
-                  <MessageProvider>
-                    <OfferProvider>
-                      <WalletProvider>
-                        <EscrowProvider>
-                          <KeyboardShortcutsProvider>
-                            {/* LoadingIndicator agregado según rama secundaria */}
-                            <LoadingIndicator />
-                            <Suspense fallback={null}>
-                              <main>
-                                {children}
-                              </main>
-                              <NotificationToast />
-                              {/* ScrollToTop agregado según rama secundaria */}
-                              <ScrollToTop />
-                            </Suspense>
-                            <Toaster position="top-right" />
-                          </KeyboardShortcutsProvider>
-                        </EscrowProvider>
-                      </WalletProvider>
-                    </OfferProvider>
-                  </MessageProvider>
-                </TalentProvider>
-              </NotificationProvider>
-            </ErrorBoundary>
-          </TrustlessWorkProvider>
+          <RoleProvider>
+            <TrustlessWorkProvider>
+              <ErrorBoundary>
+                <NotificationProvider>
+                  <TalentProvider>
+                    <MessageProvider>
+                      <OfferProvider>
+                        <WalletProvider>
+                          <EscrowProvider>
+                            <KeyboardShortcutsProvider>
+                              {/* LoadingIndicator agregado según rama secundaria */}
+                              <LoadingIndicator />
+                              <Suspense fallback={null}>
+                                <main>
+                                  {children}
+                                </main>
+                                <NotificationToast />
+                                {/* ScrollToTop agregado según rama secundaria */}
+                                <ScrollToTop />
+                              </Suspense>
+                              <Toaster position="top-right" />
+                            </KeyboardShortcutsProvider>
+                          </EscrowProvider>
+                        </WalletProvider>
+                      </OfferProvider>
+                    </MessageProvider>
+                  </TalentProvider>
+                </NotificationProvider>
+              </ErrorBoundary>
+            </TrustlessWorkProvider>
+          </RoleProvider>
         </ThemeProvider>
       </body>
     </html>
