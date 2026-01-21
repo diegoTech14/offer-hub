@@ -1,8 +1,8 @@
 #[cfg(test)]
 use super::*;
-use soroban_sdk::{contract, contractimpl, log};
+use soroban_sdk::{contract, contractimpl};
 use soroban_sdk::{
-    testutils::{Address as _, Ledger},
+    testutils::{Address as _},
     Address, Env, String, Vec,
 };
 

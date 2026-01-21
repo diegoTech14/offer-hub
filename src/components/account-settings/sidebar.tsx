@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { LayoutDashboard, Briefcase, DollarSign, HelpCircle, MessageSquare, Bell, Settings, LogOut } from "lucide-react"
 import userImage from "../../../public/avatar_olivia.jpg"
+import Link from "next/link"
 
 interface SidebarProps {
     isSidebarOpen: boolean
@@ -24,7 +25,11 @@ export function Sidebar({ isSidebarOpen, isUserActive, setIsUserActive }: Sideba
                 <div className="flex items-center gap-3 mb-6">
                     <div className="relative">
                         <Avatar className="w-12 h-12">
-                            <AvatarImage src={userImage.src} />
+                            <AvatarImage 
+                              src={userImage.src}
+                              className="object-cover"
+                              progressive={false}
+                            />
                             <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">OR</AvatarFallback>
                         </Avatar>
                         <div
@@ -43,35 +48,47 @@ export function Sidebar({ isSidebarOpen, isUserActive, setIsUserActive }: Sideba
                     <Switch className="bg-green-600" checked={isUserActive} onCheckedChange={setIsUserActive} />
                 </div>
                 <nav className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                        <LayoutDashboard className="w-4 h-4 mr-3" />
-                        Dashboard
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                        <Briefcase className="w-4 h-4 mr-3" />
-                        Discover Jobs
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                        <DollarSign className="w-4 h-4 mr-3" />
-                        Manage Finance
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                        <HelpCircle className="w-4 h-4 mr-3" />
-                        Help
-                    </Button>
+                    <Link href="/" className="block">
+                        <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                            <LayoutDashboard className="w-4 h-4 mr-3" />
+                            Dashboard
+                        </Button>
+                    </Link>
+                    <Link href="/find-workers" className="block">
+                        <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                            <Briefcase className="w-4 h-4 mr-3" />
+                            Find Workers
+                        </Button>
+                    </Link>
+                    <Link href="/wallet" className="block">
+                        <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                            <DollarSign className="w-4 h-4 mr-3" />
+                            Wallet
+                        </Button>
+                    </Link>
+                    <Link href="/help" className="block">
+                        <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                            <HelpCircle className="w-4 h-4 mr-3" />
+                            Help
+                        </Button>
+                    </Link>
                 </nav>
                 <Separator className="my-6" />
                 <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                        <MessageSquare className="w-4 h-4 mr-3" />
-                        Messages
-                        <div className="w-2 h-2 bg-red-500 rounded-full ml-auto"></div>
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                        <Bell className="w-4 h-4 mr-3" />
-                        Notifications
-                        <div className="w-2 h-2 bg-red-500 rounded-full ml-auto"></div>
-                    </Button>
+                    <Link href="/messages" className="block">
+                        <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                            <MessageSquare className="w-4 h-4 mr-3" />
+                            Messages
+                            <div className="w-2 h-2 bg-red-500 rounded-full ml-auto"></div>
+                        </Button>
+                    </Link>
+                    <Link href="/messages" className="block">
+                        <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                            <Bell className="w-4 h-4 mr-3" />
+                            Notifications
+                            <div className="w-2 h-2 bg-red-500 rounded-full ml-auto"></div>
+                        </Button>
+                    </Link>
                 </div>
                 <Separator className="my-6" />
                 <div className="space-y-2">
@@ -79,10 +96,12 @@ export function Sidebar({ isSidebarOpen, isUserActive, setIsUserActive }: Sideba
                         <span className="text-sm text-gray-600 dark:text-gray-300">Theme</span>
                         <ThemeToggle />
                     </div>
-                    <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-50 dark:bg-gray-800">
-                        <Settings className="w-4 h-4 mr-3" />
-                        Account Settings
-                    </Button>
+                    <Link href="/my-account" className="block">
+                        <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-50 dark:bg-gray-800">
+                            <Settings className="w-4 h-4 mr-3" />
+                            Account Settings
+                        </Button>
+                    </Link>
                 </div>
                 <div className="mt-8">
                     <Button

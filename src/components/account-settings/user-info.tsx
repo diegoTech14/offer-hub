@@ -114,7 +114,11 @@ export function UserInfo({ user, isUserActive, isLoading }: UserInfoProps) {
             <div className="bg-white dark:bg-gray-800 flex min-w-[190px] py-3 px-2 rounded-lg justify-around">
                 <div className="relative">
                     <Avatar className="w-12 h-12">
-                        <AvatarImage src={userImage.src} />
+                        <AvatarImage 
+                          src={userImage.src}
+                          className="object-cover"
+                          progressive={false}
+                        />
                         <AvatarFallback className="bg-gray-200 dark:bg-gray-700">
                             {getInitials(user?.name)}
                         </AvatarFallback>

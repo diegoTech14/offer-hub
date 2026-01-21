@@ -20,7 +20,8 @@ import {
 } from "@/types/middleware.types";
 import { authConfig, isPublicRoute } from "@/config/auth.config";
 import { UserRole, AuthUser } from "@/types/auth.types";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+const uuidv4 = () => require('crypto').randomUUID();
 
 /**
  * Enhanced authentication middleware with comprehensive security features
@@ -47,10 +48,11 @@ import { v4 as uuidv4 } from "uuid";
  */
 export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
   return async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction
   ) => {
+    const authReq = req as AuthenticatedRequest;
     const startTime = Date.now();
     const requestId = uuidv4();
     
@@ -69,13 +71,20 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       // Check if route is public
       if (isPublicRoute(req.url)) {
         securityContext.isAuthenticated = false;
-        req.securityContext = securityContext;
+        authReq.securityContext = securityContext;
         return next();
       }
 
-      // Extract token from Authorization header
-      const token = extractTokenFromHeader(req.headers.authorization);
-      
+      // Extract token from Authorization header or cookies
+      let token = extractTokenFromHeader(req.headers.authorization);
+
+      // If no token in header, check cookies (for OAuth flow)
+      // Note: cookie-parser populates req.cookies
+      const cookieToken = req.cookies?.accessToken;
+      if (!token && cookieToken) {
+        token = cookieToken;
+      }
+
       if (!token) {
         await logAuthAttempt({
           ...securityContext,
@@ -130,16 +139,17 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       }
 
       // Fetch user from database
+      const userId = decoded.sub || decoded.user_id;
       const { data: user, error: userError } = await supabase
         .from("users")
         .select("*")
-        .eq("id", decoded.user_id)
+        .eq("id", userId)
         .single();
 
       if (userError || !user) {
         await logAuthAttempt({
           ...securityContext,
-          userId: decoded.user_id,
+          userId: userId,
           success: false,
           errorMessage: "User not found",
         });
@@ -168,8 +178,8 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       };
 
       // Attach user and token info to request
-      req.user = authUser;
-      req.tokenInfo = {
+      authReq.user = authUser;
+      authReq.tokenInfo = {
         token,
         expiresAt: expiresAt || 0,
         needsRefresh,
@@ -178,7 +188,7 @@ export const authenticateToken = (options: AuthMiddlewareOptions = {}) => {
       // Update security context
       securityContext.isAuthenticated = true;
       securityContext.userRole = user.role;
-      req.securityContext = securityContext;
+      authReq.securityContext = securityContext;
 
       // Log successful authentication
       if (authConfig.logging.logSuccessfulAuth) {
@@ -256,24 +266,26 @@ export const verifyToken = authenticateToken();
  * ```
  */
 export function authorizeRoles(...roles: UserRole[]) {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    if (!req.user) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const authReq = req as AuthenticatedRequest;
+    
+    if (!authReq.user) {
       return next(new AppError("Authentication required", 401));
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(authReq.user.role)) {
       // Log unauthorized access attempt
       if (authConfig.logging.logRoleAccess) {
         logAuthAttempt({
-          requestId: req.securityContext?.requestId || uuidv4(),
+          requestId: authReq.securityContext?.requestId || uuidv4(),
           ipAddress: req.ip || 'unknown',
           userAgent: req.get('User-Agent') || 'unknown',
           timestamp: Date.now(),
           endpoint: req.url,
           method: req.method,
           isAuthenticated: true,
-          userId: req.user.id,
-          userRole: req.user.role,
+          userId: authReq.user.id,
+          userRole: authReq.user.role,
           success: false,
           errorMessage: `Insufficient permissions. Required roles: ${roles.join(', ')}`,
         });
@@ -490,32 +502,106 @@ export const validateRefreshToken = async (
   try {
     const decoded = verifyRefreshToken(refreshToken);
 
-    const { data: tokenRecord, error } = await supabase
+    // Query tokens by user_id first, then compare hash in memory
+    // This works around Supabase BYTEA comparison issues
+    const { data: userTokens, error: fetchError } = await supabase
       .from("refresh_tokens")
       .select("*")
-      .eq("token_hash", refreshTokenHash)
-      .single();
+      .eq("user_id", decoded.sub)
+      .eq("is_revoked", false)
+      .is("replaced_by_token_id", null);
 
-    if (error || !tokenRecord) {
+    if (fetchError || !userTokens || userTokens.length === 0) {
       return next(
         new AppError("Invalid refresh token. Please log in again", 403)
       );
     }
 
-    // Verify user ID matches between token and record
-    if (tokenRecord.user_id !== decoded.user_id) {
-      return next(new AppError("Refresh token does not match the user", 403));
+    // Find token by comparing hashes (BYTEA is returned as Buffer or hex string)
+    const tokenRecord = userTokens.find((token: any) => {
+      let tokenHashHex: string;
+      
+      // Convert BYTEA to hex string for comparison
+      if (token.token_hash instanceof Buffer) {
+        tokenHashHex = token.token_hash.toString('hex');
+      } else if (typeof token.token_hash === 'string') {
+        let processedString = token.token_hash;
+        
+        // Remove \x prefix if present (PostgreSQL BYTEA format)
+        if (processedString.startsWith('\\x')) {
+          processedString = processedString.substring(2);
+        } else if (processedString.startsWith('0x') || processedString.startsWith('0X')) {
+          processedString = processedString.substring(2);
+        }
+        
+        // Supabase may return BYTEA as hex-encoded JSON string representing a Buffer
+        // Format: hex string that decodes to "{\"type\":\"Buffer\",\"data\":[49,53,177,44...]}"
+        // First try to decode hex to string, then parse JSON
+        if (processedString.startsWith('7b2274797065223a2242756666657222')) {
+          try {
+            // Decode hex to string (JSON)
+            const jsonString = Buffer.from(processedString, 'hex').toString('utf8');
+            const bufferData = JSON.parse(jsonString);
+            if (bufferData.type === 'Buffer' && Array.isArray(bufferData.data)) {
+              tokenHashHex = Buffer.from(bufferData.data).toString('hex');
+            } else {
+              tokenHashHex = processedString;
+            }
+          } catch {
+            tokenHashHex = processedString;
+          }
+        } else if (processedString.startsWith('{') && processedString.includes('"type":"Buffer"')) {
+          // Already a JSON string (not hex-encoded)
+          try {
+            const bufferData = JSON.parse(processedString);
+            if (bufferData.type === 'Buffer' && Array.isArray(bufferData.data)) {
+              tokenHashHex = Buffer.from(bufferData.data).toString('hex');
+            } else {
+              tokenHashHex = processedString;
+            }
+          } catch {
+            tokenHashHex = processedString;
+          }
+        } else {
+          // Already a hex string without prefix (direct hash)
+          tokenHashHex = processedString;
+        }
+      } else if (token.token_hash && typeof token.token_hash === 'object') {
+        // Handle Uint8Array or other binary formats
+        tokenHashHex = Buffer.from(token.token_hash).toString('hex');
+      } else {
+        return false;
+      }
+      
+      return tokenHashHex === refreshTokenHash;
+    });
+
+    if (!tokenRecord) {
+      return next(
+        new AppError("Invalid refresh token. Please log in again", 403)
+      );
+    }
+
+    // Note: user_id, is_revoked, and replaced_by_token_id are already filtered in the query above
+
+    // Check if token has expired
+    const expiresAt = new Date(tokenRecord.expires_at);
+    if (expiresAt < new Date()) {
+      // Mark as revoked for cleanup
+      await supabase
+        .from("refresh_tokens")
+        .update({
+          is_revoked: true,
+          revoked_at: new Date().toISOString(),
+        })
+        .eq("id", tokenRecord.id);
+      return next(new AppError("Refresh token has expired", 403));
     }
 
     req.refreshTokenRecord = tokenRecord;
     next();
   } catch (err) {
     if ((err as Error).name === "TokenExpiredError") {
-      // Clean up expired refresh token
-      await supabase
-        .from("refresh_tokens")
-        .delete()
-        .eq("token_hash", refreshTokenHash);
       return next(new AppError("Refresh token has expired", 403));
     }
 

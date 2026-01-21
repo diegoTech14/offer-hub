@@ -81,6 +81,8 @@ export function MessagesMain({
                 <AvatarImage
                   src={e.avatar_url || "/placeholder.svg"}
                   alt={e.name}
+                  className="object-cover"
+                  progressive={false}
                 />
                 <AvatarFallback className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-600">
                   {e.name

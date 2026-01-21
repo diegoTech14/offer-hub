@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PortfolioGallery from '../PortfolioGallery';
-import { PortfolioProject } from '@/lib/mockData/portfolio-mock-data';
+import { PortfolioProject } from '@/__mocks__/portfolio-mock-data';
 
 // Mock ProgressiveImage component
 jest.mock('@/components/ui/progressive-image', () => {

@@ -1,4 +1,4 @@
-use soroban_sdk::{log, Address, Env, String, Symbol, Vec};
+use soroban_sdk::{Address, Env, String, Symbol, Vec};
 
 use crate::{
     error::{handle_error, Error},

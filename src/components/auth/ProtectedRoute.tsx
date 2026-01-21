@@ -1,14 +1,6 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { AuthGuard } from "./auth-guard"
-
-interface ProtectedRouteProps {
-  children: ReactNode
-  roles?: string[]
-}
-
-
-export const ProtectedRoute = ({ children, roles }: ProtectedRouteProps) => {
-  return <AuthGuard roles={roles}>{children}</AuthGuard>
-}
+// Re-export from the consolidated protected-route module
+// This file exists for backwards compatibility with PascalCase imports
+export { ProtectedRoute } from "./protected-route";
+export { ProtectedRoute as default } from "./protected-route";

@@ -1,4 +1,4 @@
-use soroban_sdk::{panic_with_error, Address, Env, IntoVal, Map, String, Symbol, Vec, log};
+use soroban_sdk::{panic_with_error, Address, Env, IntoVal, Map, String, Symbol, Vec};
 
 use crate::{
     access::{is_valid_arbitrator, is_valid_mediator},
@@ -709,6 +709,7 @@ pub fn reset_dispute_count(env: &Env, admin: Address) -> Result<(), Error> {
 // ==================== DATA EXPORT FUNCTIONS ====================
 
 /// Export dispute data (initiator, mediator, arbitrator, or admin can access)
+#[allow(dead_code)]
 pub fn export_dispute_data(env: &Env, caller: Address, dispute_id: u32) -> DisputeDataExport {
     caller.require_auth();
 
@@ -755,6 +756,7 @@ pub fn export_dispute_data(env: &Env, caller: Address, dispute_id: u32) -> Dispu
 }
 
 /// Export all dispute data (admin only)
+#[allow(dead_code)]
 pub fn export_all_dispute_data(env: &Env, admin: Address, limit: u32) -> AllDisputeDataExport {
     admin.require_auth();
 

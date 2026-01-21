@@ -6,4 +6,4 @@ export { OfferSuccess } from './OfferSuccess';
 export { OfferFormProvider, useOfferForm } from './OfferFormContext';
 
 // Export types
-export type { OfferFormData, PaymentMilestone } from '@/lib/mockData/offer-form-mock';
+export type { OfferFormData, PaymentMilestone } from '@/__mocks__/offer-form-mock';

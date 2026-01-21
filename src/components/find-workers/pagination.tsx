@@ -62,20 +62,22 @@ export default function Pagination({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 px-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       {/* Results info */}
-      <div className="text-sm text-gray-600">
-        Showing {startItem} to {endItem} of {totalItems} results
+      <div className="text-sm font-medium text-[#002333] dark:text-gray-300">
+        Showing <span className="font-semibold text-[#15949C]">{startItem}</span> to{" "}
+        <span className="font-semibold text-[#15949C]">{endItem}</span> of{" "}
+        <span className="font-semibold text-[#15949C]">{totalItems}</span> results
       </div>
 
       {/* Pagination controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <Button
           variant="outline"
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1 || isLoading}
-          className="h-8 w-8 p-0"
+          className="h-9 w-9 p-0 border-gray-200 dark:border-gray-600 hover:bg-[#15949C] hover:text-white hover:border-[#15949C] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -83,8 +85,8 @@ export default function Pagination({
         {getPageNumbers().map((page, index) => (
           <div key={index}>
             {page === 'ellipsis' ? (
-              <div className="flex items-center justify-center h-8 w-8">
-                <MoreHorizontal className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center justify-center h-9 w-9">
+                <MoreHorizontal className="h-4 w-4 text-gray-400 dark:text-gray-500" />
               </div>
             ) : (
               <Button
@@ -92,7 +94,11 @@ export default function Pagination({
                 size="sm"
                 onClick={() => onPageChange(page as number)}
                 disabled={isLoading}
-                className="h-8 w-8 p-0"
+                className={`h-9 w-9 p-0 font-medium transition-all duration-200 ${
+                  currentPage === page
+                    ? "bg-[#15949C] hover:bg-[#117a81] text-white border-[#15949C] shadow-md"
+                    : "border-gray-200 dark:border-gray-600 hover:bg-[#15949C]/10 hover:border-[#15949C] hover:text-[#15949C] dark:hover:bg-[#15949C]/20"
+                }`}
               >
                 {page}
               </Button>
@@ -105,7 +111,7 @@ export default function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages || isLoading}
-          className="h-8 w-8 p-0"
+          className="h-9 w-9 p-0 border-gray-200 dark:border-gray-600 hover:bg-[#15949C] hover:text-white hover:border-[#15949C] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

@@ -94,8 +94,8 @@ fn test_storage_optimizer() {
 #[test]
 fn test_optimized_publication_contract() {
     let env = Env::default();
-    let _contract_address = env.register_contract(None, Contract);
-    let user = Address::from_str(
+    let _contract_address = env.register(Contract, ());
+    let _user = Address::from_str(
         &env,
         "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
     );
@@ -141,7 +141,7 @@ fn test_optimized_publication_contract() {
 #[test]
 fn test_performance_improvements() {
     let env = Env::default();
-    let _contract_address = env.register_contract(None, Contract);
+    let _contract_address = env.register(Contract, ());
 
     // Test performance of validation helpers
     for i in 0..100 {

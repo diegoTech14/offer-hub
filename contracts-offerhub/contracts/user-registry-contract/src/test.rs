@@ -6,7 +6,7 @@ use crate::{
     types::{VerificationLevel},
     Contract, ContractClient
 };
-use soroban_sdk::{log, testutils::Address as _, Address, Env, String, Vec};
+use soroban_sdk::{testutils::Address as _, Address, Env, String, Vec};
 
 // ==================== LEGACY TESTS ====================
 
@@ -1017,9 +1017,8 @@ fn test_get_user_profile_formatted() {
 }
 
 
-fn create_contract(env: &Env) -> (ContractClient, Address) {
-    let contract_id = Address::generate(env);
-    env.register_contract(&contract_id, Contract);
+fn create_contract(env: &Env) -> (ContractClient<'_>, Address) {
+    let contract_id = env.register(Contract, ());
     let client = ContractClient::new(env, &contract_id);
     let admin = Address::generate(env);
 
@@ -1050,7 +1049,7 @@ fn test_pause_unpause_unauthorized() {
     let env = Env::default();
     env.mock_all_auths();
 
-    let (client, admin) = create_contract(&env);
+    let (client, _admin) = create_contract(&env);
     let unauthorized = Address::generate(&env);
     
     client.pause(&unauthorized.clone());

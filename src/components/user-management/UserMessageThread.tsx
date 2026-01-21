@@ -60,7 +60,12 @@ const UserMessageThread: React.FC = () => {
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center space-x-3">
           <Avatar className="w-10 h-10">
-            <AvatarImage src="/avatars/user.jpg" alt="User" />
+            <AvatarImage 
+              src="/avatars/user.jpg" 
+              alt="User"
+              className="object-cover"
+              progressive={false}
+            />
             <AvatarFallback className="bg-blue-500 text-white">
               JS
             </AvatarFallback>

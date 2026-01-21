@@ -1,4 +1,4 @@
-import { notifications } from "@/data/mock-data-notifications"
+import { notifications } from "@/__mocks__/mock-data-notifications"
 
 
 

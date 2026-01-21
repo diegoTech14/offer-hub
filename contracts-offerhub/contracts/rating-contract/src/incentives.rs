@@ -1,6 +1,6 @@
 use crate::events::{emit_achievement_earned, emit_incentive_claimed};
 use crate::storage::{
-    get_incentive_record, get_reputation_contract, get_user_rating_stats, save_incentive_record, get_admin
+    get_incentive_record, get_reputation_contract, get_user_rating_stats, save_incentive_record
 };
 use crate::error::Error;
 use crate::types::{IncentiveRecord};

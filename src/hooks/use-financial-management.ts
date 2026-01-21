@@ -25,7 +25,7 @@ import {
   mockFinancialMetrics,
   mockPaymentMetrics,
   mockProfitabilityAnalysis,
-} from "@/data/mock-financial-data"
+} from "@/__mocks__/mock-financial-data"
 
 interface UseFinancialManagementReturn {
   // State

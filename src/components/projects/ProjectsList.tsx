@@ -3,7 +3,7 @@
 import { ProjectCard } from "@/components/projects/ProjectCard"
 import { MoreHorizontal } from "lucide-react"
 import EmptyState from "@/components/ui/empty-state"
-import type { Project } from "@/lib/mockData/projects-list-mock"
+import type { Project } from "@/__mocks__/projects-list-mock"
 import { usePagination } from "@/hooks/use-pagination"
 import { StandardPaginationControls } from "@/components/ui/pagination"
 

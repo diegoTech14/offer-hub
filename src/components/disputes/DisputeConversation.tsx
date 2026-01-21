@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { DisputeMessageDisplay } from './DisputeMessageDisplay';
 import { DisputeMessageInput } from './DisputeMessageInput';
-import { getMessagesByDisputeId, addMessage, DisputeMessage } from '@/lib/mockData/dispute-messages-mock';
+import { getMessagesByDisputeId, addMessage, DisputeMessage } from '@/__mocks__/dispute-messages-mock';
 import { TIMEOUTS } from '@/constants/magic-numbers';
 
 interface DisputeConversationProps {

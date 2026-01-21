@@ -11,8 +11,8 @@ interface CopyButtonProps {
 export function CopyButton({ text, className, size = 'sm' }: CopyButtonProps) {
   const { copied, copy } = useClipboard();
 
-  const handleCopy = () => {
-    copy(text);
+  const handleCopy = async () => {
+    await copy(text);
   };
 
   const sizeClasses = {
@@ -24,9 +24,10 @@ export function CopyButton({ text, className, size = 'sm' }: CopyButtonProps) {
   return (
     <Button
       variant="ghost"
-      size="sm"
+      size={size === 'lg' ? 'lg' : size === 'md' ? 'default' : 'sm'}
+      aria-label={copied ? 'Copied to clipboard' : 'Copy to clipboard'}
       onClick={handleCopy}
-      className={`${sizeClasses[size]} ${className}`}
+      className={`${sizeClasses[size]} ${className ?? ''}`}
     >
       {copied ? (
         <Check className="h-4 w-4 mr-2 text-green-600" />
@@ -37,3 +38,4 @@ export function CopyButton({ text, className, size = 'sm' }: CopyButtonProps) {
     </Button>
   );
 }
+
