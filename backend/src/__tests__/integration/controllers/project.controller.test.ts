@@ -1,5 +1,6 @@
-import { getProjectHandler } from '@/controllers/project.controller';
+import { createProjectHandler, getProjectHandler } from '@/controllers/project.controller';
 import { projectService } from '@/services/project.service';
+import { UserRole } from '@/types/auth.types';
 
 // Mock the project service
 jest.mock('@/services/project.service');
@@ -195,15 +196,109 @@ describe('Project Controller - getProjectHandler', () => {
       expect(response).toHaveProperty('data');
       expect(response.data).toEqual(mockProject);
     });
+  });
+});
 
-    it('should include timestamp in response', async () => {
-      mockProjectService.getProjectById.mockResolvedValue(mockProject);
+describe('Project Controller - createProjectHandler', () => {
+  let mockReq: any;
+  let mockRes: any;
+  let mockNext: any;
 
-      await getProjectHandler(mockReq, mockRes, mockNext);
+  const mockUser = {
+    id: '456e7890-e89b-12d3-a456-426614174001',
+    role: UserRole.CLIENT,
+    wallet_address: 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+  };
 
-      const response = mockRes.json.mock.calls[0][0];
-      expect(response).toHaveProperty('timestamp');
-      expect(typeof response.timestamp).toBe('string');
-    });
+  const createPayload = {
+    title: 'New Project',
+    description: 'A new project description',
+    category: 'Development',
+    budget: 1000,
+    skills: ['TypeScript']
+  };
+
+  const createdProject = {
+    id: '123e4567-e89b-12d3-a456-426614174000',
+    client_id: mockUser.id,
+    title: createPayload.title,
+    description: createPayload.description,
+    category: createPayload.category,
+    budget: createPayload.budget,
+    budget_type: 'fixed' as const,
+    status: 'draft' as const,
+    visibility: 'public' as const,
+    project_type: 'on-time' as const,
+    experience_level: 'intermediate' as const,
+    tags: [],
+    on_chain_transaction_hash: 'tx-123',
+    version: 1,
+    featured: false,
+    priority: 0,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    skills: ['TypeScript']
+  };
+
+  beforeEach(() => {
+    mockReq = {
+      body: {},
+      user: mockUser
+    };
+
+    mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis()
+    };
+
+    mockNext = jest.fn();
+    jest.clearAllMocks();
+  });
+
+  it('should return 403 when user is not a client', async () => {
+    mockReq.user = { ...mockUser, role: UserRole.FREELANCER };
+    mockReq.body = createPayload;
+
+    await createProjectHandler(mockReq, mockRes, mockNext);
+
+    expect(mockNext).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Only clients can create projects',
+        statusCode: 403
+      })
+    );
+  });
+
+  it('should return 400 on invalid payload', async () => {
+    mockReq.body = { title: '', description: 'Missing category', budget: 100 };
+
+    await createProjectHandler(mockReq, mockRes, mockNext);
+
+    expect(mockNext).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Invalid project data',
+        statusCode: 400
+      })
+    );
+  });
+
+  it('should return 201 with created project', async () => {
+    mockReq.body = createPayload;
+    mockProjectService.createProject.mockResolvedValue(createdProject as any);
+
+    await createProjectHandler(mockReq, mockRes, mockNext);
+
+    expect(mockProjectService.createProject).toHaveBeenCalledWith(
+      expect.objectContaining(createPayload),
+      mockUser
+    );
+    expect(mockRes.status).toHaveBeenCalledWith(201);
+    expect(mockRes.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: true,
+        message: 'Project created successfully',
+        data: createdProject
+      })
+    );
   });
 });

@@ -1,10 +1,15 @@
 import { projectService } from '@/services/project.service';
 import { supabase } from '@/lib/supabase/supabase';
+import { ProjectPublicationService } from '@/blockchain/project-publication.service';
 
 // Mock Supabase
 jest.mock('@/lib/supabase/supabase');
+jest.mock('@/blockchain/project-publication.service');
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const MockedProjectPublicationService = ProjectPublicationService as jest.MockedClass<
+  typeof ProjectPublicationService
+>;
 
 describe('ProjectService - getProjectById', () => {
   const mockProjectId = '123e4567-e89b-12d3-a456-426614174000';
@@ -230,5 +235,126 @@ describe('ProjectService - getProjectById', () => {
 
       expect(mockEq).toHaveBeenCalledWith('id', mockProjectId);
     });
+  });
+});
+
+describe('ProjectService - createProject', () => {
+  const mockUser: any = {
+    id: '456e7890-e89b-12d3-a456-426614174001',
+    wallet_address: 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    role: 'client'
+  };
+
+  const createData = {
+    title: 'New Project',
+    description: 'Test description',
+    category: 'Development',
+    budget: 500,
+    skills: ['TypeScript', 'Node.js', 'TypeScript'],
+    tags: ['backend']
+  };
+
+  const mockProjectRow = {
+    id: '123e4567-e89b-12d3-a456-426614174000',
+    client_id: mockUser.id,
+    title: createData.title,
+    description: createData.description,
+    category: createData.category,
+    subcategory: null,
+    budget: createData.budget,
+    budget_type: 'fixed',
+    status: 'draft',
+    visibility: 'public',
+    project_type: 'on-time',
+    experience_level: 'intermediate',
+    duration: null,
+    deadline: null,
+    tags: createData.tags,
+    on_chain_transaction_hash: null,
+    on_chain_id: null,
+    version: 1,
+    featured: false,
+    priority: 0,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z'
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should create project and store on-chain hash when blockchain succeeds', async () => {
+    const insertMock = jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        single: jest.fn().mockResolvedValue({
+          data: mockProjectRow,
+          error: null
+        })
+      })
+    });
+    const updateMock = jest.fn().mockReturnValue({
+      eq: jest.fn().mockResolvedValue({ error: null })
+    });
+    const skillsInsertMock = jest.fn().mockResolvedValue({ error: null });
+
+    mockSupabase.from.mockImplementation((table) => {
+      if (table === 'projects') {
+        return { insert: insertMock, update: updateMock } as any;
+      }
+      if (table === 'project_skills') {
+        return { insert: skillsInsertMock } as any;
+      }
+      return {} as any;
+    });
+
+    const mockRecord = jest.fn().mockResolvedValue({ transactionHash: 'tx-123', ledger: 1 });
+    MockedProjectPublicationService.mockImplementation(() => ({
+      recordProjectPublication: mockRecord
+    }) as any);
+
+    const result = await projectService.createProject(createData as any, mockUser);
+
+    expect(insertMock).toHaveBeenCalled();
+    expect(skillsInsertMock).toHaveBeenCalledWith([
+      { project_id: mockProjectRow.id, skill_name: 'TypeScript' },
+      { project_id: mockProjectRow.id, skill_name: 'Node.js' }
+    ]);
+    expect(updateMock).toHaveBeenCalledWith({ on_chain_transaction_hash: 'tx-123' });
+    expect(result.on_chain_transaction_hash).toBe('tx-123');
+    expect(result.skills).toEqual(['TypeScript', 'Node.js']);
+  });
+
+  it('should continue when blockchain registration fails', async () => {
+    const insertMock = jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        single: jest.fn().mockResolvedValue({
+          data: mockProjectRow,
+          error: null
+        })
+      })
+    });
+    const updateMock = jest.fn().mockReturnValue({
+      eq: jest.fn().mockResolvedValue({ error: null })
+    });
+    const skillsInsertMock = jest.fn().mockResolvedValue({ error: null });
+
+    mockSupabase.from.mockImplementation((table) => {
+      if (table === 'projects') {
+        return { insert: insertMock, update: updateMock } as any;
+      }
+      if (table === 'project_skills') {
+        return { insert: skillsInsertMock } as any;
+      }
+      return {} as any;
+    });
+
+    MockedProjectPublicationService.mockImplementation(() => ({
+      recordProjectPublication: jest.fn().mockRejectedValue(new Error('Chain error'))
+    }) as any);
+
+    const result = await projectService.createProject(createData as any, mockUser);
+
+    expect(result.on_chain_transaction_hash).toBeFalsy();
+    expect(updateMock).not.toHaveBeenCalled();
   });
 });

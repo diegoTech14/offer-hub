@@ -10,6 +10,148 @@ export interface ProjectSkill {
   created_at: string;
 }
 
+export type ProjectStatus =
+  | "draft"
+  | "pending"
+  | "published"
+  | "active"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
+  | "archived"
+  | "deleted";
+
+export type ProjectVisibility = "public" | "private";
+export type ProjectType = "on-time" | "ongoing";
+export type ExperienceLevel = "entry" | "intermediate" | "expert";
+export type BudgetType = "fixed" | "hourly";
+
+export interface CreateProjectDTO {
+  title: string;
+  description: string;
+  category: string;
+  budget: number;
+  subcategory?: string;
+  skills?: string[];
+  experienceLevel?: ExperienceLevel;
+  projectType?: ProjectType;
+  visibility?: ProjectVisibility;
+  budgetType?: BudgetType;
+  duration?: string;
+  tags?: string[];
+  deadline?: string;
+  status?: ProjectStatus;
+}
+
+const PROJECT_STATUSES: ProjectStatus[] = [
+  "draft",
+  "pending",
+  "published",
+  "active",
+  "in_progress",
+  "completed",
+  "cancelled",
+  "archived",
+  "deleted",
+];
+
+const PROJECT_VISIBILITIES: ProjectVisibility[] = ["public", "private"];
+const PROJECT_TYPES: ProjectType[] = ["on-time", "ongoing"];
+const EXPERIENCE_LEVELS: ExperienceLevel[] = [
+  "entry",
+  "intermediate",
+  "expert",
+];
+const BUDGET_TYPES: BudgetType[] = ["fixed", "hourly"];
+
+export function isCreateProjectDTO(obj: any): obj is CreateProjectDTO {
+  if (typeof obj !== "object" || obj === null) {
+    return false;
+  }
+
+  if (
+    typeof obj.title !== "string" ||
+    obj.title.trim().length === 0 ||
+    typeof obj.description !== "string" ||
+    obj.description.trim().length === 0 ||
+    typeof obj.category !== "string" ||
+    obj.category.trim().length === 0 ||
+    typeof obj.budget !== "number" ||
+    !Number.isFinite(obj.budget) ||
+    obj.budget <= 0
+  ) {
+    return false;
+  }
+
+  if (
+    obj.subcategory !== undefined &&
+    typeof obj.subcategory !== "string"
+  ) {
+    return false;
+  }
+
+  if (
+    obj.skills !== undefined &&
+    (!Array.isArray(obj.skills) ||
+      obj.skills.some((skill: any) => typeof skill !== "string"))
+  ) {
+    return false;
+  }
+
+  if (
+    obj.experienceLevel !== undefined &&
+    !EXPERIENCE_LEVELS.includes(obj.experienceLevel)
+  ) {
+    return false;
+  }
+
+  if (
+    obj.projectType !== undefined &&
+    !PROJECT_TYPES.includes(obj.projectType)
+  ) {
+    return false;
+  }
+
+  if (
+    obj.visibility !== undefined &&
+    !PROJECT_VISIBILITIES.includes(obj.visibility)
+  ) {
+    return false;
+  }
+
+  if (
+    obj.budgetType !== undefined &&
+    !BUDGET_TYPES.includes(obj.budgetType)
+  ) {
+    return false;
+  }
+
+  if (obj.duration !== undefined && typeof obj.duration !== "string") {
+    return false;
+  }
+
+  if (
+    obj.tags !== undefined &&
+    (!Array.isArray(obj.tags) ||
+      obj.tags.some((tag: any) => typeof tag !== "string"))
+  ) {
+    return false;
+  }
+
+  if (obj.deadline !== undefined && typeof obj.deadline !== "string") {
+    return false;
+  }
+
+  if (
+    obj.status !== undefined &&
+    !PROJECT_STATUSES.includes(obj.status)
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 export interface Project {
   id: string;
   client_id: string;

@@ -259,7 +259,9 @@ export const CONTRACT_CREATION_SCHEMA: Record<string, ValidationRule> = {
 };
 
 // Avatar URL validation
-export const AVATAR_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const;
+export const AVATAR_IMAGE_EXTENSIONS = Object.freeze(
+  ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const
+);
 export const AVATAR_URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
 
 export const validateAvatarUrl = (url: string): boolean => {
@@ -270,7 +272,11 @@ export const validateAvatarUrl = (url: string): boolean => {
   // Check if it's a valid URL format
   if (!AVATAR_URL_REGEX.test(trimmedUrl)) return false;
 
-  // Check if URL ends with allowed image extensions
-  const urlLower = trimmedUrl.toLowerCase();
-  return AVATAR_IMAGE_EXTENSIONS.some(ext => urlLower.endsWith(ext));
+  try {
+    const parsedUrl = new URL(trimmedUrl);
+    const pathLower = parsedUrl.pathname.toLowerCase();
+    return AVATAR_IMAGE_EXTENSIONS.some(ext => pathLower.endsWith(ext));
+  } catch {
+    return false;
+  }
 };
