@@ -2,6 +2,16 @@
 
 This contract implements an immutable registry for project publications on the Stellar blockchain using Soroban. It provides proof of when a project was published and by whom.
 
+### Contract Deployed
+
+The contract has been successfully deployed to Stellar testnet with the following details:
+
+- **Contract ID**: `CC6EIP4CLZW4CY5W6T2AJB53QP67CXLKLZBUCYEMZPFGPW5AW5QVCT2M`
+- **Network**: Stellar Testnet
+- **Status**: Deployed and initialized
+
+The admin used for intializing the contract it's a cli generated wallet.
+
 ## Features
 
 - **Admin Initialization**: Contract must be initialized with an admin address before use
@@ -36,6 +46,11 @@ stellar contract build
 The resulting WASM file will be in `target/wasm32-unknown-unknown/release/project_publication_contract.wasm`.
 
 ## Deployment on Testnet
+
+
+### Deployment Steps (for reference)
+
+If you need to redeploy the contract, follow these steps:
 
 1. Install Stellar CLI:
 ```bash
