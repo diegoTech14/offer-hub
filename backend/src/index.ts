@@ -28,15 +28,11 @@ import cookieParser from "cookie-parser";
 import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
 import oauthRoutes from "@/routes/oauth.routes";
+
 import TaskRecordRouter from "@/routes/blockchain.routes";
-import {
-  errorHandlerMiddleware,
-  setupGlobalErrorHandlers,
-} from "./middlewares/errorHandler.middleware";
-import {
-  generalLimiter,
-  authLimiter,
-} from "./middlewares/ratelimit.middleware";
+import projectRoutes from "@/routes/project.routes";
+import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
+import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware";
 import { authenticateToken } from "./middlewares/auth.middleware";
 import { loggerMiddleware } from "./middlewares/logger.middleware";
 import { logger } from "./utils/logger";
@@ -97,6 +93,7 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/oauth", oauthRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 app.use("/api/task", TaskRecordRouter);
+app.use("/api/projects", projectRoutes);
 
 // Error Handling
 app.use(errorHandlerMiddleware);
