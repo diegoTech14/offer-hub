@@ -19,16 +19,16 @@ describe('Profile Controller - getProfileHandler', () => {
 
   const mockProfile = {
     id: 'profile-123',
-    user_id: mockUserId,
-    display_name: 'John Doe',
+    userId: mockUserId,
+    displayName: 'John Doe',
     bio: 'Software Engineer',
-    avatar_url: 'https://example.com/avatar.jpg',
-    date_of_birth: new Date('1990-01-01'),
+    avatarUrl: 'https://example.com/avatar.jpg',
+    dateOfBirth: new Date('1990-01-01'),
     location: 'San Francisco, CA',
     skills: ['JavaScript', 'TypeScript', 'React'],
     website: 'https://example.com',
-    created_at: new Date('2024-01-01T00:00:00Z'),
-    updated_at: new Date('2024-01-01T00:00:00Z'),
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z'),
   };
 
   beforeEach(() => {
@@ -147,23 +147,23 @@ describe('Profile Controller - getProfileHandler', () => {
       const responseData = mockRes.json.mock.calls[0][0].data;
       expect(responseData).toEqual(mockProfile);
       expect(responseData.id).toBe('profile-123');
-      expect(responseData.user_id).toBe(mockUserId);
+      expect(responseData.userId).toBe(mockUserId);
       expect(responseData.skills).toEqual(['JavaScript', 'TypeScript', 'React']);
     });
 
     it('should return profile with null optional fields', async () => {
       const minimalProfile = {
         id: 'profile-456',
-        user_id: mockUserId,
-        display_name: null,
+        userId: mockUserId,
+        displayName: null,
         bio: null,
-        avatar_url: null,
-        date_of_birth: null,
+        avatarUrl: null,
+        dateOfBirth: null,
         location: null,
         skills: [],
         website: null,
-        created_at: new Date('2024-01-01T00:00:00Z'),
-        updated_at: new Date('2024-01-01T00:00:00Z'),
+        createdAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockProfileService.getProfileByUserId.mockResolvedValue(minimalProfile);
@@ -289,16 +289,16 @@ describe('Profile Controller - getProfileHandler', () => {
     it('should handle empty profile data gracefully', async () => {
       const emptyProfile = {
         id: 'profile-empty',
-        user_id: mockUserId,
-        display_name: '',
+        userId: mockUserId,
+        displayName: '',
         bio: '',
-        avatar_url: '',
-        date_of_birth: null,
+        avatarUrl: '',
+        dateOfBirth: null,
         location: '',
         skills: [],
         website: '',
-        created_at: new Date('2024-01-01T00:00:00Z'),
-        updated_at: new Date('2024-01-01T00:00:00Z'),
+        createdAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockReq.params = { userId: mockUserId };

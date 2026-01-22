@@ -20,16 +20,16 @@ describe('ProfileService - getProfileByUserId', () => {
 
   const mockProfileData = {
     id: 'profile-123',
-    user_id: mockUserId,
-    display_name: 'John Doe',
+    userId: mockUserId,
+    displayName: 'John Doe',
     bio: 'Software Engineer',
-    avatar_url: 'https://example.com/avatar.jpg',
-    date_of_birth: new Date('1990-01-01'),
+    avatarUrl: 'https://example.com/avatar.jpg',
+    dateOfBirth: new Date('1990-01-01'),
     location: 'San Francisco, CA',
     skills: ['JavaScript', 'TypeScript', 'React'],
     website: 'https://example.com',
-    created_at: new Date('2024-01-01T00:00:00Z'),
-    updated_at: new Date('2024-01-01T00:00:00Z'),
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z'),
   };
 
   beforeEach(() => {
@@ -58,16 +58,16 @@ describe('ProfileService - getProfileByUserId', () => {
     it('should return profile with null optional fields', async () => {
       const minimalProfile = {
         id: 'profile-456',
-        user_id: mockUserId,
-        display_name: null,
+        userId: mockUserId,
+        displayName: null,
         bio: null,
-        avatar_url: null,
-        date_of_birth: null,
+        avatarUrl: null,
+        dateOfBirth: null,
         location: null,
         skills: [],
         website: null,
-        created_at: new Date('2024-01-01T00:00:00Z'),
-        updated_at: new Date('2024-01-01T00:00:00Z'),
+        createdAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockSupabase.from.mockReturnValue({
@@ -196,15 +196,7 @@ describe('ProfileService - getProfileByUserId', () => {
       await profileService.getProfileByUserId(mockUserId);
 
       expect(mockSupabase.from).toHaveBeenCalledWith('profiles');
-      expect(mockSelect).toHaveBeenCalledWith(
-        expect.stringContaining('id')
-      );
-      expect(mockSelect).toHaveBeenCalledWith(
-        expect.stringContaining('user_id')
-      );
-      expect(mockSelect).toHaveBeenCalledWith(
-        expect.stringContaining('display_name')
-      );
+      expect(mockSelect).toHaveBeenCalledWith("*");
     });
 
     it('should filter by the correct user ID', async () => {
@@ -223,7 +215,7 @@ describe('ProfileService - getProfileByUserId', () => {
 
       await profileService.getProfileByUserId(mockUserId);
 
-      expect(mockEq).toHaveBeenCalledWith('user_id', mockUserId);
+      expect(mockEq).toHaveBeenCalledWith('userId', mockUserId);
     });
 
     it('should call single() to fetch one record', async () => {

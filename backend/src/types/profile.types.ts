@@ -9,29 +9,29 @@
  */
 export interface Profile {
   id: string;
-  user_id: string;
-  display_name: string | null;
+  userId: string;
+  displayName: string | null;
   bio: string | null;
-  avatar_url: string | null;
-  date_of_birth: Date | null;
+  avatarUrl: string | null;
+  dateOfBirth: Date | null;
   location: string | null;
   skills: string[];
   website: string | null;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /**
  * Create Profile DTO (Data Transfer Object)
  * Used when creating a new profile
- * Excludes auto-generated fields: id, created_at, updated_at
+ * Excludes auto-generated fields: id, createdAt, updatedAt
  */
 export interface CreateProfileDTO {
-  user_id: string;
-  display_name?: string | null;
+  userId: string;
+  displayName?: string | null;
   bio?: string | null;
-  avatar_url?: string | null;
-  date_of_birth?: Date | null;
+  avatarUrl?: string | null;
+  dateOfBirth?: Date | null;
   location?: string | null;
   skills?: string[];
   website?: string | null;
@@ -43,10 +43,10 @@ export interface CreateProfileDTO {
  * All fields are optional except those used for identification
  */
 export interface UpdateProfileDTO {
-  display_name?: string | null;
+  displayName?: string | null;
   bio?: string | null;
-  avatar_url?: string | null;
-  date_of_birth?: Date | null;
+  avatarUrl?: string | null;
+  dateOfBirth?: Date | null;
   location?: string | null;
   skills?: string[];
   website?: string | null;
@@ -70,16 +70,16 @@ export function isProfile(obj: any): obj is Profile {
     typeof obj === "object" &&
     obj !== null &&
     typeof obj.id === "string" &&
-    typeof obj.user_id === "string" &&
-    (obj.display_name === null || typeof obj.display_name === "string") &&
+    typeof obj.userId === "string" &&
+    (obj.displayName === null || typeof obj.displayName === "string") &&
     (obj.bio === null || typeof obj.bio === "string") &&
-    (obj.avatar_url === null || typeof obj.avatar_url === "string") &&
-    (obj.date_of_birth === null || obj.date_of_birth instanceof Date) &&
+    (obj.avatarUrl === null || typeof obj.avatarUrl === "string") &&
+    (obj.dateOfBirth === null || obj.dateOfBirth instanceof Date) &&
     (obj.location === null || typeof obj.location === "string") &&
     Array.isArray(obj.skills) &&
     (obj.website === null || typeof obj.website === "string") &&
-    obj.created_at instanceof Date &&
-    obj.updated_at instanceof Date
+    obj.createdAt instanceof Date &&
+    obj.updatedAt instanceof Date
   );
 }
 
@@ -90,19 +90,19 @@ export function isCreateProfileDTO(obj: any): obj is CreateProfileDTO {
   return (
     typeof obj === "object" &&
     obj !== null &&
-    typeof obj.user_id === "string" &&
-    (obj.display_name === undefined ||
-      obj.display_name === null ||
-      typeof obj.display_name === "string") &&
+    typeof obj.userId === "string" &&
+    (obj.displayName === undefined ||
+      obj.displayName === null ||
+      typeof obj.displayName === "string") &&
     (obj.bio === undefined ||
       obj.bio === null ||
       typeof obj.bio === "string") &&
-    (obj.avatar_url === undefined ||
-      obj.avatar_url === null ||
-      typeof obj.avatar_url === "string") &&
-    (obj.date_of_birth === undefined ||
-      obj.date_of_birth === null ||
-      obj.date_of_birth instanceof Date) &&
+    (obj.avatarUrl === undefined ||
+      obj.avatarUrl === null ||
+      typeof obj.avatarUrl === "string") &&
+    (obj.dateOfBirth === undefined ||
+      obj.dateOfBirth === null ||
+      obj.dateOfBirth instanceof Date) &&
     (obj.location === undefined ||
       obj.location === null ||
       typeof obj.location === "string") &&
@@ -120,18 +120,18 @@ export function isUpdateProfileDTO(obj: any): obj is UpdateProfileDTO {
   return (
     typeof obj === "object" &&
     obj !== null &&
-    (obj.display_name === undefined ||
-      obj.display_name === null ||
-      typeof obj.display_name === "string") &&
+    (obj.displayName === undefined ||
+      obj.displayName === null ||
+      typeof obj.displayName === "string") &&
     (obj.bio === undefined ||
       obj.bio === null ||
       typeof obj.bio === "string") &&
-    (obj.avatar_url === undefined ||
-      obj.avatar_url === null ||
-      typeof obj.avatar_url === "string") &&
-    (obj.date_of_birth === undefined ||
-      obj.date_of_birth === null ||
-      obj.date_of_birth instanceof Date) &&
+    (obj.avatarUrl === undefined ||
+      obj.avatarUrl === null ||
+      typeof obj.avatarUrl === "string") &&
+    (obj.dateOfBirth === undefined ||
+      obj.dateOfBirth === null ||
+      obj.dateOfBirth instanceof Date) &&
     (obj.location === undefined ||
       obj.location === null ||
       typeof obj.location === "string") &&

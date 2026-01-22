@@ -17,22 +17,8 @@ class ProfileService {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select(
-          `
-          id,
-          user_id,
-          display_name,
-          bio,
-          avatar_url,
-          date_of_birth,
-          location,
-          skills,
-          website,
-          created_at,
-          updated_at
-          `
-        )
-        .eq("user_id", userId)
+        .select("*")
+        .eq("userId", userId)
         .single();
 
       if (error) {
