@@ -3,7 +3,7 @@
  * @author Offer Hub Team
  */
 
-// Mock Supabase
+// Mock Supabase BEFORE importing anything else
 jest.mock('@/lib/supabase/supabase', () => ({
   supabase: {
     from: jest.fn(),
@@ -21,17 +21,15 @@ describe('ProfileService - getProfileByUserId', () => {
   const mockProfileData = {
     id: 'profile-123',
     user_id: mockUserId,
+    display_name: 'John Doe',
+    bio: 'Software Engineer',
     avatar_url: 'https://example.com/avatar.jpg',
-    banner_url: 'https://example.com/banner.jpg',
+    date_of_birth: new Date('1990-01-01'),
     location: 'San Francisco, CA',
-    website: 'https://example.com',
-    twitter: '@johndoe',
-    github: 'johndoe',
-    linkedin: 'johndoe',
     skills: ['JavaScript', 'TypeScript', 'React'],
-    portfolio_items: [],
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
+    website: 'https://example.com',
+    created_at: new Date('2024-01-01T00:00:00Z'),
+    updated_at: new Date('2024-01-01T00:00:00Z'),
   };
 
   beforeEach(() => {
@@ -61,17 +59,15 @@ describe('ProfileService - getProfileByUserId', () => {
       const minimalProfile = {
         id: 'profile-456',
         user_id: mockUserId,
+        display_name: null,
+        bio: null,
         avatar_url: null,
-        banner_url: null,
+        date_of_birth: null,
         location: null,
+        skills: [],
         website: null,
-        twitter: null,
-        github: null,
-        linkedin: null,
-        skills: null,
-        portfolio_items: null,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
+        created_at: new Date('2024-01-01T00:00:00Z'),
+        updated_at: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockSupabase.from.mockReturnValue({
@@ -207,7 +203,7 @@ describe('ProfileService - getProfileByUserId', () => {
         expect.stringContaining('user_id')
       );
       expect(mockSelect).toHaveBeenCalledWith(
-        expect.stringContaining('avatar_url')
+        expect.stringContaining('display_name')
       );
     });
 

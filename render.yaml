@@ -29,6 +29,8 @@ services:
         sync: false
       - key: USER_REGISTRY_CONTRACT_ID
         sync: false
+      - key: PROJECT_PUBLICATION_CONTRACT_ID
+        sync: false
       - key: STELLAR_RPC_URL
         value: https://rpc-futurenet.stellar.org:443
       - key: STELLAR_NETWORK_PASSPHRASE

@@ -20,17 +20,15 @@ describe('Profile Controller - getProfileHandler', () => {
   const mockProfile = {
     id: 'profile-123',
     user_id: mockUserId,
+    display_name: 'John Doe',
+    bio: 'Software Engineer',
     avatar_url: 'https://example.com/avatar.jpg',
-    banner_url: 'https://example.com/banner.jpg',
+    date_of_birth: new Date('1990-01-01'),
     location: 'San Francisco, CA',
-    website: 'https://example.com',
-    twitter: '@johndoe',
-    github: 'johndoe',
-    linkedin: 'johndoe',
     skills: ['JavaScript', 'TypeScript', 'React'],
-    portfolio_items: [],
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
+    website: 'https://example.com',
+    created_at: new Date('2024-01-01T00:00:00Z'),
+    updated_at: new Date('2024-01-01T00:00:00Z'),
   };
 
   beforeEach(() => {
@@ -157,17 +155,15 @@ describe('Profile Controller - getProfileHandler', () => {
       const minimalProfile = {
         id: 'profile-456',
         user_id: mockUserId,
+        display_name: null,
+        bio: null,
         avatar_url: null,
-        banner_url: null,
+        date_of_birth: null,
         location: null,
+        skills: [],
         website: null,
-        twitter: null,
-        github: null,
-        linkedin: null,
-        skills: null,
-        portfolio_items: null,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
+        created_at: new Date('2024-01-01T00:00:00Z'),
+        updated_at: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockProfileService.getProfileByUserId.mockResolvedValue(minimalProfile);
@@ -294,17 +290,15 @@ describe('Profile Controller - getProfileHandler', () => {
       const emptyProfile = {
         id: 'profile-empty',
         user_id: mockUserId,
+        display_name: '',
+        bio: '',
         avatar_url: '',
-        banner_url: '',
+        date_of_birth: null,
         location: '',
-        website: '',
-        twitter: '',
-        github: '',
-        linkedin: '',
         skills: [],
-        portfolio_items: [],
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
+        website: '',
+        created_at: new Date('2024-01-01T00:00:00Z'),
+        updated_at: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockReq.params = { userId: mockUserId };

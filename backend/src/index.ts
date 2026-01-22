@@ -2,19 +2,24 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Validate critical environment variables
-console.log('🔍 Checking environment variables...');
+console.log("🔍 Checking environment variables...");
 const requiredEnvVars = [
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-  'JWT_SECRET'
+  "SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "JWT_SECRET",
 ];
 
-const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+const missingEnvVars = requiredEnvVars.filter(
+  (varName) => !process.env[varName],
+);
 if (missingEnvVars.length > 0) {
-  console.error('❌ Missing required environment variables:', missingEnvVars);
-  console.error('📋 Available SUPABASE env vars:', Object.keys(process.env).filter(k => k.includes('SUPABASE')));
+  console.error("❌ Missing required environment variables:", missingEnvVars);
+  console.error(
+    "📋 Available SUPABASE env vars:",
+    Object.keys(process.env).filter((k) => k.includes("SUPABASE")),
+  );
 } else {
-  console.log('✅ All required environment variables are set');
+  console.log("✅ All required environment variables are set");
 }
 
 import express from "express";
@@ -23,6 +28,8 @@ import cookieParser from "cookie-parser";
 import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
 import oauthRoutes from "@/routes/oauth.routes";
+import escrowInitRoutes from "@/routes/escrow-init.routes";
+import TaskRecordRouter from "@/routes/blockchain.routes";
 import projectRoutes from "@/routes/project.routes";
 import profileRoutes from "@/routes/profile.routes";
 import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
@@ -38,20 +45,22 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Middleware setup
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://offer-hub-hpd4.vercel.app',
-    'https://offer-hub.vercel.app',
-    'https://offer-hub-web.vercel.app',
-    'https://www.offer-hub.org',
-    'https://offer-hub.org',
-    /https:\/\/.*\.vercel\.app$/
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://offer-hub-hpd4.vercel.app",
+      "https://offer-hub.vercel.app",
+      "https://offer-hub-web.vercel.app",
+      "https://www.offer-hub.org",
+      "https://offer-hub.org",
+      /https:\/\/.*\.vercel\.app$/,
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(cookieParser()); // Parse cookies for OAuth session handling
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For Apple form_post
@@ -66,7 +75,7 @@ app.get("/health", (_req, res) => {
     status: "ok",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    env: process.env.NODE_ENV || 'development'
+    env: process.env.NODE_ENV || "development",
   });
 });
 
@@ -76,14 +85,16 @@ app.get("/", (_req, res) => {
     message: "💼 OFFER-HUB Backend API",
     version: "1.0.0",
     docs: "/docs",
-    status: "active"
+    status: "active",
   });
 });
 
 // API Routes
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/oauth", oauthRoutes);
+app.use("/api/escrows", authenticateToken(), escrowInitRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
+app.use("/api/task", TaskRecordRouter);
 app.use("/api/projects", projectRoutes);
 app.use("/api/profiles", profileRoutes);
 
@@ -102,7 +113,7 @@ app.listen(port, () => {
    ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═╝      ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ 
                                                                           
   🚀 Server is running at http://localhost:${port}
-  ⭐️ Environment: ${process.env.NODE_ENV || 'development'}
+  ⭐️ Environment: ${process.env.NODE_ENV || "development"}
   📝 API Docs: http://localhost:${port}/docs
   ❤️  Health Check: http://localhost:${port}/health
   `);

@@ -3,9 +3,9 @@
  * @author Offer Hub Team
  */
 
-import { supabase } from "@/lib/supabase/supabase";
-import { InternalServerError } from "@/utils/AppError";
-import { Profile } from "@/types/profile.types";
+import { supabase } from "../lib/supabase/supabase";
+import { InternalServerError } from "../utils/AppError";
+import { Profile } from "../types/profile.types";
 
 class ProfileService {
   /**
@@ -21,15 +21,13 @@ class ProfileService {
           `
           id,
           user_id,
+          display_name,
+          bio,
           avatar_url,
-          banner_url,
+          date_of_birth,
           location,
-          website,
-          twitter,
-          github,
-          linkedin,
           skills,
-          portfolio_items,
+          website,
           created_at,
           updated_at
           `

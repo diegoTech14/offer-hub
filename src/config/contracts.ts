@@ -7,6 +7,7 @@ export interface ContractConfig {
     userRegistry: string;
     escrow: string;
     publication: string;
+    projectPublication: string;
     rating: string;
     dispute: string;
     feeManager: string;
@@ -31,6 +32,7 @@ export const getContractConfig = (): ContractConfig => {
       userRegistry: process.env.NEXT_PUBLIC_USER_REGISTRY_CONTRACT_ID || '',
       escrow: process.env.NEXT_PUBLIC_ESCROW_CONTRACT_ID || '',
       publication: process.env.NEXT_PUBLIC_PUBLICATION_CONTRACT_ID || '',
+      projectPublication: process.env.NEXT_PUBLIC_PROJECT_PUBLICATION_CONTRACT_ID || '',
       rating: process.env.NEXT_PUBLIC_RATING_CONTRACT_ID || '',
       dispute: process.env.NEXT_PUBLIC_DISPUTE_CONTRACT_ID || '',
       feeManager: process.env.NEXT_PUBLIC_FEE_MANAGER_CONTRACT_ID || '',
@@ -63,6 +65,7 @@ export const validateContractConfig = (config: ContractConfig): { valid: boolean
     'userRegistry',
     'escrow',
     'publication',
+    'projectPublication',
     'rating',
     'dispute',
     'feeManager',
@@ -95,6 +98,7 @@ export const CONTRACT_NAMES = {
   USER_REGISTRY: 'userRegistry',
   ESCROW: 'escrow',
   PUBLICATION: 'publication',
+  PROJECT_PUBLICATION: 'projectPublication',
   RATING: 'rating',
   DISPUTE: 'dispute',
   FEE_MANAGER: 'feeManager',
@@ -120,6 +124,7 @@ export const DEFAULT_CONFIG: ContractConfig = {
     userRegistry: '',
     escrow: '',
     publication: '',
+    projectPublication: '',
     rating: '',
     dispute: '',
     feeManager: '',
