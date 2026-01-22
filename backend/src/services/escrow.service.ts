@@ -1,9 +1,10 @@
 import { 
-  Client, 
   Keypair, 
   Networks, 
   Address as SorobanAddress,
 } from "@stellar/stellar-sdk";
+// @ts-ignore - Client is exported from /contract subpath but TypeScript resolution has issues
+import { Client } from "@stellar/stellar-sdk/contract";
 import { InternalServerError } from "@/utils/AppError";
 import { randomBytes, createHash } from "crypto";
 
@@ -128,7 +129,7 @@ export class EscrowService {
         networkPassphrase: this.networkPassphrase,
         rpcUrl: this.rpcUrl,
         publicKey: this.signerKeypair.publicKey(),
-        signTransaction: async (tx) => {
+        signTransaction: async (tx: any) => {
           // Sign the transaction with the signer keypair
           tx.sign(this.signerKeypair);
           return tx;
