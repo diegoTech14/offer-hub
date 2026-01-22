@@ -26,7 +26,7 @@ export function SecuritySettings({
     setShowNewPassword
 }: SecuritySettingsProps) {
     function TabTitleComponent({ label }: { label: string }) {
-        return <h3 className="text-[20px] text-[#002333] font-normal mb-4">{label}</h3>
+        return <h3 className="text-[20px] text-[#002333] dark:text-white font-normal mb-4">{label}</h3>
     }
 
     const getPasswordStrength = (password: string) => {
@@ -54,7 +54,7 @@ export function SecuritySettings({
             <TabTitleComponent label="Login & Security" />
             <div className="space-y-6">
                 <div>
-                    <Label htmlFor="password" className="text-sm font-normal text-[#344054]">
+                    <Label htmlFor="password" className="text-sm font-normal text-[#344054] dark:text-gray-300">
                         Enter password
                     </Label>
                     <div className="relative mt-1">
@@ -63,7 +63,7 @@ export function SecuritySettings({
                             type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="pr-10 bg-gray-50 border-gray-200 text-[#667085]"
+                            className="pr-10 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-[#667085] dark:text-gray-300"
                         />
                         <Button
                             type="button"
@@ -73,15 +73,15 @@ export function SecuritySettings({
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-gray-400" />
+                                <EyeOff className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                             ) : (
-                                <Eye className="h-4 w-4 text-gray-400" />
+                                <Eye className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                             )}
                         </Button>
                     </div>
                 </div>
                 <div>
-                    <div className="text-sm font-bold mb-2 text-[#667085]">
+                    <div className="text-sm font-bold mb-2 text-[#667085] dark:text-gray-300">
                         Strength: <span className={passwordStrength.color}>{passwordStrength.strength}</span>
                     </div>
                     <div className="space-y-2 text-sm">
@@ -91,7 +91,7 @@ export function SecuritySettings({
                             ) : (
                                 <FaRegCircle className="w-4 h-4 text-gray-400" />
                             )}
-                            <span className="text-neutral-600">At least 8 characters</span>
+                            <span className="text-neutral-600 dark:text-gray-400">At least 8 characters</span>
                         </div>
                         <div className="flex items-center gap-2">
                             {passwordStrength.checks.upperLower ? (
@@ -99,7 +99,7 @@ export function SecuritySettings({
                             ) : (
                                 <FaRegCircle className="w-4 h-4 text-gray-400" />
                             )}
-                            <span className="text-neutral-600">At least one uppercase and lowercase character</span>
+                            <span className="text-neutral-600 dark:text-gray-400">At least one uppercase and lowercase character</span>
                         </div>
                         <div className="flex items-center gap-2">
                             {passwordStrength.checks.number ? (
@@ -107,7 +107,7 @@ export function SecuritySettings({
                             ) : (
                                 <FaRegCircle className="w-4 h-4 text-gray-400" />
                             )}
-                            <span className="text-neutral-600">At least one number</span>
+                            <span className="text-neutral-600 dark:text-gray-400">At least one number</span>
                         </div>
                         <div className="flex items-center gap-2">
                             {passwordStrength.checks.special ? (
@@ -115,12 +115,12 @@ export function SecuritySettings({
                             ) : (
                                 <FaRegCircle className="w-4 h-4 text-gray-400" />
                             )}
-                            <span className="text-neutral-600">At least one special character</span>
+                            <span className="text-neutral-600 dark:text-gray-400">At least one special character</span>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <Label htmlFor="new-password" className="text-sm font-medium text-[#344054]">
+                    <Label htmlFor="new-password" className="text-sm font-medium text-[#344054] dark:text-gray-300">
                         Confirm password
                     </Label>
                     <div className="relative mt-1">
@@ -129,7 +129,7 @@ export function SecuritySettings({
                             type={showNewPassword ? "text" : "password"}
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className={`pr-10 ${password !== newPassword ? 'border-red-200 focus:border-red-300' : 'border-gray-200'}`}
+                            className={`pr-10 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-300 ${password !== newPassword ? 'border-red-200 dark:border-red-600 focus:border-red-300 dark:focus:border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
                         />
                         <Button
                             type="button"
@@ -139,9 +139,9 @@ export function SecuritySettings({
                             onClick={() => setShowNewPassword(!showNewPassword)}
                         >
                             {showNewPassword ? (
-                                <EyeOff className="h-4 w-4 text-gray-400" />
+                                <EyeOff className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                             ) : (
-                                <Eye className="h-4 w-4 text-gray-400" />
+                                <Eye className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                             )}
                         </Button>
                     </div>

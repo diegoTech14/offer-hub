@@ -2,11 +2,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { User } from "@/interfaces/user.interface"
 import { Copy, MoreHorizontal } from "lucide-react"
 
-export function UserAnalyticsCardView({ data, onViewAnalytics, onOverflowAction }: {
-    data: User[],
-    onViewAnalytics: (user: User) => void,
-    onOverflowAction: (action: string, userId: number) => void
-  }) {
+interface UserAnalyticsCardViewProps {
+  data: User[];
+  onViewAnalytics: (user: User) => void;
+  onOverflowAction: (action: string, userId: number) => void;
+}
+
+export function UserAnalyticsCardView({ data, onViewAnalytics, onOverflowAction }: UserAnalyticsCardViewProps) {
     return (
       <div className="md:hidden space-y-4">
         {data.map((user) => (

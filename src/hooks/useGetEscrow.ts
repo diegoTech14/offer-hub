@@ -7,7 +7,15 @@ import { useState } from 'react';
  * - It requires a contractId and signer address
  * - Currently disabled due to missing package exports
  */
-export const useGetEscrow = () => {
+
+interface UseGetEscrowReturn {
+  error: Error | null;
+  loading: boolean;
+  data: any;
+  handleGetEscrow: (contractId: string, signer: string) => Promise<void>;
+}
+
+export const useGetEscrow = (): UseGetEscrowReturn => {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
@@ -37,6 +45,5 @@ export const useGetEscrow = () => {
     data,
     loading,
     error,
-    isSuccess: false,
   };
 };

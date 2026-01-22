@@ -83,6 +83,7 @@ export class ErrorHandlerMiddleware {
         message,
         details,
         code: errorCode,
+        statusCode,
         timestamp: new Date().toISOString(),
         ...(process.env.NODE_ENV === 'development' && {
           stack: error instanceof Error ? error.stack : undefined,

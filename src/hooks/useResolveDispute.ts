@@ -10,7 +10,13 @@ import type { WalletError } from "@/types/errors.entity"
 import { DisputeResponse } from "../types/escrow.types";
 import { isDisputeResponse } from "../utils/type-guards";
 
-export const useResolveDispute = () => {
+interface UseResolveDisputeReturn {
+  loading: boolean;
+  response: DisputeResponse | null;
+  resolveDispute: (payload: { contractId: string; signer: string; resolution: string }) => Promise<DisputeResponse>;
+}
+
+export const useResolveDispute = (): UseResolveDisputeReturn => {
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<DisputeResponse | null>(null)
   const { walletAddress } = useWalletContext()
@@ -102,7 +108,5 @@ export const useResolveDispute = () => {
     resolveDispute,
     loading,
     response,
-    reset,
-    isResolving: loading,
   }
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import withErrorBoundary from "@/components/shared/WithErrorBoundary";
 import { useServiceRequestsApi } from "@/hooks/api-connections/use-service-requests-api";
 import type { ServiceRequest } from "@/types/service-request-types";
 
@@ -66,4 +67,4 @@ const ReceivedRequestsList: React.FC<ReceivedRequestsListProps> = ({ freelancerI
   );
 };
 
-export default ReceivedRequestsList;
+export default withErrorBoundary(ReceivedRequestsList);

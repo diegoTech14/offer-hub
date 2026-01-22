@@ -26,17 +26,17 @@ export default function PillTabs({
       className={className || 'w-full'}
     >
       <TabsList
-        className={
-          'flex w-full gap-2 p-1 bg-transparent rounded-full ' +
+        className={clsx(
+          'flex w-full gap-1 p-1 bg-transparent',
           tabsListclassName
-        }
+        )}
       >
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.value}
             value={tab.value}
             className={clsx(
-              'rounded-[4px] px-4 py-2 text-sm font-medium transition-all flex-1',
+              'rounded-lg px-4 py-2.5 text-sm font-medium transition-all flex-1',
               activeTriggerClassName || 'data-[state=active]:bg-[#002333] data-[state=active]:text-white',
               inactiveTriggerClassName || 'data-[state=inactive]:text-[#002333]',
               triggerClassName

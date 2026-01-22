@@ -20,7 +20,7 @@ This document describes the standardized error handling and validation system im
 
 ### ✅ Error Response Format
 
-All error responses follow this consistent format:
+**ALL errors MUST follow this exact format without exceptions:**
 
 ```json
 {
@@ -28,6 +28,8 @@ All error responses follow this consistent format:
   "error": {
     "type": "VALIDATION_ERROR",
     "message": "Validation failed",
+    "code": "VALIDATION_ERROR",
+    "statusCode": 422,
     "details": [
       {
         "field": "email",
@@ -36,11 +38,19 @@ All error responses follow this consistent format:
         "code": "INVALID_EMAIL"
       }
     ],
-    "code": "VALIDATION_ERROR",
     "timestamp": "2024-08-25T10:30:00Z"
   }
 }
 ```
+
+**Mandatory Fields:**
+- `success`: Always `false` for errors
+- `error.type`: Readable error code (AUTHENTICATION_ERROR, VALIDATION_ERROR, etc.)
+- `error.message`: Descriptive error message
+- `error.code`: Código de error (igual que `type`)
+- `error.statusCode`: **Código HTTP (401, 404, 500, etc.) - OBLIGATORIO**
+- `error.timestamp`: ISO 8601 timestamp
+- `error.details`: Opcional, para información adicional
 
 ## Error Types
 

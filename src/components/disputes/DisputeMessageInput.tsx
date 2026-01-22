@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, Share, Camera, Smile } from 'lucide-react';
+import { TIMEOUTS } from '@/constants/magic-numbers';
 
 interface DisputeMessageInputProps {
   onSendMessage: (content: string, file?: File) => void;
@@ -26,7 +27,7 @@ export function DisputeMessageInput({ onSendMessage }: DisputeMessageInputProps)
     if (file) {
       setIsUploading(true);
       // Simulate file upload delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, TIMEOUTS.API_DELAY_VERY_LONG));
       onSendMessage(`Shared file: ${file.name}`, file);
       setIsUploading(false);
       e.target.value = ''; // Reset file input

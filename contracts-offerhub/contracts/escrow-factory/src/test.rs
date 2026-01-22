@@ -27,10 +27,10 @@ fn test_escrow_factory_registration() {
 
     // Create a dummy WASM hash for testing
     let dummy_wasm_hash = BytesN::from_array(&env, &[0u8; 32]);
-    
+
     // Test that we can register the contract
     let contract_id = env.register(EscrowFactory, (dummy_wasm_hash,));
-    
+
     // Test that the contract was registered successfully
     assert!(contract_id != Address::generate(&env));
 }
@@ -58,7 +58,7 @@ fn test_escrow_create_params_validation() {
     assert_eq!(create_params.client, client);
     assert_eq!(create_params.freelancer, freelancer);
     assert_eq!(create_params.fee_manager, fee_manager);
-    
+
     // Test that addresses are different
     assert_ne!(create_params.client, create_params.freelancer);
     assert_ne!(create_params.client, create_params.fee_manager);
@@ -72,10 +72,10 @@ fn test_escrow_factory_client_creation() {
 
     let dummy_wasm_hash = BytesN::from_array(&env, &[0u8; 32]);
     let contract_id = env.register(EscrowFactory, (dummy_wasm_hash,));
-    
+
     // Test that we can create a client
     let client = EscrowFactoryClient::new(&env, &contract_id);
-    
+
     // Test that the client was created successfully
     assert!(client.address == contract_id);
 }
@@ -87,7 +87,7 @@ fn test_batch_operations_structure() {
 
     // Test that we can create batch parameters
     let mut batch_params = Vec::new(&env);
-    
+
     for i in 0..3 {
         let create_params = EscrowCreateParams {
             client: Address::generate(&env),
@@ -98,12 +98,27 @@ fn test_batch_operations_structure() {
         };
         batch_params.push_back(create_params);
     }
-    
+
     // Test batch size
     assert_eq!(batch_params.len(), 3);
-    
+
     // Test that amounts are different
     assert_eq!(batch_params.get(0).unwrap().amount, 1000);
     assert_eq!(batch_params.get(1).unwrap().amount, 1100);
     assert_eq!(batch_params.get(2).unwrap().amount, 1200);
+}
+
+// Helper function to setup test environment
+#[allow(dead_code)]
+fn setup_env() -> (Env, Address, Address, Address, Address, BytesN<32>) {
+    let env = Env::default();
+    env.mock_all_auths();
+    
+    let admin = Address::generate(&env);
+    let client = Address::generate(&env);
+    let freelancer = Address::generate(&env);
+    let fee_manager = Address::generate(&env);
+    let wasm_hash = BytesN::from_array(&env, &[0; 32]);
+    
+    (env, admin, client, freelancer, fee_manager, wasm_hash)
 }

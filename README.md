@@ -52,7 +52,7 @@ cd offer-hub
 4️⃣ Install frontend dependencies:
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 5️⃣ Run the development server:
@@ -128,5 +128,5 @@ If you get stuck or want to discuss implementation ideas, open an issue or start
 
 ## 🧠 Maintained by
 
-**[@Josué](https://github.com/Josue1908)** 
+**[@Josué](https://github.com/Josue19-08)** 
 **[@Kevin](https://github.com/KevinMB0220)** 

@@ -1,12 +1,11 @@
 #![cfg(test)]
 
 use crate::{
-    types::{DisputeLevel, DisputeOutcome, DisputeStatus},
+    types::{DisputeLevel, DisputeOutcome, DisputeState},
     DisputeResolutionContract, DisputeResolutionContractClient,
 };
 use soroban_sdk::{
-    testutils::{Address as _, Ledger},
-    Address, Env, String,
+    testutils::{Address as _, Ledger}, Address, Env, String
 };
 
 fn setup_env() -> Env {
@@ -15,16 +14,15 @@ fn setup_env() -> Env {
     env
 }
 
-fn create_contract(env: &Env) -> (DisputeResolutionContractClient, Address, Address, Address) {
-    let contract_id = Address::generate(env);
-    env.register_contract(&contract_id, DisputeResolutionContract);
+fn create_contract(env: &Env) -> (DisputeResolutionContractClient<'_>, Address, Address, Address) {
+    let contract_id = env.register(DisputeResolutionContract, ());
     let client = DisputeResolutionContractClient::new(env, &contract_id);
     let admin = Address::generate(env);
     let escrow_contract = Address::generate(env);
     let fee_manager = Address::generate(env);
-    
+
     client.initialize(&admin, &86400_u64, &escrow_contract, &fee_manager);
-    
+
     (client, admin, escrow_contract, fee_manager)
 }
 
@@ -32,25 +30,24 @@ fn create_contract(env: &Env) -> (DisputeResolutionContractClient, Address, Addr
 fn test_initialize() {
     let env = setup_env();
     env.mock_all_auths();
-    
-    let contract_id = Address::generate(&env);
-    env.register_contract(&contract_id, DisputeResolutionContract);
+
+    let contract_id = env.register(DisputeResolutionContract, ());
     let client = DisputeResolutionContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let escrow_contract = Address::generate(&env);
     let fee_manager = Address::generate(&env);
-    
+
     client.initialize(&admin, &86400_u64, &escrow_contract, &fee_manager);
 }
 
 #[test]
-#[should_panic]
+#[should_panic(expected = "HostError: Error(Contract, #1)")]
 fn test_initialize_already_initialized() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, escrow_contract, fee_manager) = create_contract(&env);
-    
+
     // Try to initialize again
     client.initialize(&admin, &86400_u64, &escrow_contract, &fee_manager);
 }
@@ -59,23 +56,29 @@ fn test_initialize_already_initialized() {
 fn test_open_dispute() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, _, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let job_id = 1;
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract = Some(Address::generate(&env));
-    
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-    
+
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
     let dispute = client.get_dispute(&job_id);
     assert_eq!(dispute.initiator, initiator);
     assert_eq!(dispute.reason, reason);
     assert_eq!(dispute.timestamp, 1000);
     assert_eq!(dispute.resolved, false);
     assert_eq!(dispute.outcome, DisputeOutcome::None);
-    assert_eq!(dispute.status, DisputeStatus::Open);
+    assert_eq!(dispute.state, DisputeState::Open);
     assert_eq!(dispute.level, DisputeLevel::Mediation);
     assert_eq!(dispute.dispute_amount, dispute_amount);
     assert_eq!(dispute.fee_collected, 0);
@@ -88,29 +91,41 @@ fn test_open_dispute() {
 }
 
 #[test]
-#[should_panic]
+#[should_panic(expected = "HostError: Error(Contract, #4)")]
 fn test_open_dispute_already_exists() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, _, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let job_id = 1;
-    let reason = String::from_str(&env, "reason 1");
+    let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract = Some(Address::generate(&env));
-    
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-    
+
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
     // Try to open the same dispute again
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
 }
 
 #[test]
 fn test_add_evidence() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, _, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let submitter = Address::generate(&env);
@@ -118,16 +133,22 @@ fn test_add_evidence() {
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract = Some(Address::generate(&env));
-    
+
     // Open dispute first
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-    
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
     // Add evidence
     let description = String::from_str(&env, "Screenshot of incomplete work");
     let attachment_hash = Some(String::from_str(&env, "QmHash123"));
-    
+
     client.add_evidence(&job_id, &submitter, &description, &attachment_hash);
-    
+
     let evidence = client.get_dispute_evidence(&job_id);
     assert_eq!(evidence.len(), 1);
     assert_eq!(evidence.get(0).unwrap().submitter, submitter);
@@ -139,18 +160,18 @@ fn test_add_evidence() {
 fn test_arbitrator_management() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, _, _) = create_contract(&env);
     let arbitrator = Address::generate(&env);
     let arbitrator_name = String::from_str(&env, "John Doe");
-    
+
     // Add arbitrator
     client.add_arbitrator(&admin, &arbitrator, &arbitrator_name);
-    
+
     // Get arbitrators
     let _arbitrators = client.get_arbitrators();
     // Note: get_arbitrators returns empty for now due to Soroban Map limitations
-    
+
     // Remove arbitrator
     client.remove_arbitrator(&admin, &arbitrator);
 }
@@ -159,21 +180,21 @@ fn test_arbitrator_management() {
 fn test_mediator_management() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, _, _) = create_contract(&env);
     let mediator = Address::generate(&env);
-    
+
     // Add mediator
     client.add_mediator_access(&admin, &mediator);
-    
+
     // Get mediators
     let mediators = client.get_mediators();
     assert_eq!(mediators.len(), 1);
     assert_eq!(mediators.get(0).unwrap(), mediator);
-    
+
     // Remove mediator
     client.remove_mediator_access(&admin, &mediator);
-    
+
     let mediators_after = client.get_mediators();
     assert_eq!(mediators_after.len(), 0);
 }
@@ -182,7 +203,7 @@ fn test_mediator_management() {
 fn test_assign_mediator() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let mediator = Address::generate(&env);
@@ -190,26 +211,32 @@ fn test_assign_mediator() {
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract = Some(Address::generate(&env));
-    
+
     // Add mediator to the system first
     client.add_mediator_access(&admin, &mediator);
-    
+
     // Open dispute
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-    
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
     // Assign mediator
     client.assign_mediator(&job_id, &admin, &mediator);
-    
+
     let dispute = client.get_dispute(&job_id);
     assert_eq!(dispute.mediator, Some(mediator));
-    assert_eq!(dispute.status, DisputeStatus::UnderMediation);
+    assert_eq!(dispute.state, DisputeState::UnderReview(DisputeLevel::Mediation));
 }
 
 #[test]
 fn test_escalate_to_arbitration() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let mediator = Address::generate(&env);
@@ -218,21 +245,27 @@ fn test_escalate_to_arbitration() {
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract = Some(Address::generate(&env));
-    
+
     // Add mediator and arbitrator to the system
     client.add_mediator_access(&admin, &mediator);
     client.add_arbitrator(&admin, &arbitrator, &String::from_str(&env, "Jane Smith"));
-    
+
     // Open dispute and assign mediator
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
     client.assign_mediator(&job_id, &admin, &mediator);
-    
+
     // Escalate to arbitration
     client.escalate_to_arbitration(&job_id, &mediator, &arbitrator);
-    
+
     let dispute = client.get_dispute(&job_id);
     assert_eq!(dispute.arbitrator, Some(arbitrator));
-    assert_eq!(dispute.status, DisputeStatus::UnderArbitration);
+    assert_eq!(dispute.state, DisputeState::UnderReview(DisputeLevel::Arbitration));
     assert_eq!(dispute.level, DisputeLevel::Arbitration);
 }
 
@@ -240,7 +273,7 @@ fn test_escalate_to_arbitration() {
 fn test_resolve_dispute() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let mediator = Address::generate(&env);
@@ -248,59 +281,72 @@ fn test_resolve_dispute() {
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract: Option<Address> = None; // No escrow contract for this test
-    
+
     // Add mediator to the system
     client.add_mediator_access(&admin, &mediator);
-    
+
     // Open dispute
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-    
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
     // Assign mediator
     client.assign_mediator(&job_id, &admin, &mediator);
-    
+
     // Resolve dispute (favor client)
     client.resolve_dispute(&job_id, &DisputeOutcome::FavorClient);
-    
+
     let dispute = client.get_dispute(&job_id);
     assert_eq!(dispute.resolved, true);
     assert_eq!(dispute.outcome, DisputeOutcome::FavorClient);
-    assert_eq!(dispute.status, DisputeStatus::Resolved);
+    assert_eq!(dispute.state, DisputeState::Resolved);
     assert!(dispute.resolution_timestamp.is_some());
     assert_eq!(dispute.fee_collected, 50000); // 5% of 1000000
 }
 
 #[test]
-#[should_panic]
+#[should_panic(expected = "HostError: Error(Contract, #6)")]
 fn test_resolve_dispute_already_resolved() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
-    let arbitrator = Address::generate(&env);
+    let mediator = Address::generate(&env);
     let job_id = 1;
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract: Option<Address> = None; // No escrow contract for this test
-    
-    // Add arbitrator
-    client.add_arbitrator(&admin, &arbitrator, &String::from_str(&env, "John Doe"));
-    
+
+    // Add mediator to the system
+    client.add_mediator_access(&admin, &mediator);
+
     // Open dispute
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-    
-    // Resolve dispute first time
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
+    // Assign mediator
+    client.assign_mediator(&job_id, &admin, &mediator);
+
+    // Resolve dispute (favor client)
     client.resolve_dispute(&job_id, &DisputeOutcome::FavorClient);
-    
-    // Try to resolve again
-    client.resolve_dispute(&job_id, &DisputeOutcome::FavorFreelancer);
+    client.resolve_dispute(&job_id, &DisputeOutcome::FavorClient);
 }
 
 // #[test]
 // fn test_resolve_dispute_with_escrow() {
 //     let env = setup_env();
 //     env.mock_all_auths();
-//     
+//
 //     let (client, admin, escrow_contract, _) = create_contract(&env);
 //     let initiator = Address::generate(&env);
 //     let arbitrator = Address::generate(&env);
@@ -308,16 +354,16 @@ fn test_resolve_dispute_already_resolved() {
 //     let reason = String::from_str(&env, "Job not completed");
 //     let dispute_amount = 1000000;
 //     let escrow_contract = Some(escrow_contract);
-//     
+//
 //     // Add arbitrator to the system
 //     client.add_arbitrator(&admin, &arbitrator, &String::from_str(&env, "John Doe"));
-//     
+//
 //     // Open dispute
 //     client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-//     
+//
 //     // Escalate to arbitration
 //     client.escalate_to_arbitration(&job_id, &initiator, &arbitrator);
-//     
+//
 //     // Note: This test will fail because the escrow contract doesn't have the resolve_dispute function
 //     // In a real implementation, you would need to mock the escrow contract properly
 //     // For now, we'll skip this test or handle the error gracefully
@@ -327,26 +373,32 @@ fn test_resolve_dispute_already_resolved() {
 fn test_check_timeout() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, _, _, _) = create_contract(&env);
     let initiator = Address::generate(&env);
     let job_id = 1;
     let reason = String::from_str(&env, "Job not completed");
     let dispute_amount = 1000000;
     let escrow_contract = Some(Address::generate(&env));
-    
+
     // Open dispute
-    client.open_dispute(&job_id, &initiator, &reason, &escrow_contract, &dispute_amount);
-    
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
     // Check timeout immediately (should be false)
     let timeout = client.check_timeout(&job_id);
     assert_eq!(timeout, false);
-    
+
     // Advance time past timeout
     env.ledger().with_mut(|li| {
         li.timestamp = 1000 + 86400 + 1; // 24 hours + 1 second
     });
-    
+
     // Check timeout again (should be true)
     let timeout = client.check_timeout(&job_id);
     assert_eq!(timeout, true);
@@ -356,12 +408,12 @@ fn test_check_timeout() {
 fn test_set_dispute_timeout() {
     let env = setup_env();
     env.mock_all_auths();
-    
+
     let (client, admin, _, _) = create_contract(&env);
     let new_timeout = 3600_u64; // 1 hour
-    
+
     client.set_dispute_timeout(&admin, &new_timeout);
-    
+
     // The timeout should be updated (we can't directly check it, but it should work)
 }
 
@@ -370,10 +422,358 @@ fn test_set_dispute_timeout() {
 fn test_set_dispute_timeout_unauthorized() {
     let env = setup_env();
     // Don't use mock_all_auths() to test authorization
-    
+
     let (client, _, _, _) = create_contract(&env);
     let unauthorized_user = Address::generate(&env);
     let new_timeout = 3600_u64;
-    
+
     client.set_dispute_timeout(&unauthorized_user, &new_timeout);
+}
+
+#[test]
+fn test_get_total_disputes() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, _admin, _, _) = create_contract(&env);
+    let initiator = Address::generate(&env);
+    let job_id_1 = 1;
+    let job_id_2 = 2;
+    let reason = String::from_str(&env, "Job not completed");
+    let dispute_amount = 1000000;
+    let escrow_contract_addr = Some(Address::generate(&env));
+
+    // Check initial dispute count
+    let initial_count = client.get_total_disputes();
+    assert_eq!(initial_count, 0);
+
+    // Open first dispute
+    client.open_dispute(
+        &job_id_1,
+        &initiator,
+        &reason,
+        &escrow_contract_addr,
+        &dispute_amount,
+    );
+    let count_after_first = client.get_total_disputes();
+    assert_eq!(count_after_first, 1);
+
+    // Open second dispute
+    client.open_dispute(
+        &job_id_2,
+        &initiator,
+        &reason,
+        &escrow_contract_addr,
+        &dispute_amount,
+    );
+    let count_after_second = client.get_total_disputes();
+    assert_eq!(count_after_second, 2);
+}
+
+#[test]
+fn test_resettotal_disputes() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, admin, _, _) = create_contract(&env);
+    let initiator = Address::generate(&env);
+    let job_id_1 = 1;
+    let job_id_2 = 2;
+    let reason = String::from_str(&env, "Job not completed");
+    let dispute_amount = 1000000;
+    let escrow_contract_addr = Some(Address::generate(&env));
+
+    // Check initial dispute count
+    let initial_count = client.get_total_disputes();
+    assert_eq!(initial_count, 0);
+
+    // Open first dispute
+    client.open_dispute(
+        &job_id_1,
+        &initiator,
+        &reason,
+        &escrow_contract_addr,
+        &dispute_amount,
+    );
+    let count_after_first = client.get_total_disputes();
+    assert_eq!(count_after_first, 1);
+
+    // Open second dispute
+    client.open_dispute(
+        &job_id_2,
+        &initiator,
+        &reason,
+        &escrow_contract_addr,
+        &dispute_amount,
+    );
+    let count_after_second = client.get_total_disputes();
+    assert_eq!(count_after_second, 2);
+
+    let _res = client.reset_dispute_count(&admin);
+
+    let count_after_reset = client.get_total_disputes();
+    assert_eq!(count_after_reset, 0);
+}
+
+#[test]
+// #[should_panic]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_reset_total_disputes_fail() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, _admin, _, _) = create_contract(&env);
+    let initiator = Address::generate(&env);
+    let job_id_1 = 1;
+    let job_id_2 = 2;
+    let reason = String::from_str(&env, "Job not completed");
+    let dispute_amount = 1000000;
+    let escrow_contract_addr = Some(Address::generate(&env));
+    let _new_address = Address::generate(&env);
+
+    // Check initial dispute count
+    let initial_count = client.get_total_disputes();
+    assert_eq!(initial_count, 0);
+
+    // Open first dispute
+    client.open_dispute(
+        &job_id_1,
+        &initiator,
+        &reason,
+        &escrow_contract_addr,
+        &dispute_amount,
+    );
+    let count_after_first = client.get_total_disputes();
+    assert_eq!(count_after_first, 1);
+
+    // Open second dispute
+    client.open_dispute(
+        &job_id_2,
+        &initiator,
+        &reason,
+        &escrow_contract_addr,
+        &dispute_amount,
+    );
+    let count_after_second = client.get_total_disputes();
+    assert_eq!(count_after_second, 2);
+
+    let _ = client.reset_dispute_count(&initiator);
+
+    let count_after_reset = client.get_total_disputes();
+    assert_eq!(count_after_reset, 0);
+}
+
+
+#[test]
+fn test_get_dispute_info() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, admin, _, _) = create_contract(&env);
+    let initiator = Address::generate(&env);
+    let mediator = Address::generate(&env);
+    let arbitrator = Address::generate(&env);
+    let job_id = 1;
+    let reason = String::from_str(&env, "Job not completed");
+    let dispute_amount = 1000000;
+    let escrow_contract = Some(Address::generate(&env));
+
+    // Add mediator and arbitrator to the system
+    client.add_mediator_access(&admin, &mediator);
+    client.add_arbitrator(&admin, &arbitrator, &String::from_str(&env, "Jane Smith"));
+
+    // Open dispute and assign mediator
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+    client.assign_mediator(&job_id, &admin, &mediator);
+
+    // Escalate to arbitration
+    client.escalate_to_arbitration(&job_id, &mediator, &arbitrator);
+
+    let dispute = client.get_dispute_info(&job_id);
+    assert_eq!(dispute.dispute_id, 1);
+    assert_eq!(dispute.fee_collected, 0);
+    assert_eq!(dispute.resolved, false);
+    assert_eq!(dispute.reason, String::from_str(&env, "Job not completed"));
+    assert_eq!(dispute.status, String::from_str(&env, "UnderArbitration"));
+    assert_eq!(dispute.level,String::from_str(&env, "Arbitration"));
+}
+
+
+#[test]
+fn test_dispute_timeout() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, admin, _, _) = create_contract(&env);
+    let initiator = Address::generate(&env);
+    let mediator = Address::generate(&env);
+    let job_id = 1;
+    let reason = String::from_str(&env, "Job not completed");
+    let dispute_amount = 1000000;
+    let escrow_contract: Option<Address> = None; // No escrow contract for this test
+
+    // Add mediator to the system
+    client.add_mediator_access(&admin, &mediator);
+
+    // Open dispute
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
+    // Assign mediator
+    client.assign_mediator(&job_id, &admin, &mediator);
+
+    // Advance time past timeout
+    env.ledger().with_mut(|li| {
+        li.timestamp = 1000 + 86400 + 1; // 24 hours + 1 second
+    });
+
+    // Resolve dispute (favor client)
+    client.resolve_dispute(&job_id, &DisputeOutcome::FavorClient);
+   
+
+    // Verify timeout triggered: dispute closed with split outcome
+    let dispute = client.get_dispute(&job_id);
+    assert_eq!(dispute.resolved, true);
+    assert_eq!(dispute.outcome, DisputeOutcome::Split);
+    assert_eq!(dispute.state, DisputeState::Closed);
+    assert!(dispute.resolution_timestamp.is_some());
+    assert!(dispute.timeout_timestamp.is_some());
+    assert!(env.ledger().timestamp() > dispute.timeout_timestamp.unwrap());
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #11)")]
+fn test_dispute_timeout_fail_min() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, admin, _, _) = create_contract(&env);
+
+    client.set_dispute_timeout(&admin, &1);
+}
+
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #11)")]
+fn test_dispute_timeout_fail_max() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, admin, _, _) = create_contract(&env);
+
+    client.set_dispute_timeout(&admin, &2_592_001);
+}
+
+#[test]
+fn test_pause_unpause() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    
+    let contract_id = env.register(DisputeResolutionContract, ());
+    let client = DisputeResolutionContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let escrow_contract = Address::generate(&env);
+    let fee_manager = Address::generate(&env);
+
+    client.initialize(&admin, &86400_u64, &escrow_contract, &fee_manager);
+    
+    // Test pause
+    client.pause(&admin.clone());
+    assert_eq!(client.is_paused(), true);
+
+    // Test unpause
+    client.unpause(&admin.clone());
+    assert_eq!(client.is_paused(), false);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_pause_unpause_unauthorized() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    
+    let contract_id = env.register(DisputeResolutionContract, ());
+    let client = DisputeResolutionContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let escrow_contract = Address::generate(&env);
+    let fee_manager = Address::generate(&env);
+
+    client.initialize(&admin, &86400_u64, &escrow_contract, &fee_manager);
+    
+    let unauthorized = Address::generate(&env);
+    
+    // Test pause
+    client.pause(&unauthorized.clone());
+    assert_eq!(client.is_paused(), true);
+}
+
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #21)")]
+fn test_open_dispute_panic() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, admin, _, _) = create_contract(&env);
+    let initiator = Address::generate(&env);
+    let job_id = 1;
+    let reason = String::from_str(&env, "Job not completed");
+    let dispute_amount = 1000000;
+    let escrow_contract = Some(Address::generate(&env));
+
+    client.pause(&admin);
+
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+}
+
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #21)")]
+fn test_assign_mediator_panic() {
+    let env = setup_env();
+    env.mock_all_auths();
+
+    let (client, admin, _, _) = create_contract(&env);
+    let initiator = Address::generate(&env);
+    let mediator = Address::generate(&env);
+    let job_id = 1;
+    let reason = String::from_str(&env, "Job not completed");
+    let dispute_amount = 1000000;
+    let escrow_contract = Some(Address::generate(&env));
+
+    // Add mediator to the system first
+    client.add_mediator_access(&admin, &mediator);
+
+    // Open dispute
+    client.open_dispute(
+        &job_id,
+        &initiator,
+        &reason,
+        &escrow_contract,
+        &dispute_amount,
+    );
+
+    client.pause(&admin);
+
+    // Assign mediator
+    client.assign_mediator(&job_id, &admin, &mediator);
 }

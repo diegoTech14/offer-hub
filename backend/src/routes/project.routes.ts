@@ -8,15 +8,12 @@ import {
   assignFreelancerHandler,
 } from "@/controllers/project.controller";
 import { authorizeRoles, verifyToken } from "@/middlewares/auth.middleware";
+import { getProjectHandler } from "@/controllers/project.controller";
 
 const router = Router();
 
-router.post(
-  "/",
-  verifyToken,
-  authorizeRoles("client", "admin"),
-  createProjectHandler
-);
+// GET /api/projects/:projectId - Get project by ID
+router.get("/:projectId", getProjectHandler);
 
 router.get("/", getAllProjectsHandler);
 

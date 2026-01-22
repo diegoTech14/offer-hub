@@ -1,3 +1,8 @@
+/**
+ * @fileoverview React Error Boundary component for handling application errors
+ * @author Offer Hub Team
+ */
+
 "use client"
 
 import { Component, type ErrorInfo, type ReactNode } from "react"

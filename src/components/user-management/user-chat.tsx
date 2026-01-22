@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type React from "react";
 import { ArrowLeft, Smile, ImageIcon, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -49,6 +50,8 @@ export function UserChat({ onBack }: UserChatProps) {
           <AvatarImage
             src="/placeholder.svg?height=40&width=40"
             alt="John Doe"
+            className="object-cover"
+            progressive={false}
           />
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
@@ -86,7 +89,7 @@ export function UserChat({ onBack }: UserChatProps) {
           <Smile className="h-5 w-5 text-gray-400" />
           <Input
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMessage(e.currentTarget.value)}
             placeholder="Message"
             className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
           />

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { VALIDATION_LIMITS } from "@/constants/magic-numbers"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -56,7 +57,7 @@ export default function UserSelectJobType({ userData, updateUserData, prevStep, 
   const handleSelectJobType = (job: string) => {
     const newSelection = selectedJobTypes.includes(job)
       ? selectedJobTypes.filter((j) => j !== job)
-      : selectedJobTypes.length < 4
+      : selectedJobTypes.length < VALIDATION_LIMITS.MAX_JOB_TYPES_SELECTION
         ? [...selectedJobTypes, job]
         : selectedJobTypes
     setSelectedJobTypes(newSelection)
@@ -92,7 +93,7 @@ export default function UserSelectJobType({ userData, updateUserData, prevStep, 
         </div>
 
         <div className="space-y-3 md:col-span-2">
-          <h3 className="text-lg font-medium">Select up to 4 options</h3>
+          <h3 className="text-lg font-medium">Select up to {VALIDATION_LIMITS.MAX_JOB_TYPES_SELECTION} options</h3>
           <div className="flex flex-col space-y-3">
             {jobOptions.map((job) => (
               <label key={job} className="flex items-center space-x-3 cursor-pointer">
@@ -100,7 +101,7 @@ export default function UserSelectJobType({ userData, updateUserData, prevStep, 
                   type="checkbox"
                   checked={selectedJobTypes.includes(job)}
                   onChange={() => handleSelectJobType(job)}
-                  disabled={!selectedJobTypes.includes(job) && selectedJobTypes.length >= 4}
+                  disabled={!selectedJobTypes.includes(job) && selectedJobTypes.length >= VALIDATION_LIMITS.MAX_JOB_TYPES_SELECTION}
                   className="w-5 h-5 accent-[#149A9B] rounded"
                 />
                 <span className="text-sm">{job}</span>

@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
+import { TIMEOUTS } from "@/constants/magic-numbers"
 
 interface Message {
   id: string
@@ -89,7 +90,7 @@ export function MessageProvider({ children }: { children: React.ReactNode }) {
       try {
         setLoading(true)
         // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 800))
+        await new Promise((resolve) => setTimeout(resolve, TIMEOUTS.API_DELAY_LONG))
         setConversations(mockConversations)
       } catch (err) {
         setError("Failed to load conversations")
@@ -108,7 +109,7 @@ export function MessageProvider({ children }: { children: React.ReactNode }) {
   const sendMessage = async (talentId: number, text: string): Promise<void> => {
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, TIMEOUTS.API_DELAY_SHORT))
 
       const newMessage: Message = {
         id: Date.now().toString(),

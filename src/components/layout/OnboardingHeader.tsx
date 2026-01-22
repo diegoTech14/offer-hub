@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Image from 'next/image';
 
 interface OnboardingHeaderProps {
   onSignUp?: () => void;
@@ -17,9 +18,11 @@ const OnboardingHeader: React.FC<OnboardingHeaderProps> = ({
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-white">
       <div className="flex items-center space-x-2">
-        <img 
+        <Image 
           src="/dark_logo.svg" 
           alt="OfferHub Logo" 
+          width={112}
+          height={56}
           className="h-14 w-auto"
         />
         <span className="text-gray-800 font-semibold text-2xl">OfferHub</span>

@@ -4,12 +4,13 @@ mod contract;
 mod error;
 mod event;
 mod storage;
-mod utils;
-mod validation;
 #[cfg(test)]
 mod test;
 #[cfg(test)]
 mod test_optimization;
+mod types;
+mod utils;
+mod validation;
 
 use crate::contract::PublicationContract;
 use crate::error::ContractError;
@@ -31,7 +32,7 @@ impl Contract {
         amount: i128,
         timestamp: u64,
     ) -> Result<u32, ContractError> {
-        PublicationContract::publish(
+        PublicationContract::publish_internal(
             env,
             user,
             publication_type,
@@ -44,7 +45,6 @@ impl Contract {
 
     /// Retrieves a specific publication for a user.
     pub fn get_publication(env: Env, user: Address, id: u32) -> Option<PublicationData> {
-        PublicationContract::get_publication(env, user, id)
+        PublicationContract::get_publication_internal(env, user, id)
     }
 }
-

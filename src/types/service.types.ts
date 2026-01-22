@@ -1,3 +1,5 @@
+import { LocationData } from './location.types'
+
 // Service data structure from backend
 export interface Service {
   id: string;
@@ -35,6 +37,10 @@ export interface ServiceFilters {
   keyword?: string;
   page?: number;
   limit?: number;
+  location?: LocationData
+  searchRadius?: number
+  timezones?: string[]
+  
 }
 
 // API Response interfaces
@@ -61,6 +67,7 @@ export interface FreelancerDisplay {
   id: string;
   name: string;
   title: string;
+  avatar?: string;
   rating: number;
   reviewCount: number;
   location: string;
@@ -70,6 +77,9 @@ export interface FreelancerDisplay {
   projectsCompleted: number;
   responseTime: string;
   category: string;
+  coordinates?: { lat: number; lng: number }
+  timezone?: string
+  isTopRated?: boolean
 }
 
 // Search hook return type

@@ -1,22 +1,38 @@
+
 import React from "react";
+import withErrorBoundary from "@/components/shared/WithErrorBoundary";
+
 import {
   Heart,
   MessageCircle,
   ChevronLeft,
   ChevronRight,
-  Star,
+
 } from "lucide-react";
+import StarRating from "@/components/ui/star-rating";
+import { useReviewsApi } from "@/hooks/api-connections/use-reviews-api";
 interface UserProfileProps {
+  userId?: string;
   onBack: () => void;
   onMessage: () => void;
   onRestrictAccount: () => void;
 }
 
 const UserProfile = ({
+  userId = "default-user-id", // TODO: Replace with actual user ID from props or context
   //   onBack,
   onMessage,
   onRestrictAccount,
 }: UserProfileProps) => {
+  // Fetch real reviews data
+  const { useUserReviews, computeAverage } = useReviewsApi();
+  const {
+    data: reviews = [],
+    isLoading: reviewsLoading,
+    error: reviewsError,
+  } = useUserReviews(userId);
+
+  const averageRating = computeAverage(reviews);
   return (
     <div className="min-h-screen bg-white p-4 md:p-8 max-w-4xl mx-auto">
       <div className="">
@@ -194,92 +210,87 @@ const UserProfile = ({
 
         {/* Reviews Section */}
         <div className="p-6 md:p-8 border border-[#DEEFE7] mt-4 bg-[#F8F8F8] shadow-sm">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Reviews</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
+            {reviews.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <StarRating rating={averageRating} size="sm" />
+                <span className="text-sm font-medium text-gray-700">
+                  {averageRating}
+                </span>
+                <span className="text-sm text-gray-500">
+                  ({reviews.length} review{reviews.length !== 1 ? "s" : ""})
+                </span>
+              </div>
+            )}
+          </div>
 
           <div className="space-y-6 mb-6">
-            {/* Review 1 */}
-            <div className="border-b border-gray-100 pb-6 last:border-b-0">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-gray-900">John Doe</h3>
-                  <p className="text-sm text-gray-500">April 15, 2025</p>
-                </div>
-                <div className="flex gap-1">
-                  {[...Array(4)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className="fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                  <Star
-                    size={16}
-                    className="fill-yellow-400 text-yellow-400 opacity-50"
-                  />
-                </div>
+            {reviewsLoading ? (
+              <div className="space-y-6">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="border-b border-gray-100 pb-6 last:border-b-0 animate-pulse"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="h-5 bg-gray-300 rounded w-32 mb-2"></div>
+                        <div className="h-4 bg-gray-300 rounded w-24"></div>
+                      </div>
+                      <div className="h-4 bg-gray-300 rounded w-20"></div>
+                    </div>
+                    <div className="h-12 bg-gray-300 rounded w-full"></div>
+                  </div>
+                ))}
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                &quot;Very helpful, and insightful. We look forward to a long
-                lasting relationship with Mohsin and his team of lead generation
-                experts.&quot;
-              </p>
-            </div>
+            ) : reviewsError ? (
+              <div className="text-center py-12">
+                <p className="text-red-600 mb-2">Failed to load reviews</p>
+                <p className="text-gray-500 text-sm">{reviewsError}</p>
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">No reviews yet</p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Reviews from completed contracts will appear here
+                </p>
+              </div>
+            ) : (
+              reviews.map((review) => {
+                const reviewDate = new Date(review.created_at);
+                const formattedDate = reviewDate.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                });
 
-            {/* Review 2 */}
-            <div className="border-b border-gray-100 pb-6 last:border-b-0">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-gray-900">Alex Smith</h3>
-                  <p className="text-sm text-gray-500">April 15, 2025</p>
-                </div>
-                <div className="flex gap-1">
-                  {[...Array(4)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className="fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                  <Star
-                    size={16}
-                    className="fill-yellow-400 text-yellow-400 opacity-50"
-                  />
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                &quot;Incredibly useful and enlightening. We are excited about
-                building a lasting partnership with Sarah and her team of
-                marketing specialists.&quot;
-              </p>
-            </div>
-
-            {/* Review 3 */}
-            <div className="border-b border-gray-100 pb-6 last:border-b-0">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-gray-900">Emily Johnson</h3>
-                  <p className="text-sm text-gray-500">April 15, 2025</p>
-                </div>
-                <div className="flex gap-1">
-                  {[...Array(4)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className="fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                  <Star
-                    size={16}
-                    className="fill-yellow-400 text-yellow-400 opacity-50"
-                  />
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                &quot;Incredibly useful and enlightening. We are excited about
-                building a lasting partnership with Sarah and her team of
-                marketing specialists.&quot;
-              </p>
-            </div>
+                return (
+                  <div
+                    key={review.id}
+                    className="border-b border-gray-100 pb-6 last:border-b-0"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          Client Review
+                        </h3>
+                        <p className="text-sm text-gray-500">{formattedDate}</p>
+                      </div>
+                      <StarRating rating={review.rating} size="sm" />
+                    </div>
+                    {review.comment && (
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        &quot;{review.comment}&quot;
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-400 mt-2">
+                      Contract: {review.contract_id.slice(-8)}
+                    </p>
+                  </div>
+                );
+              })
+            )}
           </div>
 
           {/* Reviews Navigation */}
@@ -303,4 +314,4 @@ const UserProfile = ({
   );
 };
 
-export default UserProfile;
+export default withErrorBoundary(UserProfile);

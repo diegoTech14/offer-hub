@@ -9,7 +9,14 @@ import { isEscrowUpdateResponse, isErrorWithMessage } from '../utils/type-guards
  * - It requires a contractId and signer address
  * - Updates can include milestone information, amounts, and other escrow parameters
  */
-export const useUpdateEscrow = () => {
+
+interface UseUpdateEscrowReturn {
+  error: Error | null;
+  response: EscrowUpdateResponse | null;
+  handleUpdateEscrow: (payload: UpdateEscrowPayload) => Promise<void>;
+}
+
+export const useUpdateEscrow = (): UseUpdateEscrowReturn => {
     // const { updateEscrow, isPending, isError, isSuccess } = usePackageUpdateEscrow(); // Temporarily commented
     // const { sendTransaction } = useSendTransaction(); // Temporarily commented
     const [error, setError] = useState<Error | null>(null);
@@ -89,9 +96,7 @@ export const useUpdateEscrow = () => {
 
     return {
         handleUpdateEscrow,
-        loading: false, // Temporarily false - isPending not available
-        error: error, // Removed isError reference as it's not available
-        isSuccess: false, // Temporarily false - isSuccess not available
+        error,
         response,
     };
 };

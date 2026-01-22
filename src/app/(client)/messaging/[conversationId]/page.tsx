@@ -13,14 +13,21 @@ interface PageProps {
   params: Promise<{ conversationId: string }>
 }
 
-export default async function MessagingById({ params }: PageProps) {
+// Server component wrapper
+async function MessagingServerWrapper({ params }: PageProps) {
   const { conversationId } = await params
-  
   return <MessagingClient conversationId={conversationId} />
 }
 
+export default MessagingServerWrapper
+
+// Define proper types based on what useMessagesMock returns
+type UseMessagesReturn = ReturnType<typeof useMessages>;
+type UIConversation = UseMessagesReturn['conversations'][number];
+type UIMessage = UseMessagesReturn['messages'][number];
+
 // Convert UIConversation to MessagesConversation (for MessagesSidebar)
-const convertUIConversationToMessagesConversation = (uiConv: any): MessagesConversation => {
+const convertUIConversationToMessagesConversation = (uiConv: UIConversation): MessagesConversation => {
   return {
     id: uiConv.id,
     project_id: undefined,
@@ -41,7 +48,7 @@ const convertUIConversationToMessagesConversation = (uiConv: any): MessagesConve
 };
 
 // Convert UIConversation to MessagesMainConversation (for MessagesMainPlus)
-const convertUIConversationToMessagesMainConversation = (uiConv: any): MessagesMainConversation => {
+const convertUIConversationToMessagesMainConversation = (uiConv: UIConversation): MessagesMainConversation => {
   return {
     id: parseInt(uiConv.id),
     name: uiConv.name,
@@ -54,7 +61,7 @@ const convertUIConversationToMessagesMainConversation = (uiConv: any): MessagesM
 };
 
 // Convert UIMessage to MessagesMainMessage
-const convertUIMessageToMessagesMainMessage = (uiMsg: any): MessagesMainMessage => {
+const convertUIMessageToMessagesMainMessage = (uiMsg: UIMessage): MessagesMainMessage => {
   return {
     id: parseInt(uiMsg.id),
     content: uiMsg.content || '',
@@ -78,7 +85,9 @@ function MessagingClient({ conversationId }: { conversationId: string }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isUserActive, setIsUserActive] = useState(false)
 
-  useEffect(() => { setActiveConversationId(conversationId) }, [conversationId, setActiveConversationId])
+  useEffect(() => { 
+    setActiveConversationId(conversationId) 
+  }, [conversationId, setActiveConversationId])
 
   return (
     <div className="min-h-screen bg-gray-50">

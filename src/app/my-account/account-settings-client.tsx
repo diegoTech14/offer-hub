@@ -10,8 +10,8 @@ import { SecuritySettings } from "@/components/account-settings/security-setting
 import { NotificationSettings } from "@/components/account-settings/notification-settings";
 import { ServiceSettings } from "@/components/account-settings/service-settings";
 import { ConversionRates, Service } from "@/components/account-settings/types";
-import { useProfileApi } from "@/hooks/api-connections/use-profile-api";
-import { useFreelancerServicesApi } from "@/hooks/api-connections/use-freelancer-services-api";
+import { useProfileApiMock as useProfileApi } from "@/hooks/api-connections/use-profile-api-mock";
+import { useFreelancerServicesApiMock as useFreelancerServicesApi } from "@/hooks/api-connections/use-freelancer-services-api-mock";
 import { User } from "@/types/user.types";
 
 const fallbackConversionRates: ConversionRates = {
@@ -215,7 +215,7 @@ export default function AccountSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -241,39 +241,39 @@ export default function AccountSettings() {
               isLoading={profileLoading}
             />
             {profileError && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p className="text-red-600">{profileError.message}</p>
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+                <p className="text-red-600 dark:text-red-400">{profileError.message}</p>
                 <button
                   onClick={() => fetchProfile(TEMP_USER_ID)}
-                  className="mt-2 text-sm text-red-700 underline hover:no-underline"
+                  className="mt-2 text-sm text-red-700 dark:text-red-400 underline hover:no-underline"
                 >
                   Retry loading profile
                 </button>
               </div>
             )}
             <Tabs defaultValue="wallet" className="w-full">
-              <TabsList className="grid grid-cols-4 sm:grid-cols-4 mb-8 bg-[#F1F3F7] rounded-full items-center h-13 px-0 sm:px-2 py-1">
+              <TabsList className="grid grid-cols-4 sm:grid-cols-4 mb-8 bg-[#F1F3F7] dark:bg-gray-800 rounded-full items-center h-13 px-0 sm:px-2 py-1">
                 <TabsTrigger
                   value="wallet"
-                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white p-1 sm:p-3 rounded-full text-xs sm:text-sm"
+                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white p-1 sm:p-3 rounded-full text-xs sm:text-sm text-gray-700 dark:text-gray-300"
                 >
                   Wallet
                 </TabsTrigger>
                 <TabsTrigger
                   value="security"
-                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white p-1 sm:p-3 rounded-full text-xs sm:text-sm"
+                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white p-1 sm:p-3 rounded-full text-xs sm:text-sm text-gray-700 dark:text-gray-300"
                 >
                   Security
                 </TabsTrigger>
                 <TabsTrigger
                   value="notifications"
-                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white px-2 py-1 sm:p-3 rounded-full text-xs sm:text-sm"
+                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white px-2 py-1 sm:p-3 rounded-full text-xs sm:text-sm text-gray-700 dark:text-gray-300"
                 >
                   Notifications
                 </TabsTrigger>
                 <TabsTrigger
                   value="services"
-                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white p-1 sm:p-3 rounded-full text-xs sm:text-sm"
+                  className="data-[state=active]:bg-[#002333] data-[state=active]:text-white p-1 sm:p-3 rounded-full text-xs sm:text-sm text-gray-700 dark:text-gray-300"
                 >
                   Services
                 </TabsTrigger>
@@ -288,7 +288,7 @@ export default function AccountSettings() {
               </TabsContent>
               <TabsContent
                 value="security"
-                className="space-y-6 bg-white p-4 sm:p-6 rounded-lg"
+                className="space-y-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg"
               >
                 <SecuritySettings
                   password={password}
@@ -303,7 +303,7 @@ export default function AccountSettings() {
               </TabsContent>
               <TabsContent
                 value="notifications"
-                className="space-y-6 bg-white p-4 sm:p-6 rounded-lg"
+                className="space-y-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg"
               >
                 <NotificationSettings
                   jobAlert={jobAlert}
@@ -318,11 +318,11 @@ export default function AccountSettings() {
               </TabsContent>
               <TabsContent
                 value="services"
-                className="space-y-6 bg-white p-4 sm:p-6 rounded-lg"
+                className="space-y-6 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg"
               >
                 {servicesLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <div className="text-gray-500">Loading services...</div>
+                    <div className="text-gray-500 dark:text-gray-400">Loading services...</div>
                   </div>
                 ) : (
                   <ServiceSettings

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import QRCodeDisplay from './QRCodeDisplay'
+import { TIMEOUTS } from '@/constants/magic-numbers'
 
 interface DepositModalProps {
   isOpen: boolean
@@ -80,7 +81,7 @@ function DepositModal({ isOpen, onClose }: DepositModalProps) {
       await navigator.clipboard.writeText(walletAddress)
       setCopied(true)
       toast.success('Address copied to clipboard!')
-      setTimeout(() => setCopied(false), 2000)
+      setTimeout(() => setCopied(false), TIMEOUTS.COPY_FEEDBACK_DURATION)
     } catch (err) {
       toast.error('Failed to copy address')
     }

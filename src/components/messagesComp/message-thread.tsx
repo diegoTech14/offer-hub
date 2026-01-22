@@ -8,6 +8,7 @@ import { DateDivider } from "./date-divider";
 import { MessageBubble } from "./message-bubble";
 import { TypingIndicator } from "./typing-indicator";
 import { cn } from "@/lib/utils";
+import { TIMEOUTS } from "@/constants/magic-numbers";
 import { formatDayLabel, isoDateKey } from "@/lib/date";
 
 // Thread grouped by day, auto-scrolls, supports "jump to reply" and "jump back".
@@ -81,7 +82,7 @@ export function MessageThread({
     if (container != null && previousScrollTop != null) {
       container.scrollTo({ top: previousScrollTop, behavior: "smooth" });
     }
-    window.setTimeout(() => setShowJumpBack(false), 600);
+    window.setTimeout(() => setShowJumpBack(false), TIMEOUTS.JUMP_BACK_DISPLAY_DURATION);
   };
 
   const bottomRef = useRef<HTMLDivElement | null>(null);

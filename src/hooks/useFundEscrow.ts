@@ -5,7 +5,13 @@ interface FundEscrowPayload {
   amount: string;
 }
 
-export const useFundEscrow = () => {
+interface UseFundEscrowReturn {
+  loading: boolean;
+  error: string | null;
+  handleFundEscrow: (payload: FundEscrowPayload) => Promise<boolean>;
+}
+
+export const useFundEscrow = (): UseFundEscrowReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const handleFundEscrow = async (payload: FundEscrowPayload) => {
@@ -52,15 +58,15 @@ export const useFundEscrow = () => {
       } else {
         throw new Error(result.message || 'Transaction failed');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to fund escrow');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fund escrow');
       return false;
     } finally {
       setLoading(false);
     }
   };
   return {
-    fundEscrow: handleFundEscrow,
+    handleFundEscrow,
     loading,
     error
   };

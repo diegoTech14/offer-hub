@@ -1,53 +1,37 @@
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { VALIDATION_LIMITS } from "@/constants/magic-numbers";
+import { SkillsAutocomplete } from "./skills-autocomplete";
+import { useSkills } from "@/hooks/use-skills";
+import { ProjectContext } from "@/utils/skills-relevance";
 
 interface SkillsSelectorProps {
   addedSkills: string[];
   onSkillsChange: (skills: string[]) => void;
+  selectedCategories?: string[];
+  projectContext?: ProjectContext;
 }
 
-export function SkillsSelector({ addedSkills, onSkillsChange }: SkillsSelectorProps) {
-  const [skillSearch, setSkillSearch] = useState("");
-
-  const handleAddSkill = (skill: string) => {
-    if (skill.trim() && !addedSkills.includes(skill.trim()) && addedSkills.length < 10) {
-      onSkillsChange([...addedSkills, skill.trim()]);
-      setSkillSearch("");
-    }
-  };
-
-  const handleRemoveSkill = (skillToRemove: string) => {
-    onSkillsChange(addedSkills.filter(skill => skill !== skillToRemove));
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddSkill(skillSearch);
-    }
-  };
+export function SkillsSelector({
+  addedSkills,
+  onSkillsChange,
+  selectedCategories = [],
+  projectContext,
+}: SkillsSelectorProps) {
+  const { handleRemoveSkill } = useSkills({
+    addedSkills,
+    onSkillsChange,
+    selectedCategories,
+    projectContext,
+  });
 
   return (
     <div className="space-y-4">
-      {/* Skills Search */}
-      <div className="space-y-2">
-        <label htmlFor="skillSearch" className="text-sm font-medium text-gray-700">
-          Skill required for project
-        </label>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <Input
-            id="skillSearch"
-            type="text"
-            placeholder="Search and add up to 10 skills"
-            value={skillSearch}
-            onChange={(e) => setSkillSearch(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="w-full pl-10 rounded-lg border border-gray-300"
-          />
-        </div>
-      </div>
+      {/* Skills Autocomplete */}
+      <SkillsAutocomplete
+        addedSkills={addedSkills}
+        onSkillsChange={onSkillsChange}
+        selectedCategories={selectedCategories}
+        projectContext={projectContext}
+      />
 
       {/* Added Skills */}
       {addedSkills.length > 0 && (
@@ -75,4 +59,4 @@ export function SkillsSelector({ addedSkills, onSkillsChange }: SkillsSelectorPr
       )}
     </div>
   );
-} 
+}

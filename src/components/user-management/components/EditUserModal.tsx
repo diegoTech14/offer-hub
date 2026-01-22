@@ -46,7 +46,7 @@ export function EditUserModal({
             </label>
             <Input
               value={userToEdit?.name ?? ""}
-              onChange={(e) =>
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setUserToEdit({ ...userToEdit, name: e.target.value })
               }
             />
@@ -57,7 +57,7 @@ export function EditUserModal({
             </label>
             <Input
               value={userToEdit?.email ?? ""}
-              onChange={(e) =>
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setUserToEdit({ ...userToEdit, email: e.target.value })
               }
             />
@@ -68,7 +68,7 @@ export function EditUserModal({
             </label>
             <Select
               value={userToEdit?.status ?? ""}
-              onValueChange={(value) =>
+              onValueChange={(value: string) =>
                 setUserToEdit({ ...userToEdit, status: value })
               }
             >

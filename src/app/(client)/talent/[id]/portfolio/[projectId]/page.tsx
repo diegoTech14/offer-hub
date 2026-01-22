@@ -1,5 +1,6 @@
 "use client"
 import { useParams, useRouter } from "next/navigation"
+import "@/styles/print.css";
 import { useProjectDetails } from "@/hooks/talent/useProjectDetails"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -44,6 +45,19 @@ export default function ProjectDetailPage() {
         <div className="min-h-screen bg-gray-100">
             <TalentLayout>
                 <div className="">
+                    <div className="bg-white px-4 py-3 mb-4">
+                        <div className="flex items-center justify-end">
+                            <button
+                                type="button"
+                                className="print-btn no-print inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50"
+                                onClick={() => {
+                                    if (typeof window !== "undefined" && window.print) window.print();
+                                }}
+                            >
+                                Print
+                            </button>
+                        </div>
+                    </div>
                     {/* Main Images */}
                     <div className="mb-8">
 

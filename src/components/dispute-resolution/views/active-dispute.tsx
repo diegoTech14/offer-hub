@@ -7,7 +7,8 @@ import React, { useState } from 'react';
 import { DisputeRow } from '@/types';
 import Link from 'next/link';
 import { SlMagnifier } from 'react-icons/sl';
-import { useMockDisputes } from '@/data/generic-mock-data';
+import { useMockDisputes } from '@/__mocks__/generic-mock-data';
+import { VALIDATION_LIMITS } from '@/constants/magic-numbers';
 
 const columns: DisputeTableColumn<DisputeRow>[] = [
   { key: 'createdAt', label: 'Date Initiated' },
@@ -29,7 +30,7 @@ const columns: DisputeTableColumn<DisputeRow>[] = [
     key: 'email',
     label: 'Email address',
     render: (row) =>
-      row.email.length > 25 ? row.email.slice(0, 25) + '...' : row.email,
+      row.email.length > VALIDATION_LIMITS.MAX_EMAIL_DISPLAY_LENGTH ? row.email.slice(0, VALIDATION_LIMITS.MAX_EMAIL_DISPLAY_LENGTH) + '...' : row.email,
   },
   {
     key: 'action',

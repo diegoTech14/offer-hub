@@ -82,21 +82,22 @@ export default function ProjectRequirements({ projectData, updateProjectData }: 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={item}>
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Project Requirements</CardTitle>
-            <CardDescription>Define the skills and experience level needed for your project</CardDescription>
+            <CardTitle className="dark:text-white">Project Requirements</CardTitle>
+            <CardDescription className="dark:text-gray-300">Define the skills and experience level needed for your project</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <Label htmlFor="skills">Required Skills</Label>
+              <Label htmlFor="skills" className="dark:text-gray-300">Required Skills</Label>
               <div className="flex gap-2">
                 <Input
                   id="skills"
                   placeholder="e.g. JavaScript, Photoshop, Content Writing"
                   value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSkillInput(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 />
                 <Button type="button" onClick={addSkill} className="bg-[#15949C] hover:bg-[#15949C]/90 flex-shrink-0">
                   <Plus className="h-4 w-4" />
@@ -106,12 +107,12 @@ export default function ProjectRequirements({ projectData, updateProjectData }: 
               {projectData.skills.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {projectData.skills.map((skill: string) => (
-                    <Badge key={skill} className="bg-[#DEEFE7] text-[#002333] hover:bg-[#DEEFE7]/80">
+                    <Badge key={skill} className="bg-[#DEEFE7] text-[#002333] hover:bg-[#DEEFE7]/80 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
                       {skill}
                       <button
                         type="button"
                         onClick={() => removeSkill(skill)}
-                        className="ml-1 rounded-full hover:bg-[#15949C]/10"
+                        className="ml-1 rounded-full hover:bg-[#15949C]/10 dark:hover:bg-gray-500"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -121,7 +122,7 @@ export default function ProjectRequirements({ projectData, updateProjectData }: 
               )}
 
               <div className="mt-4">
-                <p className="text-sm text-[#002333]/70 mb-2">Suggested skills for your project:</p>
+                <p className="text-sm text-[#002333]/70 dark:text-gray-400 mb-2">Suggested skills for your project:</p>
                 <div className="flex flex-wrap gap-2">
                   {categorySkills.map((skill) => (
                     <Badge
@@ -129,7 +130,7 @@ export default function ProjectRequirements({ projectData, updateProjectData }: 
                       className={`cursor-pointer ${
                         projectData.skills.includes(skill)
                           ? "bg-[#15949C] text-white"
-                          : "bg-gray-100 text-[#002333] hover:bg-gray-200"
+                          : "bg-gray-100 text-[#002333] hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                       }`}
                       onClick={() => addSuggestedSkill(skill)}
                     >
@@ -142,30 +143,30 @@ export default function ProjectRequirements({ projectData, updateProjectData }: 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="experience-level">Experience Level</Label>
+              <Label htmlFor="experience-level" className="dark:text-gray-300">Experience Level</Label>
               <Select
                 value={projectData.experienceLevel}
-                onValueChange={(value) => updateProjectData("experienceLevel", value)}
+                onValueChange={(value: string) => updateProjectData("experienceLevel", value)}
               >
-                <SelectTrigger id="experience-level">
+                <SelectTrigger id="experience-level" className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                   <SelectValue placeholder="Select required experience level" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                   {experienceLevels.map((level) => (
-                    <SelectItem key={level.id} value={level.id}>
+                    <SelectItem key={level.id} value={level.id} className="dark:text-white dark:hover:bg-gray-600">
                       {level.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">
                 This helps match your project with freelancers of the right experience level
               </p>
             </div>
 
-            <Alert className="bg-[#DEEFE7]/30 border-[#15949C]">
+            <Alert className="bg-[#DEEFE7]/30 border-[#15949C] dark:bg-gray-700/50 dark:border-gray-600">
               <AlertCircle className="h-4 w-4 text-[#15949C]" />
-              <AlertDescription className="text-[#002333]/70">
+              <AlertDescription className="text-[#002333]/70 dark:text-gray-300">
                 Clearly defined requirements help attract qualified freelancers and result in more accurate proposals.
               </AlertDescription>
             </Alert>

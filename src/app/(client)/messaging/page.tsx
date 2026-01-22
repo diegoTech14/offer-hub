@@ -9,8 +9,13 @@ import { useMessagesMock as useMessages } from "@/hooks/useMessagesMock"
 import type { Conversation as MessagesConversation } from '@/types/messages.types';
 import type { Conversation as MessagesMainConversation, Message as MessagesMainMessage } from '@/types/index';
 
+// Define proper types based on what useMessagesMock returns
+type UseMessagesReturn = ReturnType<typeof useMessages>;
+type UIConversation = UseMessagesReturn['conversations'][number];
+type UIMessage = UseMessagesReturn['messages'][number];
+
 // Convert UIConversation to MessagesConversation (for MessagesSidebar)
-const convertUIConversationToMessagesConversation = (uiConv: any): MessagesConversation => {
+const convertUIConversationToMessagesConversation = (uiConv: UIConversation): MessagesConversation => {
   return {
     id: uiConv.id,
     project_id: undefined,
@@ -31,7 +36,7 @@ const convertUIConversationToMessagesConversation = (uiConv: any): MessagesConve
 };
 
 // Convert UIConversation to MessagesMainConversation (for MessagesMainPlus)
-const convertUIConversationToMessagesMainConversation = (uiConv: any): MessagesMainConversation => {
+const convertUIConversationToMessagesMainConversation = (uiConv: UIConversation): MessagesMainConversation => {
   return {
     id: parseInt(uiConv.id),
     name: uiConv.name,
@@ -44,7 +49,7 @@ const convertUIConversationToMessagesMainConversation = (uiConv: any): MessagesM
 };
 
 // Convert UIMessage to MessagesMainMessage
-const convertUIMessageToMessagesMainMessage = (uiMsg: any): MessagesMainMessage => {
+const convertUIMessageToMessagesMainMessage = (uiMsg: UIMessage): MessagesMainMessage => {
   return {
     id: parseInt(uiMsg.id),
     content: uiMsg.content || '',

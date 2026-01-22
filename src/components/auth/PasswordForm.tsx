@@ -2,7 +2,8 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState } from "react"
+import { TIMEOUTS } from "@/constants/magic-numbers";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +25,7 @@ export function PasswordForm() {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, TIMEOUTS.API_DELAY_EXTRA_LONG));
       console.log("Sign in attempt:", { email, password, keepLoggedIn });
 
       router.push("/dashboard");

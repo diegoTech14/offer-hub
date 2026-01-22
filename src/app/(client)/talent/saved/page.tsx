@@ -8,8 +8,8 @@ import React, { useState, useMemo, useEffect } from 'react'
 import SearchBar from '@/components/talent/SearchBar';
 import FilterComponent from '@/components/talent/TalentFilters';
 import TalentCard from '@/components/talent/TalentCard';
-import { talentProfileData as talentMockData } from '@/lib/mockData/talent-mock-data';
-import { Filters } from '@/lib/mockData/filters-mock-data';
+import { talentProfileData as talentMockData } from '@/__mocks__/talent-mock-data';
+import { Filters } from '@/__mocks__/filters-mock-data';
 
 const SavedTalentsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');

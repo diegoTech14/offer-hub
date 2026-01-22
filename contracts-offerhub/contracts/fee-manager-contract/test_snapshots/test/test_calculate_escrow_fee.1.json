@@ -1,8 +1,7 @@
 {
   "generators": {
     "address": 4,
-    "nonce": 0,
-    "mux_id": 0
+    "nonce": 0
   },
   "auth": [
     [],
@@ -30,7 +29,7 @@
     []
   ],
   "ledger": {
-    "protocol_version": 23,
+    "protocol_version": 22,
     "sequence_number": 0,
     "timestamp": 0,
     "network_id": "0000000000000000000000000000000000000000000000000000000000000000",
@@ -64,6 +63,85 @@
                     "storage": [
                       {
                         "key": {
+                          "symbol": "CONFIG"
+                        },
+                        "val": {
+                          "map": [
+                            {
+                              "key": {
+                                "symbol": "dispute_timeout_hours"
+                              },
+                              "val": {
+                                "u32": 168
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "escrow_timeout_days"
+                              },
+                              "val": {
+                                "u32": 30
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "max_escrow_amount"
+                              },
+                              "val": {
+                                "u128": {
+                                  "hi": 0,
+                                  "lo": 1000000000
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "max_rate_limit_calls"
+                              },
+                              "val": {
+                                "u32": 100
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "max_rating_per_day"
+                              },
+                              "val": {
+                                "u32": 10
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "min_escrow_amount"
+                              },
+                              "val": {
+                                "u128": {
+                                  "hi": 0,
+                                  "lo": 1000
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "platform_fee_percentage"
+                              },
+                              "val": {
+                                "u32": 2
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "rate_limit_window_hours"
+                              },
+                              "val": {
+                                "u32": 24
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "key": {
                           "symbol": "FEE_CFG"
                         },
                         "val": {
@@ -81,7 +159,10 @@
                                 "symbol": "arbitrator_fee_percentage"
                               },
                               "val": {
-                                "i128": "300"
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 300
+                                }
                               }
                             },
                             {
@@ -89,7 +170,10 @@
                                 "symbol": "dispute_fee_percentage"
                               },
                               "val": {
-                                "i128": "500"
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 500
+                                }
                               }
                             },
                             {
@@ -97,7 +181,10 @@
                                 "symbol": "escrow_fee_percentage"
                               },
                               "val": {
-                                "i128": "250"
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 250
+                                }
                               }
                             },
                             {
@@ -138,7 +225,10 @@
                                 "symbol": "total_dispute_fees"
                               },
                               "val": {
-                                "i128": "0"
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 0
+                                }
                               }
                             },
                             {
@@ -146,7 +236,10 @@
                                 "symbol": "total_escrow_fees"
                               },
                               "val": {
-                                "i128": "0"
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 0
+                                }
                               }
                             },
                             {
@@ -154,7 +247,10 @@
                                 "symbol": "total_fees_collected"
                               },
                               "val": {
-                                "i128": "0"
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 0
+                                }
                               }
                             },
                             {
@@ -162,7 +258,10 @@
                                 "symbol": "total_premium_exemptions"
                               },
                               "val": {
-                                "i128": "0"
+                                "i128": {
+                                  "hi": 0,
+                                  "lo": 0
+                                }
                               }
                             },
                             {
@@ -178,10 +277,32 @@
                       },
                       {
                         "key": {
+                          "symbol": "FEE_TOTAL"
+                        },
+                        "val": {
+                          "i128": {
+                            "hi": 0,
+                            "lo": 0
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "symbol": "PAUSED"
+                        },
+                        "val": {
+                          "bool": false
+                        }
+                      },
+                      {
+                        "key": {
                           "symbol": "PLAT_BAL"
                         },
                         "val": {
-                          "i32": 0
+                          "i128": {
+                            "hi": 0,
+                            "lo": 0
+                          }
                         }
                       },
                       {
@@ -197,7 +318,7 @@
                                     "symbol": "added_at"
                                   },
                                   "val": {
-                                    "u64": "0"
+                                    "u64": 0
                                   }
                                 },
                                 {
@@ -237,7 +358,7 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
             "key": {
               "ledger_key_nonce": {
-                "nonce": "801925984706572462"
+                "nonce": 801925984706572462
               }
             },
             "durability": "temporary"
@@ -252,7 +373,7 @@
                 "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
                 "key": {
                   "ledger_key_nonce": {
-                    "nonce": "801925984706572462"
+                    "nonce": 801925984706572462
                   }
                 },
                 "durability": "temporary",

@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { VALIDATION_LIMITS, TIMEOUTS } from "@/constants/magic-numbers"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -30,7 +31,7 @@ export default function ChangePasswordForm({ onBack }: ChangePasswordFormProps) 
 
   const getPasswordStrength = (password: string): PasswordStrength => {
     return {
-      hasMinLength: password.length >= 8,
+      hasMinLength: password.length >= VALIDATION_LIMITS.MIN_PASSWORD_LENGTH,
       hasUpperLowerNumber:
         /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password) ||
         /(?=.*[a-z])(?=.*\d)/.test(password) ||
@@ -64,7 +65,7 @@ export default function ChangePasswordForm({ onBack }: ChangePasswordFormProps) 
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, TIMEOUTS.API_DELAY_VERY_LONG))
       toast.success("Password changed", {
         description: "Your password has been updated successfully.",
       })
@@ -112,7 +113,7 @@ export default function ChangePasswordForm({ onBack }: ChangePasswordFormProps) 
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                     className="h-12 pr-10"
                     placeholder="••••••••••"
                     required
@@ -174,7 +175,7 @@ export default function ChangePasswordForm({ onBack }: ChangePasswordFormProps) 
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
                     className={`h-12 pr-10 ${formData.confirmPassword && !passwordsMatch ? "border-red-500 focus:border-red-500" : ""}`}
                     placeholder="••••••••••"
                     required

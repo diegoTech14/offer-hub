@@ -9,6 +9,7 @@ import {
   CreditCard,
   Receipt,
   FileSpreadsheet,
+  Shield,
 } from "lucide-react";
 
 interface PaymentTabsProps {
@@ -51,17 +52,23 @@ export default function PaymentTabs({
       label: "Payment Methods",
       icon: <CreditCard className="h-4 w-4 mr-2" />,
     },
+    {
+      id: "escrow",
+      label: "Escrow Management",
+      icon: <Shield className="h-4 w-4 mr-2" />,
+    },
   ];
 
   return (
     <div className="relative">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+        {/* Usar 7 columnas en pantallas grandes para acomodar todos los tabs */}
+        <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2 bg-gray-100 dark:bg-gray-800">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
               value={tab.id}
-              className="relative flex items-center justify-center"
+              className="relative flex items-center justify-center dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-300"
             >
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
@@ -70,6 +77,8 @@ export default function PaymentTabs({
                   ? "Overview"
                   : tab.id === "methods"
                   ? "Methods"
+                  : tab.id === "escrow"
+                  ? "Escrow"
                   : tab.label.split(" ")[0]}
               </span>
               {activeTab === tab.id && (

@@ -93,15 +93,15 @@ export default function ProjectReview({ projectData }: ProjectReviewProps) {
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={item}>
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Review Your Project</CardTitle>
-            <CardDescription>Review all the details of your project before posting</CardDescription>
+            <CardTitle className="dark:text-white">Review Your Project</CardTitle>
+            <CardDescription className="dark:text-gray-300">Review all the details of your project before posting</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex justify-between items-start">
-                <h3 className="text-xl font-bold text-[#002333]">{projectData.title || "Untitled Project"}</h3>
+                <h3 className="text-xl font-bold text-[#002333] dark:text-white">{projectData.title || "Untitled Project"}</h3>
                 <Button variant="ghost" size="sm" className="text-[#15949C]">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
@@ -110,23 +110,23 @@ export default function ProjectReview({ projectData }: ProjectReviewProps) {
 
               <div className="flex flex-wrap gap-2">
                 {projectData.category && (
-                  <Badge className="bg-[#DEEFE7] text-[#002333]">{getCategoryName(projectData.category)}</Badge>
+                  <Badge className="bg-[#DEEFE7] text-[#002333] dark:bg-gray-700 dark:text-white">{getCategoryName(projectData.category)}</Badge>
                 )}
                 {projectData.subcategory && (
-                  <Badge className="bg-[#DEEFE7] text-[#002333]">
+                  <Badge className="bg-[#DEEFE7] text-[#002333] dark:bg-gray-700 dark:text-white">
                     {getSubcategoryName(projectData.category, projectData.subcategory)}
                   </Badge>
                 )}
-                <Badge className="bg-blue-100 text-blue-800">
+                <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                   {projectData.projectType === "one-time" ? "One-time Project" : "Ongoing Project"}
                 </Badge>
-                <Badge className="bg-purple-100 text-purple-800">
+                <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
                   {projectData.visibility === "public" ? "Public" : "Private"}
                 </Badge>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-[#002333]/80 whitespace-pre-line">
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <p className="text-[#002333]/80 dark:text-gray-300 whitespace-pre-line">
                   {projectData.description || "No description provided."}
                 </p>
               </div>
@@ -136,29 +136,29 @@ export default function ProjectReview({ projectData }: ProjectReviewProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-medium text-[#002333] mb-3 flex items-center">
+                <h4 className="font-medium text-[#002333] dark:text-white mb-3 flex items-center">
                   <Tag className="h-4 w-4 mr-2 text-[#15949C]" />
                   Skills Required
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {projectData.skills.length > 0 ? (
                     projectData.skills.map((skill: string) => (
-                      <Badge key={skill} variant="outline">
+                      <Badge key={skill} variant="outline" className="dark:border-gray-600 dark:text-gray-300">
                         {skill}
                       </Badge>
                     ))
                   ) : (
-                    <p className="text-sm text-[#002333]/70">No skills specified</p>
+                    <p className="text-sm text-[#002333]/70 dark:text-gray-400">No skills specified</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <h4 className="font-medium text-[#002333] mb-3 flex items-center">
+                <h4 className="font-medium text-[#002333] dark:text-white mb-3 flex items-center">
                   <Users className="h-4 w-4 mr-2 text-[#15949C]" />
                   Experience Level
                 </h4>
-                <p className="text-[#002333]/80">
+                <p className="text-[#002333]/80 dark:text-gray-300">
                   {projectData.experienceLevel ? getExperienceLevelName(projectData.experienceLevel) : "Not specified"}
                 </p>
               </div>
@@ -168,34 +168,34 @@ export default function ProjectReview({ projectData }: ProjectReviewProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <h4 className="font-medium text-[#002333] mb-3 flex items-center">
+                <h4 className="font-medium text-[#002333] dark:text-white mb-3 flex items-center">
                   <DollarSign className="h-4 w-4 mr-2 text-[#15949C]" />
                   Budget
                 </h4>
                 <div className="space-y-1">
-                  <p className="text-lg font-bold text-[#002333]">${projectData.budgetAmount?.toFixed(2) || "0.00"}</p>
-                  <p className="text-sm text-[#002333]/70">
+                  <p className="text-lg font-bold text-[#002333] dark:text-white">${projectData.budgetAmount?.toFixed(2) || "0.00"}</p>
+                  <p className="text-sm text-[#002333]/70 dark:text-gray-400">
                     {projectData.budgetType === "fixed" ? "Fixed Price" : "Hourly Rate"}
                   </p>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-medium text-[#002333] mb-3 flex items-center">
+                <h4 className="font-medium text-[#002333] dark:text-white mb-3 flex items-center">
                   <Clock className="h-4 w-4 mr-2 text-[#15949C]" />
                   Duration
                 </h4>
-                <p className="text-[#002333]/80">
+                <p className="text-[#002333]/80 dark:text-gray-300">
                   {projectData.duration ? getDurationName(projectData.duration) : "Not specified"}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-medium text-[#002333] mb-3 flex items-center">
+                <h4 className="font-medium text-[#002333] dark:text-white mb-3 flex items-center">
                   <Briefcase className="h-4 w-4 mr-2 text-[#15949C]" />
                   Project Type
                 </h4>
-                <p className="text-[#002333]/80">
+                <p className="text-[#002333]/80 dark:text-gray-300">
                   {projectData.projectType === "one-time" ? "One-time Project" : "Ongoing Project"}
                 </p>
               </div>
@@ -205,12 +205,12 @@ export default function ProjectReview({ projectData }: ProjectReviewProps) {
               <>
                 <Separator />
                 <div>
-                  <h4 className="font-medium text-[#002333] mb-3">Project Milestones</h4>
+                  <h4 className="font-medium text-[#002333] dark:text-white mb-3">Project Milestones</h4>
                   <div className="space-y-3">
                     {projectData.milestones.map((milestone: any) => (
-                      <div key={milestone.id} className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                        <p className="font-medium text-[#002333]">{milestone.title}</p>
-                        <p className="font-medium text-[#002333]">${milestone.amount.toFixed(2)}</p>
+                      <div key={milestone.id} className="flex justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <p className="font-medium text-[#002333] dark:text-white">{milestone.title}</p>
+                        <p className="font-medium text-[#002333] dark:text-white">${milestone.amount.toFixed(2)}</p>
                       </div>
                     ))}
                   </div>
@@ -222,15 +222,15 @@ export default function ProjectReview({ projectData }: ProjectReviewProps) {
               <>
                 <Separator />
                 <div>
-                  <h4 className="font-medium text-[#002333] mb-3 flex items-center">
+                  <h4 className="font-medium text-[#002333] dark:text-white mb-3 flex items-center">
                     <FileText className="h-4 w-4 mr-2 text-[#15949C]" />
                     Attachments
                   </h4>
                   <div className="space-y-2">
                     {projectData.attachments.map((file: any) => (
-                      <div key={file.id} className="flex items-center p-2 bg-gray-50 rounded-lg">
-                        <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                        <p className="text-sm text-[#002333]">{file.name}</p>
+                      <div key={file.id} className="flex items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <FileText className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                        <p className="text-sm text-[#002333] dark:text-white">{file.name}</p>
                       </div>
                     ))}
                   </div>
@@ -240,21 +240,21 @@ export default function ProjectReview({ projectData }: ProjectReviewProps) {
 
             <Separator />
 
-            <div className="bg-[#DEEFE7]/30 p-4 rounded-lg">
-              <h4 className="font-medium text-[#002333] mb-2 flex items-center">
+            <div className="bg-[#DEEFE7]/30 dark:bg-gray-700/50 p-4 rounded-lg">
+              <h4 className="font-medium text-[#002333] dark:text-white mb-2 flex items-center">
                 <Eye className="h-4 w-4 mr-2 text-[#15949C]" />
                 Project Visibility
               </h4>
-              <p className="text-sm text-[#002333]/80">
+              <p className="text-sm text-[#002333]/80 dark:text-gray-300">
                 {projectData.visibility === "public"
                   ? "Your project will be visible to all freelancers who can send proposals."
                   : "Your project will only be visible to freelancers you specifically invite."}
               </p>
             </div>
 
-            <Alert className="bg-[#DEEFE7]/30 border-[#15949C]">
+            <Alert className="bg-[#DEEFE7]/30 border-[#15949C] dark:bg-gray-700/50 dark:border-gray-600">
               <AlertCircle className="h-4 w-4 text-[#15949C]" />
-              <AlertDescription className="text-[#002333]/70">
+              <AlertDescription className="text-[#002333]/70 dark:text-gray-300">
                 Once posted, your project will be live and freelancers can start submitting proposals. You can edit your
                 project details after posting if needed.
               </AlertDescription>

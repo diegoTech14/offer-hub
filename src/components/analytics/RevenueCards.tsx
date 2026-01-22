@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { revenueMetricsMock } from "@/lib/mockData/analytics-mock-data";
+import { revenueMetricsMock } from "@/__mocks__/analytics-mock-data";
 
 export default function RevenueCards() {
   return (

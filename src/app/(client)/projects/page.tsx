@@ -1,6 +1,6 @@
 import { Sidebar } from "@/components/projects/ProjectSidebar"
 import { Header } from "@/components/projects/ProjectHeader"
-import { ProjectDashboard } from "@/components/projects/ProjectDashboard"
+import ProjectDashboard from "@/components/projects/ProjectDashboard"
 
 export default function ProjectsPage() {
   return (

@@ -1,6 +1,6 @@
 #![no_std]
+use crate::error::Error;
 use soroban_sdk::{contract, contractimpl, Address, Env, Vec};
-
 mod contract;
 mod error;
 mod storage;
@@ -19,13 +19,30 @@ impl FeeManagerContract {
         contract::initialize(&env, admin, platform_wallet);
     }
 
+    pub fn pause(env: Env, admin: Address) -> Result<(), Error> {
+        contract::pause(&env, admin)
+    }
+
+    pub fn is_paused(env: Env) -> bool {
+        contract::is_paused(&env)
+    }
+
+    pub fn unpause(env: Env, admin: Address) -> Result<(), Error> {
+        contract::unpause(&env, admin)
+    }
+
     pub fn set_fee_rates(
         env: Env,
         escrow_fee_percentage: i128,
         dispute_fee_percentage: i128,
         arbitrator_fee_percentage: i128,
     ) {
-        contract::set_fee_rates(&env, escrow_fee_percentage, dispute_fee_percentage, arbitrator_fee_percentage);
+        contract::set_fee_rates(
+            &env,
+            escrow_fee_percentage,
+            dispute_fee_percentage,
+            arbitrator_fee_percentage,
+        );
     }
 
     pub fn add_premium_user(env: Env, user: Address) {
@@ -79,4 +96,26 @@ impl FeeManagerContract {
     pub fn get_premium_users(env: Env) -> Vec<types::PremiumUser> {
         contract::get_premium_users(&env)
     }
-} 
+
+
+    pub fn set_config(env: Env, caller: Address, config: types::ContractConfig) {
+        contract::set_config(&env, caller, config);
+    }
+
+    pub fn get_config(env: Env) -> types::ContractConfig {
+        contract::get_config(&env)
+    }
+
+    pub fn get_total_fees(env: &Env) -> i128 {
+        contract::get_total_fees(&env)
+    }
+
+    pub fn reset_total_fees_collected(env: &Env, admin: Address) -> Result<(), Error> {
+        contract::reset_total_fees_collected(&env, admin)
+    }
+
+    pub fn get_platform_stats(env: &Env) -> Result<types::PlatformStats, Error> {
+        contract::get_platform_stats(&env)
+    }
+}
+

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo, type ChangeEvent, type FC } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ const ResetPasswordPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Memoized password strength criteria
   const strengthCriteria = useMemo(
@@ -29,7 +30,7 @@ const ResetPasswordPage: React.FC = () => {
     hasUpperLowerOrNumber &&
     hasSpecialChar &&
     passwordsMatch
-  );
+  ) || isSubmitting;
 
   // Determine strength level
   const getStrength = () => {
@@ -40,6 +41,21 @@ const ResetPasswordPage: React.FC = () => {
     if (strength === 3) return "Strong";
     if (strength >= 1) return "Medium";
     return "Weak";
+  };
+
+  const handleSubmit = async () => {
+    if (isButtonDisabled) return;
+
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log("Password reset successfully");
+    } catch (error) {
+      console.error("Failed to reset password:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -59,7 +75,11 @@ const ResetPasswordPage: React.FC = () => {
               <Input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+
+
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
                 placeholder="Enter new password"
                 aria-label="Enter new password"
                 className="focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-400 text-sm sm:text-base"
@@ -78,7 +98,10 @@ const ResetPasswordPage: React.FC = () => {
             </div>
             <div className="mt-2">
               <p className="text-sm font-medium text-neutral-600">
-                Strength: <span className="text-gray-500 font-light">{getStrength()}</span>
+                Strength:{" "}
+                <span className="text-gray-500 font-light">
+                  {getStrength()}
+                </span>
               </p>
               <ul className="text-xs sm:text-sm mt-1 space-y-1">
                 <li
@@ -123,7 +146,9 @@ const ResetPasswordPage: React.FC = () => {
                       <Circle className="h-4 w-4 sm:h-5 sm:w-5 text-gray-300" />
                     )}
                   </span>
-                  <span>At least one uppercase, lowercase characters or numbers.</span>
+                  <span>
+                    At least one uppercase, lowercase characters or numbers.
+                  </span>
                 </li>
                 <li
                   className={`flex items-center text-xs sm:text-xs ${
@@ -164,7 +189,9 @@ const ResetPasswordPage: React.FC = () => {
               <Input
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setConfirmPassword(e.target.value)
+                }
                 placeholder="Confirm new password"
                 aria-label="Confirm new password"
                 className={`${
@@ -184,18 +211,22 @@ const ResetPasswordPage: React.FC = () => {
               </button>
             </div>
             {!passwordsMatch && confirmPassword && (
-              <p className="text-red-500 text-xs sm:text-sm mt-1">Password mis-match.</p>
+              <p className="text-red-500 text-xs sm:text-sm mt-1">
+                Password mis-match.
+              </p>
             )}
           </div>
           <Button
+            onClick={handleSubmit}
             disabled={isButtonDisabled}
+            isLoading={isSubmitting}
             className={`w-full ${
               isButtonDisabled
                 ? "bg-[#002333] disabled:bg-[#002333] disabled:opacity-100 text-white"
                 : "bg-blue-900 text-white"
             } py-2 rounded-3xl text-sm sm:text-base`}
           >
-            Change password
+            {isSubmitting ? "Changing password..." : "Change password"}
           </Button>
         </CardContent>
       </Card>

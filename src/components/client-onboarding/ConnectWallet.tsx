@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import OnboardingHeader from '@/components/layout/OnboardingHeader';
+import { TIMEOUTS } from '@/constants/magic-numbers';
 
 interface ConnectWalletProps {
   onWalletConnected: (walletAddress: string) => void;
@@ -98,7 +99,7 @@ const ConnectWallet: React.FC<ConnectWalletProps> = ({ onWalletConnected }) => {
     setIsConnecting(walletId);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, TIMEOUTS.API_DELAY_MAX));
       
       const mockAddress = `0x${Math.random().toString(16).substr(2, 40)}`;
       

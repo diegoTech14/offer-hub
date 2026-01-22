@@ -1,9 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { type ProjectDetail, projectDetailsData } from "@/lib/mockData/project-details-mock-data"
+import { type ProjectDetail, projectDetailsData } from "@/__mocks__/project-details-mock-data"
 
-export function useProjectDetails() {
+interface UseProjectDetailsReturn {
+  projects: ProjectDetail[];
+  loading: boolean;
+  getProjectById: (id: string) => ProjectDetail | undefined;
+  getProjectsByCategory: (category: string) => ProjectDetail[];
+}
+
+export function useProjectDetails(): UseProjectDetailsReturn {
   const [projects, setProjects] = useState<ProjectDetail[]>([])
   const [loading, setLoading] = useState(true)
 

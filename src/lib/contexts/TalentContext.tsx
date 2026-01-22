@@ -2,7 +2,8 @@
 
 import type React from "react"
 import { createContext, useContext, useReducer, useEffect } from "react"
-import { talentProfileData as talentMockData } from "../mockData/talent-mock-data"
+import { talentProfileData as talentMockData } from "../../__mocks__/talent-mock-data"
+import { TIMEOUTS } from "@/constants/magic-numbers"
 
 // Types
 interface Skill {
@@ -203,10 +204,10 @@ export function TalentProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "SET_LOADING", payload: true })
     try {
       // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, TIMEOUTS.API_DELAY_VERY_LONG))
       dispatch({ type: "SET_TALENTS", payload: talentMockData })
       dispatch({ type: "SET_ERROR", payload: null })
-    } catch (error) {
+    } catch {
       dispatch({ type: "SET_ERROR", payload: "Failed to fetch talents" })
     } finally {
       dispatch({ type: "SET_LOADING", payload: false })
@@ -216,7 +217,7 @@ export function TalentProvider({ children }: { children: React.ReactNode }) {
   const fetchTalentById = async (id: number) => {
     dispatch({ type: "SET_LOADING", payload: true })
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, TIMEOUTS.API_DELAY_MEDIUM))
       const talent = talentMockData.find((t) => t.id === id)
       if (talent) {
         dispatch({ type: "SET_SELECTED_TALENT", payload: talent })
@@ -224,7 +225,7 @@ export function TalentProvider({ children }: { children: React.ReactNode }) {
       } else {
         dispatch({ type: "SET_ERROR", payload: "Talent not found" })
       }
-    } catch (error) {
+    } catch {
       dispatch({ type: "SET_ERROR", payload: "Failed to fetch talent details" })
     } finally {
       dispatch({ type: "SET_LOADING", payload: false })

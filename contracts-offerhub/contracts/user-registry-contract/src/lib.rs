@@ -1,16 +1,18 @@
 #![no_std]
 
 mod access;
+mod basic_test;
 mod contract;
 mod events;
 mod storage;
-mod types;
 mod test;
-mod basic_test;
+pub mod types;
 mod validation;
+mod error;
 
 use crate::contract::UserRegistryContract;
-use crate::types::{Error, UserProfile, UserStatus, VerificationLevel};
+use crate::error::Error;
+use crate::types::{UserProfile,UserProfileSummary,  UserStatus, VerificationLevel};
 use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
 
 #[contract]
@@ -19,14 +21,26 @@ pub struct Contract;
 #[contractimpl]
 impl Contract {
     // ==================== INITIALIZATION ====================
-    
+
     /// Initialize the contract with an admin
     pub fn initialize_admin(env: Env, admin: Address) -> Result<(), Error> {
         UserRegistryContract::initialize_admin(env, admin)
     }
 
+     pub fn pause(env: Env, admin: Address) -> Result<(), Error> {
+        UserRegistryContract::pause(&env, admin)
+    }
+
+    pub fn is_paused(env: Env) -> bool {
+        UserRegistryContract::is_paused(&env)
+    }
+
+    pub fn unpause(env: Env, admin: Address) -> Result<(), Error> {
+        UserRegistryContract::unpause(&env, admin)
+    }
+
     // ==================== LEGACY FUNCTIONS (for backward compatibility) ====================
-    
+
     /// Legacy function for registering a verified user
     pub fn register_verified_user(env: Env, user: Address) -> Result<(), Error> {
         UserRegistryContract::register_verified_user(env, user)
@@ -38,7 +52,7 @@ impl Contract {
     }
 
     // ==================== ENHANCED USER VERIFICATION ====================
-    
+
     /// Verify a user with a specific level and optional expiration
     pub fn verify_user(
         env: Env,
@@ -77,7 +91,7 @@ impl Contract {
     }
 
     // ==================== BLACKLIST FUNCTIONALITY ====================
-    
+
     /// Add user to blacklist
     pub fn blacklist_user(env: Env, admin: Address, user: Address) -> Result<(), Error> {
         UserRegistryContract::blacklist_user(env, admin, user)
@@ -94,7 +108,7 @@ impl Contract {
     }
 
     // ==================== BULK OPERATIONS ====================
-    
+
     /// Bulk verify users
     pub fn bulk_verify_users(
         env: Env,
@@ -108,7 +122,7 @@ impl Contract {
     }
 
     // ==================== USER PROFILE METADATA ====================
-    
+
     /// Update user metadata
     pub fn update_user_metadata(
         env: Env,
@@ -120,7 +134,7 @@ impl Contract {
     }
 
     // ==================== STATUS CHECKING ====================
-    
+
     /// Get comprehensive user status
     pub fn get_user_status(env: Env, user: Address) -> UserStatus {
         UserRegistryContract::get_user_status(env, user)
@@ -131,13 +145,19 @@ impl Contract {
         UserRegistryContract::get_user_profile_data(env, user)
     }
 
+    /// Get  user profile formatted data
+    pub fn get_user_profile_formatted(env: Env, user: Address) -> Result<UserProfileSummary, Error> {
+        UserRegistryContract::get_user_profile(env, user)
+    }
+
+
     /// Check verification level
     pub fn get_verification_level(env: Env, user: Address) -> Option<VerificationLevel> {
         UserRegistryContract::get_verification_level(env, user)
     }
 
     // ==================== ACCESS CONTROL ====================
-    
+
     /// Add moderator
     pub fn add_moderator(env: Env, admin: Address, moderator: Address) -> Result<(), Error> {
         UserRegistryContract::add_moderator(env, admin, moderator)
@@ -149,7 +169,11 @@ impl Contract {
     }
 
     /// Transfer admin role
-    pub fn transfer_admin(env: Env, current_admin: Address, new_admin: Address) -> Result<(), Error> {
+    pub fn transfer_admin(
+        env: Env,
+        current_admin: Address,
+        new_admin: Address,
+    ) -> Result<(), Error> {
         UserRegistryContract::transfer_admin(env, current_admin, new_admin)
     }
 
@@ -164,11 +188,83 @@ impl Contract {
     }
 
     // ===== Rate limiting admin helpers =====
-    pub fn set_rate_limit_bypass(env: Env, admin: Address, user: Address, bypass: bool) -> Result<(), Error> {
+    pub fn set_rate_limit_bypass(
+        env: Env,
+        admin: Address,
+        user: Address,
+        bypass: bool,
+    ) -> Result<(), Error> {
         UserRegistryContract::set_rate_limit_bypass(env, admin, user, bypass)
     }
 
-    pub fn reset_rate_limit(env: Env, admin: Address, user: Address, limit_type: String) -> Result<(), Error> {
+    pub fn reset_rate_limit(
+        env: Env,
+        admin: Address,
+        user: Address,
+        limit_type: String,
+    ) -> Result<(), Error> {
         UserRegistryContract::reset_rate_limit(env, admin, user, limit_type)
     }
-} 
+
+    pub fn get_total_users(env: &Env) -> Result<u64, Error> {
+        UserRegistryContract::get_total_users(env)
+    }
+
+    // ==================== CONTRACT MANAGEMENT ====================
+
+    /// Set rating contract address (admin only)
+    pub fn set_rating_contract(
+        env: Env,
+        admin: Address,
+        contract_address: Address,
+    ) -> Result<(), Error> {
+        UserRegistryContract::set_rating_contract(env, admin, contract_address)
+    }
+
+    /// Add escrow contract address (admin only)
+    pub fn add_escrow_contract(
+        env: Env,
+        admin: Address,
+        contract_address: Address,
+    ) -> Result<(), Error> {
+        UserRegistryContract::add_escrow_contract(env, admin, contract_address)
+    }
+
+    /// Add dispute contract address (admin only)
+    pub fn add_dispute_contract(
+        env: Env,
+        admin: Address,
+        contract_address: Address,
+    ) -> Result<(), Error> {
+        UserRegistryContract::add_dispute_contract(env, admin, contract_address)
+    }
+
+    // ==================== DATA EXPORT FUNCTIONS ====================
+
+    /// Export user data (user themselves or admin/moderator)
+    pub fn export_user_data(
+        env: Env,
+        caller: Address,
+        user: Address,
+    ) -> Result<types::UserDataExport, Error> {
+        UserRegistryContract::export_user_data(env, caller, user)
+    }
+
+    /// Export all users data (admin only)
+    pub fn export_all_data(
+        env: Env,
+        admin: Address,
+        limit: u32,
+    ) -> Result<types::AllUsersExport, Error> {
+        UserRegistryContract::export_all_data(env, admin, limit)
+    }
+
+    /// Export all platform data (admin only) - comprehensive export across all contract types
+    pub fn export_platform_data(
+        env: Env,
+        admin: Address,
+        limit: u32,
+    ) -> Result<types::PlatformDataExport, Error> {
+        UserRegistryContract::export_platform_data(env, admin, limit)
+    }
+}

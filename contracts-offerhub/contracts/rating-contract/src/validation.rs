@@ -1,5 +1,6 @@
-use crate::storage::{has_rated_contract, get_user_restriction};
-use crate::types::{Error, MIN_RATING, MAX_RATING, MAX_FEEDBACK_LENGTH};
+use crate::storage::{get_user_restriction, has_rated_contract};
+use crate::error::Error;
+use crate::types::{MAX_FEEDBACK_LENGTH, MAX_RATING, MIN_RATING};
 use soroban_sdk::{Address, Env, String};
 
 // Additional validation constants
@@ -92,25 +93,26 @@ pub fn validate_rating_eligibility(
     if has_rated_contract(env, rater, contract_id) {
         return Err(Error::AlreadyRated);
     }
-    
+
     // Check if rater is trying to rate themselves
     validate_different_addresses(rater, rated_user)?;
-    
+
     // Check if rater has restrictions
     let restriction = get_user_restriction(env, rater);
     if restriction == String::from_str(env, "restricted") {
         return Err(Error::RatingRestricted);
     }
-    
+
     Ok(())
 }
 
 /// Validate moderation action
 pub fn validate_moderation_action(action: &String) -> Result<(), Error> {
     // Simplified validation for Soroban compatibility
-    if action == &String::from_str(&soroban_sdk::Env::default(), "approve") ||
-       action == &String::from_str(&soroban_sdk::Env::default(), "remove") ||
-       action == &String::from_str(&soroban_sdk::Env::default(), "flag") {
+    if action == &String::from_str(&soroban_sdk::Env::default(), "approve")
+        || action == &String::from_str(&soroban_sdk::Env::default(), "remove")
+        || action == &String::from_str(&soroban_sdk::Env::default(), "flag")
+    {
         Ok(())
     } else {
         Err(Error::InvalidModerationAction)
@@ -163,5 +165,3 @@ pub fn validate_report_feedback(
     validate_report_reason(reason)?;
     Ok(())
 }
-
-

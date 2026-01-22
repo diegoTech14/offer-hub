@@ -8,8 +8,8 @@ import ReviewsSection from "./ReviewsSection";
 import ProfileNavigation from "./ProfileNavigation";
 import PortfolioGallery from "./PortfolioGallery";
 import PortfolioItem from "./PortfolioItem";
-import { FreelancerProfile as FreelancerProfileType } from "@/lib/mockData/freelancer-profile-mock";
-import { PortfolioProject, getPortfolioProjects } from "@/lib/mockData/portfolio-mock-data";
+import { FreelancerProfile as FreelancerProfileType } from "@/__mocks__/freelancer-profile-mock";
+import { PortfolioProject, getPortfolioProjects } from "@/__mocks__/portfolio-mock-data";
 
 interface FreelancerProfileProps {
   freelancer: FreelancerProfileType;
