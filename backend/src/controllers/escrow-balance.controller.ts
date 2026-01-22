@@ -24,8 +24,6 @@ export const getEscrowBalances = async (
 
     const { addresses } = validationResult.data;
 
-    console.log(addresses);
-
     const apiKey = process.env.TRUSTLESSWORK_API_KEY;
     const apiUrl =
       process.env.TRUSTLESSWORK_API_URL || "https://dev.api.trustlesswork.com";
