@@ -1,8 +1,11 @@
 import { supabase } from "@/lib/supabase/supabase";
-import { CreateProjectDTO } from '@/types/project.type';
+import { Project, ProjectSkill } from '@/types/project.types';
 import { InternalServerError } from "@/utils/AppError";
 import { userService } from "./user.service";
 import { escrowService } from "./escrow.service";
+
+// CreateProjectDTO type definition
+type CreateProjectDTO = Omit<Project, 'id' | 'created_at' | 'updated_at' | 'published_at' | 'archived_at' | 'deleted_at' | 'version' | 'skills'>;
 export const createProject = async (data: CreateProjectDTO) => {
   const { data: project, error } = await supabase
     .from('projects')
@@ -66,13 +69,79 @@ export const updateProject = async (
       pending: ['in_progress'],
       in_progress: ['completed'],
     };
-/**
- * @fileoverview Project service providing project data management and database operations
- * @author Offer Hub Team
- */
 
-import { supabase } from "@/lib/supabase/supabase";
-import { Project, ProjectSkill } from "@/types/project.types";
+    const allowed = validTransitions[existing.status] || [];
+    if (!allowed.includes(updates.status)) {
+      return {
+        success: false,
+        status: 400,
+        message: 'Invalid_status_transition',
+      };
+    }
+  }
+
+  const allowedFields = ['title', 'description', 'budget', 'status'];
+  const cleanUpdates: Record<string, any> = {};
+  for (const key of allowedFields) {
+    if (updates[key as keyof CreateProjectDTO] !== undefined) {
+      cleanUpdates[key] = updates[key as keyof CreateProjectDTO];
+    }
+  }
+
+  const { data: updated, error: updateError } = await supabase
+    .from('projects')
+    .update(cleanUpdates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (updateError) {
+    return { success: false, status: 500, message: 'Update_failed' };
+  }
+
+  return { success: true, status: 200, data: updated };
+};
+
+export const deleteProject = async (id: string, client_id: string) => {
+  const { data: existing, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !existing) {
+    return { success: false, status: 404, message: 'Project_not_found' };
+  }
+
+  if (existing.client_id !== client_id) {
+    return { success: false, status: 403, message: 'Unauthorized_client' };
+  }
+
+  if (existing.status !== 'pending') {
+    return {
+      success: false,
+      status: 400,
+      message: 'Cannot_delete_non_pending_project',
+    };
+  }
+
+  const { data: deleted, error: deleteError } = await supabase
+    .from('projects')
+    .update({ status: 'deleted' })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (deleteError) {
+    return {
+      success: false,
+      status: 500,
+      message: 'Delete_failed',
+    };
+  }
+
+  return { success: true, status: 200, message: 'Project_deleted', data: deleted };
+};
 
 class ProjectService {
   /**
@@ -115,9 +184,6 @@ class ProjectService {
     } as Project;
   }
 }
-
-  return { success: true, status: 200, message: 'Project_deleted', data: deleted };
-};
 
 export const assignFreelancer = async (
   projectId: string,

@@ -6,9 +6,10 @@ import {
   updateProjectHandler,
   deleteProjectHandler,
   assignFreelancerHandler,
+  getProjectHandler,
 } from "@/controllers/project.controller";
 import { authorizeRoles, verifyToken } from "@/middlewares/auth.middleware";
-import { getProjectHandler } from "@/controllers/project.controller";
+import { UserRole } from "@/types/auth.types";
 
 const router = Router();
 
@@ -22,21 +23,21 @@ router.get("/:id", getProjectByIdHandler);
 router.patch(
   "/:id",
   verifyToken,
-  authorizeRoles("client", "admin"),
+  authorizeRoles(UserRole.CLIENT, UserRole.ADMIN),
   updateProjectHandler
 );
 
 router.delete(
   "/:id",
   verifyToken,
-  authorizeRoles("client", "admin"),
+  authorizeRoles(UserRole.CLIENT, UserRole.ADMIN),
   deleteProjectHandler
 );
 
 router.patch(
   "/:projectId/assign/:freelancerId",
   verifyToken,
-  authorizeRoles("client", "admin"),
+  authorizeRoles(UserRole.CLIENT, UserRole.ADMIN),
   assignFreelancerHandler
 );
 

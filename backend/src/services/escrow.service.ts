@@ -3,7 +3,7 @@ import {
   Networks, 
   Address as SorobanAddress,
 } from "@stellar/stellar-sdk";
-// @ts-ignore - Client is exported from /contract subpath but TypeScript resolution has issues
+// @ts-expect-error - Client is exported from /contract subpath but TypeScript resolution has issues
 import { Client } from "@stellar/stellar-sdk/contract";
 import { InternalServerError } from "@/utils/AppError";
 import { randomBytes, createHash } from "crypto";
