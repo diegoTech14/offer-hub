@@ -23,6 +23,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
 import oauthRoutes from "@/routes/oauth.routes";
+import projectRoutes from "@/routes/project.routes";
 import profileRoutes from "@/routes/profile.routes";
 import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
 import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware";
@@ -83,7 +84,9 @@ app.get("/", (_req, res) => {
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/oauth", oauthRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
+app.use("/api/projects", projectRoutes);
 app.use("/api/profiles", profileRoutes);
+
 
 // Error Handling
 app.use(errorHandlerMiddleware);
