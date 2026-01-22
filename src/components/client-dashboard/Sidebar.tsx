@@ -166,7 +166,7 @@ export function ClientSidebar() {
               <p className="text-xs text-gray-500 truncate">Developer</p>
             </div>
           </div>
-          
+
           {/* Verification Badge */}
           {!verificationLoading && verificationStatus && (
             <VerificationBadge
