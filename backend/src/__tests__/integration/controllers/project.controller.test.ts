@@ -14,27 +14,18 @@ describe('Project Controller - getProjectHandler', () => {
 
   const mockProject = {
     id: mockProjectId,
-    client_id: '456e7890-e89b-12d3-a456-426614174001',
+    clientId: '456e7890-e89b-12d3-a456-426614174001',
+    freelancerId: null,
     title: 'Test Project',
     description: 'A test project description',
     category: 'Development',
-    subcategory: 'Web Development',
-    budget: 1000,
-    budget_type: 'fixed' as const,
-    status: 'published' as const,
-    visibility: 'public' as const,
-    project_type: 'on-time' as const,
-    experience_level: 'intermediate' as const,
-    duration: '2 weeks',
+    budgetAmount: 1000,
+    currency: 'XLM',
+    status: 'open' as const,
     deadline: '2024-02-01T00:00:00Z',
-    tags: ['javascript', 'react'],
-    on_chain_transaction_hash: '0x1234567890abcdef',
-    on_chain_id: 'project_123',
-    version: 1,
-    featured: false,
-    priority: 0,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
+    onChainTxHash: '0x1234567890abcdef',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z',
     skills: ['JavaScript', 'React', 'Node.js']
   };
 
@@ -122,7 +113,7 @@ describe('Project Controller - getProjectHandler', () => {
       expect(responseData).toEqual(mockProject);
       expect(responseData.id).toBe(mockProjectId);
       expect(responseData.skills).toEqual(['JavaScript', 'React', 'Node.js']);
-      expect(responseData.on_chain_transaction_hash).toBe('0x1234567890abcdef');
+      expect(responseData.onChainTxHash).toBe('0x1234567890abcdef');
     });
   });
 
