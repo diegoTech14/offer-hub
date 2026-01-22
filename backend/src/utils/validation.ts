@@ -274,3 +274,104 @@ export const validateAvatarUrl = (url: string): boolean => {
   const urlLower = trimmedUrl.toLowerCase();
   return AVATAR_IMAGE_EXTENSIONS.some(ext => urlLower.endsWith(ext));
 };
+
+// Profile validation schema - all fields optional for updates
+export const PROFILE_UPDATE_SCHEMA: Record<string, ValidationRule> = {
+  displayName: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      // Allow empty strings (will be converted to null)
+      if (value === '' || value === null) return true;
+      return validateStringLength(value, 0, 100);
+    },
+    errorMessage: 'Display name must be less than 100 characters',
+    errorCode: 'INVALID_DISPLAY_NAME_LENGTH'
+  },
+  bio: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      // Allow empty strings (will be converted to null)
+      if (value === '' || value === null) return true;
+      return validateStringLength(value, 0, 500);
+    },
+    errorMessage: 'Bio must be less than 500 characters',
+    errorCode: 'INVALID_BIO_LENGTH'
+  },
+  avatarUrl: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      // Allow empty strings (will be converted to null)
+      if (value === '' || value === null) return true;
+      return validateAvatarUrl(value);
+    },
+    errorMessage: 'Invalid avatar URL format. Must be a valid URL ending with .jpg, .jpeg, .png, .gif, or .webp',
+    errorCode: 'INVALID_AVATAR_URL'
+  },
+  dateOfBirth: {
+    required: false,
+    // No type check - validator handles both Date objects and ISO strings
+    validator: (value) => {
+      // Allow null
+      if (value === null || value === undefined) return true;
+      // Must be a valid Date object
+      if (value instanceof Date) {
+        return !isNaN(value.getTime());
+      }
+      // Allow ISO date strings
+      if (typeof value === 'string') {
+        const date = new Date(value);
+        return !isNaN(date.getTime());
+      }
+      return false;
+    },
+    errorMessage: 'Date of birth must be a valid date',
+    errorCode: 'INVALID_DATE_OF_BIRTH'
+  },
+  location: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      // Allow empty strings (will be converted to null)
+      if (value === '' || value === null) return true;
+      return validateStringLength(value, 0, 100);
+    },
+    errorMessage: 'Location must be less than 100 characters',
+    errorCode: 'INVALID_LOCATION_LENGTH'
+  },
+  skills: {
+    required: false,
+    type: 'object',
+    validator: (value) => {
+      // Allow null or undefined
+      if (value === null || value === undefined) return true;
+      // Must be an array
+      if (!Array.isArray(value)) return false;
+      // All items must be strings
+      return value.every(item => typeof item === 'string');
+    },
+    errorMessage: 'Skills must be an array of strings',
+    errorCode: 'INVALID_SKILLS_FORMAT'
+  },
+  website: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      // Allow empty strings (will be converted to null)
+      if (value === '' || value === null) return true;
+      // Validate URL format and length
+      if (!validateStringLength(value, 0, 255)) return false;
+      // Basic URL validation
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    errorMessage: 'Website must be a valid URL and less than 255 characters',
+    errorCode: 'INVALID_WEBSITE_URL'
+  }
+};
