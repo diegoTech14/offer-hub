@@ -23,6 +23,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
 import oauthRoutes from "@/routes/oauth.routes";
+import escrowInitRoutes from "@/routes/escrow-init.routes";
 import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
 import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware";
 import { authenticateToken } from "./middlewares/auth.middleware";
@@ -81,6 +82,7 @@ app.get("/", (_req, res) => {
 // API Routes
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/oauth", oauthRoutes);
+app.use("/api/escrows", authenticateToken(), escrowInitRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 
 // Error Handling
