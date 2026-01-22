@@ -43,7 +43,7 @@ describe('ProjectService - getProjectById', () => {
     ...mockProjectData,
     skills: ['JavaScript', 'React', 'Node.js']
   };
-  delete expectedProject.project_skills;
+  const { project_skills: _, ...expectedProjectWithoutSkills } = expectedProject;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -65,7 +65,7 @@ describe('ProjectService - getProjectById', () => {
       const result = await projectService.getProjectById(mockProjectId);
 
       expect(mockSupabase.from).toHaveBeenCalledWith('projects');
-      expect(result).toEqual(expectedProject);
+      expect(result).toEqual(expectedProjectWithoutSkills);
       expect(result?.skills).toEqual(['JavaScript', 'React', 'Node.js']);
     });
 
