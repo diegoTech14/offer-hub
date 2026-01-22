@@ -1,7 +1,8 @@
 import { projectService } from '@/services/project.service';
 import { supabase } from '@/lib/supabase/supabase';
+import { ProjectStatus } from '@/types/project.types';
 
-// Mock Supabase
+
 jest.mock('@/lib/supabase/supabase');
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
@@ -18,7 +19,7 @@ describe('ProjectService - getProjectById', () => {
     category: 'Development',
     budget_amount: 1000,
     currency: 'XLM',
-    status: 'open' as const,
+    status: ProjectStatus.OPEN,
     deadline: '2024-02-01T00:00:00Z',
     on_chain_tx_hash: '0x1234567890abcdef',
     created_at: '2024-01-15T10:00:00Z',

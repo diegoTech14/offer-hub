@@ -1,5 +1,6 @@
 import { getProjectHandler } from '@/controllers/project.controller';
 import { projectService } from '@/services/project.service';
+import { ProjectStatus } from '@/types/project.types';
 
 // Mock the project service
 jest.mock('@/services/project.service');
@@ -21,7 +22,7 @@ describe('Project Controller - getProjectHandler', () => {
     category: 'Development',
     budgetAmount: 1000,
     currency: 'XLM',
-    status: 'open' as const,
+    status: ProjectStatus.OPEN,
     deadline: '2024-02-01T00:00:00Z',
     onChainTxHash: '0x1234567890abcdef',
     createdAt: '2024-01-15T10:00:00Z',
