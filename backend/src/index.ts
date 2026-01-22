@@ -92,8 +92,8 @@ app.get("/", (_req, res) => {
 // API Routes
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/oauth", oauthRoutes);
-app.use("/api/escrows", authenticateToken(), escrowInitRoutes);
-app.use("/api/escrows", authenticateToken(), escrowQueryRoutes);
+app.use("/api/escrows", escrowInitRoutes);
+app.use("/api/escrows", escrowQueryRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 app.use("/api/task", TaskRecordRouter);
 app.use("/api/projects", projectRoutes);

@@ -8,7 +8,7 @@ export const initializeEscrowSchema = z.object({
 });
 
 export const getEscrowsByRoleSchema = z.object({
-    role: z.enum(['client', 'freelancer']),
+    role: z.enum(['client', 'freelancer', 'marker', 'approver', 'releaser', 'resolver', 'platformAddress']),
     roleAddress: z.string().min(56).max(56)
 });
 
