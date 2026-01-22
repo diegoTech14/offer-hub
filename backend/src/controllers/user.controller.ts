@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "@/types/middleware.types";
+import { AuthenticatedRequest } from "@/types/auth.types";
 import { userService } from "@/services/user.service";
 import { AppError, MissingFieldsError, NotFoundError, ValidationError, BadRequestError, mapSupabaseError } from "@/utils/AppError";
 import { UserFilters } from "@/types/user.types";

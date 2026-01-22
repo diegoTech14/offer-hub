@@ -6,6 +6,22 @@ import { AppError } from '@/utils/AppError';
 jest.mock('@/services/user.service');
 const mockUserService = userService as jest.Mocked<typeof userService>;
 
+// Helper to create mock user objects
+const createMockUser = (overrides: any = {}): any => ({
+  id: '123e4567-e89b-12d3-a456-426614174000',
+  wallet_address: '0x1234567890abcdef',
+  username: 'testuser',
+  name: null,
+  bio: null,
+  email: null,
+  avatar_url: null,
+  is_freelancer: false,
+  nonce: null,
+  created_at: '2024-01-21T16:00:00Z',
+  updated_at: '2024-01-21T17:00:00Z',
+  ...overrides,
+});
+
 describe('User Controller - updateAvatarHandler', () => {
   let mockReq: any;
   let mockRes: any;
@@ -98,10 +114,10 @@ describe('User Controller - updateAvatarHandler', () => {
         'https://example.com/avatar.webp',
       ];
 
-      const mockUpdatedUser = {
-        id: '123e4567-e89b-12d3-a456-426614174000',
+      const mockUpdatedUser = createMockUser({
         avatar_url: 'https://example.com/avatar.jpg',
-      };
+        updated_at: '2024-01-21T17:00:00Z',
+      });
 
       mockUserService.updateAvatar.mockResolvedValue(mockUpdatedUser);
 
@@ -161,10 +177,9 @@ describe('User Controller - updateAvatarHandler', () => {
     it('should accept null avatar_url to remove avatar', async () => {
       mockReq.body = { avatar_url: null };
 
-      const mockUpdatedUser = {
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        avatar_url: null,
-      };
+      const mockUpdatedUser = createMockUser({
+        updated_at: '2024-01-21T17:00:00Z',
+      });
 
       mockUserService.updateAvatar.mockResolvedValue(mockUpdatedUser);
 
@@ -180,10 +195,9 @@ describe('User Controller - updateAvatarHandler', () => {
     it('should accept empty string avatar_url and convert to null', async () => {
       mockReq.body = { avatar_url: '' };
 
-      const mockUpdatedUser = {
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        avatar_url: null,
-      };
+      const mockUpdatedUser = createMockUser({
+        updated_at: '2024-01-21T17:00:00Z',
+      });
 
       mockUserService.updateAvatar.mockResolvedValue(mockUpdatedUser);
 
@@ -205,10 +219,10 @@ describe('User Controller - updateAvatarHandler', () => {
     });
 
     it('should call userService.updateAvatar with correct parameters', async () => {
-      const mockUpdatedUser = {
-        id: '123e4567-e89b-12d3-a456-426614174000',
+      const mockUpdatedUser = createMockUser({
         avatar_url: 'https://example.com/avatar.jpg',
-      };
+        updated_at: '2024-01-21T17:00:00Z',
+      });
 
       mockUserService.updateAvatar.mockResolvedValue(mockUpdatedUser);
 
@@ -222,12 +236,10 @@ describe('User Controller - updateAvatarHandler', () => {
     });
 
     it('should return 200 with updated user data on success', async () => {
-      const mockUpdatedUser = {
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        username: 'testuser',
+      const mockUpdatedUser = createMockUser({
         avatar_url: 'https://example.com/avatar.jpg',
         updated_at: '2024-01-21T17:00:00Z',
-      };
+      });
 
       mockUserService.updateAvatar.mockResolvedValue(mockUpdatedUser);
 
