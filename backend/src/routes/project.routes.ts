@@ -5,6 +5,7 @@ import {
   getProjectByIdHandler,
   updateProjectHandler,
   deleteProjectHandler,
+  assignFreelancerHandler,
 } from "@/controllers/project.controller";
 import { authorizeRoles, verifyToken } from "@/middlewares/auth.middleware";
 
@@ -33,6 +34,13 @@ router.delete(
   verifyToken,
   authorizeRoles("client", "admin"),
   deleteProjectHandler
+);
+
+router.patch(
+  "/:projectId/assign/:freelancerId",
+  verifyToken,
+  authorizeRoles("client", "admin"),
+  assignFreelancerHandler
 );
 
 export default router;

@@ -69,3 +69,48 @@ export const deleteProjectHandler = async (req: Request, res: Response) => {
 
   return res.status(result.status).json(result);
 };
+
+export const assignFreelancerHandler = async (req: Request, res: Response) => {
+  try {
+    const { projectId, freelancerId } = req.params;
+    const client_id = (req.user as any)?.id;
+
+    // Validate UUIDs
+    if (!uuidRegex.test(projectId) || !uuidRegex.test(freelancerId)) {
+      return res.status(400).json(
+        buildErrorResponse('Invalid UUID format for projectId or freelancerId')
+      );
+    }
+
+    // Validate client_id exists
+    if (!client_id || !uuidRegex.test(client_id)) {
+      return res.status(401).json(
+        buildErrorResponse('Authentication required')
+      );
+    }
+
+    // Call service method
+    const result = await projectService.assignFreelancer(
+      projectId,
+      freelancerId,
+      client_id
+    );
+
+    // Return appropriate HTTP status based on service result
+    if (result.success) {
+      return res.status(result.status).json(
+        buildSuccessResponse(result.data, result.message || 'Freelancer assigned successfully')
+      );
+    } else {
+      return res.status(result.status).json(
+        buildErrorResponse(result.message || 'Failed to assign freelancer')
+      );
+    }
+  } catch (error) {
+    // Handle unexpected errors
+    console.error('Error in assignFreelancerHandler:', error);
+    return res.status(500).json(
+      buildErrorResponse('Internal server error')
+    );
+  }
+};
