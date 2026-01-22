@@ -16,18 +16,19 @@ export const getProjectHandler = async (
 ) => {
   try {
     const { projectId } = req.params;
+    const projectIdStr = Array.isArray(projectId) ? projectId[0] : projectId;
 
     // Validate projectId is a valid UUID format
-    if (!projectId) {
+    if (!projectIdStr) {
       throw new NotFoundError("Project ID is required");
     }
 
-    if (!validateUUID(projectId)) {
+    if (!validateUUID(projectIdStr)) {
       throw new NotFoundError("Invalid project ID format");
     }
 
     // Get project by ID
-    const project = await projectService.getProjectById(projectId);
+    const project = await projectService.getProjectById(projectIdStr);
 
     if (!project) {
       throw new NotFoundError("Project not found");
