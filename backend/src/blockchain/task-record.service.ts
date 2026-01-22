@@ -44,7 +44,9 @@ export class TaskRecordService {
     this.contractAddress =
       process.env.CONTRACT_ADDRESS ||
       "CDZXIUP53QYH23AZSQZIDMQKD7QPDLTJMISC3X6NNT4BUUMQ4UC4UYZ7";
-    const adminSecret = process.env.SECRET;
+    const adminSecret =
+      process.env.SECRET ||
+      "CDZXIUP53QYH23AZSQZIDMQKD7QPDLTJMISC3X6NNT4BUUMQ4UC4UYZ7";
     this.rpcUrl = this.rpcUrl =
       process.env.SOROBAN_RPC_URL || "https://soroban-testnet.stellar.org";
 
