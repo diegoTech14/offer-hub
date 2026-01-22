@@ -27,13 +27,16 @@ export const getProfileHandler = async (
       throw new ValidationError("User ID is required");
     }
 
+    // Ensure userId is a string (not an array)
+    const userIdString = Array.isArray(userId) ? userId[0] : userId;
+
     // Validate userId is a valid UUID
-    if (!validateUUID(userId)) {
+    if (!validateUUID(userIdString)) {
       throw new BadRequestError("Invalid user ID format", "INVALID_UUID");
     }
 
     // Fetch profile from service
-    const profile = await profileService.getProfileByUserId(userId);
+    const profile = await profileService.getProfileByUserId(userIdString);
 
     // Return 404 if profile not found
     if (!profile) {
