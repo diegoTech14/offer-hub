@@ -47,7 +47,7 @@ export class TaskRecordService {
     const adminSecret =
       process.env.SECRET ||
       process.env.STELLAR_ADMIN_SECRET_KEY ||
-      "S..."; // Fallback removed for security/clarity in this edit
+      "SAO2XTN656P3TGVGQFUMYVH4DYT44EEQW6L2ITWXVNMAHXIUP6H4DQRZ";
     this.rpcUrl = this.rpcUrl =
       process.env.SOROBAN_RPC_URL || "https://soroban-testnet.stellar.org";
 
