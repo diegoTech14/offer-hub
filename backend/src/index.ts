@@ -34,7 +34,7 @@ import TaskRecordRouter from "@/routes/blockchain.routes";
 import projectRoutes from "@/routes/project.routes";
 import profileRoutes from "@/routes/profile.routes";
 import walletRoutes from "@/routes/wallet.routes";
-import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
+import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware"; 
 import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware";
 import { authenticateToken } from "./middlewares/auth.middleware";
 import { loggerMiddleware } from "./middlewares/logger.middleware";
@@ -99,9 +99,9 @@ app.use("/api/escrows", authenticateToken(), escrowQueryRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 app.use("/api/task", TaskRecordRouter);
 app.use("/api/projects", projectRoutes);
+app.use("/api/profile", authenticateToken(), profileRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/v1/wallets", authenticateToken(), walletRoutes);
-
 
 // Error Handling
 app.use(errorHandlerMiddleware);

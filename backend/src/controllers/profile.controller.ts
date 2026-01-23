@@ -1,13 +1,58 @@
 /**
- * @fileoverview Profile controller handling profile retrieval operations
+ * @fileoverview Profile controller handling profile operations
  * @author Offer Hub Team
  */
 
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
+
+import { PROFILE_CREATION_SCHEMA, validateObject } from "@/utils/validation";
 import { profileService } from "@/services/profile.service";
-import { NotFoundError, ValidationError, BadRequestError, mapSupabaseError } from "@/utils/AppError";
+import {
+  NotFoundError,
+  ValidationError,
+  BadRequestError,
+  mapSupabaseError,
+} from "@/utils/AppError";
 import { buildSuccessResponse } from "@/utils/responseBuilder";
 import { validateUUID } from "@/utils/validation";
+
+export const createProfileHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const validationResult = validateObject(req.body, PROFILE_CREATION_SCHEMA);
+
+    if (!validationResult.isValid) {
+      throw new ValidationError(
+        "Profile Details validation failed",
+        validationResult.errors,
+      );
+    }
+
+    const { display_name, bio, website, skills, date_of_birth, location } =
+      req.body;
+
+    // Create a new profile
+    const profile = await profileService.createProfile({
+      userId: req.user.id,
+      displayName: display_name,
+      bio,
+      website,
+      skills,
+      dateOfBirth: date_of_birth,
+      location,
+    });
+
+    // Return 201 with profile data
+    res
+      .status(201)
+      .json(buildSuccessResponse(profile, "Profile created successfully"));
+  } catch (error: any) {
+    next(error);
+  }
+};
 
 /**
  * Get profile by user ID handler
@@ -17,7 +62,7 @@ import { validateUUID } from "@/utils/validation";
 export const getProfileHandler = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { userId } = req.params;
@@ -44,9 +89,9 @@ export const getProfileHandler = async (
     }
 
     // Return 200 with profile data
-    res.status(200).json(
-      buildSuccessResponse(profile, "Profile retrieved successfully")
-    );
+    res
+      .status(200)
+      .json(buildSuccessResponse(profile, "Profile retrieved successfully"));
   } catch (error: any) {
     // Handle Supabase errors
     if (error.code && error.message) {
