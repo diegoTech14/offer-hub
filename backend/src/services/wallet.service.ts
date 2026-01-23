@@ -1,11 +1,11 @@
-import { Keypair } from '@stellar/stellar-sdk';
+import { Keypair, StrKey } from '@stellar/stellar-sdk';
 import { supabase } from '@/lib/supabase/supabase';
 import { encrypt, decrypt } from '@/utils/crypto.utils';
-import { 
-  Wallet, 
-  CreateWalletDTO, 
+import {
+  Wallet,
+  CreateWalletDTO,
   GenerateWalletResult,
-  WalletType 
+  WalletType
 } from '@/types/wallet.types';
 import { AppError } from '@/utils/AppError';
 
@@ -108,6 +108,75 @@ export async function linkExternalWallet(userId: string, address: string): Promi
     );
   }
 }
+
+/**
+ * Connect an external wallet to a user with full validation
+ * Validates Stellar public key format and checks for duplicates
+ * @param userId - The user ID to associate the wallet with
+ * @param publicKey - The Stellar public key (must start with 'G' and be 56 characters)
+ * @param provider - The wallet provider (freighter, albedo, rabet, xbull, other)
+ * @returns The created wallet record
+ */
+export async function connectExternalWallet(
+  userId: string,
+  publicKey: string,
+  provider: string
+): Promise<Wallet> {
+  try {
+    // Validate Stellar public key format
+    if (!StrKey.isValidEd25519PublicKey(publicKey)) {
+      throw new AppError('Invalid Stellar public key format', 400);
+    }
+
+    // Validate provider
+    const validProviders = ['freighter', 'albedo', 'rabet', 'xbull', 'other'];
+    if (!validProviders.includes(provider)) {
+      throw new AppError(
+        `Invalid provider. Must be one of: ${validProviders.join(', ')}`,
+        400
+      );
+    }
+
+    // Check if public key is already registered by ANY user
+    const { data: existingWallet } = await supabase
+      .from('wallets')
+      .select('*')
+      .eq('address', publicKey)
+      .single();
+
+    if (existingWallet) {
+      throw new AppError('This wallet address is already registered', 409);
+    }
+
+    // Create external wallet record
+    const { data: wallet, error } = await supabase
+      .from('wallets')
+      .insert([
+        {
+          user_id: userId,
+          address: publicKey,
+          type: 'external' as WalletType,
+          provider: provider,
+          is_primary: false, // Default to false as per requirements
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      throw new AppError(`Failed to connect external wallet: ${error.message}`, 500);
+    }
+
+    return wallet as Wallet;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(
+      `Error connecting external wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      500
+    );
+  }
+}
+
 
 /**
  * Get all wallets for a user
