@@ -31,7 +31,7 @@ import oauthRoutes from "@/routes/oauth.routes";
 import escrowInitRoutes from "@/routes/escrow-init.routes";
 import TaskRecordRouter from "@/routes/blockchain.routes";
 import projectRoutes from "@/routes/project.routes";
-import profileRoute from "@/routes/profile.routes";
+import profileRoutes from "@/routes/profile.routes";
 import {
   errorHandlerMiddleware,
   setupGlobalErrorHandlers,
@@ -102,7 +102,8 @@ app.use("/api/escrows", authenticateToken(), escrowInitRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 app.use("/api/task", TaskRecordRouter);
 app.use("/api/projects", projectRoutes);
-app.use("/api/profile", authenticateToken(), profileRoute);
+app.use("/api/profile", authenticateToken(), profileRoutes);
+app.use("/api/profiles", profileRoutes);
 
 // Error Handling
 app.use(errorHandlerMiddleware);
