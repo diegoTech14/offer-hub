@@ -1,4 +1,4 @@
-import { config } from 'dotenv';
+const config = require('dotenv').config;
 // Load test environment variables
 config({ path: '.env.test' });
 
