@@ -245,3 +245,86 @@ export async function deleteWallet(walletId: string): Promise<void> {
   }
 }
 
+/**
+ * Get a wallet by ID
+ * @param walletId - The wallet ID
+ * @returns The wallet or null if not found
+ */
+export async function getWalletById(walletId: string): Promise<Wallet | null> {
+  try {
+    const { data: wallet, error } = await supabase
+      .from('wallets')
+      .select('*')
+      .eq('id', walletId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null; // Wallet not found
+      }
+      throw new AppError(`Failed to fetch wallet: ${error.message}`, 500);
+    }
+
+    return wallet as Wallet;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(
+      `Error fetching wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      500
+    );
+  }
+}
+
+/**
+ * Disconnect (remove) an external wallet from a user's account
+ * Validates ownership, type, and ensures user has at least one wallet remaining
+ * @param walletId - The wallet ID to disconnect
+ * @param userId - The authenticated user's ID
+ * @throws AppError with appropriate status codes for various error conditions
+ */
+export async function disconnectWallet(walletId: string, userId: string): Promise<void> {
+  try {
+    // 1. Fetch the wallet
+    const wallet = await getWalletById(walletId);
+    
+    if (!wallet) {
+      throw new AppError('Wallet not found', 404, 'WALLET_NOT_FOUND');
+    }
+
+    // 2. Verify ownership
+    if (wallet.user_id !== userId) {
+      throw new AppError('You do not have permission to disconnect this wallet', 403, 'FORBIDDEN');
+    }
+
+    // 3. Validate wallet type (only external wallets can be disconnected)
+    if (wallet.type !== 'external') {
+      throw new AppError('Cannot disconnect system-generated invisible wallets', 400, 'INVALID_WALLET_TYPE');
+    }
+
+    // 4. Get all user wallets to check if this is the only one
+    const userWallets = await getWalletsByUserId(userId);
+    
+    if (userWallets.length <= 1) {
+      throw new AppError('Cannot disconnect your only wallet. You must have at least one wallet.', 400, 'LAST_WALLET');
+    }
+
+    // 5. Check if this is the primary wallet (earliest created)
+    const sortedWallets = [...userWallets].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+    const isPrimary = sortedWallets[0].id === walletId;
+
+    // 6. Delete the wallet
+    await deleteWallet(walletId);
+
+    // Note: If the deleted wallet was primary, the next oldest wallet automatically becomes primary
+    // since primary is determined by created_at ordering in getPrimaryWallet
+    
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(
+      `Error disconnecting wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      500
+    );
+  }
+}

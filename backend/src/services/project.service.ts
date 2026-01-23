@@ -1,5 +1,10 @@
 import { supabase } from "@/lib/supabase/supabase";
-import { Project, ProjectSkill } from '@/types/project.types';
+import {
+  Project,
+  ProjectRow,
+  ProjectSkillRow,
+  ProjectStatus,
+} from "@/types/project.types";
 import { InternalServerError } from "@/utils/AppError";
 import { userService } from "./user.service";
 import { escrowService } from "./escrow.service";
@@ -172,16 +177,29 @@ class ProjectService {
       return null;
     }
 
-    // Transform the data to include skills as array of strings
-    const skills = projectData.project_skills?.map((ps: ProjectSkill) => ps.skill_name) || [];
+    const row = projectData as ProjectRow & {
+      project_skills?: ProjectSkillRow[] | null;
+    };
 
-    // Remove the nested project_skills data and add the skills array
-    const { project_skills, ...project } = projectData;
+    // Transform the data to include skills as array of strings
+    const skills = row.project_skills?.map((ps) => ps.skill_name) || [];
 
     return {
-      ...project,
-      skills
-    } as Project;
+      id: row.id,
+      clientId: row.client_id,
+      freelancerId: row.freelancer_id,
+      title: row.title,
+      description: row.description,
+      category: row.category,
+      budgetAmount: Number(row.budget_amount),
+      currency: row.currency || "XLM",
+      status: (row.status || ProjectStatus.OPEN) as ProjectStatus,
+      deadline: row.deadline,
+      onChainTxHash: row.on_chain_tx_hash,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      skills,
+    };
   }
 }
 
