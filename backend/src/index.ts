@@ -30,9 +30,11 @@ import authRoutes from "@/routes/auth.routes";
 import oauthRoutes from "@/routes/oauth.routes";
 import escrowInitRoutes from "@/routes/escrow-init.routes";
 import escrowBalanceRoutes from "@/routes/escrow-balance.routes";
+import escrowQueryRoutes from "@/routes/escrow-query.routes";
 import TaskRecordRouter from "@/routes/blockchain.routes";
 import projectRoutes from "@/routes/project.routes";
 import profileRoutes from "@/routes/profile.routes";
+import walletRoutes from "@/routes/wallet.routes";
 import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
 import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware";
 import { authenticateToken } from "./middlewares/auth.middleware";
@@ -95,10 +97,12 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/oauth", oauthRoutes);
 app.use("/api/escrows", authenticateToken(), escrowInitRoutes);
 app.use("/api/escrows", authenticateToken(), escrowBalanceRoutes);
+app.use("/api/escrows", authenticateToken(), escrowQueryRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 app.use("/api/task", TaskRecordRouter);
 app.use("/api/projects", projectRoutes);
 app.use("/api/profiles", profileRoutes);
+app.use("/api/v1/wallets", authenticateToken(), walletRoutes);
 
 
 // Error Handling

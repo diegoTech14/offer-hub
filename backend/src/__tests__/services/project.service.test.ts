@@ -1,7 +1,8 @@
 import { projectService } from '@/services/project.service';
 import { supabase } from '@/lib/supabase/supabase';
+import { ProjectStatus } from '@/types/project.types';
 
-// Mock Supabase
+
 jest.mock('@/lib/supabase/supabase');
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
@@ -12,24 +13,15 @@ describe('ProjectService - getProjectById', () => {
   const mockProjectData = {
     id: mockProjectId,
     client_id: '456e7890-e89b-12d3-a456-426614174001',
+    freelancer_id: null,
     title: 'Test Project',
     description: 'A test project description',
     category: 'Development',
-    subcategory: 'Web Development',
-    budget: 1000,
-    budget_type: 'fixed' as const,
-    status: 'published' as const,
-    visibility: 'public' as const,
-    project_type: 'on-time' as const,
-    experience_level: 'intermediate' as const,
-    duration: '2 weeks',
+    budget_amount: 1000,
+    currency: 'XLM',
+    status: ProjectStatus.OPEN,
     deadline: '2024-02-01T00:00:00Z',
-    tags: ['javascript', 'react'],
-    on_chain_transaction_hash: '0x1234567890abcdef',
-    on_chain_id: 'project_123',
-    version: 1,
-    featured: false,
-    priority: 0,
+    on_chain_tx_hash: '0x1234567890abcdef',
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
     project_skills: [
@@ -40,10 +32,21 @@ describe('ProjectService - getProjectById', () => {
   };
 
   const expectedProject = {
-    ...mockProjectData,
+    id: mockProjectId,
+    clientId: mockProjectData.client_id,
+    freelancerId: null,
+    title: mockProjectData.title,
+    description: mockProjectData.description,
+    category: mockProjectData.category,
+    budgetAmount: mockProjectData.budget_amount,
+    currency: mockProjectData.currency,
+    status: mockProjectData.status,
+    deadline: mockProjectData.deadline,
+    onChainTxHash: mockProjectData.on_chain_tx_hash,
+    createdAt: mockProjectData.created_at,
+    updatedAt: mockProjectData.updated_at,
     skills: ['JavaScript', 'React', 'Node.js']
   };
-  const { project_skills: _, ...expectedProjectWithoutSkills } = expectedProject;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -65,8 +68,7 @@ describe('ProjectService - getProjectById', () => {
       const result = await projectService.getProjectById(mockProjectId);
 
       expect(mockSupabase.from).toHaveBeenCalledWith('projects');
-      expect(result).toEqual(expectedProjectWithoutSkills);
-      expect(result?.skills).toEqual(['JavaScript', 'React', 'Node.js']);
+      expect(result).toEqual(expectedProject);
     });
 
     it('should return project with empty skills array when no skills exist', async () => {
