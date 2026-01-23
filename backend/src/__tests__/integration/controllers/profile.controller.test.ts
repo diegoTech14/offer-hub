@@ -3,9 +3,13 @@
  * @author Offer Hub Team
  */
 
-import { createProfileHandler, getProfileHandler } from "@/controllers/profile.controller";
+import {
+  createProfileHandler,
+  getProfileHandler,
+} from "@/controllers/profile.controller";
 import { profileService } from "@/services/profile.service";
 import { ValidationError, AppError } from "@/utils/AppError";
+import { validateObject } from "@/utils/validation";
 
 // Mock the profile service
 jest.mock("@/services/profile.service");
@@ -13,7 +17,6 @@ const mockProfileService = profileService as jest.Mocked<typeof profileService>;
 
 // Mock validation
 jest.mock("@/utils/validation");
-import { validateObject } from "@/utils/validation";
 const mockValidateObject = validateObject as jest.MockedFunction<
   typeof validateObject
 >;
@@ -419,7 +422,10 @@ describe("Profile Controller - getProfileHandler", () => {
       const response = mockRes.json.mock.calls[0][0];
 
       expect(response).toHaveProperty("success", true);
-      expect(response).toHaveProperty("message", "Profile retrieved successfully");
+      expect(response).toHaveProperty(
+        "message",
+        "Profile retrieved successfully",
+      );
       expect(response).toHaveProperty("data");
       expect(response.data).toEqual(mockProfile);
     });
