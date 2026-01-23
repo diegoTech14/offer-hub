@@ -55,7 +55,9 @@
     "zod": "^4.3.5"
   },
   "overrides": {
-    "tar": "^7.5.4"
+    "tar": "^7.5.4",
+    "jws": "^4.0.1",
+    "js-yaml": "^4.1.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
