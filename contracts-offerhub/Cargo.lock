@@ -428,6 +428,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "dispute-contract"
+version = "0.0.0"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
 name = "downcast-rs"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -496,6 +503,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "emergency-contract"
+version = "0.1.0"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
 name = "equivalent"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -508,10 +522,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2bfcf67fea2815c2fc3b90873fae90957be12ff417335dfadc7f52927feb03b2"
 
 [[package]]
+name = "escrow-contract"
+version = "0.0.0"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
+name = "escrow-factory"
+version = "0.0.0"
+dependencies = [
+ "rand",
+ "soroban-sdk",
+]
+
+[[package]]
 name = "ethnum"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0939f82868b77ef93ce3c3c3daf2b3c526b456741da5a1a4559e590965b6026b"
+
+[[package]]
+name = "fee-manager-contract"
+version = "0.0.0"
+dependencies = [
+ "soroban-sdk",
+]
 
 [[package]]
 name = "ff"
@@ -919,6 +955,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rating-contract"
+version = "1.0.0"
+dependencies = [
+ "rand",
+ "reputation-nft-contract",
+ "soroban-sdk",
+]
+
+[[package]]
+name = "reputation-nft-contract"
+version = "0.0.0"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
 name = "rfc6979"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1279,6 +1331,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "stat-contract"
+version = "0.0.0"
+dependencies = [
+ "dispute-contract",
+ "escrow-contract",
+ "fee-manager-contract",
+ "rating-contract",
+ "soroban-sdk",
+ "user-registry-contract",
+]
+
+[[package]]
 name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1414,6 +1478,13 @@ name = "unicode-ident"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5a5f39404a5da50712a4c1eecf25e90dd62b613502b7e925fd4e4d19b5c96512"
+
+[[package]]
+name = "user-registry-contract"
+version = "0.0.0"
+dependencies = [
+ "soroban-sdk",
+]
 
 [[package]]
 name = "version_check"
