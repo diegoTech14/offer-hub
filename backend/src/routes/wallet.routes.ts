@@ -4,13 +4,21 @@
  */
 
 import { Router } from "express";
-import { disconnectWallet } from "@/controllers/wallet.controller";
-import { authenticateToken } from "@/middlewares/auth.middleware";
+import { connectExternalWalletHandler, disconnectWallet } from "@/controllers/wallet.controller";
+import { verifyToken } from "@/middlewares/auth.middleware";
 
 const router = Router();
 
 // Wallet management routes
 // All routes require authentication (applied at app level in index.ts)
+
+/**
+ * POST /api/v1/wallets/external
+ * Connect an external Stellar wallet to the authenticated user
+ * Requires: JWT authentication
+ * Body: { public_key: string, provider: string }
+ */
+router.post("/external", verifyToken, connectExternalWalletHandler);
 
 /**
  * DELETE /api/v1/wallets/:id
