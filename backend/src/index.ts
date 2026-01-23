@@ -101,9 +101,9 @@ app.use("/api/users", roleRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
 app.use("/api/task", TaskRecordRouter);
 app.use("/api/projects", projectRoutes);
+app.use("/api/profile", authenticateToken(), profileRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/v1/wallets", authenticateToken(), walletRoutes);
-
 
 // Error Handling
 app.use(errorHandlerMiddleware);
