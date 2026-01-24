@@ -7,6 +7,7 @@
 jest.mock('@/lib/supabase/supabase', () => ({
   supabase: {
     rpc: jest.fn(),
+    from: jest.fn(),
   },
 }));
 
@@ -95,5 +96,202 @@ describe('BalanceService - creditAvailable', () => {
     ).rejects.toThrow(InternalServerError);
 
     expect(mockLogger.error).toHaveBeenCalled();
+  });
+});
+
+describe('BalanceService - getUserBalances', () => {
+  const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
+
+  // Mock query builder chain
+  const createMockQuery = (mockData: any[], mockError: any = null, hasCurrencyFilter: boolean = false) => {
+    // Create the result object
+    const result = {
+      data: mockData,
+      error: mockError,
+    };
+
+    // Track how many times eq is called
+    let eqCallCount = 0;
+    const expectedEqCalls = hasCurrencyFilter ? 2 : 1; // user_id + currency if filtered
+
+    const mockQuery: any = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockImplementation((...args) => {
+        eqCallCount++;
+        // On the last eq call, return a Promise that resolves to the result
+        if (eqCallCount === expectedEqCalls) {
+          return Promise.resolve(result);
+        }
+        // Otherwise return the query builder for chaining
+        return mockQuery;
+      }),
+    };
+
+    return mockQuery;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return all balances when no currency filter is provided', async () => {
+    const mockBalances = [
+      { currency: 'USD', available: 1500.00, held: 500.00 },
+      { currency: 'XLM', available: 100.50, held: 0.00 },
+    ];
+
+    const mockQuery = createMockQuery(mockBalances);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    const result = await balanceService.getUserBalances(mockUserId);
+
+    expect(mockSupabase.from).toHaveBeenCalledWith('balances');
+    expect(mockQuery.select).toHaveBeenCalledWith('currency, available, held');
+    expect(mockQuery.eq).toHaveBeenCalledWith('user_id', mockUserId);
+    expect(result).toEqual([
+      {
+        currency: 'USD',
+        available: '1500.00',
+        held: '500.00',
+        total: '2000.00',
+      },
+      {
+        currency: 'XLM',
+        available: '100.50',
+        held: '0.00',
+        total: '100.50',
+      },
+    ]);
+  });
+
+  it('should return filtered balance when currency is provided', async () => {
+    const mockBalances = [
+      { currency: 'USD', available: 1500.00, held: 500.00 },
+    ];
+
+    const mockQuery = createMockQuery(mockBalances, null, true);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    const result = await balanceService.getUserBalances(mockUserId, 'USD');
+
+    expect(mockSupabase.from).toHaveBeenCalledWith('balances');
+    expect(mockQuery.select).toHaveBeenCalledWith('currency, available, held');
+    expect(mockQuery.eq).toHaveBeenCalledWith('user_id', mockUserId);
+    expect(mockQuery.eq).toHaveBeenCalledWith('currency', 'USD');
+    expect(result).toEqual([
+      {
+        currency: 'USD',
+        available: '1500.00',
+        held: '500.00',
+        total: '2000.00',
+      },
+    ]);
+  });
+
+  it('should throw ValidationError for invalid currency', async () => {
+    await expect(
+      balanceService.getUserBalances(mockUserId, 'INVALID')
+    ).rejects.toThrow(ValidationError);
+
+    expect(mockSupabase.from).not.toHaveBeenCalled();
+  });
+
+  it('should return empty array when user has no balances', async () => {
+    const mockQuery = createMockQuery([]);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    const result = await balanceService.getUserBalances(mockUserId);
+
+    expect(result).toEqual([]);
+  });
+
+  it('should calculate total correctly (available + held)', async () => {
+    const mockBalances = [
+      { currency: 'USD', available: 100.25, held: 50.75 },
+    ];
+
+    const mockQuery = createMockQuery(mockBalances);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    const result = await balanceService.getUserBalances(mockUserId);
+
+    expect(result[0].total).toBe('151.00');
+  });
+
+  it('should format amounts as strings with 2 decimal places', async () => {
+    const mockBalances = [
+      { currency: 'USD', available: 100.5, held: 25.123 },
+    ];
+
+    const mockQuery = createMockQuery(mockBalances);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    const result = await balanceService.getUserBalances(mockUserId);
+
+    expect(typeof result[0].available).toBe('string');
+    expect(typeof result[0].held).toBe('string');
+    expect(typeof result[0].total).toBe('string');
+    expect(result[0].available).toBe('100.50');
+    expect(result[0].held).toBe('25.12');
+  });
+
+  it('should throw BadRequestError for invalid user ID format', async () => {
+    await expect(
+      balanceService.getUserBalances('invalid-uuid')
+    ).rejects.toThrow(BadRequestError);
+
+    expect(mockSupabase.from).not.toHaveBeenCalled();
+  });
+
+  it('should throw InternalServerError on database error', async () => {
+    const mockError = { message: 'Database connection failed' };
+    const mockQuery = createMockQuery([], mockError);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    await expect(
+      balanceService.getUserBalances(mockUserId)
+    ).rejects.toThrow(InternalServerError);
+
+    expect(mockLogger.error).toHaveBeenCalled();
+  });
+
+  it('should handle zero values correctly', async () => {
+    const mockBalances = [
+      { currency: 'USD', available: 0, held: 0 },
+    ];
+
+    const mockQuery = createMockQuery(mockBalances);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    const result = await balanceService.getUserBalances(mockUserId);
+
+    expect(result).toEqual([
+      {
+        currency: 'USD',
+        available: '0.00',
+        held: '0.00',
+        total: '0.00',
+      },
+    ]);
+  });
+
+  it('should handle null values and convert to 0', async () => {
+    const mockBalances = [
+      { currency: 'USD', available: null, held: null },
+    ];
+
+    const mockQuery = createMockQuery(mockBalances);
+    (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+    const result = await balanceService.getUserBalances(mockUserId);
+
+    expect(result).toEqual([
+      {
+        currency: 'USD',
+        available: '0.00',
+        held: '0.00',
+        total: '0.00',
+      },
+    ]);
   });
 });

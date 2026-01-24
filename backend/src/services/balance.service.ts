@@ -90,6 +90,82 @@ export class BalanceService {
       throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
     }
   }
+
+  /**
+   * Retrieves user balances by currency.
+   * @param userId - The user ID to get balances for
+   * @param currency - Optional currency filter (USD, XLM)
+   * @returns Array of balance objects with formatted amounts
+   */
+  async getUserBalances(
+    userId: string,
+    currency?: string
+  ): Promise<Array<{
+    currency: string;
+    available: string;
+    held: string;
+    total: string;
+  }>> {
+    const correlationId = crypto.randomUUID();
+    
+    try {
+      logger.info(
+        `[BalanceService] Starting getUserBalances ${correlationId} - User: ${userId}, Currency: ${currency || 'all'}`
+      );
+
+      // 1. Validation
+      if (!validateUUID(userId)) {
+        throw new BadRequestError("Invalid user ID format");
+      }
+
+      if (currency && !SUPPORTED_CURRENCIES.includes(currency as Currency)) {
+        throw new ValidationError(`Currency ${currency} is not supported. Supported currencies: ${SUPPORTED_CURRENCIES.join(', ')}`);
+      }
+
+      // 2. Build query
+      let query = supabase
+        .from('balances')
+        .select('currency, available, held')
+        .eq('user_id', userId);
+
+      // 3. Apply currency filter if provided
+      if (currency) {
+        query = query.eq('currency', currency);
+      }
+
+      // 4. Execute query
+      const { data, error } = await query;
+
+      if (error) {
+        logger.error(`[BalanceService] Database Error ${correlationId}`, error);
+        throw new InternalServerError(`Failed to retrieve balances: ${error.message}`);
+      }
+
+      // 5. Transform data to response format
+      const balances = (data || []).map((balance) => {
+        const available = Number(balance.available) || 0;
+        const held = Number(balance.held) || 0;
+        const total = available + held;
+
+        return {
+          currency: balance.currency,
+          available: available.toFixed(2),
+          held: held.toFixed(2),
+          total: total.toFixed(2),
+        };
+      });
+
+      logger.info(`[BalanceService] Success ${correlationId} - Found ${balances.length} balance(s)`);
+
+      return balances;
+
+    } catch (err: any) {
+      if (err instanceof ValidationError || err instanceof BadRequestError || err instanceof InternalServerError) {
+        throw err;
+      }
+      throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
+    }
+  }
 }
 
 export const balanceService = new BalanceService();
