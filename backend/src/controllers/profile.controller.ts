@@ -22,6 +22,11 @@ export const createProfileHandler = async (
   next: NextFunction,
 ) => {
   try {
+    // Validate user is authenticated
+    if (!req.user) {
+      throw new AuthorizationError("Authentication required", "UNAUTHORIZED");
+    }
+
     const validationResult = validateObject(req.body, PROFILE_CREATION_SCHEMA);
 
     if (!validationResult.isValid) {
