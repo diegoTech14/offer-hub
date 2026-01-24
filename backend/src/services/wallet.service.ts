@@ -397,3 +397,61 @@ export async function disconnectWallet(walletId: string, userId: string): Promis
     );
   }
 }
+
+/**
+ * Set a wallet as the primary wallet for a user
+ * Uses database transaction to ensure atomicity:
+ * - Sets is_primary = false on ALL user's wallets
+ * - Sets is_primary = true on the selected wallet
+ * @param walletId - The wallet ID to set as primary
+ * @param userId - The authenticated user's ID
+ * @returns The updated wallet
+ * @throws AppError with appropriate status codes for various error conditions
+ */
+export async function setPrimaryWallet(walletId: string, userId: string): Promise<Wallet> {
+  try {
+    // 1. Fetch the wallet
+    const wallet = await getWalletById(walletId);
+    
+    if (!wallet) {
+      throw new AppError('Wallet not found', 404, 'WALLET_NOT_FOUND');
+    }
+
+    // 2. Verify ownership
+    if (wallet.user_id !== userId) {
+      throw new AppError('You do not have permission to modify this wallet', 403, 'FORBIDDEN');
+    }
+
+    // 3. Execute transaction to update primary wallet atomically
+    // First, set all user wallets to is_primary = false
+    const { error: resetError } = await supabase
+      .from('wallets')
+      .update({ is_primary: false })
+      .eq('user_id', userId);
+
+    if (resetError) {
+      throw new AppError(`Failed to reset primary wallets: ${resetError.message}`, 500);
+    }
+
+    // Then, set the selected wallet to is_primary = true
+    const { data: updatedWallet, error: updateError } = await supabase
+      .from('wallets')
+      .update({ is_primary: true })
+      .eq('id', walletId)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw new AppError(`Failed to set primary wallet: ${updateError.message}`, 500);
+    }
+
+    return updatedWallet as Wallet;
+    
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(
+      `Error setting primary wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      500
+    );
+  }
+}

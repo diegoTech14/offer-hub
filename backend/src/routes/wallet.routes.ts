@@ -4,7 +4,11 @@
  */
 
 import { Router } from "express";
-import { connectExternalWalletHandler, disconnectWallet } from "@/controllers/wallet.controller";
+import { 
+  connectExternalWalletHandler, 
+  disconnectWallet,
+  setPrimaryWallet
+} from "@/controllers/wallet.controller";
 import { verifyToken } from "@/middlewares/auth.middleware";
 
 const router = Router();
@@ -21,6 +25,21 @@ const router = Router();
 router.post("/external", verifyToken, connectExternalWalletHandler);
 
 /**
+ * PUT /api/v1/wallets/:id/primary
+ * Set a wallet as the primary wallet for the authenticated user
+ * - Requires valid JWT authentication
+ * - Validates UUID format for :id parameter
+ * - Uses database transaction for atomicity
+ * - Sets is_primary = false on ALL user's wallets
+ * - Sets is_primary = true on the selected wallet
+ * - Returns 404 if wallet not found
+ * - Returns 403 if wallet belongs to another user
+ * - Returns 400 if invalid UUID format
+ * - Returns 200 with updated wallet data on success
+ */
+router.put("/:id/primary", verifyToken, setPrimaryWallet);
+
+/**
  * DELETE /api/v1/wallets/:id
  * Disconnect (remove) an external wallet from the authenticated user's account
  * - Requires valid JWT authentication
@@ -30,6 +49,6 @@ router.post("/external", verifyToken, connectExternalWalletHandler);
  * - Returns 403 if wallet belongs to another user
  * - Returns 400 if trying to delete invisible wallet or last wallet
  */
-router.delete("/:id", disconnectWallet);
+router.delete("/:id", verifyToken, disconnectWallet);
 
 export default router;
