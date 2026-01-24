@@ -7,13 +7,15 @@ import {
   InternalServerError, 
   ValidationError, 
   BadRequestError,
-  BusinessLogicError
+  BusinessLogicError,
+  InsufficientFundsError
 } from "../utils/AppError";
 import { validateUUID } from "../utils/validation";
 import { 
   Balance, 
   Currency, 
-  CreditReference, 
+  CreditReference,
+  DebitReference,
   SUPPORTED_CURRENCIES 
 } from "../types/balance.types";
 import { logger } from "../utils/logger"; 
@@ -264,6 +266,102 @@ export class BalanceService {
 
     } catch (err: any) {
       if (err instanceof ValidationError || err instanceof BadRequestError || err instanceof InternalServerError) {
+        throw err;
+      }
+      throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
+    }
+  }
+
+  /**
+   * Removes funds from a user's available balance.
+   * Used when a withdrawal is completed or when funds are spent.
+   * @param userId - The user to debit
+   * @param amount - Amount to debit (must be positive)
+   * @param currency - Currency code (USD, XLM)
+   * @param reference - Source of the debit
+   * @param description - Optional description
+   * @returns Updated Balance object
+   */
+  async debitAvailable(
+    userId: string,
+    amount: number,
+    currency: string,
+    reference: DebitReference,
+    description?: string
+  ): Promise<Balance> {
+    const correlationId = crypto.randomUUID();
+    
+    try {
+      logger.info(
+        `[BalanceService] Starting debitAvailable ${correlationId} - User: ${userId}, Amount: ${amount} ${currency}`
+      );
+
+      // 1. Validation
+      if (!validateUUID(userId)) {
+        throw new BadRequestError("Invalid user ID format");
+      }
+
+      if (amount <= 0) {
+        throw new ValidationError("Amount must be positive");
+      }
+
+      if (!SUPPORTED_CURRENCIES.includes(currency as Currency)) {
+        throw new ValidationError(`Currency ${currency} is not supported`);
+      }
+
+      if (!reference.id || !reference.type) {
+        throw new ValidationError("Invalid reference data");
+      }
+
+      // 2. Atomic Transaction (via RPC)
+      // We rely on a database function to lock the row, validate funds,
+      // update balance, AND insert the log in one go.
+      const { data, error } = await supabase.rpc('debit_available_balance', {
+        p_user_id: userId,
+        p_amount: amount,
+        p_currency: currency,
+        p_ref_id: reference.id,
+        p_ref_type: reference.type,
+        p_description: description || ''
+      });
+
+      if (error) {
+        logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
+        
+        // Check if error is about insufficient funds
+        if (error.message && (
+          error.message.includes('Insufficient funds') ||
+          error.message.includes('no balance record')
+        )) {
+          throw new InsufficientFundsError(
+            error.message,
+            {
+              userId,
+              currency,
+              requestedAmount: amount,
+              correlationId
+            }
+          );
+        }
+        
+        throw new InternalServerError(`Balance debit failed: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new InternalServerError("Balance update failed: No data returned");
+      }
+
+      logger.info(`[BalanceService] Success ${correlationId} - New Balance: ${data.available}`);
+
+      return data as Balance;
+
+    } catch (err: any) {
+      if (
+        err instanceof ValidationError || 
+        err instanceof BadRequestError || 
+        err instanceof InternalServerError ||
+        err instanceof InsufficientFundsError
+      ) {
         throw err;
       }
       throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
