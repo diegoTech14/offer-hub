@@ -8,6 +8,7 @@ import { AuthenticatedRequest } from "@/types/auth.types";
 import {
   connectExternalWallet,
   disconnectWallet as disconnectWalletService,
+  setPrimaryWallet as setPrimaryWalletService,
 } from "@/services/wallet.service";
 import {
   AppError,
@@ -20,17 +21,7 @@ import {
   buildSuccessResponse,
   buildSuccessResponseWithoutData,
 } from "@/utils/responseBuilder";
-
-/**
- * Validate UUID format
- * @param id - String to validate as UUID
- * @returns Boolean indicating if valid UUID
- */
-function isValidUUID(id: string): boolean {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
-}
+import { validateUUID } from "@/utils/validation";
 
 /**
  * Connect an external wallet to the authenticated user
@@ -136,8 +127,8 @@ export async function disconnectWallet(
     }
 
     // Validate UUID format
-    if (!id || !isValidUUID(id as string)) {
-      throw new AppError("Invalid wallet ID format", 400, "INVALID_UUID");
+    if (!id || !validateUUID(id as string)) {
+      throw new BadRequestError("Invalid wallet ID format", "INVALID_UUID");
     }
 
     // Call service to disconnect wallet
@@ -148,6 +139,54 @@ export async function disconnectWallet(
       .json(
         buildSuccessResponseWithoutData("Wallet disconnected successfully"),
       );
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Set a wallet as the primary wallet for the authenticated user
+ * @route PUT /api/v1/wallets/:id/primary
+ * @param req - Express request object with wallet ID in params
+ * @param res - Express response object
+ * @param next - Express next function
+ */
+export async function setPrimaryWallet(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    // Validate authenticated user
+    if (!userId) {
+      throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+    }
+
+    // Validate UUID format
+    if (!id || !validateUUID(id as string)) {
+      throw new BadRequestError("Invalid wallet ID format", "INVALID_UUID");
+    }
+
+    // Call service to set primary wallet
+    const wallet = await setPrimaryWalletService(id as string, userId);
+
+    // Build response according to spec
+    return res.status(200).json(
+      buildSuccessResponse(
+        {
+          id: wallet.id,
+          public_key: wallet.address,
+          type: wallet.type,
+          provider: wallet.provider,
+          is_primary: wallet.is_primary,
+          created_at: wallet.created_at,
+        },
+        "Primary wallet updated successfully",
+      ),
+    );
   } catch (error) {
     next(error);
   }
