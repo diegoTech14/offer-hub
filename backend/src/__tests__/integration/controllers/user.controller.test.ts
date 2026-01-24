@@ -1,6 +1,11 @@
-import { updateAvatarHandler } from '@/controllers/user.controller';
+import { updateAvatarHandler, deleteOwnAccountHandler } from '@/controllers/user.controller';
 import { userService } from '@/services/user.service';
-import { AppError } from '@/utils/AppError';
+import { AppError, BadRequestError } from '@/utils/AppError';
+
+// Mock email service to avoid sending emails during tests
+jest.mock('@/services/email.service', () => ({
+  sendAccountDeletionEmail: jest.fn().mockResolvedValue(undefined),
+}));
 
 // Mock the user service
 jest.mock('@/services/user.service');
@@ -269,6 +274,196 @@ describe('User Controller - updateAvatarHandler', () => {
       mockUserService.updateAvatar.mockRejectedValue(unexpectedError);
 
       await updateAvatarHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(unexpectedError);
+    });
+  });
+});
+
+describe('User Controller - deleteOwnAccountHandler', () => {
+  let mockReq: any;
+  let mockRes: any;
+  let mockNext: any;
+
+  beforeEach(() => {
+    mockReq = {
+      body: {},
+      user: null,
+    };
+
+    mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+    };
+
+    mockNext = jest.fn();
+
+    // Reset all mocks
+    jest.clearAllMocks();
+  });
+
+  describe('Authentication Validation', () => {
+    it('should return 401 if user is not authenticated', async () => {
+      mockReq.body = { password: 'password123', confirmation: 'DELETE' };
+      mockReq.user = null;
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Authentication required',
+          statusCode: 401,
+        })
+      );
+    });
+
+    it('should return 401 if user.id is missing', async () => {
+      mockReq.body = { password: 'password123', confirmation: 'DELETE' };
+      mockReq.user = {}; // user exists but no id
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Authentication required',
+          statusCode: 401,
+        })
+      );
+    });
+  });
+
+  describe('Input Validation', () => {
+    beforeEach(() => {
+      mockReq.user = { id: '123e4567-e89b-12d3-a456-426614174000' };
+    });
+
+    it('should return 400 if password is missing', async () => {
+      mockReq.body = { confirmation: 'DELETE' };
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Password is required',
+          errorCode: 'MISSING_PASSWORD',
+        })
+      );
+    });
+
+    it('should return 400 if confirmation is missing', async () => {
+      mockReq.body = { password: 'password123' };
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Confirmation is required',
+          errorCode: 'MISSING_CONFIRMATION',
+        })
+      );
+    });
+
+    it('should return 400 if confirmation is not "DELETE"', async () => {
+      mockReq.body = { password: 'password123', confirmation: 'delete' }; // lowercase
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Confirmation must be exactly 'DELETE'",
+          errorCode: 'INVALID_CONFIRMATION',
+        })
+      );
+    });
+
+    it('should return 400 if confirmation is wrong string', async () => {
+      mockReq.body = { password: 'password123', confirmation: 'CONFIRM' };
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Confirmation must be exactly 'DELETE'",
+          errorCode: 'INVALID_CONFIRMATION',
+        })
+      );
+    });
+  });
+
+  describe('Service Integration', () => {
+    const userId = '123e4567-e89b-12d3-a456-426614174000';
+
+    beforeEach(() => {
+      mockReq.user = { id: userId };
+      mockReq.body = { password: 'correctPassword123', confirmation: 'DELETE' };
+    });
+
+    it('should call userService.deleteOwnAccount with correct parameters', async () => {
+      mockUserService.deleteOwnAccount.mockResolvedValue(undefined);
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockUserService.deleteOwnAccount).toHaveBeenCalledWith(
+        userId,
+        'correctPassword123',
+        'DELETE'
+      );
+      expect(mockUserService.deleteOwnAccount).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 200 with success message on successful deletion', async () => {
+      mockUserService.deleteOwnAccount.mockResolvedValue(undefined);
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        success: true,
+        message: 'Account scheduled for deletion. You will receive a confirmation email.',
+      });
+    });
+
+    it('should forward BadRequestError for incorrect password', async () => {
+      const passwordError = new BadRequestError('Incorrect password', 'INVALID_PASSWORD');
+      mockUserService.deleteOwnAccount.mockRejectedValue(passwordError);
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(passwordError);
+    });
+
+    it('should forward BadRequestError for invalid confirmation from service', async () => {
+      const confirmError = new BadRequestError("Confirmation must be exactly 'DELETE'", 'INVALID_CONFIRMATION');
+      mockUserService.deleteOwnAccount.mockRejectedValue(confirmError);
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(confirmError);
+    });
+
+    it('should forward NotFoundError when user does not exist', async () => {
+      const notFoundError = new AppError('User not found', 404, 'USER_NOT_FOUND');
+      mockUserService.deleteOwnAccount.mockRejectedValue(notFoundError);
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(notFoundError);
+    });
+
+    it('should forward BadRequestError when account is already deleted', async () => {
+      const alreadyDeletedError = new BadRequestError('Account is already deleted', 'ACCOUNT_ALREADY_DELETED');
+      mockUserService.deleteOwnAccount.mockRejectedValue(alreadyDeletedError);
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(alreadyDeletedError);
+    });
+
+    it('should handle unexpected errors', async () => {
+      const unexpectedError = new Error('Database connection failed');
+      mockUserService.deleteOwnAccount.mockRejectedValue(unexpectedError);
+
+      await deleteOwnAccountHandler(mockReq, mockRes, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(unexpectedError);
     });

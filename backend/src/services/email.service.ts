@@ -177,3 +177,56 @@ export async function sendPasswordResetEmail(
   });
 }
 
+/**
+ * Send account deletion confirmation email
+ * @param email - Recipient email address (original email before anonymization)
+ */
+export async function sendAccountDeletionEmail(email: string): Promise<void> {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const supportEmail = process.env.SUPPORT_EMAIL || 'support@offer-hub.org';
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Account Deletion Confirmation</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background-color: #f8f9fa; padding: 30px; border-radius: 8px; margin-bottom: 20px;">
+        <h1 style="color: #2c3e50; margin-top: 0;">Account Deletion Confirmation</h1>
+        <p>Hello,</p>
+        <p>We're writing to confirm that your Offer Hub account has been scheduled for deletion.</p>
+        <div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 5px; padding: 15px; margin: 20px 0;">
+          <p style="margin: 0; color: #856404;">
+            <strong>What this means:</strong>
+          </p>
+          <ul style="color: #856404; margin: 10px 0 0 0; padding-left: 20px;">
+            <li>Your account has been deactivated</li>
+            <li>Your personal data has been anonymized</li>
+            <li>All active sessions have been terminated</li>
+          </ul>
+        </div>
+        <p>If you did not request this deletion or believe this was done in error, please contact our support team immediately:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="mailto:${supportEmail}" style="background-color: #dc3545; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Contact Support</a>
+        </div>
+        <p style="color: #666; font-size: 14px;">
+          We're sorry to see you go. If you'd like to share feedback about your experience, please reply to this email.
+        </p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        <p style="color: #999; font-size: 12px; margin-bottom: 0;">
+          This is an automated message from Offer Hub. This email was sent to confirm account deletion.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  await sendEmail({
+    to: email,
+    subject: 'Offer Hub Account Deletion Confirmation',
+    html,
+  });
+}
