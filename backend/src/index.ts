@@ -29,6 +29,7 @@ import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
 import oauthRoutes from "@/routes/oauth.routes";
 import escrowInitRoutes from "@/routes/escrow-init.routes";
+import escrowBalanceRoutes from "@/routes/escrow-balance.routes";
 import escrowQueryRoutes from "@/routes/escrow-query.routes";
 import TaskRecordRouter from "@/routes/blockchain.routes";
 import projectRoutes from "@/routes/project.routes";
@@ -97,6 +98,7 @@ app.get("/", (_req, res) => {
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/oauth", oauthRoutes);
 app.use("/api/escrows", authenticateToken(), escrowInitRoutes);
+app.use("/api/escrows", authenticateToken(), escrowBalanceRoutes);
 app.use("/api/escrows", authenticateToken(), escrowQueryRoutes);
 app.use("/api/users", roleRoutes);
 app.use("/api/users", authenticateToken(), userRoutes);
