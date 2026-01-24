@@ -5,7 +5,7 @@ members = [
 ]
 
 [workspace.dependencies]
-soroban-sdk = "23.0.0-rc.2.4"
+soroban-sdk = "22.0.0"
 rating-contract = { path = "contracts/rating-contract/"}
 user-registry-contract = { path = "contracts/user-registry-contract/"}
 escrow-contract = { path = "contracts/escrow-contract/"}

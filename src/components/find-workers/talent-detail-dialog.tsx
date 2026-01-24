@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { VALIDATION_LIMITS } from "@/constants/magic-numbers"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Star, Heart, MessageSquare, Check, MapPin, Clock, Briefcase, Globe, Award, X } from "lucide-react"
+import { Star, Heart, Check, MapPin, Clock, Briefcase, Globe, Award } from "lucide-react"
 import { useReviewsApi } from "@/hooks/api-connections/use-reviews-api"
 
 interface TalentDetailDialogProps {
@@ -76,23 +76,22 @@ export default function TalentDetailDialog({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-        <div className="flex flex-col h-full">
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+        <DialogTitle className="sr-only">
+          {freelancer.name} - Freelancer Profile
+        </DialogTitle>
+        <div className="flex flex-col h-full max-h-[90vh]">
           {/* Header */}
-          <div className="relative h-40 bg-gradient-to-r from-[#002333] to-[#15949C]">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 h-8 w-8 bg-white/20 hover:bg-white/30 text-white"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-
-            <div className="absolute -bottom-16 left-6">
-              <Avatar className="h-32 w-32 border-4 border-white">
-                <AvatarImage src={freelancer.avatar} alt={freelancer.name} />
-                <AvatarFallback className="bg-[#15949C]/20 text-[#15949C] text-3xl">
+          <div className="relative h-32 bg-gradient-to-r from-[#002333] to-[#15949C] flex-shrink-0">
+            <div className="absolute -bottom-12 left-6">
+              <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+                <AvatarImage 
+                  src={freelancer.avatar} 
+                  alt={freelancer.name}
+                  className="object-cover"
+                  progressive={false}
+                />
+                <AvatarFallback className="bg-white text-[#15949C] text-2xl font-semibold">
                   {freelancer.name
                     .split(" ")
                     .map((n: string) => n[0])
@@ -102,80 +101,77 @@ export default function TalentDetailDialog({
             </div>
           </div>
 
-          <div className="pt-20 px-6 pb-6">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-[#002333]">{freelancer.name}</h2>
-                  {freelancer.isVerified && <Badge className="bg-blue-100 text-blue-800">Verified</Badge>}
-                  {freelancer.isTopRated && <Badge className="bg-yellow-100 text-yellow-800">Top Rated</Badge>}
+          {/* Content - scrollable */}
+          <ScrollArea className="flex-1 overflow-y-auto">
+            <div className="pt-16 px-6 pb-6">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-bold text-[#002333] dark:text-white">{freelancer.name}</h2>
+                    {freelancer.isVerified && <Badge className="bg-blue-100 text-blue-800 text-xs">Verified</Badge>}
+                    {freelancer.isTopRated && <Badge className="bg-yellow-100 text-yellow-800 text-xs">Top Rated</Badge>}
+                  </div>
+
+                  <p className="text-[#002333]/70 dark:text-gray-300 mt-1">{freelancer.title}</p>
+
+                  <div className="flex items-center mt-2">
+                    <div className="flex mr-2">{renderStars(averageRating > 0 ? averageRating : freelancer.rating)}</div>
+                    <span className="text-[#002333] dark:text-white font-medium">{(averageRating > 0 ? averageRating : freelancer.rating).toFixed(1)}</span>
+                    <span className="text-[#002333]/70 dark:text-gray-400 ml-1">({reviews.length > 0 ? reviews.length : freelancer.reviewCount} reviews)</span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-4 mt-3 text-sm text-[#002333]/70 dark:text-gray-400">
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {freelancer.location}
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {freelancer.availability || "Full-time"}
+                    </div>
+                    <div className="flex items-center">
+                      <Briefcase className="h-4 w-4 mr-1" />
+                      {freelancer.experience || "3+ years"}
+                    </div>
+                  </div>
                 </div>
 
-                <p className="text-[#002333]/70 mt-1">{freelancer.title}</p>
-
-                <div className="flex items-center mt-2">
-                  <div className="flex mr-2">{renderStars(freelancer.rating)}</div>
-                  <span className="text-[#002333] font-medium">{averageRating > 0 ? averageRating : freelancer.rating}</span>
-                  <span className="text-[#002333]/70 ml-1">({reviews.length > 0 ? reviews.length : freelancer.reviewCount} reviews)</span>
-                </div>
-
-                <div className="flex flex-wrap gap-4 mt-2 text-sm text-[#002333]/70">
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {freelancer.location}
+                <div className="flex flex-col items-end flex-shrink-0">
+                  <div className="text-[#002333] dark:text-white font-bold text-2xl">${freelancer.hourlyRate}/hr</div>
+                  <div className="text-[#002333]/70 dark:text-gray-400 text-sm">
+                    {freelancer.totalEarned ? `$${freelancer.totalEarned.toLocaleString()}+ earned` : "New freelancer"}
                   </div>
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {freelancer.availability}
-                  </div>
-                  <div className="flex items-center">
-                    <Briefcase className="h-4 w-4 mr-1" />
-                    {freelancer.experience}
+
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      className={isSelected ? "bg-[#15949C] hover:bg-[#15949C]/90 text-white" : "border-2 border-[#15949C] text-[#15949C] hover:bg-[#15949C] hover:text-white"}
+                      onClick={onToggleSelect}
+                    >
+                      {isSelected ? (
+                        <>
+                          <Check className="h-4 w-4 mr-2" />
+                          Selected
+                        </>
+                      ) : (
+                        <>
+                          <Heart className="h-4 w-4 mr-2" />
+                          Select
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col items-end">
-                <div className="text-[#002333] font-bold text-2xl">${freelancer.hourlyRate}/hr</div>
-                <div className="text-[#002333]/70 text-sm">
-                  {freelancer.totalEarned ? `$${freelancer.totalEarned.toLocaleString()}+ earned` : "New freelancer"}
-                </div>
+              <Separator className="my-6" />
 
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    variant={isSelected ? "default" : "outline"}
-                    className={isSelected ? "bg-[#15949C] hover:bg-[#15949C]/90" : "border-[#15949C] text-[#15949C]"}
-                    onClick={onToggleSelect}
-                  >
-                    {isSelected ? (
-                      <>
-                        <Check className="h-4 w-4 mr-2" />
-                        Selected
-                      </>
-                    ) : (
-                      <>
-                        <Heart className="h-4 w-4 mr-2" />
-                        Select
-                      </>
-                    )}
-                  </Button>
-                  <Button className="bg-[#15949C] hover:bg-[#15949C]/90">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Contact
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-              <TabsList className="grid grid-cols-4 w-full">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
-                <TabsTrigger value="skills">Skills & Experience</TabsTrigger>
-              </TabsList>
-
-              <ScrollArea className="h-[calc(90vh-300px)] mt-6">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid grid-cols-4 w-full mb-6">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+                  <TabsTrigger value="reviews">Reviews ({reviews.length > 0 ? reviews.length : freelancer.reviewCount})</TabsTrigger>
+                  <TabsTrigger value="skills">Skills</TabsTrigger>
+                </TabsList>
                 <TabsContent value="overview" className="space-y-6">
                   <div>
                     <h3 className="font-medium text-lg text-[#002333] mb-3">About</h3>
@@ -464,9 +460,9 @@ export default function TalentDetailDialog({
                     </div>
                   </div>
                 </TabsContent>
-              </ScrollArea>
-            </Tabs>
-          </div>
+              </Tabs>
+            </div>
+          </ScrollArea>
         </div>
       </DialogContent>
     </Dialog>

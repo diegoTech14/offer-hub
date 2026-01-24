@@ -1,0 +1,70 @@
+/* Responsive Typography Styles */
+/* Mobile-first approach with progressive enhancement */
+
+/* Base typography for mobile devices */
+.text-responsive {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.text-responsive-sm {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.4;
+}
+
+.text-responsive-lg {
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+}
+
+.text-responsive-xl {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.6;
+}
+
+/* Tablet breakpoint (768px and up) */
+@media (min-width: 768px) {
+  .text-responsive {
+    font-size: 1rem; /* 16px */
+    line-height: 1.6;
+  }
+  
+  .text-responsive-sm {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+  }
+  
+  .text-responsive-lg {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.7;
+  }
+  
+  .text-responsive-xl {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.7;
+  }
+}
+
+/* Desktop breakpoint (1024px and up) */
+@media (min-width: 1024px) {
+  .text-responsive {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.7;
+  }
+  
+  .text-responsive-sm {
+    font-size: 1rem; /* 16px */
+    line-height: 1.6;
+  }
+  
+  .text-responsive-lg {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.8;
+  }
+  
+  .text-responsive-xl {
+    font-size: 1.5rem; /* 24px */
+    line-height: 1.8;
+  }
+}

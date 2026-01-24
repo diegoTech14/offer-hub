@@ -11,7 +11,7 @@ use crate::types::ContractConfig;
 #[test]
 fn test_initialize() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -31,7 +31,7 @@ fn test_initialize() {
 #[should_panic(expected = "HostError: Error(Contract, #2)")]
 fn test_not_initialize() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
 
     let _ = client.get_fee_config();
@@ -41,7 +41,7 @@ fn test_not_initialize() {
 #[should_panic(expected = "HostError: Error(Contract, #1)")]
 fn test_already_initialize() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -53,7 +53,7 @@ fn test_already_initialize() {
 #[test]
 fn test_set_fee_rates() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -75,7 +75,7 @@ fn test_set_fee_rates() {
 #[test]
 fn test_set_config() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -113,7 +113,7 @@ fn test_set_config() {
 #[test]
 fn test_get_config_defaults() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -135,7 +135,7 @@ fn test_get_config_defaults() {
 #[should_panic(expected = "Error(Contract, #3)")]
 fn test_set_config_unauthorized() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -165,7 +165,7 @@ fn test_set_config_unauthorized() {
 #[should_panic(expected = "Error(Contract, #4)")]
 fn test_set_config_invalid_parameters() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -195,7 +195,7 @@ fn test_set_config_invalid_parameters() {
 #[should_panic(expected = "Error(Auth, InvalidAction)")]
 fn test_set_fee_rates_unauthorized() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -210,7 +210,7 @@ fn test_set_fee_rates_unauthorized() {
 #[test]
 fn test_add_premium_user() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -230,7 +230,7 @@ fn test_add_premium_user() {
 #[should_panic(expected = "HostError: Error(Contract, #7)")]
 fn test_add_premium_user_already_exist() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -249,7 +249,7 @@ fn test_add_premium_user_already_exist() {
 #[should_panic(expected = "HostError: Error(Contract, #8)")]
 fn test_remove_premium_user_not_found() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -266,7 +266,7 @@ fn test_remove_premium_user_not_found() {
 #[test]
 fn test_remove_premium_user() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -287,7 +287,7 @@ fn test_remove_premium_user() {
 #[test]
 fn test_calculate_escrow_fee() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -317,7 +317,7 @@ fn test_calculate_escrow_fee() {
 #[test]
 fn test_calculate_dispute_fee() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -336,7 +336,7 @@ fn test_calculate_dispute_fee() {
 #[test]
 fn test_collect_fee() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -353,7 +353,7 @@ fn test_collect_fee() {
 #[test]
 fn test_collect_fee_premium_user() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -375,7 +375,7 @@ fn test_collect_fee_premium_user() {
 #[test]
 fn test_withdraw_platform_fees() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -393,7 +393,7 @@ fn test_withdraw_platform_fees() {
 #[should_panic(expected = "Error(Auth, InvalidAction)")]
 fn test_withdraw_platform_fees_unauthorized() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -408,7 +408,7 @@ fn test_withdraw_platform_fees_unauthorized() {
 #[test]
 fn test_multiple_fee_collections() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -428,7 +428,7 @@ fn test_multiple_fee_collections() {
 #[test]
 fn test_fee_precision() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -445,11 +445,11 @@ fn test_fee_precision() {
 #[test]
 fn test_get_fee_stats() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
-    let user = Address::generate(&env);
+    let _user = Address::generate(&env);
 
     client.initialize(&admin, &platform_wallet);
 
@@ -465,7 +465,7 @@ fn test_get_fee_stats() {
 #[test]
 fn test_get_premium_users() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -489,7 +489,7 @@ fn test_get_premium_users() {
 #[test]
 fn test_fee_transparency() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -515,7 +515,7 @@ fn test_fee_transparency() {
 fn test_get_total_fees() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -557,7 +557,7 @@ fn test_get_total_fees() {
 fn test_get_total_fees_reset() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -589,7 +589,7 @@ fn test_get_total_fees_reset() {
     let fees_after_non_premium = client.get_total_fees();
     assert_eq!(fees_after_non_premium, 100_000);
 
-    let res = client.reset_total_fees_collected(&admin);
+    let _res = client.reset_total_fees_collected(&admin);
 
     let fees_after_reset = client.get_total_fees();
     assert_eq!(fees_after_reset, 0);
@@ -600,7 +600,7 @@ fn test_get_total_fees_reset() {
 fn test_get_total_fees_reset_failed() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -641,7 +641,7 @@ fn test_get_total_fees_reset_failed() {
 fn test_get_platform_stats() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, FeeManagerContract);
+    let contract_id = env.register(FeeManagerContract, ());
     let client = FeeManagerContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     let platform_wallet = Address::generate(&env);
@@ -686,4 +686,99 @@ fn test_get_platform_stats() {
     assert_eq!(get_platform_stats.total_premium_exemptions, 0);
     assert_eq!(get_platform_stats.total_transactions, 3);
 
+}
+
+#[test]
+fn test_pause_unpause() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    
+    let contract_id = env.register(FeeManagerContract, ());
+    let client = FeeManagerContractClient::new(&env, &contract_id);
+   let admin = Address::generate(&env);
+    let platform_wallet = Address::generate(&env);
+    let _non_admin = Address::generate(&env);
+
+    client.initialize(&admin, &platform_wallet);
+    
+    // Test pause
+    client.pause(&admin.clone());
+    assert_eq!(client.is_paused(), true);
+
+    // Test unpause
+    client.unpause(&admin.clone());
+    assert_eq!(client.is_paused(), false);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #14)")]
+fn test_set_config_paused() {
+    let env = Env::default();
+    let contract_id = env.register(FeeManagerContract, ());
+    let client = FeeManagerContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let platform_wallet = Address::generate(&env);
+    let _non_admin = Address::generate(&env);
+
+    client.initialize(&admin, &platform_wallet);
+
+    // Mock non-admin authentication
+    env.mock_all_auths();
+
+    let new_config = ContractConfig {
+        platform_fee_percentage: 3,
+        escrow_timeout_days: 45,
+        max_rating_per_day: 15,
+        min_escrow_amount: 2000,
+        max_escrow_amount: 2000000000,
+        dispute_timeout_hours: 240,
+        rate_limit_window_hours: 12,
+        max_rate_limit_calls: 150,
+    };
+    client.pause(&admin);
+
+    // This should fail because non_admin is not the admin
+    client.set_config(&admin, &new_config);
+}
+
+
+#[test]
+#[should_panic(expected = "Error(Contract, #14)")]
+fn test_set_fee_rates_pause() {
+    let env = Env::default();
+    let contract_id = env.register(FeeManagerContract, ());
+    let client = FeeManagerContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let platform_wallet = Address::generate(&env);
+
+    client.initialize(&admin, &platform_wallet);
+
+    // Mock admin authentication
+    env.mock_all_auths();
+    client.pause(&admin);
+
+    // Set new fee rates
+    client.set_fee_rates(&300, &600, &400);
+
+    let _fee_config = client.get_fee_config();
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_pause_unpause_unauthorized() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(FeeManagerContract, ());
+    let client = FeeManagerContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let platform_wallet = Address::generate(&env);
+
+    client.initialize(&admin, &platform_wallet);
+    
+    let unauthorized = Address::generate(&env);
+    
+    // Test pause
+    client.pause(&unauthorized.clone());
 }

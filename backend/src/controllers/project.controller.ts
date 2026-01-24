@@ -1,93 +1,245 @@
-import { Request, Response } from 'express';
-import * as projectService from '@/services/project.service';
-import { buildSuccessResponse, buildErrorResponse } from '../utils/responseBuilder';
-import { AuthenticatedRequest } from '@/types/middleware.types';
-import { UpdateProjectDTO } from '@/types/project.type';
+/**
+ * @fileoverview Project controller handling project retrieval operations
+ * @author Offer Hub Team
+ */
 
-const uuidRegex =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+import { Request, Response, NextFunction } from "express";
+import { projectService } from "@/services/project.service";
+import {
+  createProject,
+  getAllProjects,
+  getProjectById as getProjectByIdService,
+  updateProject,
+  deleteProject,
+  assignFreelancer
+} from "@/services/project.service";
+import { NotFoundError, BadRequestError } from "@/utils/AppError";
+import { buildSuccessResponse, buildErrorResponse } from "../utils/responseBuilder";
+import { validateUUID } from "@/utils/validation";
 
-export const createProjectHandler = async (req: Request, res: Response) => {
+export const getProjectHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { projectId } = req.params;
+    const projectIdStr = Array.isArray(projectId) ? projectId[0] : projectId;
 
-    const project = await projectService.createProject(req.body);
-    return res.status(201).json(
-      buildSuccessResponse(project, 'Project created successfully')
-    );
+    // Validate projectId is a valid UUID format
+    if (!projectIdStr) {
+      throw new NotFoundError("Project ID is required");
+    }
 
-};
+    if (!validateUUID(projectIdStr)) {
+      throw new NotFoundError("Invalid project ID format");
+    }
 
-export const getAllProjectsHandler = async (req: Request, res: Response) => {
+    // Get project by ID
+    const project = await projectService.getProjectById(projectIdStr);
 
-    const filters = req.query;
-    const projects = await projectService.getAllProjects(filters);
-    return res.json(
-      buildSuccessResponse(projects, 'Projects retrieved successfully')
-    );
-
-};
-
-export const getProjectByIdHandler = async (req: Request, res: Response) => {
-
-    const { id } = req.params;
-    const project = await projectService.getProjectById(id);
     if (!project) {
-      return res.status(404).json(
-        buildErrorResponse('Project not found')
+      throw new NotFoundError("Project not found");
+    }
+
+    // Return 200 with project data
+    res.status(200).json(
+      buildSuccessResponse(project, "Project retrieved successfully")
+    );
+  } catch (error: any) {
+    if (next) {
+      next(error);
+    } else {
+      throw error;
+    }
+  }
+};
+
+export const createProjectHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const project = await createProject(req.body);
+    res.status(201).json(
+      buildSuccessResponse(project, "Project created successfully")
+    );
+  } catch (error: any) {
+    if (next) {
+      next(error);
+    } else {
+      throw error;
+    }
+  }
+};
+
+export const getAllProjectsHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const filters = req.query;
+    const projects = await getAllProjects(filters);
+    res.status(200).json(
+      buildSuccessResponse(projects, "Projects retrieved successfully")
+    );
+  } catch (error: any) {
+    if (next) {
+      next(error);
+    } else {
+      throw error;
+    }
+  }
+};
+
+export const getProjectByIdHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    if (!validateUUID(id)) {
+      throw new BadRequestError("Invalid project ID format");
+    }
+
+    const project = await getProjectByIdService(id);
+
+    if (!project) {
+      throw new NotFoundError("Project not found");
+    }
+
+    res.status(200).json(
+      buildSuccessResponse(project, "Project retrieved successfully")
+    );
+  } catch (error: any) {
+    if (next) {
+      next(error);
+    } else {
+      throw error;
+    }
+  }
+};
+
+export const updateProjectHandler = async (
+  req: Request,
+  res: Response,
+  next?: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const client_id = (req as any).user?.id;
+    const updates = req.body;
+
+    if (!validateUUID(id)) {
+      throw new BadRequestError("Invalid project ID format");
+    }
+
+    if (!client_id) {
+      throw new BadRequestError("Client ID is required");
+    }
+
+    const result = await updateProject(id, updates, client_id);
+
+    if (!result.success) {
+      return res.status(result.status).json(
+        buildErrorResponse(result.message || 'Update failed')
       );
     }
-    return res.json(
-      buildSuccessResponse(project, 'Project retrieved successfully')
-    );
 
+    res.status(result.status).json(
+      buildSuccessResponse(result.data, result.message || 'Project updated successfully')
+    );
+  } catch (error: any) {
+    if (next) {
+      next(error);
+    } else {
+      throw error;
+    }
+  }
 };
 
-export const updateProjectHandler = async (req: AuthenticatedRequest, res: Response) => {
-  const { id: projectId } = req.params;
-  const updates: UpdateProjectDTO = req.body;
+export const deleteProjectHandler = async (
+  req: Request,
+  res: Response,
+  next?: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const client_id = (req as any).user?.id;
 
-  // Get client_id from authenticated user
-  const clientId = req.user.id;
+    if (!validateUUID(id)) {
+      throw new BadRequestError("Invalid project ID format");
+    }
 
-  if (!uuidRegex.test(projectId)) {
-    return res.status(400).json(
-      buildErrorResponse('Invalid project ID format')
+    if (!client_id) {
+      throw new BadRequestError("Client ID is required");
+    }
+
+    const result = await deleteProject(id, client_id);
+
+    if (!result.success) {
+      return res.status(result.status).json(
+        buildErrorResponse(result.message || 'Delete failed')
+      );
+    }
+
+    res.status(result.status).json(
+      buildSuccessResponse(result.data, result.message || 'Project deleted successfully')
     );
+  } catch (error: any) {
+    if (next) {
+      next(error);
+    } else {
+      throw error;
+    }
   }
-
-  const result = await projectService.updateProject(projectId, updates, clientId);
-
-  if (!result.success) {
-    return res.status(result.status).json(
-      buildErrorResponse(result.message || 'Update failed')
-    );
-  }
-
-  return res.status(200).json(
-    buildSuccessResponse(result.data, 'Project updated successfully')
-  );
 };
 
-export const deleteProjectHandler = async (req: AuthenticatedRequest, res: Response) => {
-  const { id } = req.params;
+export const assignFreelancerHandler = async (
+  req: Request,
+  res: Response,
+  next?: NextFunction
+) => {
+  try {
+    const { projectId, freelancerId } = req.params;
+    const client_id = (req as any).user?.id;
 
-  // Get client_id from authenticated user
-  const clientId = req.user.id;
+    // Validate UUIDs
+    if (!validateUUID(projectId) || !validateUUID(freelancerId)) {
+      throw new BadRequestError("Invalid UUID format for projectId or freelancerId");
+    }
 
-  if (!uuidRegex.test(id)) {
-    return res.status(400).json(
-      buildErrorResponse('Invalid project ID format')
+    // Validate client_id exists
+    if (!client_id || !validateUUID(client_id)) {
+      throw new BadRequestError("Authentication required");
+    }
+
+    // Call service method
+    const result = await assignFreelancer(
+      projectId,
+      freelancerId,
+      client_id
     );
+
+    // Return appropriate HTTP status based on service result
+    if (result.success) {
+      return res.status(result.status).json(
+        buildSuccessResponse(result.data, result.message || 'Freelancer assigned successfully')
+      );
+    } else {
+      return res.status(result.status).json(
+        buildErrorResponse(result.message || 'Failed to assign freelancer')
+      );
+    }
+  } catch (error: any) {
+    if (next) {
+      next(error);
+    } else {
+      throw error;
+    }
   }
-
-  const result = await projectService.deleteProject(id, clientId);
-
-  if (!result.success) {
-    return res.status(result.status).json(
-      buildErrorResponse(result.message || 'Delete failed')
-    );
-  }
-
-  return res.status(200).json(
-    buildSuccessResponse(result.data, result.message || 'Project deleted successfully')
-  );
 };

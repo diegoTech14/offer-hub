@@ -4,6 +4,7 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
+
 interface ProgressProps
   extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
   indeterminate?: boolean;
@@ -22,12 +23,21 @@ const Progress = React.forwardRef<
     )}
     {...props}
   >
+    <div className="absolute inset-0 flex items-center justify-center">
+      <span className={cn(
+        "text-xs z-10 font-semibold",
+        value && value > 48 ? "text-white" : "text-primary-500"
+      )}>
+        {Math.round(value || 0)}%
+      </span>
+    </div>
     <ProgressPrimitive.Indicator
       className="flex-1 w-full h-full transition-all bg-primary-500"
       style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
     />
   </ProgressPrimitive.Root>
 ));
+
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
 export { Progress };

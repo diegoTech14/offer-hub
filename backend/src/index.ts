@@ -1,118 +1,132 @@
 import dotenv from "dotenv";
 dotenv.config();
+
+// Validate critical environment variables
+console.log("🔍 Checking environment variables...");
+const requiredEnvVars = [
+  "SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "JWT_SECRET",
+];
+
+const missingEnvVars = requiredEnvVars.filter(
+  (varName) => !process.env[varName],
+);
+if (missingEnvVars.length > 0) {
+  console.error("❌ Missing required environment variables:", missingEnvVars);
+  console.error(
+    "📋 Available SUPABASE env vars:",
+    Object.keys(process.env).filter((k) => k.includes("SUPABASE")),
+  );
+} else {
+  console.log("✅ All required environment variables are set");
+}
+
 import express from "express";
 import cors from "cors";
-import serviceRequestRoutes from "@/routes/service-request.routes";
-import { reviewRoutes } from "./routes/review.routes";
-import serviceRoutes from "@/routes/service.routes";
-import applicationRoutes from "@/routes/application.routes";
-import nftRoutes from "@/routes/nft.routes";
-import contractRoutes from "@/routes/contract.routes";
-import projectRoutes from "@/routes/project.routes";
+import cookieParser from "cookie-parser";
 import userRoutes from "@/routes/user.routes";
 import authRoutes from "@/routes/auth.routes";
+import oauthRoutes from "@/routes/oauth.routes";
+import escrowInitRoutes from "@/routes/escrow-init.routes";
+import escrowBalanceRoutes from "@/routes/escrow-balance.routes";
+import escrowQueryRoutes from "@/routes/escrow-query.routes";
+import TaskRecordRouter from "@/routes/blockchain.routes";
+import projectRoutes from "@/routes/project.routes";
+import taskRoutes from "@/routes/task.routes";
+import profileRoutes from "@/routes/profile.routes";
+import walletRoutes from "@/routes/wallet.routes";
+import roleRoutes from "@/routes/role.routes";
+import balanceRoutes from "@/routes/balance.routes";
 import { errorHandlerMiddleware, setupGlobalErrorHandlers } from "./middlewares/errorHandler.middleware";
 import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware";
 import { authenticateToken } from "./middlewares/auth.middleware";
 import { loggerMiddleware } from "./middlewares/logger.middleware";
 import { logger } from "./utils/logger";
-import conversationRoutes from "@/routes/conversation.routes";
-import messageRoutes from "@/routes/message.routes";
-import { adminIntegrationRoutes, adminExternalApiRoutes, adminWebhookRoutes } from "@/routes/admin-integration.routes";
-import { apiRequestLoggingMiddleware } from "@/middlewares/sensitive-data-redaction.middleware";
-import { requireAdminRole } from "@/middlewares/admin-rbac.middleware";
-import { adminRateLimitMiddleware, burstRateLimitMiddleware } from "@/middlewares/admin-rate-limit.middleware";
-import { adminApiKeyMiddleware } from "@/middlewares/admin-api-key.middleware";
-import { rawBodyParser, verifyWebhookSignature } from "@/middlewares/webhook-signature.middleware";
-import { redactSensitiveHeaders } from "@/middlewares/sensitive-data-redaction.middleware";
-import reviewResponseRoutes from "@/routes/review-response.routes";
-import { workflowRoutes } from "@/routes/workflow.routes";
 
-
-// Setup global error handlers for uncaught exceptions and unhandled rejections
+// Setup global error handlers
 setupGlobalErrorHandlers();
 
 const app = express();
 const port = process.env.PORT || 4000;
 
 // Middleware setup
-logger.debug("Setting up CORS and JSON middleware");
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://offer-hub-hpd4.vercel.app",
+      "https://offer-hub.vercel.app",
+      "https://offer-hub-web.vercel.app",
+      "https://www.offer-hub.org",
+      "https://offer-hub.org",
+      /https:\/\/.*\.vercel\.app$/,
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+app.use(cookieParser()); // Parse cookies for OAuth session handling
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // For Apple form_post
 
-// Request logging middleware
-logger.debug("Setting up logger middleware");
+// Request logging & Rate limiting
 app.use(loggerMiddleware);
-
-// Apply general rate limiting to all routes
-logger.debug("Setting up rate limiting");
 app.use(generalLimiter);
 
-// Route setup
-logger.debug("Setting up routes");
-
-// Workflow routes (no authentication required for testing)
-app.use("/api/workflow", workflowRoutes);
-
-// Public routes (no authentication required)
-app.use("/api/auth", authLimiter, authRoutes);
-
-// Protected routes (authentication required)
-app.use("/api/service-requests", authenticateToken(), serviceRequestRoutes);
-app.use("/api/reviews", authenticateToken(), reviewRoutes);
-app.use("/api/services", authenticateToken(), serviceRoutes);
-app.use("/api/applications", authenticateToken(), applicationRoutes);
-app.use("/api/nfts-awarded", authenticateToken(), nftRoutes);
-app.use("/api/contracts", authenticateToken(), contractRoutes);
-app.use("/api/projects", authenticateToken(), projectRoutes);
-app.use("/api/users", authenticateToken(), userRoutes);
-app.use("/api/conversations", authenticateToken(), conversationRoutes);
-app.use("/api/messages", authenticateToken(), messageRoutes);
-app.use("/api", reviewResponseRoutes);
-
-// Simple test endpoint to verify server is working
-app.get("/test", (req, res) => {
-  logger.debug("Test endpoint accessed");
-  res.json({ message: "Server is working", timestamp: new Date() });
+// Health Check
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    env: process.env.NODE_ENV || "development",
+  });
 });
 
-// Admin Integration API routes with comprehensive security
-app.use("/api/admin", 
-  redactSensitiveHeaders,
-  authenticateToken(),
-  requireAdminRole,
-  adminRateLimitMiddleware,
-  adminIntegrationRoutes
-);
-
-app.use("/api/admin/external", 
-  redactSensitiveHeaders,
-  adminApiKeyMiddleware,
-  burstRateLimitMiddleware,
-  adminRateLimitMiddleware,
-  apiRequestLoggingMiddleware,
-  adminExternalApiRoutes
-);
-
-app.use("/api/admin/webhooks", 
-  redactSensitiveHeaders,
-  rawBodyParser,
-  adminWebhookRoutes
-);
-
+// Root endpoint
 app.get("/", (_req, res) => {
-  logger.debug("Root endpoint accessed");
-  res.send("💼 OFFER-HUB backend is up and running!");
+  res.json({
+    message: "💼 OFFER-HUB Backend API",
+    version: "1.0.0",
+    docs: "/docs",
+    status: "active",
+  });
 });
 
-// Use the new error handling middleware
+// API Routes
+app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/oauth", oauthRoutes);
+app.use("/api/escrows", authenticateToken(), escrowInitRoutes);
+app.use("/api/escrows", authenticateToken(), escrowBalanceRoutes);
+app.use("/api/escrows", authenticateToken(), escrowQueryRoutes);
+app.use("/api/users", roleRoutes);
+app.use("/api/users", authenticateToken(), userRoutes);
+app.use("/api/v1/wallets", authenticateToken(), walletRoutes);
+app.use("/api/v1/balances", authenticateToken(), balanceRoutes);
+app.use("/api/task", TaskRecordRouter);
+app.use("/api/projects", projectRoutes);
+app.use("/api/task-records", taskRoutes);
+app.use("/api/profile", authenticateToken(), profileRoutes);
+app.use("/api/profiles", profileRoutes);
+
+// Error Handling
 app.use(errorHandlerMiddleware);
 
 // Start server
 app.listen(port, () => {
-  logger.info(`🚀 OFFER-HUB server is live at http://localhost:${port}`);
-  logger.info("🌐 Connecting freelancers and clients around the world...");
-  logger.info("✅ Working...");
-  logger.debug(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.debug("All routes and middleware configured successfully");
+  console.log(`
+   ██████╗ ███████╗███████╗███████╗██████╗       ██╗  ██╗██╗   ██╗██████╗ 
+  ██╔═══██╗██╔════╝██╔════╝██╔════╝██╔══██╗      ██║  ██║██║   ██║██╔══██╗
+  ██║   ██║█████╗  █████╗  █████╗  ██████╔╝█████╗███████║██║   ██║██████╔╝
+  ██║   ██║██╔══╝  ██╔══╝  ██╔══╝  ██╔══██╗╚════╝██╔══██║██║   ██║██╔══██╗
+  ╚██████╔╝██║     ██║     ███████╗██║  ██║      ██║  ██║╚██████╔╝██████╔╝
+   ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═╝      ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ 
+                                                                          
+  🚀 Server is running at http://localhost:${port}
+  ⭐️ Environment: ${process.env.NODE_ENV || "development"}
+  📝 API Docs: http://localhost:${port}/docs
+  ❤️  Health Check: http://localhost:${port}/health
+  `);
 });

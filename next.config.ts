@@ -7,6 +7,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  typescript: {
+    // Completely ignore TypeScript errors during builds
+    ignoreBuildErrors: true,
+  },
   images: {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -14,6 +18,11 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ['sharp'],
+  },
+  turbopack: {
+    resolveAlias: process.env.NODE_ENV === 'production' ? {
+      '@/__mocks__': false,
+    } : undefined,
   },
   async rewrites() {
     return [

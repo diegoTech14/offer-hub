@@ -14,7 +14,12 @@ export function Header() {
       </div>
       <div className="text-sm font-medium text-slate-600">Manage Project</div>
       <Avatar>
-        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Usuario" />
+        <AvatarImage 
+          src="/placeholder.svg?height=40&width=40" 
+          alt="Usuario"
+          className="object-cover"
+          progressive={false}
+        />
         <AvatarFallback>U</AvatarFallback>
       </Avatar>
     </div>

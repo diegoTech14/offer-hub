@@ -14,7 +14,7 @@ mod error;
 
 use crate::types::{ArbitratorData, DisputeData, DisputeOutcome, Evidence, DisputeInfo};
 use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
-use crate::{error::{handle_error, Error}};
+use crate::error::Error;
 
 #[contract]
 pub struct DisputeResolutionContract;
@@ -30,6 +30,18 @@ impl DisputeResolutionContract {
     ) -> Result<(), Error> {
         contract::initialize(&env, admin, default_timeout, escrow_contract, fee_manager);
         Ok(())
+    }
+
+    pub fn pause(env: Env, admin: Address) -> Result<(), Error> {
+        contract::pause(&env, admin)
+    }
+
+    pub fn is_paused(env: Env) -> bool {
+        contract::is_paused(&env)
+    }
+
+    pub fn unpause(env: Env, admin: Address) -> Result<(), Error> {
+        contract::unpause(&env, admin)
     }
 
     pub fn open_dispute(

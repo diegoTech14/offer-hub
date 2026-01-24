@@ -13,6 +13,8 @@ pub const RATE_BYPASS: Symbol = symbol_short!("RLBYP");
 
 pub const CONTRACT_CONFIG: Symbol = symbol_short!("CONFIG");
 
+pub const PAUSED: Symbol = symbol_short!("PAUSED");
+
 // Default configuration values
 pub const DEFAULT_TIMEOUT_HOURS: u32 = 168;           // 7 days (168 hours)
 pub const DEFAULT_MAX_EVIDENCE: u32 = 10;             // Maximum 10 evidence submissions
@@ -104,6 +106,7 @@ pub fn set_total_disputes(env: &Env, count: u64) {
 use crate::types::{DisputeData, DisputeState};
 use crate::error::handle_error;
 
+#[allow(dead_code)]
 pub fn set_dispute_state(env: &Env, job_id: u32, new_state: DisputeState) {
      let key = (DISPUTES, job_id);
       let mut data: DisputeData = match env.storage().instance().get(&key) {
@@ -118,6 +121,7 @@ pub fn set_dispute_state(env: &Env, job_id: u32, new_state: DisputeState) {
 }
 
 
+#[allow(dead_code)]
 pub fn get_dispute_state(env: &Env, job_id: u32) -> DisputeState {
     let key = (DISPUTES, job_id);
     let data: DisputeData = match env.storage().instance().get(&key) {
@@ -128,6 +132,7 @@ pub fn get_dispute_state(env: &Env, job_id: u32) -> DisputeState {
    data.state
 }
 
+#[allow(dead_code)]
 pub fn is_dispute_initiated(env: &Env, job_id: u32) -> bool {
     get_dispute_state(env, job_id) == DisputeState::Open
 }

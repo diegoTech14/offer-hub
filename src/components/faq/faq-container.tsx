@@ -4,6 +4,8 @@ import { useState } from "react";
 import { FaqCategories } from "./faq-categories";
 import { FaqAccordion } from "./faq-accordion";
 import { FaqSupport } from "./faq-support";
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 import {
   HelpCircle,
   CreditCard,
@@ -125,64 +127,72 @@ export default function FaqContainer() {
   const categories = Object.keys(faqData);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 mb-4">
-          Frequently Asked Questions
-        </h1>
-        <p className="text-[#7a8a9a] max-w-2xl mx-auto">
-          Find answers to the most common questions about Offer Hub and how our
-          platform works.
-        </p>
-      </div>
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
+      <Navbar />
 
-      <FaqCategories
-        categories={categories}
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
+      <main className="flex-1">
+        <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+          <div className="text-center mb-12">
+            <h1 className="text-3xl md:text-4xl font-bold text-secondary-500 dark:text-white mb-4">
+              Frequently Asked Questions
+            </h1>
+            <p className="text-[#7a8a9a] dark:text-gray-300 max-w-2xl mx-auto">
+              Find answers to the most common questions about Offer Hub and how our
+              platform works.
+            </p>
+          </div>
 
-      <div className="mt-12">
-        <div className="flex items-center gap-3 mb-6">
-          {activeCategory === "General Questions" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <HelpCircle size={20} className="text-primary-500" />
+          <FaqCategories
+            categories={categories}
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+          />
+
+          <div className="mt-12">
+            <div className="flex items-center gap-3 mb-6">
+              {activeCategory === "General Questions" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <HelpCircle size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "Payments & Billing" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <CreditCard size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "For Clients" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Users size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "For Freelancers" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Briefcase size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "Security & Privacy" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Shield size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              {activeCategory === "Technical Support" && (
+                <div className="w-8 h-8 rounded-full bg-[#e4f7f7] dark:bg-gray-700 flex items-center justify-center">
+                  <Settings size={20} className="text-primary-500 dark:text-teal-400" />
+                </div>
+              )}
+              <h2 className="text-2xl font-bold text-secondary-500 dark:text-white">
+                {activeCategory}
+              </h2>
             </div>
-          )}
-          {activeCategory === "Payments & Billing" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <CreditCard size={20} className="text-primary-500" />
-            </div>
-          )}
-          {activeCategory === "For Clients" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Users size={20} className="text-primary-500" />
-            </div>
-          )}
-          {activeCategory === "For Freelancers" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Briefcase size={20} className="text-primary-500" />
-            </div>
-          )}
-          {activeCategory === "Security & Privacy" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Shield size={20} className="text-primary-500" />
-            </div>
-          )}
-          {activeCategory === "Technical Support" && (
-            <div className="w-8 h-8 rounded-full bg-[#e4f7f7] flex items-center justify-center">
-              <Settings size={20} className="text-primary-500" />
-            </div>
-          )}
-          <h2 className="text-2xl font-bold text-secondary-500">
-            {activeCategory}
-          </h2>
+
+            <FaqAccordion faqs={faqData[activeCategory as keyof typeof faqData]} />
+          </div>
+
+          <FaqSupport />
         </div>
+      </main>
 
-        <FaqAccordion faqs={faqData[activeCategory as keyof typeof faqData]} />
-      </div>
-
-      <FaqSupport />
+      <Footer />
     </div>
   );
 }

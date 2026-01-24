@@ -5,16 +5,93 @@ use crate::types::{
 };
 
 use crate::{error::Error, types::DisputeParams};
-use soroban_sdk::{BytesN, Symbol};
+use soroban_sdk::{BytesN, Symbol, symbol_short};
 use soroban_sdk::{Address, Env, Vec};
 
 const MAX_BATCH_SIZE: u32 = 100;
+const PAUSED: Symbol = symbol_short!("PAUSED");
+#[allow(dead_code)]
+const ADMIN: Symbol = symbol_short!("ADMIN");
+
+#[allow(dead_code)]
+pub fn initialize(env: &Env, admin: Address) {
+    if env.storage().instance().has(&ADMIN) {
+        handle_error(env, Error::AlreadyInitialized);
+    }
+    
+    admin.require_auth();
+    
+    env.storage().instance().set(&ADMIN, &admin);
+    // Added: Initialize pause state as false
+    env.storage().instance().set(&PAUSED, &false);
+    
+    env.events().publish(
+        (Symbol::new(env, "contract_initialized"), admin),
+        env.ledger().timestamp(),
+    );
+}
+
+pub fn is_paused(env: &Env) -> bool {
+    env.storage().instance().get(&PAUSED).unwrap_or(false)
+}
+
+#[allow(dead_code)]
+pub fn pause(env: &Env, admin: Address) -> Result<(), Error> {
+    admin.require_auth();
+    let stored_admin: Address = env.storage().instance().get(&ADMIN).unwrap_or_else(|| handle_error(env, Error::NotInitialized));
+    if stored_admin != admin {
+        return Err(Error::Unauthorized);
+    }
+    
+    if is_paused(env) {
+        return Err(Error::AlreadyPaused);
+    }
+    
+    env.storage().instance().set(&PAUSED, &true);
+    
+    env.events().publish(
+        (Symbol::new(env, "contract_paused"), admin),
+        env.ledger().timestamp(),
+    );
+    
+    Ok(())
+}
+
+#[allow(dead_code)]
+pub fn unpause(env: &Env, admin: Address) -> Result<(), Error> {
+    admin.require_auth();
+    let stored_admin: Address = env.storage().instance().get(&ADMIN).unwrap_or_else(|| handle_error(env, Error::NotInitialized));
+    if stored_admin != admin {
+        return Err(Error::Unauthorized);
+    }
+    
+    if !is_paused(env) {
+        return Err(Error::NotPaused);
+    }
+    
+    env.storage().instance().set(&PAUSED, &false);
+    
+    env.events().publish(
+        (Symbol::new(env, "contract_unpaused"), admin),
+        env.ledger().timestamp(),
+    );
+    
+    Ok(())
+}
 
 pub fn upload_escrow_wasm(env: Env, wasm_hash: BytesN<32>) {
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     storage::store_escrow_wasm(&env, wasm_hash);
 }
 
 pub fn deploy_new_escrow(env: Env, create_params: EscrowCreateParams) -> Address {
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     // Validate amount is positive
     if create_params.amount <= 0 {
         handle_error(&env, Error::InvalidAmountSet)
@@ -57,6 +134,10 @@ pub fn deploy_new_escrow(env: Env, create_params: EscrowCreateParams) -> Address
 }
 
 pub fn batch_deploy(env: Env, params: Vec<EscrowCreateParams>) -> Vec<Address> {
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     if params.len() > MAX_BATCH_SIZE {
         handle_error(&env, Error::BatchSizeExceeded)
     }
@@ -76,6 +157,10 @@ pub fn batch_deploy(env: Env, params: Vec<EscrowCreateParams>) -> Vec<Address> {
 pub fn batch_deposit_funds(env: Env, escrow_ids: Vec<u32>, client: Address) {
     client.require_auth();
 
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     for escrow_id in escrow_ids.iter() {
         let escrow_address = storage::escrow_addr_by_id(&env, escrow_id);
 
@@ -83,10 +168,10 @@ pub fn batch_deposit_funds(env: Env, escrow_ids: Vec<u32>, client: Address) {
             handle_error(&env, Error::EscrowIdNotFoundError);
         }
 
-        let escrow_address = escrow_address.unwrap();
+        let _escrow_address = escrow_address.unwrap();
 
         // TODO: Call escrow contract (commented out due to WASM import issues)
-        // let escrow_client = crate::escrow_contract::Client::new(&env, &escrow_address);
+        // let escrow_client = crate::escrow_contract::Client::new(&env, &_escrow_address);
         // escrow_client.deposit_funds(&client);
     }
 }
@@ -94,6 +179,10 @@ pub fn batch_deposit_funds(env: Env, escrow_ids: Vec<u32>, client: Address) {
 pub fn batch_release_funds(env: Env, escrow_ids: Vec<u32>, freelancer: Address) {
     freelancer.require_auth();
 
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     for escrow_id in escrow_ids.iter() {
         let escrow_address = storage::escrow_addr_by_id(&env, escrow_id);
 
@@ -101,10 +190,10 @@ pub fn batch_release_funds(env: Env, escrow_ids: Vec<u32>, freelancer: Address) 
             handle_error(&env, Error::EscrowIdNotFoundError);
         }
 
-        let escrow_address = escrow_address.unwrap();
+        let _escrow_address = escrow_address.unwrap();
 
         // TODO: Call escrow contract (commented out due to WASM import issues)
-        // let escrow_client = crate::escrow_contract::Client::new(&env, &escrow_address);
+        // let escrow_client = crate::escrow_contract::Client::new(&env, &_escrow_address);
         // escrow_client.release_funds(&freelancer);
     }
 }
@@ -112,6 +201,10 @@ pub fn batch_release_funds(env: Env, escrow_ids: Vec<u32>, freelancer: Address) 
 pub fn batch_create_disputes(env: Env, escrow_ids: Vec<u32>, caller: Address) {
     caller.require_auth();
 
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     for escrow_id in escrow_ids.iter() {
         let escrow_address = storage::escrow_addr_by_id(&env, escrow_id);
 
@@ -119,16 +212,20 @@ pub fn batch_create_disputes(env: Env, escrow_ids: Vec<u32>, caller: Address) {
             handle_error(&env, Error::EscrowIdNotFoundError);
         }
 
-        let escrow_address = escrow_address.unwrap();
+        let _escrow_address = escrow_address.unwrap();
 
         // TODO: Call escrow contract (commented out due to WASM import issues)
-        // let escrow_client = crate::escrow_contract::Client::new(&env, &escrow_address);
+        // let escrow_client = crate::escrow_contract::Client::new(&env, &_escrow_address);
         // escrow_client.dispute(&caller);
     }
 }
 
 pub fn batch_resolve_disputes(env: Env, caller: Address, dispute_params: Vec<DisputeParams>) {
     caller.require_auth();
+
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
 
     for param in dispute_params.iter() {
         let escrow_address = storage::escrow_addr_by_id(&env, param.escrow_id);
@@ -137,10 +234,10 @@ pub fn batch_resolve_disputes(env: Env, caller: Address, dispute_params: Vec<Dis
             handle_error(&env, Error::EscrowIdNotFoundError);
         }
 
-        let escrow_address = escrow_address.unwrap();
+        let _escrow_address = escrow_address.unwrap();
 
         // TODO: Call escrow contract (commented out due to WASM import issues)
-        // let escrow_client = crate::escrow_contract::Client::new(&env, &escrow_address);
+        // let escrow_client = crate::escrow_contract::Client::new(&env, &_escrow_address);
         // escrow_client.resolve_dispute(&caller, &param.result);
     }
 }
@@ -152,6 +249,10 @@ pub fn batch_add_milestones(
 ) -> Vec<MilestoneCreateResult> {
     client.require_auth();
 
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     let mut milestone_create_results = Vec::new(&env);
 
     for param in milestone_create_params.iter() {
@@ -161,10 +262,10 @@ pub fn batch_add_milestones(
             handle_error(&env, Error::EscrowIdNotFoundError);
         }
 
-        let escrow_address = escrow_address.unwrap();
+        let _escrow_address = escrow_address.unwrap();
 
         // TODO: Call escrow contract (commented out due to WASM import issues)
-        // let escrow_client = crate::escrow_contract::Client::new(&env, &escrow_address);
+        // let escrow_client = crate::escrow_contract::Client::new(&env, &_escrow_address);
         // let milestone_id = escrow_client.add_milestone(&client, &param.desc, &param.amount);
 
         // For now, return a dummy milestone ID
@@ -184,6 +285,10 @@ pub fn batch_add_milestones(
 pub fn batch_approve_milestones(env: Env, milestone_params: Vec<MilestoneParams>, client: Address) {
     client.require_auth();
 
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     for param in milestone_params.iter() {
         let escrow_address = storage::escrow_addr_by_id(&env, param.escrow_id);
 
@@ -191,10 +296,10 @@ pub fn batch_approve_milestones(env: Env, milestone_params: Vec<MilestoneParams>
             handle_error(&env, Error::EscrowIdNotFoundError);
         }
 
-        let escrow_address = escrow_address.unwrap();
+        let _escrow_address = escrow_address.unwrap();
 
         // TODO: Call escrow contract (commented out due to WASM import issues)
-        // let escrow_client = crate::escrow_contract::Client::new(&env, &escrow_address);
+        // let escrow_client = crate::escrow_contract::Client::new(&env, &_escrow_address);
         // escrow_client.approve_milestone(&client, &param.milestone_id);
     }
 }
@@ -206,6 +311,10 @@ pub fn batch_release_milestones(
 ) {
     freelancer.require_auth();
 
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     for param in milestone_params.iter() {
         let escrow_address = storage::escrow_addr_by_id(&env, param.escrow_id);
 
@@ -213,15 +322,19 @@ pub fn batch_release_milestones(
             handle_error(&env, Error::EscrowIdNotFoundError);
         }
 
-        let escrow_address = escrow_address.unwrap();
+        let _escrow_address = escrow_address.unwrap();
 
         // TODO: Call escrow contract (commented out due to WASM import issues)
-        // let escrow_client = crate::escrow_contract::Client::new(&env, &escrow_address);
+        // let escrow_client = crate::escrow_contract::Client::new(&env, &_escrow_address);
         // escrow_client.release_milestone(&freelancer, &param.milestone_id);
     }
 }
 
 pub fn batch_archive_escrows(env: Env, escrow_ids: Vec<u32>) -> Vec<u32> {
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
+
     let mut archived_escrows = Vec::new(&env);
 
     for escrow_id in escrow_ids.iter() {
@@ -249,6 +362,9 @@ pub fn batch_check_escrow_status(
     env: Env,
     _escrow_ids: Vec<u32>,
 ) -> Vec<crate::types::EscrowStatus> {
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
     // TODO: Implement proper conversion from WASM types
     // For now, return empty vector to allow compilation
     Vec::new(&env)
@@ -258,6 +374,9 @@ pub fn batch_get_escrow_information(
     env: Env,
     _escrow_ids: Vec<u32>,
 ) -> Vec<crate::types::EscrowData> {
+    if is_paused(&env) {
+        handle_error(&env, Error::ContractPaused);
+    }
     // TODO: Implement proper conversion from WASM types
     // For now, return empty vector to allow compilation
     Vec::new(&env)

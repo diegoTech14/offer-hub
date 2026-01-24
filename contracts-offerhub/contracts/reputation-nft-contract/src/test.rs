@@ -22,6 +22,7 @@ struct ContractClient {
     contract_id: Address,
 }
 
+#[allow(dead_code)]
 impl ContractClient {
     fn new(env: Env, contract_id: Address) -> Self {
         Self { env, contract_id }
@@ -32,6 +33,27 @@ impl ContractClient {
         let args = vec![env, admin.into_val(env)];
         self.env
             .invoke_contract(&self.contract_id, &symbol_short!("init"), args)
+    }
+
+    fn is_paused(&self) -> Result<bool, Error> {
+        let env = &self.env;
+        let args = vec![env];
+        self.env
+            .invoke_contract(&self.contract_id, &symbol_short!("is_paused"), args)
+    }
+
+     fn pause(&self, admin: Address) -> Result<(), Error> {
+        let env = &self.env;
+        let args = vec![env, admin.into_val(env)];
+        self.env
+            .invoke_contract(&self.contract_id, &symbol_short!("pause"), args)
+    }
+
+    fn unpause(&self, admin: Address) -> Result<(), Error> {
+        let env = &self.env;
+        let args = vec![env, admin.into_val(env)];
+        self.env
+            .invoke_contract(&self.contract_id, &symbol_short!("unpause"), args)
     }
 
     fn mint(
@@ -1585,4 +1607,57 @@ fn test_auto_rewards_metadata_consistency() {
         assert!(!metadata.uri.is_empty());
         assert_eq!(metadata.achievement_type, AchievementType::RatingMilestone);
     });
+}
+
+
+#[test]
+fn test_pause_unpause() {
+    let (env, admin, contract_id) = setup();
+    let client = ContractClient::new(env.clone(), contract_id.clone());
+
+    client.init(admin.clone()).unwrap();
+    env.mock_all_auths();
+    // Test pause
+    let _ = client.pause(admin.clone());
+    assert_eq!(client.is_paused().unwrap(), true);
+
+    // Test unpause
+    let _ = client.unpause(admin.clone());
+    assert_eq!(client.is_paused().unwrap(), false);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #1)")]
+fn test_pause_unpause_unauthorized() {
+    let (env, admin, contract_id) = setup();
+    let client = ContractClient::new(env.clone(), contract_id.clone());
+    let unauthorized = Address::generate(&env);
+
+    client.init(admin.clone()).unwrap();
+    env.mock_all_auths();
+    // Test pause
+    let _ = client.pause(unauthorized.clone());
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #11)")]
+fn test_transfer_panic() {
+    let (env, admin, contract_id) = setup();
+    let user1 = Address::generate(&env);
+    let client = ContractClient::new(env.clone(), contract_id.clone());
+
+    client.init(admin.clone()).unwrap();
+    env.mock_all_auths();
+    client.add_minter(admin.clone(), admin.clone()).unwrap();
+    let _pause_result = client.pause(admin.clone());
+
+    // Mint an NFT to user1
+    let _result = client.mint(
+        admin.clone(),
+        user1.clone(),
+        1,
+        String::from_str(&env, "Test NFT"),
+        String::from_str(&env, "Test Description"),
+        String::from_str(&env, "ipfs://test"),
+    );
 }

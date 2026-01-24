@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useOfferForm } from "./OfferFormContext";
+import { AutoSaveForm } from "@/components/forms/auto-save-form";
 
 interface OfferFormStep1Props {
   onNext: () => void;
@@ -45,6 +46,11 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
     }
   };
 
+  const handleAutoSave = (data: any) => {
+    // Auto-save form data to localStorage
+    localStorage.setItem('offer-form-draft', JSON.stringify(data));
+  };
+
   return (
     <div className="flex-1 flex items-center justify-center p-8">
       <div className="w-full max-w-md space-y-8">
@@ -59,6 +65,7 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
         </div>
 
         {/* Form */}
+        <AutoSaveForm onAutoSave={handleAutoSave}>
         <div className="space-y-6">
           {/* Job Title */}
           <div className="space-y-2">
@@ -121,6 +128,7 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
             )}
           </div>
         </div>
+        </AutoSaveForm>
 
         {/* Buttons */}
         <div className="space-y-3 pt-4">

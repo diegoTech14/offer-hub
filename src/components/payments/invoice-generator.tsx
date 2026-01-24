@@ -175,16 +175,16 @@ export default function InvoiceGenerator() {
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="create">Create Invoice</TabsTrigger>
-            <TabsTrigger value="history">Invoice History</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 dark:bg-gray-800">
+            <TabsTrigger value="create" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-white">Create Invoice</TabsTrigger>
+            <TabsTrigger value="history" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-white">Invoice History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="create" className="space-y-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Create New Invoice</CardTitle>
-                <CardDescription>
+            <Card className="dark:bg-gray-900 dark:border-gray-700 shadow-lg">
+              <CardHeader className="dark:border-gray-700">
+                <CardTitle className="dark:text-white text-xl">Create New Invoice</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Generate a professional invoice for your clients
                 </CardDescription>
               </CardHeader>
@@ -193,26 +193,26 @@ export default function InvoiceGenerator() {
                   <div>
                     <Label
                       htmlFor="invoice-number"
-                      className="text-[#002333] font-medium"
+                      className="text-[#002333] dark:text-white font-medium"
                     >
                       Invoice Number
                     </Label>
                     <Input
                       id="invoice-number"
                       placeholder="INV-2023-001"
-                      className="mt-1"
+                      className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     />
                   </div>
                   <div>
                     <Label
                       htmlFor="invoice-date"
-                      className="text-[#002333] font-medium"
+                      className="text-[#002333] dark:text-white font-medium"
                     >
                       Invoice Date
                     </Label>
                     <div className="relative mt-1">
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 h-4 w-4" />
-                      <Input id="invoice-date" type="date" className="pl-10" />
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 dark:text-gray-400 h-4 w-4" />
+                      <Input id="invoice-date" type="date" className="pl-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
                     </div>
                   </div>
                 </div>
@@ -221,52 +221,53 @@ export default function InvoiceGenerator() {
                   <div>
                     <Label
                       htmlFor="due-date"
-                      className="text-[#002333] font-medium"
+                      className="text-[#002333] dark:text-white font-medium"
                     >
                       Due Date
                     </Label>
                     <div className="relative mt-1">
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 h-4 w-4" />
-                      <Input id="due-date" type="date" className="pl-10" />
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 dark:text-gray-400 h-4 w-4" />
+                      <Input id="due-date" type="date" className="pl-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
                     </div>
                   </div>
                   <div>
                     <Label
                       htmlFor="client"
-                      className="text-[#002333] font-medium"
+                      className="text-[#002333] dark:text-white font-medium"
                     >
                       Client
                     </Label>
                     <Select>
-                      <SelectTrigger className="mt-1">
+                      <SelectTrigger className="mt-1 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
                         <SelectValue placeholder="Select a client" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="dark:bg-gray-800 dark:border-gray-600">
                         {clients.map((client) => (
                           <SelectItem
                             key={client.id}
                             value={client.id.toString()}
+                            className="dark:text-white dark:hover:bg-gray-700"
                           >
                             {client.name}
                           </SelectItem>
                         ))}
-                        <SelectItem value="new">+ Add New Client</SelectItem>
+                        <SelectItem value="new" className="dark:text-white dark:hover:bg-gray-700">+ Add New Client</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="dark:bg-gray-600" />
 
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium text-[#002333]">
+                    <h3 className="font-medium text-[#002333] dark:text-white">
                       Invoice Items
                     </h3>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 border-[#15949C] text-[#15949C]"
+                      className="h-8 border-[#15949C] text-[#15949C] dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                       onClick={handleAddItem}
                     >
                       <Plus className="h-4 w-4 mr-1" />
@@ -291,6 +292,7 @@ export default function InvoiceGenerator() {
                                 e.target.value
                               )
                             }
+                            className="dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                           />
                         </div>
                         <div className="col-span-2">
@@ -305,15 +307,16 @@ export default function InvoiceGenerator() {
                                 Number.parseInt(e.target.value)
                               )
                             }
+                            className="dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                           />
                         </div>
                         <div className="col-span-2">
                           <div className="relative">
-                            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 h-4 w-4" />
+                            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 dark:text-gray-400 h-4 w-4" />
                             <Input
                               type="number"
                               placeholder="Rate"
-                              className="pl-10"
+                              className="pl-10 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                               value={item.rate}
                               onChange={(e) =>
                                 handleItemChange(
@@ -327,11 +330,11 @@ export default function InvoiceGenerator() {
                         </div>
                         <div className="col-span-2">
                           <div className="relative">
-                            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 h-4 w-4" />
+                            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#002333]/70 dark:text-gray-400 h-4 w-4" />
                             <Input
                               type="number"
                               placeholder="Amount"
-                              className="pl-10"
+                              className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                               value={item.amount}
                               disabled
                             />
@@ -342,7 +345,7 @@ export default function InvoiceGenerator() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                               onClick={() => handleRemoveItem(index)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -356,21 +359,21 @@ export default function InvoiceGenerator() {
                   <div className="flex justify-end mt-6">
                     <div className="w-64 space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-[#002333]/70">Subtotal</span>
-                        <span className="font-medium">
+                        <span className="text-[#002333]/70 dark:text-gray-300">Subtotal</span>
+                        <span className="font-medium dark:text-white">
                           ${calculateTotal().toFixed(2)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#002333]/70">Tax (0%)</span>
-                        <span className="font-medium">$0.00</span>
+                        <span className="text-[#002333]/70 dark:text-gray-300">Tax (0%)</span>
+                        <span className="font-medium dark:text-white">$0.00</span>
                       </div>
-                      <Separator />
+                      <Separator className="dark:bg-gray-600" />
                       <div className="flex justify-between">
-                        <span className="font-medium text-[#002333]">
+                        <span className="font-medium text-[#002333] dark:text-white">
                           Total
                         </span>
-                        <span className="font-bold text-[#002333]">
+                        <span className="font-bold text-[#002333] dark:text-white">
                           ${calculateTotal().toFixed(2)}
                         </span>
                       </div>
@@ -378,30 +381,30 @@ export default function InvoiceGenerator() {
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="dark:bg-gray-600" />
 
                 <div>
-                  <Label htmlFor="notes" className="text-[#002333] font-medium">
+                  <Label htmlFor="notes" className="text-[#002333] dark:text-white font-medium">
                     Notes
                   </Label>
                   <Textarea
                     id="notes"
                     placeholder="Add any additional notes or payment instructions..."
-                    className="mt-1 min-h-[100px]"
+                    className="mt-1 min-h-[100px] dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   />
                 </div>
 
                 <div className="flex justify-end gap-3">
                   <Button
                     variant="outline"
-                    className="border-[#15949C] text-[#15949C]"
+                    className="border-[#15949C] text-[#15949C] dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Save as Draft
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-[#15949C] text-[#15949C]"
+                    className="border-[#15949C] text-[#15949C] dark:bg-gray-600 dark:border-gray-600 dark:text-white dark:hover:bg-gray-500"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Download PDF
@@ -416,10 +419,10 @@ export default function InvoiceGenerator() {
           </TabsContent>
 
           <TabsContent value="history" className="space-y-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Invoice History</CardTitle>
-                <CardDescription>
+            <Card className="dark:bg-gray-900 dark:border-gray-700 shadow-lg">
+              <CardHeader className="dark:border-gray-700">
+                <CardTitle className="dark:text-white text-xl">Invoice History</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   View and manage your past invoices
                 </CardDescription>
               </CardHeader>

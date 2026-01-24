@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, MapPin, DollarSign } from "lucide-react";
-import { mockFreelancerProfiles } from "@/lib/mockData/freelancer-profile-mock";
+import { mockFreelancerProfiles } from "@/__mocks__/freelancer-profile-mock";
 import Link from "next/link";
 import TalentLayout from "@/components/talent/TalentLayout";
 
 export default function DemoFreelancerProfilePage() {
-  const [selectedFreelancer, setSelectedFreelancer] = useState<string | null>(null);
+  // Removed unused state
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -88,8 +88,6 @@ export default function DemoFreelancerProfilePage() {
             </Card>
           ))}
         </div>
-
-       
       </div>
     </TalentLayout>
   );

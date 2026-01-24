@@ -1,8 +1,10 @@
 use soroban_sdk::{Env, String, Symbol};
 
 /// Shared validation helpers for common checks across Stellar contracts
+#[allow(dead_code)]
 pub struct ValidationHelpers;
 
+#[allow(dead_code)]
 impl ValidationHelpers {
     /// Validates that amount is greater than zero
     pub fn validate_amount(amount: i128) -> bool {

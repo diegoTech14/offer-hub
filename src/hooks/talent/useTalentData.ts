@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { type TalentProfile, talentProfileData } from "@/lib/mockData/talent-mock-data"
+import { type TalentProfile, talentProfileData } from "@/__mocks__/talent-mock-data"
 
 interface UseTalentDataReturn {
   talents: TalentProfile[];

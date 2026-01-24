@@ -22,7 +22,7 @@ import {
   mockFinancialMetrics,
   mockPaymentMetrics,
   mockProfitabilityAnalysis,
-} from "@/data/mock-financial-data"
+} from "@/__mocks__/mock-financial-data"
 
 // Revenue Streams
 export async function getRevenueStreams(period?: { start: Date; end: Date }): Promise<RevenueStream[]> {

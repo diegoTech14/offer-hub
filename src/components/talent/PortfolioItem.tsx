@@ -2,8 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, DollarSign, Clock, CheckCircle, Target, TrendingUp } from "lucide-react";
-import { PortfolioProject } from "@/lib/mockData/portfolio-mock-data";
+import { CheckCircle, Target, TrendingUp } from "lucide-react";
+import { PortfolioProject } from "@/__mocks__/portfolio-mock-data";
 
 interface PortfolioItemProps {
   project: PortfolioProject;

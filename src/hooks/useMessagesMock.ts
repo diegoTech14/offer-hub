@@ -1,98 +1,218 @@
+import { useState, useEffect, useCallback } from 'react';
+import type { Conversation, Message, CreateMessageDTO } from '@/types/messages.types';
 
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
-import { conversations as rawConvs } from "@/lib/mockData/conversations-mock";
-import { messages as rawMsgs } from "@/lib/mockData/messages-mock";
-import { currentUserId, users } from "@/lib/mockData/users-mock";
-
-// === Tipos que consumen MessagesSidebar y MessagesMainPlus ===
-type UIConversation = {
-  id: string;            // ej: "c1"
-  name: string;          // nombre mostrado en la sidebar
-  avatarUrl?: string;
-  unreadCount?: number;
-};
-
-type UIMessage = {
-  id: string;
-  isOutgoing: boolean;
-  content?: string;
-  timestamp: string;     // string para evitar hydration mismatch
-  type?: "text" | "file";
-  fileData?: { name: string; size: string; uploadDate: string; status: string };
-};
-
-const getUser = (id: string) => users.find(u => u.id === id);
-
-interface UseMessagesMockReturn {
-  conversations: UIConversation[];
-  activeConversationId: string;
+interface UseMessagesResult {
+  conversations: Conversation[];
+  activeConversationId: string | null;
   setActiveConversationId: (id: string) => void;
-  activeConversation: UIConversation | null;
-  messages: UIMessage[];
-  handleSendMessage: (text: string) => void;
+  activeConversation: Conversation | null;
+  messages: Message[];
+  handleSendMessage: (content: string, file?: File) => Promise<void>;
+  loadingConversations: boolean;
+  loadingMessages: boolean;
+  sendingMessage: boolean;
+  errorConversations: string | null;
+  errorMessages: string | null;
+  errorSend: string | null;
 }
 
-export function useMessagesMock(): UseMessagesMockReturn {
-  // Conversaciones adaptadas a la UI
-  const conversations: UIConversation[] = useMemo(() => {
-    return rawConvs.map((c) => {
-      const other = c.participants.find((p) => p.id !== currentUserId) || c.participants[0];
-      return {
-        id: c.id,
-        name: other.name,
-        avatarUrl: other.avatarUrl,
-        unreadCount: c.unreadCount ?? 0,
-      };
-    });
-  }, []);
+// Mock data
+const mockConversations: Conversation[] = [
+  {
+    id: 'conv-1',
+    client_id: 'user-1',
+    freelancer_id: 'user-2',
+    last_message_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    participants: [
+      { id: 'user-1', name: 'You', avatar_url: '/avatar.png', online: true },
+      { id: 'user-2', name: 'Alex Johnson', avatar_url: '/person1.png', online: false }
+    ],
+    last_message: {
+      id: 'msg-1',
+      conversation_id: 'conv-1',
+      sender_id: 'user-2',
+      content: 'Thanks for the great work!',
+      message_type: 'text',
+      is_read: false,
+      created_at: new Date().toISOString(),
+    },
+    unread_count: 2,
+  },
+  {
+    id: 'conv-2',
+    client_id: 'user-1',
+    freelancer_id: 'user-3',
+    last_message_at: new Date(Date.now() - 3600000).toISOString(),
+    created_at: new Date().toISOString(),
+    participants: [
+      { id: 'user-1', name: 'You', avatar_url: '/avatar.png', online: true },
+      { id: 'user-3', name: 'Sarah Wilson', avatar_url: '/person2.png', online: true }
+    ],
+    last_message: {
+      id: 'msg-2',
+      conversation_id: 'conv-2',
+      sender_id: 'user-3',
+      content: 'Can we schedule a call for tomorrow?',
+      message_type: 'text',
+      is_read: true,
+      created_at: new Date(Date.now() - 3600000).toISOString(),
+    },
+    unread_count: 0,
+  },
+];
 
-  // Mensajes agrupados por conversación
-  const [messagesByConv, setMessagesByConv] = useState<Record<string, UIMessage[]>>(() => {
-    const g: Record<string, UIMessage[]> = {};
-    for (const m of rawMsgs) {
-      (g[m.conversationId] ??= []).push({
-        id: String(m.id),
-        isOutgoing: m.senderId === currentUserId,
-        content: m.fileUrl ? undefined : m.text,
-        type: m.fileUrl ? "file" : "text",
-        fileData: m.fileUrl
-          ? {
-              name: "file",
-              size: "—",
-              uploadDate: new Date(m.createdAt).toLocaleDateString(),
-              status: m.status === "read" ? "Read" : m.status === "delivered" ? "Delivered" : "Sent",
-            }
-          : undefined,
-        timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      });
+const mockMessages: Record<string, Message[]> = {
+  'conv-1': [
+    {
+      id: 'msg-1',
+      conversation_id: 'conv-1',
+      sender_id: 'user-1',
+      content: 'Hello! I\'m ready to start the project.',
+      message_type: 'text',
+      is_read: true,
+      created_at: new Date(Date.now() - 7200000).toISOString(),
+    },
+    {
+      id: 'msg-2',
+      conversation_id: 'conv-1',
+      sender_id: 'user-2',
+      content: 'Great! Here are the requirements...',
+      message_type: 'text',
+      is_read: true,
+      created_at: new Date(Date.now() - 7000000).toISOString(),
+    },
+    {
+      id: 'msg-3',
+      conversation_id: 'conv-1',
+      sender_id: 'user-1',
+      content: 'Perfect, I\'ll get started right away.',
+      message_type: 'text',
+      is_read: true,
+      created_at: new Date(Date.now() - 6800000).toISOString(),
+    },
+    {
+      id: 'msg-4',
+      conversation_id: 'conv-1',
+      sender_id: 'user-2',
+      content: 'Thanks for the great work!',
+      message_type: 'text',
+      is_read: false,
+      created_at: new Date().toISOString(),
+    },
+  ],
+  'conv-2': [
+    {
+      id: 'msg-5',
+      conversation_id: 'conv-2',
+      sender_id: 'user-1',
+      content: 'Hi Sarah, how are you?',
+      message_type: 'text',
+      is_read: true,
+      created_at: new Date(Date.now() - 7200000).toISOString(),
+    },
+    {
+      id: 'msg-6',
+      conversation_id: 'conv-2',
+      sender_id: 'user-3',
+      content: 'Can we schedule a call for tomorrow?',
+      message_type: 'text',
+      is_read: true,
+      created_at: new Date(Date.now() - 3600000).toISOString(),
+    },
+  ],
+};
+
+export function useMessagesMock(userId?: string): UseMessagesResult {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loadingConversations, setLoadingConversations] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [errorConversations, setErrorConversations] = useState<string | null>(null);
+  const [errorMessages, setErrorMessages] = useState<string | null>(null);
+  const [errorSend, setErrorSend] = useState<string | null>(null);
+
+  // Load conversations
+  useEffect(() => {
+    if (!userId) return;
+    setLoadingConversations(true);
+    setErrorConversations(null);
+    
+    // Simulate API delay
+    setTimeout(() => {
+      setConversations(mockConversations);
+      setLoadingConversations(false);
+    }, 1000);
+  }, [userId]);
+
+  // Set active conversation
+  useEffect(() => {
+    if (!activeConversationId) {
+      setActiveConversation(null);
+      setMessages([]);
+      return;
     }
-    return g;
-  });
+    const conv = conversations.find((c) => c.id === activeConversationId) || null;
+    setActiveConversation(conv);
+  }, [activeConversationId, conversations]);
 
-  const [activeConversationId, setActiveConversationId] = useState<string>(conversations[0]?.id ?? "c1");
+  // Load messages for active conversation
+  useEffect(() => {
+    if (!activeConversationId) return;
+    setLoadingMessages(true);
+    setErrorMessages(null);
+    
+    // Simulate API delay
+    setTimeout(() => {
+      const convMessages = mockMessages[activeConversationId] || [];
+      setMessages(convMessages);
+      setLoadingMessages(false);
+    }, 500);
+  }, [activeConversationId]);
 
-  const activeConversation = useMemo(
-    () => conversations.find((c) => c.id === activeConversationId) || null,
-    [conversations, activeConversationId]
+  const handleSendMessage = useCallback(
+    async (content: string, file?: File) => {
+      if (!activeConversationId || !userId) return;
+      
+      setSendingMessage(true);
+      setErrorSend(null);
+      
+      // Create optimistic message
+      const optimisticMsg: Message = {
+        id: 'optimistic-' + Date.now(),
+        conversation_id: activeConversationId,
+        sender_id: userId,
+        content,
+        message_type: file ? 'file' : 'text',
+        file_url: file ? URL.createObjectURL(file) : undefined,
+        file_name: file?.name,
+        file_size: file?.size,
+        is_read: false,
+        created_at: new Date().toISOString(),
+      };
+      
+      setMessages((prev) => [...prev, optimisticMsg]);
+      
+      // Simulate sending delay
+      setTimeout(() => {
+        // Replace optimistic message with real one
+        const realMsg: Message = {
+          ...optimisticMsg,
+          id: 'msg-' + Date.now(),
+        };
+        
+        setMessages((prev) =>
+          prev.map((m) => (m.id === optimisticMsg.id ? realMsg : m))
+        );
+        
+        setSendingMessage(false);
+      }, 1000);
+    },
+    [activeConversationId, userId]
   );
-
-  const messages: UIMessage[] = useMemo(
-    () => messagesByConv[activeConversationId] ?? [],
-    [messagesByConv, activeConversationId]
-  );
-
-  // Enviar mensaje (mock, solo UI)
-  const handleSendMessage = (text: string) => {
-    const id = String(Date.now());
-    const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const newMsg: UIMessage = { id, isOutgoing: true, content: text, timestamp: ts, type: "text" };
-    setMessagesByConv((prev) => ({
-      ...prev,
-      [activeConversationId]: [...(prev[activeConversationId] ?? []), newMsg],
-    }));
-  };
 
   return {
     conversations,
@@ -101,5 +221,11 @@ export function useMessagesMock(): UseMessagesMockReturn {
     activeConversation,
     messages,
     handleSendMessage,
+    loadingConversations,
+    loadingMessages,
+    sendingMessage,
+    errorConversations,
+    errorMessages,
+    errorSend,
   };
 }

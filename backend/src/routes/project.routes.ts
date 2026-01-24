@@ -5,18 +5,16 @@ import {
   getProjectByIdHandler,
   updateProjectHandler,
   deleteProjectHandler,
+  assignFreelancerHandler,
+  getProjectHandler,
 } from "@/controllers/project.controller";
 import { authorizeRoles, verifyToken } from "@/middlewares/auth.middleware";
 import { UserRole } from "@/types/auth.types";
 
 const router = Router();
 
-router.post(
-  "/",
-  verifyToken,
-  authorizeRoles(UserRole.CLIENT, UserRole.ADMIN),
-  createProjectHandler
-);
+// GET /api/projects/:projectId - Get project by ID
+router.get("/:projectId", getProjectHandler);
 
 router.get("/", getAllProjectsHandler);
 
@@ -34,6 +32,13 @@ router.delete(
   verifyToken,
   authorizeRoles(UserRole.CLIENT, UserRole.ADMIN),
   deleteProjectHandler
+);
+
+router.patch(
+  "/:projectId/assign/:freelancerId",
+  verifyToken,
+  authorizeRoles(UserRole.CLIENT, UserRole.ADMIN),
+  assignFreelancerHandler
 );
 
 export default router;

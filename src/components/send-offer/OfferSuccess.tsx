@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { FreelancerProfile } from "@/lib/mockData/freelancer-profile-mock";
-import { getMockOfferSentData } from "@/lib/mockData/offer-form-mock";
+import { FreelancerProfile } from "@/__mocks__/freelancer-profile-mock";
+import { getMockOfferSentData } from "@/__mocks__/offer-form-mock";
 import Image from "next/image";
 
 interface OfferSuccessProps {

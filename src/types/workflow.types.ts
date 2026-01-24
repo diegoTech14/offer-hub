@@ -408,10 +408,38 @@ export interface NotificationCenterProps {
   compact?: boolean;
 }
 
+/**
+ * Props for the MobileWorkflow component
+ * 
+ * This interface defines the properties for the mobile-optimized dispute workflow component
+ * that provides a touch-friendly interface for managing dispute resolution processes.
+ */
 export interface MobileWorkflowProps {
+  /** 
+   * Unique identifier for the dispute being managed
+   * @example "dispute_12345"
+   */
   disputeId: string;
+  
+  /** 
+   * Callback function called when a pending action is completed
+   * @param action - The completed action object containing id, type, title, etc.
+   * @example onActionComplete={(action) => console.log('Action completed:', action.title)}
+   */
   onActionComplete?: (action: PendingAction) => void;
+  
+  /** 
+   * Whether to show the offline/online status indicator in the header
+   * @default true
+   * @example showOfflineIndicator={false}
+   */
   showOfflineIndicator?: boolean;
+  
+  /** 
+   * Whether to enable swipe gestures for navigating between pending actions
+   * @default true
+   * @example enableGestures={false}
+   */
   enableGestures?: boolean;
 }
 

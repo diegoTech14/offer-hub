@@ -1,4 +1,4 @@
-use soroban_sdk::{contracterror, panic_with_error, Env};
+use soroban_sdk::contracterror;
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -24,4 +24,7 @@ pub enum Error {
     NonTransferableToken = 7,
 
     InvalidInput = 8,
+    AlreadyPaused = 9,
+    NotPaused = 10,
+    ContractPaused = 11,
 }

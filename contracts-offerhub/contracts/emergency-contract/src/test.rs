@@ -1,5 +1,4 @@
 #![cfg(test)]
-use std::os::macos::raw::stat;
 
 use soroban_sdk::{symbol_short, testutils::{Address as _, Ledger}, vec, Address, Env};
 use crate::emergency::*;
@@ -11,9 +10,8 @@ fn setup_env() -> Env {
     env
 }
 
-fn create_contract(env: &Env) -> EmergencyContractClient {
-    let contract_id = Address::generate(env);
-    env.register_contract(&contract_id, EmergencyContract);
+fn create_contract(env: &Env) -> EmergencyContractClient<'_> {
+    let contract_id = env.register(EmergencyContract, ());
     let client = EmergencyContractClient::new(env, &contract_id);
     client
 }
@@ -22,7 +20,7 @@ fn create_contract(env: &Env) -> EmergencyContractClient {
 fn test_emergency_initialization() {
     let env = Env::default();
     let admin = Address::generate(&env);
-    let contract_id = env.register_contract(None, EmergencyContract);
+    let contract_id = env.register(EmergencyContract, ());
 
     // Initialize through the contract
     env.as_contract(&contract_id, || {
@@ -41,7 +39,7 @@ fn test_emergency_initialization() {
 fn test_emergency_pause() {
     let env = Env::default();
     let admin = Address::generate(&env);
-    let contract_id = env.register_contract(None, EmergencyContract);
+    let contract_id = env.register(EmergencyContract, ());
 
     // Initialize through the contract
     env.as_contract(&contract_id, || {
@@ -81,7 +79,7 @@ fn test_emergency_pause() {
 fn test_circuit_breaker() {
     let env = Env::default();
     let admin = Address::generate(&env);
-    let contract_id = env.register_contract(None, EmergencyContract);
+    let contract_id = env.register(EmergencyContract, ());
 
     // Initialize through the contract
     env.as_contract(&contract_id, || {

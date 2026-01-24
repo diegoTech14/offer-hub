@@ -7,6 +7,8 @@ import { DisputeReasonSelector } from './DisputeReasonSelector';
 import { ProjectSelector } from './ProjectSelector';
 import { Upload, Paperclip } from 'lucide-react';
 import { TIMEOUTS, VALIDATION_LIMITS } from '@/constants/magic-numbers';
+import { FileUpload } from '@/components/ui/file-upload';
+import { UploadProgress } from '@/components/common/upload-progress';
 
 interface DisputeFormData {
   reason: string;
@@ -28,6 +30,8 @@ export function DisputeCreationForm({ onSubmit }: DisputeCreationFormProps) {
   });
   const [errors, setErrors] = useState<Partial<DisputeFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<DisputeFormData> = {};
@@ -70,8 +74,23 @@ export function DisputeCreationForm({ onSubmit }: DisputeCreationFormProps) {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const handleFileUpload = (files: File[]) => {
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    // Simulate upload progress
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsUploading(false);
+          setUploadProgress(0);
+          return 0;
+        }
+        return prev + 10;
+      });
+    }, 100);
+    
     setFormData(prev => ({
       ...prev,
       evidence: [...(prev.evidence || []), ...files]
@@ -125,25 +144,20 @@ export function DisputeCreationForm({ onSubmit }: DisputeCreationFormProps) {
         <label className="text-sm font-medium text-gray-700">
           Upload evidence (Optional)
         </label>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-          <div className="flex flex-col items-center gap-2">
-            <Upload className="h-8 w-8 text-gray-400" />
-            <div className="text-gray-600">
-              <span className="font-medium">Drag your file(s) or </span>
-              <label className="text-blue-600 hover:text-blue-700 cursor-pointer underline">
-                browse
-                <input
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <p className="text-sm text-gray-500">Max 10 MB files are allowed</p>
-          </div>
-        </div>
+        
+        <FileUpload
+          onFilesSelected={handleFileUpload}
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+          disabled={isUploading}
+        />
+        
+        {/* Upload progress */}
+        {isUploading && (
+          <UploadProgress 
+            progress={uploadProgress}
+            fileName="Uploading evidence files..."
+          />
+        )}
         
         {/* Display uploaded files */}
         {formData.evidence && formData.evidence.length > 0 && (

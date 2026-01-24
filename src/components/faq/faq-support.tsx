@@ -10,7 +10,7 @@ export function FaqSupport() {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="mt-16 rounded-xl overflow-hidden"
     >
-      <div className="bg-gradient-to-r from-[#002333] to-[#159A9C] p-8 md:p-12 text-center">
+      <div className="bg-gradient-to-r from-[#002333] to-[#159A9C] dark:from-gray-900 dark:to-gray-800 p-8 md:p-12 text-center">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Still Have Questions?
@@ -25,11 +25,11 @@ export function FaqSupport() {
             whileTap={{ scale: 0.95 }}
             className="
               inline-flex items-center justify-center
-              bg-white text-[#159A9C] font-medium
+              bg-gray-600 text-white font-medium
               px-6 py-3 rounded-lg
               shadow-lg
               transition-all duration-300
-              hover:shadow-xl
+              hover:shadow-xl hover:bg-gray-700
             "
           >
             Contact Support

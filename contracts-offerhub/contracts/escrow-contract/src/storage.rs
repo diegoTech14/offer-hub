@@ -5,6 +5,9 @@ pub const ESCROW_DATA: Symbol = symbol_short!("ESCROW");
 pub const INITIALIZED: Symbol = symbol_short!("INIT");
 pub const CONTRACT_CONFIG: Symbol = symbol_short!("CONFIG");
 
+pub const PAUSED: Symbol = symbol_short!("PAUSED");
+
+
 // Rate limit storage keys
 pub const RATE_LIMITS: Symbol = symbol_short!("RLIM");
 pub const RATE_BYPASS: Symbol = symbol_short!("RLBYP");
@@ -131,6 +134,7 @@ pub fn add_call_log(env: &Env, log: &CallLog) {
     env.storage().instance().set(&LOG_COUNT, &(count + 1));
 }
 
+#[allow(dead_code)]
 pub fn get_call_logs(env: &Env) -> Vec<CallLog> {
     let count = env.storage().instance().get(&LOG_COUNT).unwrap_or(0);
     let mut logs = Vec::new(env);
@@ -148,6 +152,7 @@ pub fn get_call_logs(env: &Env) -> Vec<CallLog> {
     logs
 }
 
+#[allow(dead_code)]
 pub fn clear_call_logs(env: &Env) {
     let count = env.storage().instance().get(&LOG_COUNT).unwrap_or(0);
 
@@ -194,6 +199,7 @@ use crate::error::handle_error;
 //     log!(env, "Escrow state changed to {:?}", new_state);
 // }
 
+#[allow(dead_code)]
 pub fn set_escrow_state(env: &Env, new_state: EscrowState) {
         let mut data: EscrowData = crate::storage::get_escrow_data(env);
         // Guard initialization and load
@@ -225,16 +231,18 @@ pub fn set_escrow_state(env: &Env, new_state: EscrowState) {
         // Emit event + keep debug log
         env.events().publish(
             (Symbol::new(env, "escrow_state_changed"), env.current_contract_address()),
-            (&prev, &data.state, now),
+            (prev.clone(), data.state.clone(), now),
         );
 
         log!(env, "Escrow state changed from {:?} to {:?}", prev, data.state);
     }
 
+#[allow(dead_code)]
 pub fn get_escrow_state(env: &Env) -> EscrowState {
     get_escrow_data(env).state
 }
 
+#[allow(dead_code)]
 pub fn get_escrow_data(env: &Env) -> EscrowData {
     if !env.storage().instance().has(&INITIALIZED) {
         handle_error(env, Error::NotInitialized);
@@ -243,6 +251,7 @@ pub fn get_escrow_data(env: &Env) -> EscrowData {
     env.storage().instance().get(&ESCROW_DATA).unwrap()
 }
 
+#[allow(dead_code)]
 pub fn is_escrow_funded(env: &Env) -> bool {
     get_escrow_state(env) == EscrowState::Funded
 }

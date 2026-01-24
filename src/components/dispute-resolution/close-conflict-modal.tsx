@@ -12,7 +12,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FaCaretDown } from 'react-icons/fa';
 import { PropagateLoader } from 'react-spinners';
-import { simulateDisputResolution } from '@/data/generic-mock-data';
+import { simulateDisputResolution } from '@/__mocks__/generic-mock-data';
 import { toast } from 'sonner';
 
 export default function CloseConflictModal({

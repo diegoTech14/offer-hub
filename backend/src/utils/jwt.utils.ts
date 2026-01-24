@@ -34,7 +34,11 @@ export function signRefreshToken(payload: Omit<JWTPayload, "iat" | "exp">) {
 
   const refreshTokenHash = hashToken(refreshToken);
 
-  return { refreshToken, refreshTokenHash };
+  // Calculate expiration date
+  const decoded = jwt.decode(refreshToken) as JWTPayload;
+  const expiresAt = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  return { refreshToken, refreshTokenHash, expiresAt };
 }
 
 export function verifyAccessToken(token: string): JWTPayload {

@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { DisputeRow } from '@/types';
 import Link from 'next/link';
 import { SlMagnifier } from 'react-icons/sl';
-import { useMockDisputes } from '@/data/generic-mock-data';
+import { useMockDisputes } from '@/__mocks__/generic-mock-data';
 import { VALIDATION_LIMITS } from '@/constants/magic-numbers';
 
 const columns: DisputeTableColumn<DisputeRow>[] = [

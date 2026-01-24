@@ -1,34 +1,57 @@
-// Centralized test setup for backend tests
-// Mocks common modules that require env vars or external services
+// Jest setup file for backend tests
+import { config } from 'dotenv';
 
-// Mock supabase client
-jest.mock('@/lib/supabase/supabase', () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({ single: () => ({ data: null, error: null }) }),
-      insert: () => ({ error: null }),
-      update: () => ({ error: null }),
-      delete: () => ({ error: null }),
-      order: () => ({ data: [], error: null }),
+// Extend global object for test utilities
+declare global {
+    var testUtils: {
+        wait: (ms: number) => Promise<void>;
+        createMockReq: (overrides?: any) => any;
+        createMockRes: (overrides?: any) => any;
+        createMockNext: () => jest.MockedFunction<any>;
+    };
+}
+
+// Load test environment variables
+config({ path: '.env.test' });
+
+// Set test environment
+process.env.NODE_ENV = 'test';
+
+// Mock console methods to reduce noise in tests
+const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+
+beforeAll(() => {
+    console.error = jest.fn();
+    console.warn = jest.fn();
+});
+
+afterAll(() => {
+    console.error = originalConsoleError;
+    console.warn = originalConsoleWarn;
+});
+
+// Global test utilities
+global.testUtils = {
+    // Helper to wait for async operations
+    wait: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
+
+    // Helper to create mock request/response objects
+    createMockReq: (overrides = {}) => ({
+        body: {},
+        params: {},
+        query: {},
+        headers: {},
+        user: null,
+        ...overrides,
     }),
-  },
-}));
 
-// Mock jwt utils
-jest.mock('@/utils/jwt.utils', () => ({
-  signAccessToken: () => 'access-token',
-  signRefreshToken: () => ({ refreshToken: 'refresh-token', refreshTokenHash: 'refresh-hash' }),
-  hashToken: () => 'refresh-hash',
-}));
+    createMockRes: (overrides = {}) => ({
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis(),
+        ...overrides,
+    }),
 
-// Provide a minimal auth config so modules that validate it don't throw
-jest.mock('@/config/auth.config', () => ({
-  authConfig: {
-    jwt: { secret: 'a'.repeat(32), expiresIn: '24h' },
-    rateLimiting: {
-      general: { windowMs: 60000, max: 100 },
-      auth: { windowMs: 60000, max: 10 },
-      admin: { windowMs: 60000, max: 1000 },
-    },
-  },
-}));
+    createMockNext: () => jest.fn(),
+};

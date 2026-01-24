@@ -22,9 +22,11 @@ impl AccessControl {
         caller.require_auth();
 
         let admin = get_admin(env).ok_or(Error::NotInitialized)?;
+
         if admin != *caller {
             return Err(Error::Unauthorized);
         }
+
         Ok(())
     }
 

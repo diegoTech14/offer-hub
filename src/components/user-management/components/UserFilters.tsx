@@ -1,7 +1,7 @@
-import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Search } from "lucide-react";
+import type { ChangeEvent } from "react";
+import { Calendar as CalendarIcon, Search, Loader2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FilterLoading, FilterSkeleton } from "@/components/filters/filter-loading";
 
 type UserFiltersProps = {
   roleFilter: string;
@@ -28,6 +29,8 @@ type UserFiltersProps = {
   setDate: (date: Date | undefined) => void;
   handleExport: () => void;
   userType: "Freelancer" | "Customer" | "User" | "All";
+  isLoading?: boolean;
+  isExporting?: boolean;
 };
 
 export function UserFilters({
@@ -41,14 +44,21 @@ export function UserFilters({
   setDate,
   handleExport,
   userType,
+  isLoading = false,
+  isExporting = false,
 }: UserFiltersProps) {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col md:flex-row flex-wrap items-start md:items-center justify-between gap-4 bg-white p-3 rounded border-b">
+        <FilterLoading className="w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col md:flex-row flex-wrap items-start md:items-center justify-between gap-4 bg-white p-3 rounded border-b">
       <div className="flex flex-col sm:flex-row w-full md:w-auto flex-wrap items-start sm:items-center gap-3 md:gap-4">
-        <Select
-          value={roleFilter}
-          onValueChange={setRoleFilter}
-        >
+        <Select value={roleFilter} onValueChange={setRoleFilter} disabled={isLoading}>
           <SelectTrigger className="w-full sm:w-[140px] rounded-sm h-10 border-[#B4B9C9]">
             <SelectValue placeholder="Select role" />
           </SelectTrigger>
@@ -65,10 +75,7 @@ export function UserFilters({
           </Button>
         </div>
 
-        <Select
-          value={statusFilter}
-          onValueChange={setStatusFilter}
-        >
+        <Select value={statusFilter} onValueChange={setStatusFilter} disabled={isLoading}>
           <SelectTrigger className="w-full sm:w-[140px] rounded-sm h-10 border-[#B4B9C9]">
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
@@ -85,7 +92,10 @@ export function UserFilters({
             placeholder="Search by customer name"
             className="pl-9 h-10 border-[#B4B9C9] focus-visible:ring-offset-0 w-full rounded-sm"
             value={searchQuery}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+            disabled={isLoading}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearchQuery(e.target.value)
+            }
           />
           <Search
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#B4B9C9]"
@@ -101,6 +111,7 @@ export function UserFilters({
               <Button
                 variant="outline"
                 className="h-10 px-3 border-[#B4B9C9] text-[#6D758F] rounded-sm hover:bg-gray-50 gap-2 w-full sm:w-auto"
+                disabled={isLoading}
               >
                 <CalendarIcon className="h-4 w-4 text-[#6D758F]" />
                 {date ? format(date, "MM/dd/yy") : "Select date"}
@@ -118,6 +129,7 @@ export function UserFilters({
           <Button
             variant="outline"
             className="h-10 px-4 border-[#B4B9C9] text-[#6D758F] rounded-sm hover:bg-gray-50 w-full sm:w-auto"
+            disabled={isLoading}
           >
             Filter
           </Button>
@@ -126,8 +138,16 @@ export function UserFilters({
         <Button
           className="h-10 px-4 bg-[#002333] hover:bg-[#001a26] text-white rounded-full w-full sm:w-auto"
           onClick={handleExport}
+          disabled={isExporting || isLoading}
         >
-          Export Report
+          {isExporting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              Exporting...
+            </>
+          ) : (
+            "Export Report"
+          )}
         </Button>
       </div>
     </div>

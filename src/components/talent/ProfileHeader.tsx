@@ -6,7 +6,7 @@ import { Award, CheckCircle, Clock, MapPin, Send, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FreelancerProfile } from "@/lib/mockData/freelancer-profile-mock";
+import { FreelancerProfile } from "@/__mocks__/freelancer-profile-mock";
 
 interface ProfileHeaderProps {
   freelancer: FreelancerProfile;
@@ -41,7 +41,12 @@ export default function ProfileHeader({ freelancer }: ProfileHeaderProps) {
         <div className="flex flex-col md:flex-row items-start gap-4">
           <div className="relative">
             <Avatar className="w-24 h-24">
-              <AvatarImage src={freelancer.avatar} alt={freelancer.name} />
+              <AvatarImage 
+                src={freelancer.avatar} 
+                alt={freelancer.name}
+                className="object-cover"
+                progressive={false}
+              />
               <AvatarFallback className="text-lg font-semibold">
                 {freelancer.name.split(" ").map(n => n[0]).join("")}
               </AvatarFallback>

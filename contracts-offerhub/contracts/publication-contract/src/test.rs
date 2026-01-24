@@ -3,7 +3,7 @@
 use super::*;
 use crate::{contract::PublicationContractClient, error::ContractError, storage::DataKey, types::PublicationState};
 use soroban_sdk::{
-    testutils::{Address as _, Ledger, LedgerInfo, Events as _},
+    testutils::{Address as _, Ledger, Events as _},
     vec, Address, Env, IntoVal, String, Symbol, TryFromVal,
 };
 
@@ -21,7 +21,7 @@ impl<'a> PublicationTest<'a> {
         let env = Env::default();
         env.mock_all_auths();
 
-        let contract_address = env.register_contract(None, Contract);
+        let contract_address = env.register(Contract, ());
         let contract = PublicationContractClient::new(&env, &contract_address);
 
         let user1 = Address::generate(&env);
@@ -314,7 +314,7 @@ fn test_expiration_triggers_expired_state() {
     let env = &test.env;
     let user = test.user1.clone();
     let timestamp = env.ledger().timestamp();
-    let EXPIRATION_PERIOD: u64 = 2_592_000; // Default expiration period (30 days)
+    let expiration_period: u64 = 2_592_000; // Default expiration period (30 days)
     
     // Publish a new publication
     let id = test.contract.publish(
@@ -332,18 +332,8 @@ fn test_expiration_triggers_expired_state() {
     assert_eq!(publication.state, PublicationState::Published);
 
     // Simulate expiration by advancing ledger timestamp beyond expiration
-    let expiration = timestamp + EXPIRATION_PERIOD;
-    let timestamp = 3000;
-    env.ledger().set(LedgerInfo {
-        timestamp: expiration + 1,
-        protocol_version: 23,
-        sequence_number: env.ledger().sequence(),
-        network_id: Default::default(),
-        base_reserve: 0,
-        min_temp_entry_ttl: 0,
-        min_persistent_entry_ttl: 0,
-        max_entry_ttl: 0,
-    });
+    let expiration = timestamp + expiration_period;
+    env.ledger().with_mut(|l| l.timestamp = expiration + 1);
 
     // Retrieve publication again to trigger check_expiration
     let updated_publication = test.contract.get_publication(&user.clone(), &id).unwrap();

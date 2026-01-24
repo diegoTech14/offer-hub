@@ -54,7 +54,7 @@ export default function TalentGridView({
               id: service.id,
               name: service.name,
               title: service.title,
-              avatar: "",
+              avatar: service.avatar || "",
               rating: service.rating,
               reviewCount: service.reviewCount,
               hourlyRate: service.hourlyRate,

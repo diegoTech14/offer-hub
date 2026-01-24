@@ -1,10 +1,10 @@
 import rateLimit from "express-rate-limit";
 import { Request, Response } from "express";
-import { 
-  RateLimitMiddlewareOptions, 
-  AuthenticatedRequest,
-  RateLimitInfo 
+import {
+  RateLimitMiddlewareOptions,
+  RateLimitInfo
 } from "@/types/middleware.types";
+import { AuthenticatedRequest } from "@/types/auth.types";
 import { authConfig } from "@/config/auth.config";
 
 /**
@@ -28,6 +28,17 @@ function createEnhancedLimiter(options: RateLimitMiddlewareOptions) {
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     skipSuccessfulRequests: options.skipSuccessfulRequests || false,
     skipFailedRequests: options.skipFailedRequests || false,
+    // Skip rate limiting for health checks from Render, Vercel, etc.
+    skip: (req: Request) => {
+      const userAgent = req.get('User-Agent') || '';
+      const isHealthCheck = userAgent.includes('Render') || 
+                           userAgent.includes('Vercel') || 
+                           userAgent.includes('health-check') ||
+                           req.path === '/' ||
+                           req.path === '/health' ||
+                           req.path === '/api/health';
+      return isHealthCheck;
+    },
     keyGenerator: options.keyGenerator || ((req: Request) => {
       // Default key generator: use IP address for unauthenticated requests,
       // user ID for authenticated requests

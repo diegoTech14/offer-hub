@@ -1,4 +1,4 @@
-use soroban_sdk::{contracterror, panic_with_error, Env};
+use soroban_sdk::contracterror;
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -38,4 +38,7 @@ pub enum Error {
     
     TimestampTooOld = 17, 
     NoRatingsFound = 18,
+    AlreadyPaused = 19,
+    NotPaused = 20,
+    ContractPaused = 21,
 }

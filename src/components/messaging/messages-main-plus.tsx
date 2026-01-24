@@ -31,6 +31,7 @@ export function MessagesMainPlus({
     handleSendMessage,
     handleFileUpload,
     handleKeyPress,
+    isLoading: composerIsLoading,
   } = useMessageComposer(onSendMessage);
 
   const [statusById, setStatusById] = useState<Record<string, MsgStatus>>({});
@@ -191,6 +192,7 @@ export function MessagesMainPlus({
                 size="icon"
                 className="w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-transparent"
                 onClick={() => fileInputRef.current?.click()}
+                disabled={composerIsLoading}
               >
                 <Upload className="w-4 h-4" />
               </Button>
@@ -198,6 +200,7 @@ export function MessagesMainPlus({
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-transparent"
+                disabled={composerIsLoading}
               >
                 <Camera className="w-4 h-4" />
               </Button>
@@ -205,10 +208,14 @@ export function MessagesMainPlus({
           </div>
           <Button
             onClick={handleSendMessage}
-            disabled={!newMessage.trim()}
-            className="flex items-center justify-center w-10 h-10 p-0 text-white bg-black rounded-full hover:bg-gray-800"
+            disabled={composerIsLoading || !newMessage.trim()}
+            className="flex items-center justify-center w-10 h-10 p-0 text-white bg-black rounded-full hover:bg-gray-800 disabled:opacity-60"
           >
-            <Send className="w-4 h-4" />
+            {composerIsLoading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
 

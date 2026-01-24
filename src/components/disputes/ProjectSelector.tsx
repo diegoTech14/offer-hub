@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { getActiveProjects } from '@/lib/mockData/projects-mock';
+import { getActiveProjects } from '@/__mocks__/projects-mock';
 
 interface ProjectSelectorProps {
   value: string;
