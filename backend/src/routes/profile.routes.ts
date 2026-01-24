@@ -4,8 +4,12 @@
  */
 
 import { Router } from "express";
-import { createProfileHandler } from "@/controllers/profile.controller";
-import { getProfileHandler } from "@/controllers/profile.controller";
+import { 
+  createProfileHandler,
+  getProfileHandler,
+  updateProfileHandler
+} from "@/controllers/profile.controller";
+import { verifyToken } from "@/middlewares/auth.middleware";
 
 const router = Router();
 
@@ -18,5 +22,8 @@ router.post("/", createProfileHandler);
  * @access Public (no authentication required)
  */
 router.get("/:userId", getProfileHandler);
+
+// PATCH /api/profiles/:userId - Update profile (protected with authentication)
+router.patch("/:userId", verifyToken, updateProfileHandler);
 
 export default router;

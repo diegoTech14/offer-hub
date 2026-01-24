@@ -23,7 +23,7 @@ jest.mock('@/utils/logger', () => ({
 import { balanceService } from '@/services/balance.service';
 import { supabase } from '@/lib/supabase/supabase';
 import { logger } from '@/utils/logger';
-import { ValidationError, BadRequestError, InternalServerError, BusinessLogicError } from '@/utils/AppError';
+import { ValidationError, BadRequestError, InternalServerError, BusinessLogicError, InsufficientFundsError } from '@/utils/AppError';
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
 const mockLogger = logger as jest.Mocked<typeof logger>;
@@ -690,6 +690,355 @@ describe('BalanceService - settleBalance', () => {
 
       expect(result.fromBalance.currency).toBe('XLM');
       expect(result.toBalance.currency).toBe('XLM');
+    });
+  });
+});
+
+describe('BalanceService - debitAvailable', () => {
+  const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
+  const mockRef = { id: 'withdrawal-123', type: 'withdrawal' as const };
+
+  const mockBalanceData = {
+    id: 'bal-123',
+    user_id: mockUserId,
+    currency: 'USD',
+    available: 100.00000000,
+    held: 0.00000000,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('Success Cases', () => {
+    it('should call RPC and return updated balance on success', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 50.00000000,
+        updated_at: '2024-01-01T01:00:00Z',
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.debitAvailable(
+        mockUserId,
+        50.00,
+        'USD',
+        mockRef,
+        'Withdrawal'
+      );
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('debit_available_balance', {
+        p_user_id: mockUserId,
+        p_amount: 50.00,
+        p_currency: 'USD',
+        p_ref_id: mockRef.id,
+        p_ref_type: mockRef.type,
+        p_description: 'Withdrawal',
+      });
+
+      expect(result).toEqual(updatedBalance);
+      expect(result.available).toBe(50.00000000);
+    });
+
+    it('should handle payment reference type', async () => {
+      const paymentRef = { id: 'payment-456', type: 'payment' as const };
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 75.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.debitAvailable(
+        mockUserId,
+        25.00,
+        'USD',
+        paymentRef
+      );
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('debit_available_balance', {
+        p_user_id: mockUserId,
+        p_amount: 25.00,
+        p_currency: 'USD',
+        p_ref_id: paymentRef.id,
+        p_ref_type: paymentRef.type,
+        p_description: '',
+      });
+
+      expect(result.available).toBe(75.00000000);
+    });
+
+    it('should handle fee reference type', async () => {
+      const feeRef = { id: 'fee-789', type: 'fee' as const };
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 99.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.debitAvailable(
+        mockUserId,
+        1.00,
+        'USD',
+        feeRef,
+        'Platform fee'
+      );
+
+      expect(result.available).toBe(99.00000000);
+    });
+
+    it('should work with XLM currency', async () => {
+      const xlmBalance = {
+        ...mockBalanceData,
+        currency: 'XLM',
+        available: 200.00000000,
+      };
+      const updatedBalance = {
+        ...xlmBalance,
+        available: 150.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.debitAvailable(
+        mockUserId,
+        50.00,
+        'XLM',
+        mockRef
+      );
+
+      expect(result.currency).toBe('XLM');
+      expect(result.available).toBe(150.00000000);
+    });
+
+    it('should log operation with correlation ID', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: mockBalanceData,
+        error: null,
+      });
+
+      await balanceService.debitAvailable(mockUserId, 10, 'USD', mockRef);
+
+      expect(mockLogger.info).toHaveBeenCalledTimes(2); // Start and success
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('[BalanceService] Starting debitAvailable')
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('[BalanceService] Success')
+      );
+    });
+  });
+
+  describe('Validation Errors', () => {
+    it('should throw ValidationError for non-positive amount', async () => {
+      await expect(
+        balanceService.debitAvailable(mockUserId, -10, 'USD', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for zero amount', async () => {
+      await expect(
+        balanceService.debitAvailable(mockUserId, 0, 'USD', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestError for invalid UUID', async () => {
+      await expect(
+        balanceService.debitAvailable('bad-id', 50, 'USD', mockRef)
+      ).rejects.toThrow(BadRequestError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for unsupported currency', async () => {
+      await expect(
+        balanceService.debitAvailable(mockUserId, 50, 'EUR', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for invalid reference (missing id)', async () => {
+      const invalidRef = { id: '', type: 'withdrawal' as const };
+      await expect(
+        balanceService.debitAvailable(mockUserId, 50, 'USD', invalidRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for invalid reference (missing type)', async () => {
+      const invalidRef = { id: 'ref-123', type: '' as any };
+      await expect(
+        balanceService.debitAvailable(mockUserId, 50, 'USD', invalidRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Insufficient Funds', () => {
+    it('should throw InsufficientFundsError when available balance is less than amount', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient funds: required 150, but only 100 available',
+        },
+      });
+
+      await expect(
+        balanceService.debitAvailable(mockUserId, 150, 'USD', mockRef)
+      ).rejects.toThrow(InsufficientFundsError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw InsufficientFundsError when user has no balance record', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient funds: user has no balance record for currency USD',
+        },
+      });
+
+      await expect(
+        balanceService.debitAvailable(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InsufficientFundsError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should include error details in InsufficientFundsError', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient funds: required 150, but only 100 available',
+        },
+      });
+
+      try {
+        await balanceService.debitAvailable(mockUserId, 150, 'USD', mockRef);
+        fail('Should have thrown InsufficientFundsError');
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(InsufficientFundsError);
+        expect(error.errorCode).toBe('INSUFFICIENT_FUNDS');
+        expect(error.details).toMatchObject({
+          userId: mockUserId,
+          currency: 'USD',
+          requestedAmount: 150,
+        });
+        expect(error.details.correlationId).toBeDefined();
+      }
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should throw InternalServerError on RPC failure', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: { message: 'Database connection failed' },
+      });
+
+      await expect(
+        balanceService.debitAvailable(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw InternalServerError when no data is returned', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: null,
+      });
+
+      await expect(
+        balanceService.debitAvailable(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+    });
+
+    it('should handle unexpected errors gracefully', async () => {
+      (mockSupabase.rpc as jest.Mock).mockRejectedValue(
+        new Error('Unexpected error')
+      );
+
+      await expect(
+        balanceService.debitAvailable(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle exact amount match (available === amount)', async () => {
+      const exactMatchBalance = {
+        ...mockBalanceData,
+        available: 0.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: exactMatchBalance,
+        error: null,
+      });
+
+      const result = await balanceService.debitAvailable(
+        mockUserId,
+        100.00, // Exact match
+        'USD',
+        mockRef
+      );
+
+      expect(result.available).toBe(0.00000000);
+    });
+
+    it('should handle small amounts correctly', async () => {
+      const smallAmountBalance = {
+        ...mockBalanceData,
+        available: 99.99999999,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: smallAmountBalance,
+        error: null,
+      });
+
+      const result = await balanceService.debitAvailable(
+        mockUserId,
+        0.00000001,
+        'USD',
+        mockRef
+      );
+
+      expect(result.available).toBe(99.99999999);
+    });
+
+    it('should handle empty description', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: mockBalanceData,
+        error: null,
+      });
+
+      await balanceService.debitAvailable(mockUserId, 10, 'USD', mockRef);
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+        'debit_available_balance',
+        expect.objectContaining({
+          p_description: '',
+        })
+      );
     });
   });
 });
