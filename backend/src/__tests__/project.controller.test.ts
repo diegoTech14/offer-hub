@@ -2,6 +2,33 @@ import request from 'supertest';
 import express, { Request, Response, NextFunction } from 'express';
 import { UpdateProjectResult } from '@/types/project.type';
 
+// Mock supabase before importing project.service
+jest.mock('@/lib/supabase/supabase', () => ({
+  supabase: {
+    from: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    single: jest.fn(),
+    insert: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+  },
+}));
+
+// Mock escrow service to avoid stellar-sdk dependency
+jest.mock('@/services/escrow.service', () => ({
+  escrowService: {
+    createEscrow: jest.fn(),
+  },
+}));
+
+// Mock user service
+jest.mock('@/services/user.service', () => ({
+  userService: {
+    getUserById: jest.fn(),
+  },
+}));
+
 // Mock auth middleware
 jest.mock('@/middlewares/auth.middleware', () => ({
   verifyToken: (_req: Request, _res: Response, next: NextFunction) => {
@@ -25,12 +52,14 @@ jest.mock('@/services/project.service', () => ({
 // Import AFTER mocks
 import projectRoutes from '@/routes/project.routes';
 import * as projectService from '@/services/project.service';
+import { errorHandlerMiddleware } from '@/middlewares/errorHandler.middleware';
 
 const mockedUpdateProject = projectService.updateProject as jest.MockedFunction<typeof projectService.updateProject>;
 
 const app = express();
 app.use(express.json());
 app.use('/api/projects', projectRoutes);
+app.use(errorHandlerMiddleware);
 
 describe('PATCH /api/projects/:id', () => {
   beforeEach(() => {

@@ -1,3 +1,30 @@
+// Mock supabase before importing project.service
+jest.mock('@/lib/supabase/supabase', () => ({
+  supabase: {
+    from: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    single: jest.fn(),
+    insert: jest.fn().mockReturnThis(),
+    update: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+  },
+}));
+
+// Mock escrow service to avoid stellar-sdk dependency
+jest.mock('@/services/escrow.service', () => ({
+  escrowService: {
+    createEscrow: jest.fn(),
+  },
+}));
+
+// Mock user service
+jest.mock('@/services/user.service', () => ({
+  userService: {
+    getUserById: jest.fn(),
+  },
+}));
+
 import { isValidStatusTransition } from '@/services/project.service';
 
 describe('Project Service - Status Transition Validation', () => {
