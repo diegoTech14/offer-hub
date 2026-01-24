@@ -6,7 +6,8 @@ import { supabase } from "../lib/supabase/supabase";
 import { 
   InternalServerError, 
   ValidationError, 
-  BadRequestError 
+  BadRequestError,
+  BusinessLogicError
 } from "../utils/AppError";
 import { validateUUID } from "../utils/validation";
 import { 
@@ -85,6 +86,108 @@ export class BalanceService {
 
     } catch (err: any) {
       if (err instanceof ValidationError || err instanceof BadRequestError || err instanceof InternalServerError) {
+        throw err;
+      }
+      throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
+    }
+  }
+
+  /**
+   * Transfers held funds from one user to another's available balance.
+   * Used when a contract is completed successfully.
+   * @param fromUserId - The user to transfer funds from (client)
+   * @param toUserId - The user to transfer funds to (freelancer)
+   * @param amount - Amount to transfer (must be positive)
+   * @param currency - Currency code (USD, XLM)
+   * @param reference - Reference to the contract
+   * @returns Object containing both updated balance objects
+   */
+  async settleBalance(
+    fromUserId: string,
+    toUserId: string,
+    amount: number,
+    currency: string,
+    reference: { id: string; type: 'contract' }
+  ): Promise<{ fromBalance: Balance; toBalance: Balance }> {
+    const correlationId = crypto.randomUUID();
+    
+    try {
+      logger.info(
+        `[BalanceService] Starting settleBalance ${correlationId} - From: ${fromUserId}, To: ${toUserId}, Amount: ${amount} ${currency}`
+      );
+
+      // 1. Validation
+      if (!validateUUID(fromUserId)) {
+        throw new BadRequestError("Invalid fromUser ID format");
+      }
+
+      if (!validateUUID(toUserId)) {
+        throw new BadRequestError("Invalid toUser ID format");
+      }
+
+      if (fromUserId === toUserId) {
+        throw new ValidationError("Cannot settle balance to the same user");
+      }
+
+      if (amount <= 0) {
+        throw new ValidationError("Amount must be positive");
+      }
+
+      if (!SUPPORTED_CURRENCIES.includes(currency as Currency)) {
+        throw new ValidationError(`Currency ${currency} is not supported. Supported currencies: ${SUPPORTED_CURRENCIES.join(', ')}`);
+      }
+
+      if (!reference.id || !reference.type) {
+        throw new ValidationError("Invalid reference data");
+      }
+
+      // 2. Atomic Transaction (via RPC)
+      // We rely on a database function to lock both rows, update balances, 
+      // AND insert the transaction logs in one go.
+      const { data, error } = await supabase.rpc('settle_balance', {
+        p_from_user_id: fromUserId,
+        p_to_user_id: toUserId,
+        p_amount: amount,
+        p_currency: currency,
+        p_ref_id: reference.id,
+        p_ref_type: reference.type,
+        p_description: `Settlement for contract ${reference.id}`
+      });
+
+      if (error) {
+        logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
+        
+        // Check if error is about insufficient funds
+        if (error.message && error.message.includes('Insufficient held balance')) {
+          throw new BusinessLogicError(
+            error.message,
+            'INSUFFICIENT_FUNDS'
+          );
+        }
+        
+        throw new InternalServerError(`Balance settlement failed: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new InternalServerError("Balance settlement failed: No data returned");
+      }
+
+      // 3. Parse and validate response structure
+      if (!data.fromBalance || !data.toBalance) {
+        throw new InternalServerError("Invalid response structure from settle_balance RPC");
+      }
+
+      logger.info(
+        `[BalanceService] Success ${correlationId} - From Balance Held: ${data.fromBalance.held}, To Balance Available: ${data.toBalance.available}`
+      );
+
+      return {
+        fromBalance: data.fromBalance as Balance,
+        toBalance: data.toBalance as Balance
+      };
+
+    } catch (err: any) {
+      if (err instanceof ValidationError || err instanceof BadRequestError || err instanceof InternalServerError || err instanceof BusinessLogicError) {
         throw err;
       }
       throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
