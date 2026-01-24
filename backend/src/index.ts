@@ -32,6 +32,7 @@ import escrowInitRoutes from "@/routes/escrow-init.routes";
 import escrowQueryRoutes from "@/routes/escrow-query.routes";
 import TaskRecordRouter from "@/routes/blockchain.routes";
 import projectRoutes from "@/routes/project.routes";
+import taskRoutes from "@/routes/task.routes";
 import profileRoutes from "@/routes/profile.routes";
 import walletRoutes from "@/routes/wallet.routes";
 import roleRoutes from "@/routes/role.routes";
@@ -102,6 +103,7 @@ app.use("/api/users", authenticateToken(), userRoutes);
 app.use("/api/v1/wallets", authenticateToken(), walletRoutes);
 app.use("/api/task", TaskRecordRouter);
 app.use("/api/projects", projectRoutes);
+app.use("/api/task-records", taskRoutes);
 app.use("/api/profile", authenticateToken(), profileRoutes);
 app.use("/api/profiles", profileRoutes);
 

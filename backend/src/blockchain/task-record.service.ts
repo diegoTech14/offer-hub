@@ -322,6 +322,24 @@ export class TaskRecordService {
   }
 
   /**
+   * Record a task outcome on the blockchain (wrapper method for service compatibility)
+   */
+  async recordTask(taskData: {
+    project_id: string;
+    freelancer_id: string;
+    client_id: string;
+    completed: boolean;
+    outcome_description: string;
+  }): Promise<RecordTaskResult> {
+    return this.recordTaskOutcome(
+      taskData.project_id,
+      taskData.freelancer_id,
+      taskData.client_id,
+      taskData.completed
+    );
+  }
+
+  /**
    * Get account from Stellar network
    */
   private async getAccount(publicKey: string): Promise<Account> {
