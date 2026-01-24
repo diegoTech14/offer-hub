@@ -43,10 +43,12 @@ next-env.d.ts
 # Claude
 .claude/
 
-#IDE/Editors 
+#IDE/Editors
 ./vscode
 ./idea
 settings.json
 
 # Freelance matching service dependencies
 /services/freelance-matching/node_modules/
+
+bun.lock

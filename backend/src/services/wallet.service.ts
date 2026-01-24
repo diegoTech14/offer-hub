@@ -1,13 +1,13 @@
-import { Keypair, StrKey } from '@stellar/stellar-sdk';
-import { supabase } from '@/lib/supabase/supabase';
-import { encrypt, decrypt } from '@/utils/crypto.utils';
+import { Keypair, StrKey, Horizon } from "@stellar/stellar-sdk";
+import { supabase } from "@/lib/supabase/supabase";
+import { encrypt, decrypt } from "@/utils/crypto.utils";
 import {
   Wallet,
   CreateWalletDTO,
   GenerateWalletResult,
-  WalletType
-} from '@/types/wallet.types';
-import { AppError } from '@/utils/AppError';
+  WalletType,
+} from "@/types/wallet.types";
+import { AppError } from "@/utils/AppError";
 
 /**
  * Wallet Service
@@ -18,10 +18,11 @@ import { AppError } from '@/utils/AppError';
  * Generate a new invisible wallet for a user
  * Creates a Stellar keypair, encrypts the private key, and stores it in the database
  * @param userId - The user ID to associate the wallet with
- * @param email - User's email (optional, not used for keypair generation)
  * @returns The created wallet with address
  */
-export async function generateInvisibleWallet(userId: string, email?: string): Promise<GenerateWalletResult> {
+export async function generateInvisibleWallet(
+  userId: string,
+): Promise<GenerateWalletResult> {
   try {
     // Generate a new Stellar keypair
     const keypair = Keypair.random();
@@ -33,20 +34,23 @@ export async function generateInvisibleWallet(userId: string, email?: string): P
 
     // Create wallet record in database
     const { data: wallet, error } = await supabase
-      .from('wallets')
+      .from("wallets")
       .insert([
         {
           user_id: userId,
           address: publicKey,
           encrypted_private_key: encryptedPrivateKey,
-          type: 'invisible' as WalletType,
+          type: "invisible" as WalletType,
         },
       ])
       .select()
       .single();
 
     if (error) {
-      throw new AppError(`Failed to create invisible wallet: ${error.message}`, 500);
+      throw new AppError(
+        `Failed to create invisible wallet: ${error.message}`,
+        500,
+      );
     }
 
     return {
@@ -57,8 +61,8 @@ export async function generateInvisibleWallet(userId: string, email?: string): P
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error generating regular wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error generating regular wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -69,42 +73,48 @@ export async function generateInvisibleWallet(userId: string, email?: string): P
  * @param address - The wallet address to link
  * @returns The created wallet record
  */
-export async function linkExternalWallet(userId: string, address: string): Promise<Wallet> {
+export async function linkExternalWallet(
+  userId: string,
+  address: string,
+): Promise<Wallet> {
   try {
     // Check if wallet already exists
     const { data: existingWallet } = await supabase
-      .from('wallets')
-      .select('*')
-      .eq('address', address)
+      .from("wallets")
+      .select("*")
+      .eq("address", address)
       .single();
 
     if (existingWallet) {
-      throw new AppError('This wallet is already linked to an account', 400);
+      throw new AppError("This wallet is already linked to an account", 400);
     }
 
     // Create external wallet record
     const { data: wallet, error } = await supabase
-      .from('wallets')
+      .from("wallets")
       .insert([
         {
           user_id: userId,
           address: address,
-          type: 'external' as WalletType,
+          type: "external" as WalletType,
         },
       ])
       .select()
       .single();
 
     if (error) {
-      throw new AppError(`Failed to link external wallet: ${error.message}`, 500);
+      throw new AppError(
+        `Failed to link external wallet: ${error.message}`,
+        500,
+      );
     }
 
     return wallet as Wallet;
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error linking external wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error linking external wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -120,42 +130,42 @@ export async function linkExternalWallet(userId: string, address: string): Promi
 export async function connectExternalWallet(
   userId: string,
   publicKey: string,
-  provider: string
+  provider: string,
 ): Promise<Wallet> {
   try {
     // Validate Stellar public key format
     if (!StrKey.isValidEd25519PublicKey(publicKey)) {
-      throw new AppError('Invalid Stellar public key format', 400);
+      throw new AppError("Invalid Stellar public key format", 400);
     }
 
     // Validate provider
-    const validProviders = ['freighter', 'albedo', 'rabet', 'xbull', 'other'];
+    const validProviders = ["freighter", "albedo", "rabet", "xbull", "other"];
     if (!validProviders.includes(provider)) {
       throw new AppError(
-        `Invalid provider. Must be one of: ${validProviders.join(', ')}`,
-        400
+        `Invalid provider. Must be one of: ${validProviders.join(", ")}`,
+        400,
       );
     }
 
     // Check if public key is already registered by ANY user
     const { data: existingWallet } = await supabase
-      .from('wallets')
-      .select('*')
-      .eq('address', publicKey)
+      .from("wallets")
+      .select("*")
+      .eq("address", publicKey)
       .single();
 
     if (existingWallet) {
-      throw new AppError('This wallet address is already registered', 409);
+      throw new AppError("This wallet address is already registered", 409);
     }
 
     // Create external wallet record
     const { data: wallet, error } = await supabase
-      .from('wallets')
+      .from("wallets")
       .insert([
         {
           user_id: userId,
           address: publicKey,
-          type: 'external' as WalletType,
+          type: "external" as WalletType,
           provider: provider,
           is_primary: false, // Default to false as per requirements
         },
@@ -164,19 +174,21 @@ export async function connectExternalWallet(
       .single();
 
     if (error) {
-      throw new AppError(`Failed to connect external wallet: ${error.message}`, 500);
+      throw new AppError(
+        `Failed to connect external wallet: ${error.message}`,
+        500,
+      );
     }
 
     return wallet as Wallet;
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error connecting external wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error connecting external wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
-
 
 /**
  * Get all wallets for a user
@@ -186,9 +198,9 @@ export async function connectExternalWallet(
 export async function getWalletsByUserId(userId: string): Promise<Wallet[]> {
   try {
     const { data: wallets, error } = await supabase
-      .from('wallets')
-      .select('*')
-      .eq('user_id', userId);
+      .from("wallets")
+      .select("*")
+      .eq("user_id", userId);
 
     if (error) {
       throw new AppError(`Failed to fetch wallets: ${error.message}`, 500);
@@ -198,8 +210,8 @@ export async function getWalletsByUserId(userId: string): Promise<Wallet[]> {
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error fetching wallets: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error fetching wallets: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -209,16 +221,18 @@ export async function getWalletsByUserId(userId: string): Promise<Wallet[]> {
  * @param address - The wallet address
  * @returns The wallet or null if not found
  */
-export async function getWalletByAddress(address: string): Promise<Wallet | null> {
+export async function getWalletByAddress(
+  address: string,
+): Promise<Wallet | null> {
   try {
     const { data: wallet, error } = await supabase
-      .from('wallets')
-      .select('*')
-      .eq('address', address)
+      .from("wallets")
+      .select("*")
+      .eq("address", address)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null; // Wallet not found
       }
       throw new AppError(`Failed to fetch wallet: ${error.message}`, 500);
@@ -228,8 +242,8 @@ export async function getWalletByAddress(address: string): Promise<Wallet | null
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error fetching wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error fetching wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -242,26 +256,29 @@ export async function getWalletByAddress(address: string): Promise<Wallet | null
 export async function getPrimaryWallet(userId: string): Promise<Wallet | null> {
   try {
     const { data: wallet, error } = await supabase
-      .from('wallets')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: true })
+      .from("wallets")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
       .limit(1)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null; // No wallet found
       }
-      throw new AppError(`Failed to fetch primary wallet: ${error.message}`, 500);
+      throw new AppError(
+        `Failed to fetch primary wallet: ${error.message}`,
+        500,
+      );
     }
 
     return wallet as Wallet;
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error fetching primary wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error fetching primary wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -273,20 +290,20 @@ export async function getPrimaryWallet(userId: string): Promise<Wallet | null> {
  * @returns The decrypted private key
  */
 export function decryptPrivateKey(wallet: Wallet): string {
-  if (wallet.type !== 'invisible') {
-    throw new AppError('Cannot decrypt private key of external wallet', 400);
+  if (wallet.type !== "invisible") {
+    throw new AppError("Cannot decrypt private key of external wallet", 400);
   }
 
   if (!wallet.encrypted_private_key) {
-    throw new AppError('Wallet does not have an encrypted private key', 400);
+    throw new AppError("Wallet does not have an encrypted private key", 400);
   }
 
   try {
     return decrypt(wallet.encrypted_private_key);
   } catch (error) {
     throw new AppError(
-      `Failed to decrypt private key: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Failed to decrypt private key: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -298,9 +315,9 @@ export function decryptPrivateKey(wallet: Wallet): string {
 export async function deleteWallet(walletId: string): Promise<void> {
   try {
     const { error } = await supabase
-      .from('wallets')
+      .from("wallets")
       .delete()
-      .eq('id', walletId);
+      .eq("id", walletId);
 
     if (error) {
       throw new AppError(`Failed to delete wallet: ${error.message}`, 500);
@@ -308,8 +325,8 @@ export async function deleteWallet(walletId: string): Promise<void> {
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error deleting wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error deleting wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -322,13 +339,13 @@ export async function deleteWallet(walletId: string): Promise<void> {
 export async function getWalletById(walletId: string): Promise<Wallet | null> {
   try {
     const { data: wallet, error } = await supabase
-      .from('wallets')
-      .select('*')
-      .eq('id', walletId)
+      .from("wallets")
+      .select("*")
+      .eq("id", walletId)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null; // Wallet not found
       }
       throw new AppError(`Failed to fetch wallet: ${error.message}`, 500);
@@ -338,8 +355,8 @@ export async function getWalletById(walletId: string): Promise<Wallet | null> {
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error fetching wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error fetching wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
     );
   }
 }
@@ -351,35 +368,51 @@ export async function getWalletById(walletId: string): Promise<Wallet | null> {
  * @param userId - The authenticated user's ID
  * @throws AppError with appropriate status codes for various error conditions
  */
-export async function disconnectWallet(walletId: string, userId: string): Promise<void> {
+export async function disconnectWallet(
+  walletId: string,
+  userId: string,
+): Promise<void> {
   try {
     // 1. Fetch the wallet
     const wallet = await getWalletById(walletId);
-    
+
     if (!wallet) {
-      throw new AppError('Wallet not found', 404, 'WALLET_NOT_FOUND');
+      throw new AppError("Wallet not found", 404, "WALLET_NOT_FOUND");
     }
 
     // 2. Verify ownership
     if (wallet.user_id !== userId) {
-      throw new AppError('You do not have permission to disconnect this wallet', 403, 'FORBIDDEN');
+      throw new AppError(
+        "You do not have permission to disconnect this wallet",
+        403,
+        "FORBIDDEN",
+      );
     }
 
     // 3. Validate wallet type (only external wallets can be disconnected)
-    if (wallet.type !== 'external') {
-      throw new AppError('Cannot disconnect system-generated invisible wallets', 400, 'INVALID_WALLET_TYPE');
+    if (wallet.type !== "external") {
+      throw new AppError(
+        "Cannot disconnect system-generated invisible wallets",
+        400,
+        "INVALID_WALLET_TYPE",
+      );
     }
 
     // 4. Get all user wallets to check if this is the only one
     const userWallets = await getWalletsByUserId(userId);
-    
+
     if (userWallets.length <= 1) {
-      throw new AppError('Cannot disconnect your only wallet. You must have at least one wallet.', 400, 'LAST_WALLET');
+      throw new AppError(
+        "Cannot disconnect your only wallet. You must have at least one wallet.",
+        400,
+        "LAST_WALLET",
+      );
     }
 
     // 5. Check if this is the primary wallet (earliest created)
     const sortedWallets = [...userWallets].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
     );
     const isPrimary = sortedWallets[0].id === walletId;
 
@@ -388,12 +421,104 @@ export async function disconnectWallet(walletId: string, userId: string): Promis
 
     // Note: If the deleted wallet was primary, the next oldest wallet automatically becomes primary
     // since primary is determined by created_at ordering in getPrimaryWallet
-    
   } catch (error) {
     if (error instanceof AppError) throw error;
     throw new AppError(
-      `Error disconnecting wallet: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      500
+      `Error disconnecting wallet: ${error instanceof Error ? error.message : "Unknown error"}`,
+      500,
+    );
+  }
+}
+
+// Internal memory cache for wallet balances
+// Key: `wallet_balance:${walletId}`
+// Value: { data: any, expiresAt: number }
+const balanceCache = new Map<string, { data: any; expiresAt: number }>();
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds
+
+/**
+ * Get real-time Stellar balance for a specific wallet
+ * Uses Horizon API and implements 30s caching
+ * @param walletId - The UUID of the wallet
+ * @param userId - The UUID of the authenticated user
+ * @returns Object containing public key, balances, and timestamp
+ */
+export async function getStellarBalance(
+  walletId: string,
+  userId: string,
+): Promise<any> {
+  const cacheKey = `wallet_balance:${walletId}`;
+  const now = Date.now();
+
+  // 1. Check Cache
+  const cached = balanceCache.get(cacheKey);
+  if (cached && cached.expiresAt > now) {
+    return cached.data;
+  }
+
+  try {
+    // 2. Fetch Wallet & Verify Ownership
+    const wallet = await getWalletById(walletId);
+
+    if (!wallet) {
+      throw new AppError("Wallet not found", 404, "WALLET_NOT_FOUND");
+    }
+
+    if (wallet.user_id !== userId) {
+      throw new AppError("Access denied", 403, "FORBIDDEN");
+    }
+
+    // 3. Query Horizon API
+    // Defaults to public Horizon instance
+    const server = new Horizon.Server("https://horizon.stellar.org");
+    let account: Horizon.AccountResponse;
+
+    try {
+      account = await server.loadAccount(wallet.address);
+    } catch (err: any) {
+      if (err.response && err.response.status === 404) {
+        throw new AppError(
+          "Account not found on Stellar network",
+          404,
+          "STELLAR_ACCOUNT_NOT_FOUND",
+        );
+      }
+      if (err.response && err.response.status === 429) {
+        throw new AppError(
+          "Rate limit exceeded from Stellar Horizon",
+          429,
+          "RATE_LIMIT_EXCEEDED",
+        );
+      }
+      throw err;
+    }
+
+    // 4. Format Response
+    const responseData = {
+      wallet_id: wallet.id,
+      public_key: wallet.address,
+      balances: account.balances.map((b: any) => ({
+        asset_type: b.asset_type,
+        asset_code: b.asset_code || "XLM",
+        asset_issuer: b.asset_issuer,
+        balance: b.balance,
+      })),
+      last_updated: new Date().toISOString(),
+    };
+
+    // 5. Update Cache
+    balanceCache.set(cacheKey, {
+      data: responseData,
+      expiresAt: now + CACHE_TTL_MS,
+    });
+
+    return responseData;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    // Handle generic errors (network timeout etc)
+    throw new AppError(
+      `Error fetching Stellar balance: ${error instanceof Error ? error.message : "Unknown error"}`,
+      503,
     );
   }
 }

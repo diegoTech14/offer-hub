@@ -4,7 +4,10 @@
  */
 
 import { Router } from "express";
-import { connectExternalWalletHandler, disconnectWallet } from "@/controllers/wallet.controller";
+import {
+  connectExternalWalletHandler,
+  disconnectWallet,
+} from "@/controllers/wallet.controller";
 import { verifyToken } from "@/middlewares/auth.middleware";
 
 const router = Router();
@@ -31,5 +34,16 @@ router.post("/external", verifyToken, connectExternalWalletHandler);
  * - Returns 400 if trying to delete invisible wallet or last wallet
  */
 router.delete("/:id", disconnectWallet);
+
+/**
+ * GET /api/v1/wallets/:id/balance
+ * Get real-time balance for a specific wallet
+ * - Requires valid JWT authentication
+ * - Returns 200 with balance data
+ * - Returns 404 if wallet or account not found
+ * - Returns 403 if wallet belongs to another user
+ */
+import { getWalletBalanceHandler } from "@/controllers/wallet.controller";
+router.get("/:id/balance", verifyToken, getWalletBalanceHandler);
 
 export default router;
