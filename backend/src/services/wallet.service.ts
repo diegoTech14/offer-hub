@@ -450,9 +450,25 @@ export async function getStellarBalance(
   const cacheKey = `wallet_balance:${walletId}`;
   const now = Date.now();
 
-  // 1. Check Cache
+  // 1. Check Cache (but still validate ownership)
   const cached = balanceCache.get(cacheKey);
   if (cached && cached.expiresAt > now) {
+    // Fetch wallet to confirm it still exists and is owned by this user
+    const wallet = await getWalletById(walletId);
+
+    if (!wallet) {
+      // Wallet was deleted; invalidate cache and report not found
+      balanceCache.delete(cacheKey);
+      throw new AppError("Wallet not found", 404, "WALLET_NOT_FOUND");
+    }
+
+    if (wallet.user_id !== userId) {
+      // Ownership changed; invalidate cache and deny access
+      balanceCache.delete(cacheKey);
+      throw new AppError("Access denied", 403, "FORBIDDEN");
+    }
+
+    // Wallet exists and is still owned by this user; return cached balance
     return cached.data;
   }
 
