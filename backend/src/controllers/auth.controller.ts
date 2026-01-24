@@ -5,12 +5,20 @@
 
 import { NextFunction, Request, Response } from "express";
 import * as authService from "@/services/auth.service";
-import { DeviceInfo, EmailLoginDTO, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO, ForgotPasswordDTO, ResetPasswordDTO } from "@/types/auth.types";
+import {
+  DeviceInfo,
+  EmailLoginDTO,
+  RegisterDTO,
+  RegisterWithEmailDTO,
+  RegisterWithWalletDTO,
+  ForgotPasswordDTO,
+  ResetPasswordDTO,
+} from "@/types/auth.types";
 
 export async function getNonce(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const { wallet_address } = req.body;
@@ -26,7 +34,6 @@ export async function getNonce(
     next(err);
   }
 }
-
 
 /**
  * Register a new user with email and password
@@ -66,7 +73,7 @@ export async function getNonce(
 export async function register(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const data = req.body as RegisterDTO;
@@ -81,7 +88,7 @@ export async function register(
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -97,7 +104,7 @@ export async function register(
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -112,18 +119,21 @@ export async function register(
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     // Get device info for audit logging
     const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
-      os: getOSFromUserAgent(req.get('User-Agent') || ''),
-      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
-      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
-      user_agent: req.get('User-Agent') || 'unknown',
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
     };
 
     const result = await authService.register(data, deviceInfo);
@@ -134,7 +144,7 @@ export async function register(
       data: result,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -163,7 +173,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -179,7 +189,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -194,21 +204,27 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     // Get device info for audit logging
     const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
-      os: getOSFromUserAgent(req.get('User-Agent') || ''),
-      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
-      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
-      user_agent: req.get('User-Agent') || 'unknown',
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
     };
 
-    const result = await authService.loginWithEmail({ email, password }, deviceInfo);
+    const result = await authService.loginWithEmail(
+      { email, password },
+      deviceInfo,
+    );
 
     // Set user ID in request for logging purposes after successful login
     (req as any).user = { id: result.user.id };
@@ -219,7 +235,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       data: result,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -231,9 +247,25 @@ export async function login(req: Request, res: Response, next: NextFunction) {
  * Authenticate user login with Wallet
  * @route POST /api/auth/login/wallet
  */
-export async function loginWithWallet(req: Request, res: Response, next: NextFunction) {
+export async function loginWithWallet(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
-    const { user, tokens } = await authService.login(req.body);
+    // Get device info for audit logging and session tracking
+    const deviceInfo: DeviceInfo = {
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
+    };
+
+    const { user, tokens } = await authService.login(req.body, deviceInfo);
     res.status(200).json({
       status: "success",
       user,
@@ -262,13 +294,13 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     const { accessToken, refreshToken } = await authService.refreshSession(
-      req.refreshTokenRecord
+      req.refreshTokenRecord,
     );
 
     res.status(200).json({
@@ -282,7 +314,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       },
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -320,7 +352,7 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -332,7 +364,7 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
       message,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -345,7 +377,11 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
  * Automatically generates an invisible wallet
  * @route POST /api/auth/register-with-email
  */
-export async function registerWithEmail(req: Request, res: Response, next: NextFunction) {
+export async function registerWithEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const data = req.body as RegisterWithEmailDTO;
 
@@ -359,7 +395,7 @@ export async function registerWithEmail(req: Request, res: Response, next: NextF
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -375,7 +411,7 @@ export async function registerWithEmail(req: Request, res: Response, next: NextF
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -390,18 +426,21 @@ export async function registerWithEmail(req: Request, res: Response, next: NextF
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     // Get device info for audit logging
     const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
-      os: getOSFromUserAgent(req.get('User-Agent') || ''),
-      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
-      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
-      user_agent: req.get('User-Agent') || 'unknown',
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
     };
 
     const result = await authService.registerWithEmail(data, deviceInfo);
@@ -412,7 +451,7 @@ export async function registerWithEmail(req: Request, res: Response, next: NextF
       data: result,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -425,21 +464,32 @@ export async function registerWithEmail(req: Request, res: Response, next: NextF
  * Links external wallet and creates account
  * @route POST /api/auth/register-with-wallet
  */
-export async function registerWithWallet(req: Request, res: Response, next: NextFunction) {
+export async function registerWithWallet(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const data = req.body as RegisterWithWalletDTO;
 
     // Basic input validation
-    if (!data.wallet_address || !data.signature || !data.email || !data.password || !data.username) {
+    if (
+      !data.wallet_address ||
+      !data.signature ||
+      !data.email ||
+      !data.password ||
+      !data.username
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Wallet address, signature, email, password, and username are required",
+        message:
+          "Wallet address, signature, email, password, and username are required",
         error: {
           code: "MISSING_FIELDS",
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -455,7 +505,7 @@ export async function registerWithWallet(req: Request, res: Response, next: Next
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -470,18 +520,21 @@ export async function registerWithWallet(req: Request, res: Response, next: Next
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     // Get device info for audit logging
     const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
-      os: getOSFromUserAgent(req.get('User-Agent') || ''),
-      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
-      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
-      user_agent: req.get('User-Agent') || 'unknown',
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
     };
 
     const result = await authService.registerWithWallet(data, deviceInfo);
@@ -492,7 +545,7 @@ export async function registerWithWallet(req: Request, res: Response, next: Next
       data: result,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -500,7 +553,11 @@ export async function registerWithWallet(req: Request, res: Response, next: Next
   }
 }
 
-export async function loginWithEmail(req: Request, res: Response, next: NextFunction) {
+export async function loginWithEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { email, password } = req.body as EmailLoginDTO;
 
@@ -514,7 +571,7 @@ export async function loginWithEmail(req: Request, res: Response, next: NextFunc
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -530,7 +587,7 @@ export async function loginWithEmail(req: Request, res: Response, next: NextFunc
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -545,21 +602,27 @@ export async function loginWithEmail(req: Request, res: Response, next: NextFunc
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     // Get device info for audit logging
     const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
-      os: getOSFromUserAgent(req.get('User-Agent') || ''),
-      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
-      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
-      user_agent: req.get('User-Agent') || 'unknown',
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
     };
 
-    const result = await authService.loginWithEmail({ email, password }, deviceInfo);
+    const result = await authService.loginWithEmail(
+      { email, password },
+      deviceInfo,
+    );
 
     // Set user ID in request for logging purposes after successful login
     (req as any).user = { id: result.user.id };
@@ -570,7 +633,7 @@ export async function loginWithEmail(req: Request, res: Response, next: NextFunc
       data: result,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -582,10 +645,18 @@ export async function loginWithEmail(req: Request, res: Response, next: NextFunc
  * Get user sessions
  * GET /api/auth/sessions
  */
-export async function getSessions(req: Request, res: Response, next: NextFunction) {
+export async function getSessions(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const userId = req.user.id;
-    const result = await authService.getUserSessions(userId);
+    const ip = req.ip || req.connection.remoteAddress || "unknown";
+    const userAgent = req.get("User-Agent") || "unknown";
+
+    // Pass current IP and UA to identify current session
+    const result = await authService.getUserSessions(userId, ip, userAgent);
 
     res.status(200).json({
       success: true,
@@ -603,10 +674,16 @@ export async function getSessions(req: Request, res: Response, next: NextFunctio
  * Deactivate a user session
  * DELETE /api/auth/sessions/:sessionId
  */
-export async function deactivateSession(req: Request, res: Response, next: NextFunction) {
+export async function deactivateSession(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const userId = req.user.id;
-    const sessionId = Array.isArray(req.params.sessionId) ? req.params.sessionId[0] : req.params.sessionId;
+    const sessionId = Array.isArray(req.params.sessionId)
+      ? req.params.sessionId[0]
+      : req.params.sessionId;
 
     await authService.deactivateSession(userId, sessionId);
 
@@ -630,12 +707,16 @@ export async function deactivateSession(req: Request, res: Response, next: NextF
 function getDeviceType(userAgent: string): string {
   const ua = userAgent.toLowerCase();
 
-  if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
-    return 'mobile';
-  } else if (ua.includes('tablet') || ua.includes('ipad')) {
-    return 'tablet';
+  if (
+    ua.includes("mobile") ||
+    ua.includes("android") ||
+    ua.includes("iphone")
+  ) {
+    return "mobile";
+  } else if (ua.includes("tablet") || ua.includes("ipad")) {
+    return "tablet";
   } else {
-    return 'desktop';
+    return "desktop";
   }
 }
 
@@ -647,13 +728,13 @@ function getDeviceType(userAgent: string): string {
 function getOSFromUserAgent(userAgent: string): string {
   const ua = userAgent.toLowerCase();
 
-  if (ua.includes('windows')) return 'Windows';
-  if (ua.includes('macintosh') || ua.includes('mac os x')) return 'macOS';
-  if (ua.includes('linux')) return 'Linux';
-  if (ua.includes('android')) return 'Android';
-  if (ua.includes('iphone') || ua.includes('ipad')) return 'iOS';
+  if (ua.includes("windows")) return "Windows";
+  if (ua.includes("macintosh") || ua.includes("mac os x")) return "macOS";
+  if (ua.includes("linux")) return "Linux";
+  if (ua.includes("android")) return "Android";
+  if (ua.includes("iphone") || ua.includes("ipad")) return "iOS";
 
-  return 'Unknown';
+  return "Unknown";
 }
 
 /**
@@ -664,13 +745,13 @@ function getOSFromUserAgent(userAgent: string): string {
 function getBrowserFromUserAgent(userAgent: string): string {
   const ua = userAgent.toLowerCase();
 
-  if (ua.includes('chrome') && !ua.includes('edg')) return 'Chrome';
-  if (ua.includes('firefox')) return 'Firefox';
-  if (ua.includes('safari') && !ua.includes('chrome')) return 'Safari';
-  if (ua.includes('edg')) return 'Edge';
-  if (ua.includes('opera')) return 'Opera';
+  if (ua.includes("chrome") && !ua.includes("edg")) return "Chrome";
+  if (ua.includes("firefox")) return "Firefox";
+  if (ua.includes("safari") && !ua.includes("chrome")) return "Safari";
+  if (ua.includes("edg")) return "Edge";
+  if (ua.includes("opera")) return "Opera";
 
-  return 'Unknown';
+  return "Unknown";
 }
 
 /**
@@ -681,7 +762,11 @@ function getBrowserFromUserAgent(userAgent: string): string {
  * @param res - Express response object
  * @param next - Express next function
  */
-export async function forgotPassword(req: Request, res: Response, next: NextFunction) {
+export async function forgotPassword(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { email } = req.body as ForgotPasswordDTO;
 
@@ -695,7 +780,7 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -711,18 +796,21 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     // Get device info for audit logging
     const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
-      os: getOSFromUserAgent(req.get('User-Agent') || ''),
-      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
-      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
-      user_agent: req.get('User-Agent') || 'unknown',
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
     };
 
     const result = await authService.forgotPassword(email, deviceInfo);
@@ -732,7 +820,7 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
       message: result.message,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {
@@ -748,7 +836,11 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
  * @param res - Express response object
  * @param next - Express next function
  */
-export async function resetPassword(req: Request, res: Response, next: NextFunction) {
+export async function resetPassword(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     const { token, password } = req.body as ResetPasswordDTO;
 
@@ -762,7 +854,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
@@ -777,18 +869,21 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: req.headers['x-request-id'] as string || 'unknown',
+          requestId: (req.headers["x-request-id"] as string) || "unknown",
         },
       });
     }
 
     // Get device info for audit logging
     const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get('User-Agent') || '') as 'desktop' | 'mobile' | 'tablet',
-      os: getOSFromUserAgent(req.get('User-Agent') || ''),
-      browser: getBrowserFromUserAgent(req.get('User-Agent') || ''),
-      ip_address: req.ip || req.connection.remoteAddress || 'unknown',
-      user_agent: req.get('User-Agent') || 'unknown',
+      type: getDeviceType(req.get("User-Agent") || "") as
+        | "desktop"
+        | "mobile"
+        | "tablet",
+      os: getOSFromUserAgent(req.get("User-Agent") || ""),
+      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
+      ip_address: req.ip || req.connection.remoteAddress || "unknown",
+      user_agent: req.get("User-Agent") || "unknown",
     };
 
     const result = await authService.resetPassword(token, password, deviceInfo);
@@ -798,7 +893,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
       message: result.message,
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: req.headers['x-request-id'] as string || 'unknown',
+        requestId: (req.headers["x-request-id"] as string) || "unknown",
       },
     });
   } catch (err) {

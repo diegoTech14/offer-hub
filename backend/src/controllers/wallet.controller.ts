@@ -8,7 +8,6 @@ import { AuthenticatedRequest } from "@/types/auth.types";
 import {
   connectExternalWallet,
   disconnectWallet as disconnectWalletService,
-  getStellarBalance,
 } from "@/services/wallet.service";
 import {
   AppError,
@@ -137,12 +136,12 @@ export async function disconnectWallet(
     }
 
     // Validate UUID format
-    if (typeof id !== "string" || !isValidUUID(id)) {
+    if (!id || !isValidUUID(id as string)) {
       throw new AppError("Invalid wallet ID format", 400, "INVALID_UUID");
     }
 
     // Call service to disconnect wallet
-    await disconnectWalletService(id, userId);
+    await disconnectWalletService(id as string, userId);
 
     return res
       .status(200)
@@ -153,43 +152,3 @@ export async function disconnectWallet(
     next(error);
   }
 }
-
-/**
- * Get real-time balance for a specific wallet
- * @route GET /api/v1/wallets/:id/balance
- */
-export const getWalletBalanceHandler = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      throw new AppError("User not authenticated", 401);
-    }
-
-    if (typeof id !== "string") {
-      throw new ValidationError("Invalid wallet ID");
-    }
-
-    if (!isValidUUID(id)) {
-      throw new ValidationError("Invalid wallet ID format");
-    }
-
-    const balanceData = await getStellarBalance(id, userId);
-
-    res
-      .status(200)
-      .json(
-        buildSuccessResponse(
-          balanceData,
-          "Wallet balance retrieved successfully",
-        ),
-      );
-  } catch (error) {
-    next(error);
-  }
-};
