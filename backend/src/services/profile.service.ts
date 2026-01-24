@@ -5,9 +5,77 @@
 
 import { supabase } from "@/lib/supabase/supabase";
 import { AppError, NotFoundError, InternalServerError, BadRequestError } from "@/utils/AppError";
-import { UpdateProfileDTO, Profile, ProfileConstraints } from "@/types/profile.types";
+import { CreateProfileDTO, UpdateProfileDTO, Profile, ProfileConstraints } from "@/types/profile.types";
 
 class ProfileService {
+  /**
+   * Create a new profile for the authenticated user
+   *
+   * @returns The created Profile object or null if creation failed
+   */
+  async createProfile(data: CreateProfileDTO): Promise<Profile | void> {
+    // Check if user already exists
+    const { data: existingProfile, error } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", data.userId)
+      .single();
+
+    if (existingProfile) {
+      throw new AppError("Your profile has already been created", 409);
+    }
+
+    if (error && error.code !== "PGRST116") {
+      throw new AppError(
+        "Failed to check existing profile: " + error.message,
+        500,
+      );
+    }
+
+    // Insert new profile
+    const { data: profileData, error: insertError } = await supabase
+      .from("profiles")
+      .insert([
+        {
+          user_id: data.userId,
+          display_name: data.displayName,
+          bio: data.bio,
+          website: data.website,
+          skills: data.skills,
+          date_of_birth: data.dateOfBirth,
+          location: data.location,
+        },
+      ])
+      .select()
+      .single();
+
+    if (insertError) {
+      throw new AppError(
+        "Failed to create profile: " + insertError.message,
+        500,
+      );
+    }
+
+    if (!profileData) {
+      return;
+    }
+
+    // Map database columns (snake_case) to Profile interface (camelCase)
+    return {
+      id: profileData.id,
+      userId: profileData.user_id,
+      displayName: profileData.display_name,
+      bio: profileData.bio,
+      avatarUrl: profileData.avatar_url,
+      dateOfBirth: profileData.date_of_birth ? new Date(profileData.date_of_birth) : null,
+      location: profileData.location,
+      skills: profileData.skills || [],
+      website: profileData.website,
+      createdAt: new Date(profileData.created_at),
+      updatedAt: new Date(profileData.updated_at),
+    };
+  }
+
   /**
    * Get profile by user ID
    * @param userId - The user ID to fetch profile for

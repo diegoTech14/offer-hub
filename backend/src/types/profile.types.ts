@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Profile type definitions
+ * @author Offer Hub Team
+ */
 
 /**
  * Full Profile Entity
@@ -136,4 +140,10 @@ export function isUpdateProfileDTO(obj: any): obj is UpdateProfileDTO {
       obj.website === null ||
       typeof obj.website === "string")
   );
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
 }
