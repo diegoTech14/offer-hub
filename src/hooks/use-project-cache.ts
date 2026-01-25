@@ -1,17 +1,17 @@
 // Intelligent Caching System for Project Data
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  Project, 
-  ProjectFilters, 
-  ProjectCacheConfig, 
+import {
+  Project,
+  ProjectFilters,
+  ProjectCacheConfig,
   ProjectCacheEntry,
   ProjectSearchParams,
   PaginationInfo
 } from '@/types/project.types';
-import { 
-  ProjectCacheManager, 
-  getProjectCacheManager, 
-  createCacheKey, 
+import {
+  ProjectCacheManager,
+  getProjectCacheManager,
+  createCacheKey,
   invalidateProjectCache,
   getCacheStats
 } from '@/utils/project-cache-manager';
@@ -33,7 +33,7 @@ export interface UseProjectCacheReturn {
   has: (key: string) => boolean;
   delete: (key: string) => boolean;
   clear: () => void;
-  
+
   // Project-specific operations
   getProject: (id: string) => Project | null;
   setProject: (project: Project, ttl?: number) => void;
@@ -41,13 +41,13 @@ export interface UseProjectCacheReturn {
   setProjectsList: (projects: Project[], filters?: ProjectFilters, ttl?: number) => void;
   getSearchResults: (query: string, filters?: ProjectFilters) => Project[] | null;
   setSearchResults: (results: Project[], query: string, filters?: ProjectFilters, ttl?: number) => void;
-  
+
   // Cache management
   invalidateProject: (id: string) => void;
   invalidateByPattern: (pattern: string) => void;
   refreshProject: (id: string) => Promise<Project | null>;
   refreshProjectsList: (filters?: ProjectFilters) => Promise<Project[] | null>;
-  
+
   // Cache statistics
   getStats: () => {
     size: number;
@@ -56,22 +56,22 @@ export interface UseProjectCacheReturn {
     oldestEntry: Date | null;
     newestEntry: Date | null;
   };
-  
+
   // Cache state
   isConnected: boolean;
   lastSync: Date | null;
   pendingUpdates: string[];
-  
+
   // Utility
   generateKey: (operation: string, params?: any) => string;
   subscribe: (key: string, callback: (data: any) => void) => () => void;
 }
 
 export function useProjectCache(options: UseProjectCacheOptions = {}): UseProjectCacheReturn {
-  const [isConnected, setIsConnected] = useState(navigator.onLine);
+  const [isConnected, setIsConnected] = useState(typeof window !== 'undefined' ? navigator.onLine : true);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [pendingUpdates, setPendingUpdates] = useState<string[]>([]);
-  
+
   const cacheManagerRef = useRef<ProjectCacheManager | null>(null);
   const cleanupTimerRef = useRef<NodeJS.Timeout | null>(null);
   const subscribersRef = useRef<Map<string, Set<(data: any) => void>>>(new Map());
@@ -114,7 +114,7 @@ export function useProjectCache(options: UseProjectCacheOptions = {}): UseProjec
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      
+
       if (cleanupTimerRef.current) {
         clearInterval(cleanupTimerRef.current);
       }
@@ -132,7 +132,7 @@ export function useProjectCache(options: UseProjectCacheOptions = {}): UseProjec
         const batch = pendingUpdates.slice(i, i + batchSize);
         await Promise.all(batch.map(key => refreshCacheEntry(key)));
       }
-      
+
       setPendingUpdates([]);
       setLastSync(new Date());
     } catch (error) {
@@ -271,7 +271,7 @@ export function useProjectCache(options: UseProjectCacheOptions = {}): UseProjec
       oldestEntry: null,
       newestEntry: null
     };
-    
+
     return cacheManagerRef.current.getStats();
   }, []);
 
@@ -282,7 +282,7 @@ export function useProjectCache(options: UseProjectCacheOptions = {}): UseProjec
   }, []);
 
   const subscribe = useCallback((key: string, callback: (data: any) => void): (() => void) => {
-    if (!cacheManagerRef.current) return () => {};
+    if (!cacheManagerRef.current) return () => { };
 
     // Store subscriber reference
     if (!subscribersRef.current.has(key)) {
@@ -313,7 +313,7 @@ export function useProjectCache(options: UseProjectCacheOptions = {}): UseProjec
     has,
     delete: deleteKey,
     clear,
-    
+
     // Project-specific operations
     getProject,
     setProject,
@@ -321,21 +321,21 @@ export function useProjectCache(options: UseProjectCacheOptions = {}): UseProjec
     setProjectsList,
     getSearchResults,
     setSearchResults,
-    
+
     // Cache management
     invalidateProject,
     invalidateByPattern,
     refreshProject,
     refreshProjectsList,
-    
+
     // Cache statistics
     getStats,
-    
+
     // Cache state
     isConnected,
     lastSync,
     pendingUpdates,
-    
+
     // Utility
     generateKey,
     subscribe
@@ -369,7 +369,7 @@ export function useProjectCacheStats() {
 
 export function useProjectCacheConnection() {
   const { isConnected, lastSync, pendingUpdates } = useProjectCache();
-  
+
   return {
     isConnected,
     lastSync,
