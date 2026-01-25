@@ -7,7 +7,7 @@ import { CheckCircle2 } from "lucide-react";
 
 export default function CompletedProjectsList() {
   const { stats, loading } = useDashboardStats();
-  
+
   // Filter completed projects
   const completedProjects = stats.projects.filter((p) => p.status === "completed");
 
@@ -28,7 +28,7 @@ export default function CompletedProjectsList() {
             No Completed Projects
           </h3>
           <p className="text-gray-600 text-center">
-            You haven't completed any projects yet.
+            You haven&apos;t completed any projects yet.
           </p>
         </CardContent>
       </Card>
