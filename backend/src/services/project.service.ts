@@ -11,38 +11,15 @@ import { escrowService } from "./escrow.service";
 
 // CreateProjectDTO type definition
 type CreateProjectDTO = Omit<Project, 'id' | 'created_at' | 'updated_at' | 'published_at' | 'archived_at' | 'deleted_at' | 'version' | 'skills'>;
-export const createProject = async (data: any) => {
-  // Map camelCase to snake_case for DB
-  const dbData = {
-    client_id: data.clientId || data.client_id,
-    title: data.title,
-    description: data.description,
-    category: data.category,
-    budget_amount: data.budgetAmount || data.budget || 0,
-    currency: data.currency || 'XLM',
-    status: data.status || 'open',
-    deadline: data.deadline,
-    on_chain_tx_hash: data.onChainTxHash || data.on_chain_tx_hash
-  };
-
+export const createProject = async (data: CreateProjectDTO) => {
   const { data: project, error } = await supabase
     .from('projects')
-    .insert([dbData])
+    .insert([data])
     .select()
     .single();
 
   if (error) throw new InternalServerError(error.message);
-  return mapRow(project);
-};
-
-const mapRow = (row: any) => {
-  if (!row) return null;
-  return {
-    ...row,
-    client_id: row.client_id,
-    budget: row.budget_amount,
-    onChainTxHash: row.on_chain_tx_hash
-  };
+  return project;
 };
 
 export const getAllProjects = async (filters: any) => {
@@ -50,13 +27,13 @@ export const getAllProjects = async (filters: any) => {
 
   if (filters.category) query = query.eq('category', filters.category);
   if (filters.status) query = query.eq('status', filters.status);
-  if (filters.budget_min) query = query.gte('budget_amount', filters.budget_min);
-  if (filters.budget_max) query = query.lte('budget_amount', filters.budget_max);
+  if (filters.budget_min) query = query.gte('budget', filters.budget_min);
+  if (filters.budget_max) query = query.lte('budget', filters.budget_max);
 
   const { data, error } = await query;
 
   if (error) throw new InternalServerError(error.message);
-  return (data || []).map(mapRow);
+  return data;
 };
 
 export const getProjectById = async (id: string) => {
@@ -67,10 +44,10 @@ export const getProjectById = async (id: string) => {
     .single();
 
   if (error) throw new InternalServerError(error.message);
-  return mapRow({
+  return {
     ...project,
     client_name: project.users?.name || null,
-  });
+  };
 };
 
 export const updateProject = async (
@@ -340,7 +317,7 @@ export const assignFreelancer = async (
     // If escrow creation fails, do NOT update project (maintain atomicity)
     // Log error for debugging
     console.error('Escrow creation failed:', error);
-
+    
     // Check if it's an AppError to get the status code
     if (error instanceof InternalServerError) {
       return {

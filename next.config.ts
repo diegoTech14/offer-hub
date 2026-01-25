@@ -19,6 +19,11 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['sharp'],
   },
+  turbopack: {
+    resolveAlias: process.env.NODE_ENV === 'production' ? {
+      '@/__mocks__': false,
+    } : undefined,
+  },
   async rewrites() {
     return [
       {

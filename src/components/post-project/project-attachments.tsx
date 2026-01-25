@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -116,8 +118,9 @@ export default function ProjectAttachments({ projectData, updateProjectData }: P
           </CardHeader>
           <CardContent className="space-y-6">
             <div
-              className={`border-2 border-dashed rounded-lg p-8 text-center ${isDragging ? "border-[#15949C] bg-[#DEEFE7]/20 dark:bg-gray-700/20" : "border-gray-200 dark:border-gray-600"
-                }`}
+              className={`border-2 border-dashed rounded-lg p-8 text-center ${
+                isDragging ? "border-[#15949C] bg-[#DEEFE7]/20 dark:bg-gray-700/20" : "border-gray-200 dark:border-gray-600"
+              }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}

@@ -1,8 +1,8 @@
 // Comprehensive Project Validation Logic
-import {
-  CreateProjectDTO,
-  UpdateProjectDTO,
-  ProjectValidationResult,
+import { 
+  CreateProjectDTO, 
+  UpdateProjectDTO, 
+  ProjectValidationResult, 
   ProjectValidationError,
   ProjectStatus,
   ProjectDraft
@@ -37,7 +37,7 @@ export class ProjectValidator {
       skipFields: [],
       ...config
     };
-
+    
     this.customRules = new Map();
     this.setupCustomRules();
   }
@@ -54,16 +54,16 @@ export class ProjectValidator {
 
     // Validate required fields
     this.validateRequiredFields(project, errors);
-
+    
     // Validate field formats
     this.validateFieldFormats(project, errors, warnings);
-
+    
     // Validate business rules
     this.validateBusinessRules(project, errors, warnings);
-
+    
     // Validate custom rules
     this.validateCustomRules(project, errors, warnings);
-
+    
     // Validate dependencies
     this.validateDependencies(project, errors, warnings);
 
@@ -102,7 +102,7 @@ export class ProjectValidator {
 
   validateField(field: string, value: any, project: any): ProjectValidationError[] {
     const errors: ProjectValidationError[] = [];
-
+    
     // Skip if field is in skip list
     if (this.config.skipFields.includes(field)) {
       return errors;
@@ -151,6 +151,7 @@ export class ProjectValidator {
   // Required field validation
   private validateRequiredFields(project: any, errors: ProjectValidationError[]): void {
     const requiredFields = [
+      'client_id',
       'title',
       'description',
       'category',
@@ -343,10 +344,10 @@ export class ProjectValidator {
         code: 'REQUIRED_TITLE',
         value: title
       });
-    } else if (title.length < 5) {
+    } else if (title.length < 10) {
       errors.push({
         field: 'title',
-        message: 'Project title should be at least 5 characters long',
+        message: 'Project title should be at least 10 characters long',
         code: 'TITLE_TOO_SHORT',
         value: title
       });
@@ -382,10 +383,10 @@ export class ProjectValidator {
         code: 'REQUIRED_DESCRIPTION',
         value: description
       });
-    } else if (description.length < 20) {
+    } else if (description.length < 50) {
       errors.push({
         field: 'description',
-        message: 'Project description should be at least 20 characters long',
+        message: 'Project description should be at least 50 characters long',
         code: 'DESCRIPTION_TOO_SHORT',
         value: description
       });
@@ -482,8 +483,14 @@ export class ProjectValidator {
       return errors;
     }
 
-    // Skills are optional - no minimum requirement
-    if (skills.length > 20) {
+    if (skills.length === 0) {
+      errors.push({
+        field: 'skills',
+        message: 'At least one skill is required',
+        code: 'REQUIRED_SKILLS',
+        value: skills
+      });
+    } else if (skills.length > 20) {
       errors.push({
         field: 'skills',
         message: 'Cannot have more than 20 skills',
