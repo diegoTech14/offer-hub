@@ -14,6 +14,7 @@ import {
   ForgotPasswordDTO,
   ResetPasswordDTO,
 } from "@/types/auth.types";
+import { validateUUID } from "@/utils/validation";
 
 export async function getNonce(
   req: Request,
@@ -45,29 +46,29 @@ export async function getNonce(
  *
  * Expected request body:
  * {
- *   "email": "string (required) - User's email address",
- *   "password": "string (required) - User's password (min 8 characters)"
+ * "email": "string (required) - User's email address",
+ * "password": "string (required) - User's password (min 8 characters)"
  * }
  *
  * Response format:
  * {
- *   "success": true,
- *   "message": "User registered successfully",
- *   "data": {
- *     "user": { ... },
- *     "wallet": {
- *       "address": "string - Smart wallet contract address",
- *       "type": "smart_wallet" | "invisible"
- *     },
- *     "tokens": {
- *       "accessToken": "string",
- *       "refreshToken": "string"
- *     }
- *   },
- *   "metadata": {
- *     "timestamp": "string",
- *     "requestId": "string"
- *   }
+ * "success": true,
+ * "message": "User registered successfully",
+ * "data": {
+ * "user": { ... },
+ * "wallet": {
+ * "address": "string - Smart wallet contract address",
+ * "type": "smart_wallet" | "invisible"
+ * },
+ * "tokens": {
+ * "accessToken": "string",
+ * "refreshToken": "string"
+ * }
+ * },
+ * "metadata": {
+ * "timestamp": "string",
+ * "requestId": "string"
+ * }
  * }
  */
 export async function register(
@@ -671,25 +672,43 @@ export async function getSessions(
 }
 
 /**
- * Deactivate a user session
- * DELETE /api/auth/sessions/:sessionId
+ * Revoke a specific session
+ * DELETE /api/auth/sessions/:id
  */
-export async function deactivateSession(
+export async function revokeSession(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    const userId = req.user.id;
-    const sessionId = Array.isArray(req.params.sessionId)
-      ? req.params.sessionId[0]
-      : req.params.sessionId;
+    const userId = (req as any).user.id;
+    const { id } = req.params;
 
-    await authService.deactivateSession(userId, sessionId);
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Session ID is required",
+      });
+    }
+
+    // Validate UUID format
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid session ID format",
+        error: { code: "INVALID_UUID" },
+      });
+    }
+
+    // Attempt to identify current session ID to prevent self-revocation
+    const currentSessionId =
+      (req as any).user?.session_id || (req as any).sessionId;
+
+    await authService.revokeSession(userId, id, currentSessionId);
 
     res.status(200).json({
       success: true,
-      message: "Session deactivated successfully",
+      message: "Session revoked successfully",
       metadata: {
         timestamp: new Date().toISOString(),
       },

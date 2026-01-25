@@ -1042,23 +1042,65 @@ export async function getUserSessions(
 import { createHash } from "crypto";
 
 /**
- * Deactivate a user session
- * @param userId - User ID
- * @param sessionId - Session ID to deactivate
+ * Revoke a specific session by ID
+ * @param userId - ID of the authenticated user
+ * @param sessionId - ID of the session to revoke
+ * @param currentSessionId - ID of the current session (optional, to prevent self-revocation)
  */
-export async function deactivateSession(userId: string, sessionId: string) {
-  const { error } = await supabase
+export async function revokeSession(
+  userId: string,
+  sessionId: string,
+  currentSessionId?: string,
+) {
+  // 1. Validation: Cannot revoke current session
+  if (currentSessionId && sessionId === currentSessionId) {
+    throw new AppError(
+      "Cannot revoke current session. Use /logout instead.",
+      400,
+    );
+  }
+
+  // 2. Fetch session details to verify ownership and existence
+  const { data: session, error: fetchError } = await supabase
+    .from("refresh_tokens")
+    .select("id, user_id, is_revoked")
+    .eq("id", sessionId)
+    .single();
+
+  // Handling Supabase errors explicitly to avoid Typescript narrowing issues
+  if (fetchError) {
+    if (fetchError.code === "PGRST116") {
+      throw new AppError("Session not found", 404);
+    }
+    throw new AppError(`Database error: ${fetchError.message}`, 500);
+  }
+
+  if (!session) {
+    throw new AppError("Session not found", 404);
+  }
+
+  // 3. Authorization: Session must belong to the user
+  if (session.user_id !== userId) {
+    throw new AppError(
+      "You do not have permission to revoke this session",
+      403,
+    );
+  }
+
+  // 4. Revoke the session
+  const { error: updateError } = await supabase
     .from("refresh_tokens")
     .update({
       is_revoked: true,
       revoked_at: new Date().toISOString(),
     })
-    .eq("user_id", userId)
     .eq("id", sessionId);
 
-  if (error) {
-    throw new AppError("Failed to deactivate session", 500);
+  if (updateError) {
+    throw new AppError(`Failed to revoke session: ${updateError.message}`, 500);
   }
+
+  return { message: "Session revoked successfully" };
 }
 
 /**
