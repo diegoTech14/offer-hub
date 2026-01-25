@@ -3,7 +3,6 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-    Calendar,
     DollarSign,
     Tag,
     Clock,
@@ -179,7 +178,7 @@ export default function ProjectDetailPage() {
                     </Card>
 
                     {/* Freelancer Info if assigned */}
-                    {(project as any).freelancer_id && (
+                    {project.freelancer_id && (
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg">Assigned Freelancer</CardTitle>
@@ -191,12 +190,12 @@ export default function ProjectDetailPage() {
                                     </div>
                                     <div>
                                         <p className="font-semibold">Freelancer User</p>
-                                        <p className="text-xs text-muted-foreground">ID: {(project as any).freelancer_id}</p>
+                                        <p className="text-xs text-muted-foreground">ID: {project.freelancer_id}</p>
                                     </div>
                                 </div>
                                 <div className="mt-4 pt-4 border-t">
                                     <Button variant="outline" className="w-full" asChild>
-                                        <Link href={`/talent/${(project as any).freelancer_id}`}>View Profile</Link>
+                                        <Link href={`/talent/${project.freelancer_id}`}>View Profile</Link>
                                     </Button>
                                 </div>
                             </CardContent>

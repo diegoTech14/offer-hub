@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { Plus, Search, Filter, Loader2 } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
@@ -80,7 +80,7 @@ export default function ClientProjectsPage() {
                         <Plus className="h-8 w-8 text-neutral-400" />
                     </div>
                     <h3 className="text-lg font-medium mb-2">No projects found</h3>
-                    <p className="text-muted-foreground mb-6">You haven't posted any projects yet.</p>
+                    <p className="text-muted-foreground mb-6">You haven&apos;t posted any projects yet.</p>
                     <Link href="/projects/new">
                         <Button variant="outline">Create your first project</Button>
                     </Link>

@@ -70,6 +70,7 @@ export interface Project {
   published_at?: string;
   archived_at?: string;
   deleted_at?: string;
+  freelancer_id?: string;
   client?: ProjectClient;
   applications?: ProjectApplication[];
   statistics?: ProjectStatistics;

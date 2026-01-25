@@ -3,12 +3,9 @@
 import { useMemo, useState } from "react"
 
 import withErrorBoundary from "@/components/shared/WithErrorBoundary";
-import { ProjectCard } from "@/components/projects/ProjectCard"
 import { ProjectTabs } from "@/components/projects/ProjectTabs"
 import { ProjectsList } from "@/components/projects/ProjectsList"
 import { Button } from "@/components/ui/button"
-
-import { getMockProjects } from "@/__mocks__/projects-list-mock"
 
 import { useProjects } from "@/hooks/use-projects";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -41,7 +38,7 @@ function ProjectDashboard() {
       title: p.title,
       person: p.client?.name || "Client",
       date: p.created_at ? new Date(p.created_at).toLocaleDateString() : "Recently",
-      status: (p.status === "open" || p.status === "in_progress") ? "active" : p.status as any,
+      status: (p.status === "open" || p.status === "in_progress") ? "active" as const : p.status as "completed" | "dispute" | "active",
       avatarSrc: p.client?.avatar || "/placeholder.svg?height=40&width=40"
     }));
   }, [tab, projects])

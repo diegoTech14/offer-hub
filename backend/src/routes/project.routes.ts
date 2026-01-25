@@ -13,6 +13,13 @@ import { UserRole } from "@/types/auth.types";
 
 const router = Router();
 
+router.post(
+  "/",
+  verifyToken,
+  authorizeRoles(UserRole.CLIENT, UserRole.ADMIN),
+  createProjectHandler
+);
+
 // GET /api/projects/:projectId - Get project by ID
 router.get("/:projectId", getProjectHandler);
 

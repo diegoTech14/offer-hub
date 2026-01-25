@@ -5,9 +5,9 @@
 
 import { Request, Response, NextFunction } from "express";
 import { projectService } from "@/services/project.service";
-import { 
-  createProject, 
-  getAllProjects, 
+import {
+  createProject,
+  getAllProjects,
   getProjectById as getProjectByIdService,
   updateProject,
   deleteProject,
@@ -61,7 +61,11 @@ export const createProjectHandler = async (
   next: NextFunction
 ) => {
   try {
-    const project = await createProject(req.body);
+    const clientId = (req.user as any)?.id;
+    const project = await createProject({
+      ...req.body,
+      clientId: clientId // Use ID from verifyToken middleware
+    });
     res.status(201).json(
       buildSuccessResponse(project, "Project created successfully")
     );
@@ -101,13 +105,13 @@ export const getProjectByIdHandler = async (
 ) => {
   try {
     const { id } = req.params;
-    
+
     if (!validateUUID(id)) {
       throw new BadRequestError("Invalid project ID format");
     }
 
     const project = await getProjectByIdService(id);
-    
+
     if (!project) {
       throw new NotFoundError("Project not found");
     }

@@ -113,14 +113,16 @@ export function CreateProjectForm() {
                 router.push("/projects/mine");
             }, 3000);
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("❌ Error creating project:", error);
-            console.error("Error details:", {
+            const errorMessage = error instanceof Error ? error.message : "Failed to create project. Please try again.";
+            const errorDetails = error instanceof Error ? {
                 message: error.message,
                 stack: error.stack,
-                response: error.response
-            });
-            toast.error(error.message || "Failed to create project. Please try again.");
+                response: (error as Error & { response?: unknown }).response
+            } : { error };
+            console.error("Error details:", errorDetails);
+            toast.error(errorMessage);
         }
     }
 

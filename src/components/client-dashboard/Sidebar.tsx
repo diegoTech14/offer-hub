@@ -29,7 +29,7 @@ const navigationItems = [
   {
     title: "My Projects",
     icon: FolderOpen,
-    href: "/dashboard/projects",
+    href: "/projects/mine",
     description: "Manage work",
   },
   {
@@ -41,7 +41,7 @@ const navigationItems = [
   {
     title: "Post Job",
     icon: Plus,
-    href: "/client/create-project",
+    href: "/projects/new",
     description: "New project",
   },
   {
