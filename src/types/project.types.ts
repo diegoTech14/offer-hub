@@ -1,6 +1,6 @@
 // Enhanced Project Types for Comprehensive Project Management
 export interface CreateProjectDTO {
-  client_id: string;
+  client_id?: string;
   title: string;
   description: string;
   category: string;
@@ -49,6 +49,7 @@ export interface Project {
   category: string;
   subcategory?: string;
   budget: number;
+  currency?: string;
   budgetType: 'fixed' | 'hourly';
   status: ProjectStatus;
   visibility: 'public' | 'private';
@@ -65,6 +66,7 @@ export interface Project {
   version: number;
   created_at: string;
   updated_at: string;
+  onChainTxHash?: string | null;
   published_at?: string;
   archived_at?: string;
   deleted_at?: string;
@@ -187,14 +189,16 @@ export interface ProjectDraft {
 }
 
 // Project Status Types
-export type ProjectStatus = 
+export type ProjectStatus =
   | 'draft'
   | 'pending'
+  | 'open'
   | 'published'
   | 'active'
   | 'in_progress'
   | 'completed'
   | 'cancelled'
+  | 'dispute'
   | 'archived'
   | 'deleted';
 
@@ -326,7 +330,7 @@ export interface UseProjectsReturn {
   projects: Project[];
   currentProject: Project | null;
   pagination: PaginationInfo | null;
-  
+
   // Loading States
   loading: {
     fetching: boolean;
@@ -335,37 +339,37 @@ export interface UseProjectsReturn {
     deleting: boolean;
     searching: boolean;
   };
-  
+
   // Error Handling
   error: ProjectError | null;
-  
+
   // CRUD Operations
   createProject: (project: CreateProjectDTO) => Promise<Project>;
   updateProject: (id: string, updates: Partial<UpdateProjectDTO>) => Promise<Project>;
   deleteProject: (id: string, softDelete?: boolean) => Promise<void>;
   getProject: (id: string) => Promise<Project>;
   getProjects: (filters?: ProjectFilters) => Promise<Project[]>;
-  
+
   // Search and Filter
   searchProjects: (params: ProjectSearchParams) => Promise<Project[]>;
   setFilters: (filters: ProjectFilters) => void;
   clearFilters: () => void;
-  
+
   // Cache Management
   refreshProject: (id: string) => Promise<Project>;
   refreshAll: () => Promise<void>;
   clearCache: () => void;
-  
+
   // State Management
   setCurrentProject: (project: Project | null) => void;
   clearError: () => void;
-  
+
   // Validation
   validateProject: (project: CreateProjectDTO | UpdateProjectDTO) => ProjectValidationResult;
-  
+
   // Statistics
   getProjectStats: () => ProjectStatistics | null;
-  
+
   // Utility
   isProjectModified: (id: string) => boolean;
   getProjectHistory: (id: string) => ProjectVersion[];
