@@ -5,9 +5,9 @@
 
 import { Request, Response, NextFunction } from "express";
 import { projectService } from "@/services/project.service";
-import { 
-  createProject, 
-  getAllProjects, 
+import {
+  createProject,
+  getAllProjects,
   getProjectById as getProjectByIdService,
   updateProject,
   deleteProject,
@@ -15,7 +15,7 @@ import {
 } from "@/services/project.service";
 import { NotFoundError, BadRequestError } from "@/utils/AppError";
 import { buildSuccessResponse, buildErrorResponse } from "../utils/responseBuilder";
-import { validateUUID, UUID_REGEX } from "@/utils/validation";
+import { validateUUID } from "@/utils/validation";
 
 export const getProjectHandler = async (
   req: Request,
@@ -101,13 +101,13 @@ export const getProjectByIdHandler = async (
 ) => {
   try {
     const { id } = req.params;
-    
+
     if (!validateUUID(id)) {
       throw new BadRequestError("Invalid project ID format");
     }
 
     const project = await getProjectByIdService(id);
-    
+
     if (!project) {
       throw new NotFoundError("Project not found");
     }
@@ -131,7 +131,7 @@ export const updateProjectHandler = async (
 ) => {
   try {
     const { id } = req.params;
-    const client_id = (req.user as any)?.id;
+    const client_id = (req as any).user?.id;
     const updates = req.body;
 
     if (!validateUUID(id)) {
@@ -169,7 +169,7 @@ export const deleteProjectHandler = async (
 ) => {
   try {
     const { id } = req.params;
-    const client_id = (req.user as any)?.id;
+    const client_id = (req as any).user?.id;
 
     if (!validateUUID(id)) {
       throw new BadRequestError("Invalid project ID format");
@@ -206,7 +206,7 @@ export const assignFreelancerHandler = async (
 ) => {
   try {
     const { projectId, freelancerId } = req.params;
-    const client_id = (req.user as any)?.id;
+    const client_id = (req as any).user?.id;
 
     // Validate UUIDs
     if (!validateUUID(projectId) || !validateUUID(freelancerId)) {
