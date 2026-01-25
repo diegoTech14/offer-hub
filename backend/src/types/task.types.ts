@@ -42,3 +42,8 @@ export interface BlockchainTaskResult {
   timestamp: number;
   ledger: number;
 }
+
+interface UpdateTaskRatingDTO {
+  rating: number;      
+  comment?: string;  
+}
