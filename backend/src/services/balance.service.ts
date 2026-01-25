@@ -367,6 +367,80 @@ export class BalanceService {
       throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
     }
   }
+
+  /**
+   * Returns held funds back to a user's available balance.
+   * Used when canceling a withdrawal or refunding a failed withdrawal.
+   * @param userId - The user to release funds for
+   * @param amount - Amount to release (must be positive)
+   * @param currency - Currency code (USD, XLM)
+   * @param reference - Source of the release
+   * @param description - Optional description
+   * @returns Updated Balance object
+   */
+  async releaseBalance(
+    userId: string,
+    amount: number,
+    currency: string,
+    reference: CreditReference,
+    description?: string
+  ): Promise<Balance> {
+    const correlationId = crypto.randomUUID();
+    
+    try {
+      logger.info(
+        `[BalanceService] Starting releaseBalance ${correlationId} - User: ${userId}, Amount: ${amount} ${currency}`
+      );
+
+      // 1. Validation
+      if (!validateUUID(userId)) {
+        throw new BadRequestError("Invalid user ID format");
+      }
+
+      if (amount <= 0) {
+        throw new ValidationError("Amount must be positive");
+      }
+
+      if (!SUPPORTED_CURRENCIES.includes(currency as Currency)) {
+        throw new ValidationError(`Currency ${currency} is not supported`);
+      }
+
+      if (!reference.id || !reference.type) {
+        throw new ValidationError("Invalid reference data");
+      }
+
+      // 2. Atomic Transaction (via RPC)
+      // We rely on a database function to lock the row, update balance,
+      // AND insert the log in one go.
+      const { data, error } = await supabase.rpc('release_balance', {
+        p_user_id: userId,
+        p_amount: amount,
+        p_currency: currency,
+        p_ref_id: reference.id,
+        p_ref_type: reference.type,
+        p_description: description || ''
+      });
+
+      if (error) {
+        logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
+        throw new InternalServerError(`Balance release failed: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new InternalServerError("Balance release failed: No data returned");
+      }
+
+      logger.info(`[BalanceService] Success ${correlationId} - New Balance: ${data.available}`);
+
+      return data as Balance;
+
+    } catch (err: any) {
+      if (err instanceof ValidationError || err instanceof BadRequestError || err instanceof InternalServerError) {
+        throw err;
+      }
+      throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
+    }
+  }
 }
 
 export const balanceService = new BalanceService();

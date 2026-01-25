@@ -18,7 +18,7 @@ export interface Balance {
 
 export interface CreditReference {
   id: string;
-  type: 'topup' | 'refund' | 'settlement';
+  type: 'topup' | 'refund' | 'settlement' | 'withdrawal_refund' | 'withdrawal_cancel';
 }
 
 export interface DebitReference {

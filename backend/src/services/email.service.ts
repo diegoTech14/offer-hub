@@ -177,3 +177,56 @@ export async function sendPasswordResetEmail(
   });
 }
 
+/**
+ * Send withdrawal refund notification email
+ * @param email - Recipient email address
+ * @param amount - Refunded amount
+ * @param currency - Currency code
+ */
+export async function sendWithdrawalRefundEmail(
+  email: string,
+  amount: number,
+  currency: string
+): Promise<void> {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Withdrawal Refunded</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background-color: #f8f9fa; padding: 30px; border-radius: 8px; margin-bottom: 20px;">
+        <h1 style="color: #2c3e50; margin-top: 0;">Withdrawal Refunded</h1>
+        <p>Hello,</p>
+        <p>Your withdrawal request has been refunded due to a processing failure. The funds have been returned to your available balance.</p>
+        <div style="background-color: #e7f3ff; padding: 20px; border-left: 4px solid #007bff; margin: 20px 0;">
+          <p style="margin: 0;"><strong>Refunded Amount:</strong> ${amount.toFixed(2)} ${currency}</p>
+        </p>
+        <p>The funds are now available in your account and you can initiate a new withdrawal request or use them for other transactions.</p>
+        <p style="color: #666; font-size: 14px; margin-top: 30px;">
+          If you have any questions or concerns, please contact our support team.
+        </p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        <p style="color: #999; font-size: 12px; margin-bottom: 0;">
+          This is an automated message from Offer Hub. Please do not reply to this email.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  await sendEmail({
+    to: email,
+    subject: 'Withdrawal Refunded - Funds Returned to Your Account',
+    html,
+  });
+}
+
+// EmailService object for consistent API
+export const emailService = {
+  sendEmail,
+  sendPasswordResetEmail,
+  sendWithdrawalRefundEmail,
+};
