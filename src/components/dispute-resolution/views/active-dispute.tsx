@@ -47,7 +47,6 @@ const columns: DisputeTableColumn<DisputeRow>[] = [
 ];
 
 export default function ActiveDispute() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeTab, setActiveTab] = useState('all');
   const [selectedRole, setSelectedRole] = useState('freelancer');
   const {

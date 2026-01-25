@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -244,7 +243,7 @@ export default function PostProjectPage() {
       await createProject(dto);
       toast.success("Success!! Project Posted");
       setCurrentStep(totalSteps + 1); // Show success screen
-      if (typeof window !== "undefined") 
+      if (typeof window !== "undefined")
         localStorage.removeItem('projectDataDraft');
       setProjectData({ ...initialProjectData, client_id: user?.id });
     } catch (error: any) {
