@@ -40,11 +40,21 @@ export default function ProjectDetailPage() {
     autoFetch: false
   });
 
+  // Use useState to avoid hydration mismatch with date formatting
+  // IMPORTANT: All Hooks must be called before any conditional returns
+  const [postedTime, setPostedTime] = useState<string>('Recently');
+
   useEffect(() => {
     if (projectId) {
       getProject(projectId);
     }
   }, [projectId, getProject]);
+
+  useEffect(() => {
+    if (project?.created_at) {
+      setPostedTime(formatDistanceToNow(new Date(project.created_at), { addSuffix: true }));
+    }
+  }, [project?.created_at]);
 
   const handleRetry = () => {
     clearError();
@@ -104,15 +114,6 @@ export default function ProjectDetailPage() {
   const budgetDisplay = budgetType === 'hourly' 
     ? formatHourlyRate(budget)
     : formatCurrency(budget);
-
-  // Use useState to avoid hydration mismatch with date formatting
-  const [postedTime, setPostedTime] = useState<string>('Recently');
-  
-  useEffect(() => {
-    if (created_at) {
-      setPostedTime(formatDistanceToNow(new Date(created_at), { addSuffix: true }));
-    }
-  }, [created_at]);
 
   return (
     <div className="max-w-[1400px] mx-auto p-4 md:p-8">
