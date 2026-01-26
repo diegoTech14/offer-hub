@@ -155,7 +155,7 @@ describe("getClientTaskRecords (controller)", () => {
       mockReq.user = { id: mockClientId };
       mockTaskService.getTaskRecordsByClientId.mockResolvedValue({
         taskRecords: sampleRows.filter(r => r.completed),
-        meta: { page: 1, limit: 20, total_items: 1 }
+        meta: { page: 1, limit: 20, total_items: 20 }
       });
 
       await getClientTaskRecords(mockReq, mockRes, mockNext);
