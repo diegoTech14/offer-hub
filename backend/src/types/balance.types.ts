@@ -28,7 +28,7 @@ export interface DebitReference {
 
 export interface HoldReference {
   id: string;
-  type: 'contract' | 'escrow';
+  type: 'contract' | 'escrow' | 'withdrawal';
 }
 
 export interface ReleaseReference {
