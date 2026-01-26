@@ -18,7 +18,11 @@ import {
   DebitReference,
   HoldReference,
   ReleaseReference,
-  SUPPORTED_CURRENCIES
+  SUPPORTED_CURRENCIES,
+  TransactionFilters,
+  TransactionHistoryResult,
+  TRANSACTION_TYPES,
+  TransactionType
 } from "../types/balance.types";
 import { logger } from "../utils/logger"; 
 
@@ -363,6 +367,148 @@ export class BalanceService {
         err instanceof BadRequestError || 
         err instanceof InternalServerError ||
         err instanceof InsufficientFundsError
+      ) {
+        throw err;
+      }
+      throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
+    }
+  }
+
+  /**
+   * Retrieves transaction history for a user with filtering and pagination.
+   * @param userId - The user ID to get transaction history for
+   * @param filters - Filter and pagination options
+   * @returns Transaction history with pagination info
+   */
+  async getTransactionHistory(
+    userId: string,
+    filters: TransactionFilters
+  ): Promise<TransactionHistoryResult> {
+    const correlationId = crypto.randomUUID();
+
+    try {
+      logger.info(
+        `[BalanceService] Starting getTransactionHistory ${correlationId} - User: ${userId}, Filters: ${JSON.stringify(filters)}`
+      );
+
+      // 1. Validation
+      if (!validateUUID(userId)) {
+        throw new BadRequestError("Invalid user ID format");
+      }
+
+      // Validate currency if provided
+      if (filters.currency && !SUPPORTED_CURRENCIES.includes(filters.currency as Currency)) {
+        throw new ValidationError(`Currency ${filters.currency} is not supported. Supported currencies: ${SUPPORTED_CURRENCIES.join(', ')}`);
+      }
+
+      // Validate transaction type if provided
+      if (filters.type && !TRANSACTION_TYPES.includes(filters.type as TransactionType)) {
+        throw new ValidationError(`Transaction type ${filters.type} is not supported. Supported types: ${TRANSACTION_TYPES.join(', ')}`);
+      }
+
+      // Validate date range
+      if (filters.from && filters.to) {
+        const fromDate = new Date(filters.from);
+        const toDate = new Date(filters.to);
+
+        if (isNaN(fromDate.getTime())) {
+          throw new ValidationError('Invalid from date format');
+        }
+
+        if (isNaN(toDate.getTime())) {
+          throw new ValidationError('Invalid to date format');
+        }
+
+        if (fromDate > toDate) {
+          throw new ValidationError('from date must be before or equal to to date');
+        }
+      } else if (filters.from) {
+        const fromDate = new Date(filters.from);
+        if (isNaN(fromDate.getTime())) {
+          throw new ValidationError('Invalid from date format');
+        }
+      } else if (filters.to) {
+        const toDate = new Date(filters.to);
+        if (isNaN(toDate.getTime())) {
+          throw new ValidationError('Invalid to date format');
+        }
+      }
+
+      // Validate pagination
+      const page = filters.page !== undefined ? filters.page : 1;
+      const limit = filters.limit !== undefined ? filters.limit : 20;
+
+      if (page < 1) {
+        throw new ValidationError('Page must be greater than 0');
+      }
+
+      if (limit < 1 || limit > 100) {
+        throw new ValidationError('Limit must be between 1 and 100');
+      }
+
+      // 2. Build query
+      let query = supabase
+        .from('balance_transactions')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId);
+
+      // Apply filters
+      if (filters.currency) {
+        query = query.eq('currency', filters.currency);
+      }
+
+      if (filters.type) {
+        query = query.eq('type', filters.type);
+      }
+
+      if (filters.from) {
+        query = query.gte('created_at', filters.from);
+      }
+
+      if (filters.to) {
+        // Add one day to include the entire 'to' date
+        const toDate = new Date(filters.to);
+        toDate.setDate(toDate.getDate() + 1);
+        query = query.lt('created_at', toDate.toISOString());
+      }
+
+      // Apply ordering (newest first)
+      query = query.order('created_at', { ascending: false });
+
+      // Apply pagination
+      const offset = (page - 1) * limit;
+      query = query.range(offset, offset + limit - 1);
+
+      // 3. Execute query
+      const { data, error, count } = await query;
+
+      if (error) {
+        logger.error(`[BalanceService] Database Error ${correlationId}`, error);
+        throw new InternalServerError(`Failed to retrieve transaction history: ${error.message}`);
+      }
+
+      const total = count || 0;
+      const pages = Math.ceil(total / limit);
+
+      logger.info(
+        `[BalanceService] Success ${correlationId} - Found ${data?.length || 0} transactions (Total: ${total})`
+      );
+
+      return {
+        transactions: data || [],
+        pagination: {
+          page,
+          limit,
+          total,
+          pages
+        }
+      };
+
+    } catch (err: any) {
+      if (
+        err instanceof ValidationError ||
+        err instanceof BadRequestError ||
+        err instanceof InternalServerError
       ) {
         throw err;
       }

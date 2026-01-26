@@ -1042,7 +1042,439 @@ describe('BalanceService - debitAvailable', () => {
     });
   });
 });
+describe('BalanceService - getTransactionHistory', () => {
+  const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
 
+  const mockTransactions = [
+    {
+      id: 'tx-1',
+      user_id: mockUserId,
+      amount: 100,
+      currency: 'USD',
+      type: 'credit',
+      reference_id: 'ref-1',
+      reference_type: 'topup',
+      balance_before: 0,
+      balance_after: 100,
+      description: 'Top up',
+      created_at: '2024-01-15T10:30:00Z'
+    },
+    {
+      id: 'tx-2',
+      user_id: mockUserId,
+      amount: 50,
+      currency: 'USD',
+      type: 'debit',
+      reference_id: 'ref-2',
+      reference_type: 'withdrawal',
+      balance_before: 100,
+      balance_after: 50,
+      description: 'Withdrawal',
+      created_at: '2024-01-14T09:00:00Z'
+    }
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('Success cases', () => {
+    it('should retrieve transaction history with no filters', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: 2
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockSupabase.from).toHaveBeenCalledWith('balance_transactions');
+      expect(mockQuery.select).toHaveBeenCalledWith('*', { count: 'exact' });
+      expect(mockQuery.eq).toHaveBeenCalledWith('user_id', mockUserId);
+      expect(mockQuery.order).toHaveBeenCalledWith('created_at', { ascending: false });
+      expect(mockQuery.range).toHaveBeenCalledWith(0, 19);
+
+      expect(result).toEqual({
+        transactions: mockTransactions,
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 2,
+          pages: 1
+        }
+      });
+    });
+
+    it('should filter by currency', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [mockTransactions[0]],
+          error: null,
+          count: 1
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        currency: 'USD',
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockQuery.eq).toHaveBeenCalledWith('user_id', mockUserId);
+      expect(mockQuery.eq).toHaveBeenCalledWith('currency', 'USD');
+      expect(result.transactions).toHaveLength(1);
+    });
+
+    it('should filter by transaction type', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [mockTransactions[0]],
+          error: null,
+          count: 1
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        type: 'credit',
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockQuery.eq).toHaveBeenCalledWith('type', 'credit');
+      expect(result.transactions).toHaveLength(1);
+    });
+
+    it('should filter by date range', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lt: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: 2
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        from: '2024-01-01',
+        to: '2024-01-31',
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockQuery.gte).toHaveBeenCalledWith('created_at', '2024-01-01');
+      expect(mockQuery.lt).toHaveBeenCalledWith('created_at', expect.any(String));
+      expect(result.transactions).toHaveLength(2);
+    });
+
+    it('should handle pagination correctly', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [mockTransactions[1]],
+          error: null,
+          count: 10
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 2,
+        limit: 5
+      });
+
+      expect(mockQuery.range).toHaveBeenCalledWith(5, 9);
+      expect(result.pagination).toEqual({
+        page: 2,
+        limit: 5,
+        total: 10,
+        pages: 2
+      });
+    });
+
+    it('should use default pagination values when not provided', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: 2
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {});
+
+      expect(mockQuery.range).toHaveBeenCalledWith(0, 19);
+      expect(result.pagination).toEqual({
+        page: 1,
+        limit: 20,
+        total: 2,
+        pages: 1
+      });
+    });
+
+    it('should return empty array when no transactions found', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [],
+          error: null,
+          count: 0
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 1,
+        limit: 20
+      });
+
+      expect(result.transactions).toEqual([]);
+      expect(result.pagination.total).toBe(0);
+    });
+  });
+
+  describe('Validation errors', () => {
+    it('should throw BadRequestError for invalid user ID', async () => {
+      await expect(
+        balanceService.getTransactionHistory('invalid-uuid', {})
+      ).rejects.toThrow(BadRequestError);
+    });
+
+    it('should throw ValidationError for unsupported currency', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          currency: 'EUR'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for unsupported transaction type', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          type: 'invalid' as any
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError when from date is after to date', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          from: '2024-01-31',
+          to: '2024-01-01'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for invalid from date', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          from: 'invalid-date'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for invalid to date', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          to: 'invalid-date'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for page less than 1', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          page: 0
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for limit less than 1', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          limit: 0
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for limit greater than 100', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          limit: 101
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+  });
+
+  describe('Database errors', () => {
+    it('should throw InternalServerError on database error', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Database connection failed' },
+          count: null
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          page: 1,
+          limit: 20
+        })
+      ).rejects.toThrow(InternalServerError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should handle null count gracefully', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: null
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 1,
+        limit: 20
+      });
+
+      expect(result.pagination.total).toBe(0);
+      expect(result.pagination.pages).toBe(0);
+    });
+  });
+
+  describe('Edge cases', () => {
+    it('should handle all transaction types', async () => {
+      const allTypes = ['credit', 'debit', 'hold', 'release', 'settle_in', 'settle_out'];
+
+      for (const type of allTypes) {
+        const mockQuery = {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          order: jest.fn().mockReturnThis(),
+          range: jest.fn().mockResolvedValue({
+            data: [],
+            error: null,
+            count: 0
+          })
+        };
+
+        (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+        await expect(
+          balanceService.getTransactionHistory(mockUserId, {
+            type: type as any
+          })
+        ).resolves.not.toThrow();
+      }
+    });
+
+    it('should handle all supported currencies', async () => {
+      const currencies = ['USD', 'XLM'];
+
+      for (const currency of currencies) {
+        const mockQuery = {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          order: jest.fn().mockReturnThis(),
+          range: jest.fn().mockResolvedValue({
+            data: [],
+            error: null,
+            count: 0
+          })
+        };
+
+        (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+        await expect(
+          balanceService.getTransactionHistory(mockUserId, {
+            currency
+          })
+        ).resolves.not.toThrow();
+      }
+    });
+
+    it('should handle combined filters', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lt: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [],
+          error: null,
+          count: 0
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        currency: 'USD',
+        type: 'credit',
+        from: '2024-01-01',
+        to: '2024-01-31',
+        page: 2,
+        limit: 10
+      });
+
+      expect(mockQuery.eq).toHaveBeenCalledWith('currency', 'USD');
+      expect(mockQuery.eq).toHaveBeenCalledWith('type', 'credit');
+      expect(mockQuery.gte).toHaveBeenCalled();
+      expect(mockQuery.lt).toHaveBeenCalled();
+      expect(mockQuery.range).toHaveBeenCalledWith(10, 19);
+    });
+  });
+});
 describe('BalanceService - holdBalance', () => {
   const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
   const mockRef = { id: 'contract-123', type: 'contract' as const };
