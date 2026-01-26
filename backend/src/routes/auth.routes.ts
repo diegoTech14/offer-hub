@@ -15,7 +15,7 @@ import {
   registerWithWallet,
   loginWithEmail,
   getSessions,
-  deactivateSession,
+  revokeSession,
   forgotPassword,
   resetPassword,
 } from "@/controllers/auth.controller";
@@ -50,6 +50,8 @@ router.post("/reset-password", authLimiter, resetPassword);
 // User routes
 router.get("/me", authenticateToken(), me);
 router.get("/sessions", authenticateToken(), getSessions);
-router.delete("/sessions/:sessionId", authenticateToken(), deactivateSession);
+
+// Revoke Session Route
+router.delete("/sessions/:id", authenticateToken(), revokeSession);
 
 export default router;
