@@ -24,7 +24,7 @@ export const createUserHandler = async (req: Request, res: Response, next: NextF
 
     // Use standardized validation
     const validationResult = validateObject(req.body, USER_CREATION_SCHEMA);
-    
+
     if (!validationResult.isValid) {
       throw new ValidationError("User validation failed", validationResult.errors);
     }
@@ -221,6 +221,60 @@ export const updateAvatarHandler = async (
     // Handle Supabase errors
     if (error.code && error.message) {
       throw mapSupabaseError(error);
+    }
+
+    next(error);
+  }
+};
+
+/**
+ * Delete own account handler (soft-delete)
+ * Requires JWT authentication
+ * Request body: { password: string, confirmation: "DELETE" }
+ */
+export const deleteOwnAccountHandler = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { password, confirmation } = req.body;
+
+    // Validate required fields
+    if (!password) {
+      throw new BadRequestError("Password is required", "MISSING_PASSWORD");
+    }
+
+    if (!confirmation) {
+      throw new BadRequestError("Confirmation is required", "MISSING_CONFIRMATION");
+    }
+
+    // Validate confirmation string (case-sensitive exact match)
+    if (confirmation !== "DELETE") {
+      throw new BadRequestError(
+        "Confirmation must be exactly 'DELETE'",
+        "INVALID_CONFIRMATION"
+      );
+    }
+
+    // Get authenticated user ID
+    if (!req.user || !req.user.id) {
+      throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+    }
+
+    const userId = req.user.id;
+
+    // Call service to delete account
+    await userService.deleteOwnAccount(userId, password, confirmation);
+
+    res.status(200).json({
+      success: true,
+      message: "Account scheduled for deletion. You will receive a confirmation email."
+    });
+  } catch (error: any) {
+    // Handle Supabase errors
+    if (error.code && error.message && !error.statusCode) {
+      return next(mapSupabaseError(error));
     }
 
     next(error);

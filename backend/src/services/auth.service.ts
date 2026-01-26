@@ -11,13 +11,28 @@ import {
   signRefreshToken,
 } from "@/utils/jwt.utils";
 import { supabase } from "@/lib/supabase/supabase";
-import { AuthUser, LoginDTO, RefreshTokenRecord, EmailLoginDTO, AuditLogEntry, DeviceInfo, UserRole, RegisterDTO, RegisterWithEmailDTO, RegisterWithWalletDTO } from "@/types/auth.types";
-import { AppError, AuthenticationError, AuthorizationError } from "@/utils/AppError";
+import {
+  AuthUser,
+  LoginDTO,
+  RefreshTokenRecord,
+  EmailLoginDTO,
+  AuditLogEntry,
+  DeviceInfo,
+  UserRole,
+  RegisterDTO,
+  RegisterWithEmailDTO,
+  RegisterWithWalletDTO,
+} from "@/types/auth.types";
+import {
+  AppError,
+  AuthenticationError,
+  AuthorizationError,
+} from "@/utils/AppError";
 import { randomBytes } from "crypto";
 import { sanitizeUser } from "@/utils/sanitizeUser";
 import bcrypt from "bcryptjs";
 // import { v4 as uuidv4 } from "uuid";
-const uuidv4 = () => require('crypto').randomUUID();
+const uuidv4 = () => require("crypto").randomUUID();
 
 export async function getNonce(wallet_address: string) {
   const nonce = randomBytes(16).toString("hex");
@@ -51,25 +66,25 @@ export async function register(data: RegisterDTO, deviceInfo: DeviceInfo) {
   const { email, password } = data;
 
   // Import wallet service
-  const walletService = await import('./wallet.service');
-  const { validateEmail } = await import('@/utils/validation');
+  const walletService = await import("./wallet.service");
+  const { validateEmail } = await import("@/utils/validation");
 
   // Validate email format
-  if (!email || typeof email !== 'string') {
-    throw new AppError('Email is required', 400);
+  if (!email || typeof email !== "string") {
+    throw new AppError("Email is required", 400);
   }
 
   if (!validateEmail(email)) {
-    throw new AppError('Invalid email format', 400);
+    throw new AppError("Invalid email format", 400);
   }
 
   // Validate password
-  if (!password || typeof password !== 'string') {
-    throw new AppError('Password is required', 400);
+  if (!password || typeof password !== "string") {
+    throw new AppError("Password is required", 400);
   }
 
   if (password.length < 8) {
-    throw new AppError('Password must be at least 8 characters long', 400);
+    throw new AppError("Password must be at least 8 characters long", 400);
   }
 
   // Check if email already exists
@@ -87,7 +102,8 @@ export async function register(data: RegisterDTO, deviceInfo: DeviceInfo) {
   const password_hash = await bcrypt.hash(password, 10);
 
   // Generate a username from email (before @ symbol)
-  const username = email.split('@')[0] + '_' + Math.random().toString(36).substring(2, 8);
+  const username =
+    email.split("@")[0] + "_" + Math.random().toString(36).substring(2, 8);
 
   // Create user (without wallet_address initially)
   const { data: newUser, error: userError } = await supabase
@@ -106,12 +122,17 @@ export async function register(data: RegisterDTO, deviceInfo: DeviceInfo) {
     .single();
 
   if (userError || !newUser) {
-    throw new AppError(`Failed to create user: ${userError?.message || 'Unknown error'}`, 500);
+    throw new AppError(
+      `Failed to create user: ${userError?.message || "Unknown error"}`,
+      500,
+    );
   }
 
   try {
     // Generate invisible wallet (Stellar keypair) for the user
-    const { wallet, publicKey } = await walletService.generateInvisibleWallet(newUser.id, email);
+    const { wallet, publicKey } = await walletService.generateInvisibleWallet(
+      newUser.id,
+    );
 
     // Update user with wallet address
     const { error: updateError } = await supabase
@@ -120,44 +141,50 @@ export async function register(data: RegisterDTO, deviceInfo: DeviceInfo) {
       .eq("id", newUser.id);
 
     if (updateError) {
-      throw new AppError(`Failed to link wallet to user: ${updateError.message}`, 500);
+      throw new AppError(
+        `Failed to link wallet to user: ${updateError.message}`,
+        500,
+      );
     }
 
     // Log registration event
     await logAuthAttempt({
       userId: newUser.id,
-      action: 'user_register',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "user_register",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
 
     // Generate tokens
-    const accessToken = signAccessToken({ 
+    const accessToken = signAccessToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
-      permissions: []
+      permissions: [],
     });
     const { refreshToken, refreshTokenHash } = signRefreshToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
-      permissions: []
+      permissions: [],
     });
 
     // Save refresh token in DB
     const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     // Convert hex string to BYTEA for PostgreSQL
-    const tokenHashBytes = Buffer.from(refreshTokenHash, 'hex');
+    const tokenHashBytes = Buffer.from(refreshTokenHash, "hex");
     const { error: rtInsertError } = await supabase
       .from("refresh_tokens")
-      .insert([{ 
-        user_id: newUser.id, 
-        token_hash: tokenHashBytes,
-        expires_at: refreshTokenExpiry.toISOString()
-      }]);
+      .insert([
+        {
+          user_id: newUser.id,
+          token_hash: tokenHashBytes,
+          expires_at: refreshTokenExpiry.toISOString(),
+          device_info: deviceInfo,
+        },
+      ]);
 
     if (rtInsertError) {
       throw new AppError("Failed to persist refresh token", 500);
@@ -183,17 +210,18 @@ export async function register(data: RegisterDTO, deviceInfo: DeviceInfo) {
 export async function signup(data: CreateUserDTO) {
   const newUser = await userService.createUser(data);
 
-  const accessToken = signAccessToken({ 
+  const accessToken = signAccessToken({
     sub: newUser.id,
     email: newUser.email,
     role: newUser.role || UserRole.CLIENT,
-    permissions: newUser.permissions?.map((p: { name: string }) => p.name) || []
+    permissions:
+      newUser.permissions?.map((p: { name: string }) => p.name) || [],
   });
   const { refreshToken, refreshTokenHash } = signRefreshToken({
     sub: newUser.id,
     email: newUser.email,
     role: newUser.role || UserRole.CLIENT,
-    permissions: newUser.permissions?.map((p: any) => p.name) || []
+    permissions: newUser.permissions?.map((p: any) => p.name) || [],
   });
 
   // Save refresh token in DB
@@ -203,6 +231,7 @@ export async function signup(data: CreateUserDTO) {
       {
         user_id: newUser.id,
         token_hash: refreshTokenHash,
+        device_info: {}, // Signup doesn't receive deviceInfo in this signature, consider updating or passing empty
       },
     ]);
 
@@ -225,11 +254,14 @@ export async function signup(data: CreateUserDTO) {
  * @param deviceInfo - Device information for audit logging
  * @returns User data and JWT tokens
  */
-export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: DeviceInfo) {
+export async function registerWithEmail(
+  data: RegisterWithEmailDTO,
+  deviceInfo: DeviceInfo,
+) {
   const { email, password, username, name, bio, is_freelancer } = data;
 
   // Import wallet service
-  const walletService = await import('./wallet.service');
+  const walletService = await import("./wallet.service");
 
   // Check if email already exists
   const { data: existingUser, error: emailCheckError } = await supabase
@@ -274,12 +306,17 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
     .single();
 
   if (userError || !newUser) {
-    throw new AppError(`Failed to create user: ${userError?.message || 'Unknown error'}`, 500);
+    throw new AppError(
+      `Failed to create user: ${userError?.message || "Unknown error"}`,
+      500,
+    );
   }
 
   try {
     // Generate invisible wallet for the user
-    const { wallet, publicKey } = await walletService.generateInvisibleWallet(newUser.id);
+    const { wallet, publicKey } = await walletService.generateInvisibleWallet(
+      newUser.id,
+    );
 
     // Update user with wallet address
     const { error: updateError } = await supabase
@@ -288,7 +325,10 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
       .eq("id", newUser.id);
 
     if (updateError) {
-      throw new AppError(`Failed to link wallet to user: ${updateError.message}`, 500);
+      throw new AppError(
+        `Failed to link wallet to user: ${updateError.message}`,
+        500,
+      );
     }
 
     // Stellar blockchain registration disabled temporarily
@@ -323,10 +363,10 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
     // Log registration event
     await logAuthAttempt({
       userId: newUser.id,
-      action: 'user_register_email',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "user_register_email",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
 
@@ -335,19 +375,26 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
-      permissions: []
+      permissions: [],
     });
     const { refreshToken, refreshTokenHash, expiresAt } = signRefreshToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
-      permissions: []
+      permissions: [],
     });
 
     // Save refresh token in DB
     const { error: rtInsertError } = await supabase
       .from("refresh_tokens")
-      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash, expires_at: expiresAt.toISOString() }]);
+      .insert([
+        {
+          user_id: newUser.id,
+          token_hash: refreshTokenHash,
+          expires_at: expiresAt.toISOString(),
+          device_info: deviceInfo,
+        },
+      ]);
 
     if (rtInsertError) {
       throw new AppError("Failed to persist refresh token", 500);
@@ -359,7 +406,7 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
       user: safeUser,
       wallet: {
         address: publicKey,
-        type: 'invisible',
+        type: "invisible",
       },
       tokens: { accessToken, refreshToken },
     };
@@ -377,11 +424,23 @@ export async function registerWithEmail(data: RegisterWithEmailDTO, deviceInfo: 
  * @param deviceInfo - Device information for audit logging
  * @returns User data and JWT tokens
  */
-export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo: DeviceInfo) {
-  const { wallet_address, signature, email, password, username, name, bio, is_freelancer } = data;
+export async function registerWithWallet(
+  data: RegisterWithWalletDTO,
+  deviceInfo: DeviceInfo,
+) {
+  const {
+    wallet_address,
+    signature,
+    email,
+    password,
+    username,
+    name,
+    bio,
+    is_freelancer,
+  } = data;
 
   // Import wallet service
-  const walletService = await import('./wallet.service');
+  const walletService = await import("./wallet.service");
 
   // Verify signature (user must sign a message proving they own the wallet)
   // For Stellar, we would verify the signature using the wallet address
@@ -448,7 +507,10 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
     .single();
 
   if (userError || !newUser) {
-    throw new AppError(`Failed to create user: ${userError?.message || 'Unknown error'}`, 500);
+    throw new AppError(
+      `Failed to create user: ${userError?.message || "Unknown error"}`,
+      500,
+    );
   }
 
   try {
@@ -487,10 +549,10 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
     // Log registration event
     await logAuthAttempt({
       userId: newUser.id,
-      action: 'user_register_wallet',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "user_register_wallet",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
 
@@ -499,19 +561,26 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
-      permissions: []
+      permissions: [],
     });
     const { refreshToken, refreshTokenHash, expiresAt } = signRefreshToken({
       sub: newUser.id,
       email: newUser.email,
       role: UserRole.CLIENT,
-      permissions: []
+      permissions: [],
     });
 
     // Save refresh token in DB
     const { error: rtInsertError } = await supabase
       .from("refresh_tokens")
-      .insert([{ user_id: newUser.id, token_hash: refreshTokenHash, expires_at: expiresAt.toISOString() }]);
+      .insert([
+        {
+          user_id: newUser.id,
+          token_hash: refreshTokenHash,
+          expires_at: expiresAt.toISOString(),
+          device_info: deviceInfo,
+        },
+      ]);
 
     if (rtInsertError) {
       throw new AppError("Failed to persist refresh token", 500);
@@ -523,7 +592,7 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
       user: safeUser,
       wallet: {
         address: wallet_address,
-        type: 'external',
+        type: "external",
       },
       tokens: { accessToken, refreshToken },
     };
@@ -534,7 +603,7 @@ export async function registerWithWallet(data: RegisterWithWalletDTO, deviceInfo
   }
 }
 
-export async function login(data: LoginDTO) {
+export async function login(data: LoginDTO, deviceInfo?: DeviceInfo) {
   const { wallet_address, signature } = data;
 
   const { data: user, error } = await supabase
@@ -570,20 +639,27 @@ export async function login(data: LoginDTO) {
   // Issue tokens
   const accessToken = signAccessToken({
     sub: user.id,
-    email: user.email || '',
+    email: user.email || "",
     role: user.role || UserRole.CLIENT,
-    permissions: user.permissions?.map((p: any) => p.name) || []
+    permissions: user.permissions?.map((p: any) => p.name) || [],
   });
   const { refreshToken, refreshTokenHash, expiresAt } = signRefreshToken({
     sub: user.id,
-    email: user.email || '',
+    email: user.email || "",
     role: user.role || UserRole.CLIENT,
-    permissions: user.permissions?.map((p: any) => p.name) || []
+    permissions: user.permissions?.map((p: any) => p.name) || [],
   });
 
   const { error: rtInsertError } = await supabase
     .from("refresh_tokens")
-    .insert([{ user_id: user.id, token_hash: refreshTokenHash, expires_at: expiresAt.toISOString() }]);
+    .insert([
+      {
+        user_id: user.id,
+        token_hash: refreshTokenHash,
+        expires_at: expiresAt.toISOString(),
+        device_info: deviceInfo || {},
+      },
+    ]);
 
   if (rtInsertError) {
     throw new AppError("Failed to persist refresh token", 500);
@@ -614,32 +690,35 @@ export async function refreshSession(tokenRecord: RefreshTokenRecord) {
   }
 
   // Generate new tokens
-  const accessToken = signAccessToken({ 
+  const accessToken = signAccessToken({
     sub: user.id,
-    email: user.email || '',
+    email: user.email || "",
     role: user.role || UserRole.CLIENT,
-    permissions: user.permissions?.map((p: any) => p.name) || []
+    permissions: user.permissions?.map((p: any) => p.name) || [],
   });
   const { refreshToken: newRefreshToken, refreshTokenHash } = signRefreshToken({
     sub: user.id,
-    email: user.email || '',
+    email: user.email || "",
     role: user.role || UserRole.CLIENT,
-    permissions: user.permissions?.map((p: any) => p.name) || []
+    permissions: user.permissions?.map((p: any) => p.name) || [],
   });
 
   // Convert token hash to BYTEA format
-  const tokenHashBytes = Buffer.from(refreshTokenHash, 'hex');
+  const tokenHashBytes = Buffer.from(refreshTokenHash, "hex");
   const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   // Create new refresh token record
   const { data: newTokenRecord, error: insertError } = await supabase
     .from("refresh_tokens")
-    .insert([{
-      user_id: user.id,
-      token_hash: tokenHashBytes,
-      expires_at: refreshTokenExpiry.toISOString(),
-      is_revoked: false,
-    }])
+    .insert([
+      {
+        user_id: user.id,
+        token_hash: tokenHashBytes,
+        expires_at: refreshTokenExpiry.toISOString(),
+        is_revoked: false,
+        device_info: tokenRecord.device_info,
+      },
+    ])
     .select("id")
     .single();
 
@@ -710,16 +789,19 @@ export async function getMe(userId: string) {
  * @param deviceInfo - Device information for audit logging
  * @returns User data and JWT tokens
  */
-export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo) {
+export async function loginWithEmail(
+  data: EmailLoginDTO,
+  deviceInfo: DeviceInfo,
+) {
   const { email, password } = data;
 
   // Log login attempt
   await logAuthAttempt({
-    userId: '', // Will be set after user lookup
-    action: 'login_attempt',
-    resource: 'auth',
-    ipAddress: deviceInfo.ip_address || '',
-    userAgent: deviceInfo.user_agent || '',
+    userId: "", // Will be set after user lookup
+    action: "login_attempt",
+    resource: "auth",
+    ipAddress: deviceInfo.ip_address || "",
+    userAgent: deviceInfo.user_agent || "",
     timestamp: new Date(),
   });
 
@@ -732,11 +814,11 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
 
   if (error || !user) {
     await logAuthAttempt({
-      userId: '',
-      action: 'login_failure',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      userId: "",
+      action: "login_failure",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
     throw new AuthenticationError("Invalid email or password");
@@ -746,13 +828,15 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
   if (!user.password_hash) {
     await logAuthAttempt({
       userId: user.id,
-      action: 'login_failure',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "login_failure",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
-    throw new AuthenticationError("Email authentication not enabled for this account. Please use wallet authentication.");
+    throw new AuthenticationError(
+      "Email authentication not enabled for this account. Please use wallet authentication.",
+    );
   }
 
   // Verify password
@@ -760,10 +844,10 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
   if (!isPasswordValid) {
     await logAuthAttempt({
       userId: user.id,
-      action: 'login_failure',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "login_failure",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
     throw new AuthenticationError("Invalid email or password");
@@ -773,13 +857,15 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
   if (!user.is_active) {
     await logAuthAttempt({
       userId: user.id,
-      action: 'login_failure',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "login_failure",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
-    throw new AuthorizationError("Account is inactive. Please contact support.");
+    throw new AuthorizationError(
+      "Account is inactive. Please contact support.",
+    );
   }
 
   // Update last_login_at
@@ -791,30 +877,33 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
   // Generate tokens
   const accessToken = signAccessToken({
     sub: user.id,
-    email: user.email || '',
+    email: user.email || "",
     role: user.role || UserRole.CLIENT,
-    permissions: user.permissions?.map((p: any) => p.name) || []
+    permissions: user.permissions?.map((p: any) => p.name) || [],
   });
   const { refreshToken, refreshTokenHash } = signRefreshToken({
     sub: user.id,
-    email: user.email || '',
+    email: user.email || "",
     role: user.role || UserRole.CLIENT,
-    permissions: user.permissions?.map((p: any) => p.name) || []
+    permissions: user.permissions?.map((p: any) => p.name) || [],
   });
 
   // Calculate refresh token expiration time
   const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   // Save refresh token (using schema from migration)
-  const tokenHashBytes = Buffer.from(refreshTokenHash, 'hex');
+  const tokenHashBytes = Buffer.from(refreshTokenHash, "hex");
   const { error: rtInsertError } = await supabase
     .from("refresh_tokens")
-    .insert([{
-      user_id: user.id,
-      token_hash: tokenHashBytes,
-      expires_at: refreshTokenExpiry.toISOString(),
-      is_revoked: false,
-    }]);
+    .insert([
+      {
+        user_id: user.id,
+        token_hash: tokenHashBytes,
+        expires_at: refreshTokenExpiry.toISOString(),
+        is_revoked: false,
+        device_info: deviceInfo,
+      },
+    ]);
 
   if (rtInsertError) {
     console.error("Failed to persist refresh token:", rtInsertError);
@@ -824,10 +913,10 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
   // Log successful login
   await logAuthAttempt({
     userId: user.id,
-    action: 'login_success',
-    resource: 'auth',
-    ipAddress: deviceInfo.ip_address || '',
-    userAgent: deviceInfo.user_agent || '',
+    action: "login_success",
+    resource: "auth",
+    ipAddress: deviceInfo.ip_address || "",
+    userAgent: deviceInfo.user_agent || "",
     timestamp: new Date(),
   });
 
@@ -848,7 +937,9 @@ export async function loginWithEmail(data: EmailLoginDTO, deviceInfo: DeviceInfo
  * Log authentication attempts for audit purposes
  * @param logEntry - Audit log entry
  */
-async function logAuthAttempt(logEntry: Omit<AuditLogEntry, 'id'>): Promise<void> {
+async function logAuthAttempt(
+  logEntry: Omit<AuditLogEntry, "id">,
+): Promise<void> {
   try {
     const auditEntry: AuditLogEntry = {
       id: uuidv4(),
@@ -857,15 +948,17 @@ async function logAuthAttempt(logEntry: Omit<AuditLogEntry, 'id'>): Promise<void
 
     // In production, this should be stored in a dedicated audit table
     // For now, we'll log to console with structured format
-    console.log(JSON.stringify({
-      type: 'AUTH_AUDIT',
-      ...auditEntry,
-    }));
+    console.log(
+      JSON.stringify({
+        type: "AUTH_AUDIT",
+        ...auditEntry,
+      }),
+    );
 
     // TODO: Store in audit_logs table
     // await supabase.from('audit_logs').insert(auditEntry);
   } catch (error) {
-    console.error('Failed to log auth attempt:', error);
+    console.error("Failed to log auth attempt:", error);
   }
 }
 
@@ -874,39 +967,139 @@ async function logAuthAttempt(logEntry: Omit<AuditLogEntry, 'id'>): Promise<void
  * @param userId - User ID
  * @returns List of active sessions
  */
-export async function getUserSessions(userId: string) {
+export async function getUserSessions(
+  userId: string,
+  currentIp?: string,
+  currentUserAgent?: string,
+) {
+  // Query refresh_tokens table instead of user_sessions
   const { data: sessions, error } = await supabase
-    .from("user_sessions")
+    .from("refresh_tokens")
     .select("*")
     .eq("user_id", userId)
-    .eq("is_active", true)
+    .eq("is_revoked", false)
+    .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false });
 
   if (error) {
     throw new AppError("Failed to retrieve sessions", 500);
   }
 
-  return {
-    sessions: sessions || [],
-    total: sessions?.length || 0,
-  };
+  // parsers for device info if needed, but it's JSONB so it should be object
+  const formattedSessions =
+    sessions?.map((session: any) => {
+      // Determine is_current
+      let is_current = false;
+
+      // Parse device info if string (should be object)
+      let deviceInfo = session.device_info;
+      if (typeof deviceInfo === "string") {
+        try {
+          deviceInfo = JSON.parse(deviceInfo);
+        } catch (e) {
+          deviceInfo = {};
+        }
+      } else if (!deviceInfo) {
+        deviceInfo = {};
+      }
+
+      // Heuristic: Match IP and User Agent if stored
+      // Note: This is an approximation.
+      if (
+        currentIp &&
+        currentUserAgent &&
+        deviceInfo.ip_address === currentIp &&
+        deviceInfo.user_agent === currentUserAgent
+      ) {
+        is_current = true;
+      }
+
+      return {
+        id: session.id,
+        device_info: {
+          browser: deviceInfo?.browser || "Unknown",
+          os: deviceInfo?.os || "Unknown",
+          device: deviceInfo?.type || "Unknown",
+        },
+        ip_hash: deviceInfo?.ip_address
+          ? createHash("sha256")
+              .update(deviceInfo.ip_address)
+              .digest("hex")
+              .substring(0, 10) + "..."
+          : null,
+        created_at: session.created_at,
+        last_used_at: session.last_activity_at || session.created_at, // Refresh tokens don't track last use natively unless updated
+        expires_at: session.expires_at,
+        is_current: is_current,
+      };
+    }) || [];
+
+  return formattedSessions;
 }
 
+// Helper for hash
+import { createHash } from "crypto";
+
 /**
- * Deactivate a user session
- * @param userId - User ID
- * @param sessionId - Session ID to deactivate
+ * Revoke a specific session by ID
+ * @param userId - ID of the authenticated user
+ * @param sessionId - ID of the session to revoke
+ * @param currentSessionId - ID of the current session (optional, to prevent self-revocation)
  */
-export async function deactivateSession(userId: string, sessionId: string) {
-  const { error } = await supabase
-    .from("user_sessions")
-    .update({ is_active: false })
-    .eq("user_id", userId)
+export async function revokeSession(
+  userId: string,
+  sessionId: string,
+  currentSessionId?: string,
+) {
+  // 1. Validation: Cannot revoke current session
+  if (currentSessionId && sessionId === currentSessionId) {
+    throw new AppError(
+      "Cannot revoke current session. Use /logout instead.",
+      400,
+    );
+  }
+
+  // 2. Fetch session details to verify ownership and existence
+  const { data: session, error: fetchError } = await supabase
+    .from("refresh_tokens")
+    .select("id, user_id, is_revoked")
+    .eq("id", sessionId)
+    .single();
+
+  // Handling Supabase errors explicitly to avoid Typescript narrowing issues
+  if (fetchError) {
+    if (fetchError.code === "PGRST116") {
+      throw new AppError("Session not found", 404);
+    }
+    throw new AppError(`Database error: ${fetchError.message}`, 500);
+  }
+
+  if (!session) {
+    throw new AppError("Session not found", 404);
+  }
+
+  // 3. Authorization: Session must belong to the user
+  if (session.user_id !== userId) {
+    throw new AppError(
+      "You do not have permission to revoke this session",
+      403,
+    );
+  }
+
+  // 4. Revoke the session
+  const { error: updateError } = await supabase
+    .from("refresh_tokens")
+    .update({
+      is_revoked: true,
+      revoked_at: new Date().toISOString(),
+    })
     .eq("id", sessionId);
 
-  if (error) {
-    throw new AppError("Failed to deactivate session", 500);
+  if (updateError) {
+    throw new AppError(`Failed to revoke session: ${updateError.message}`, 500);
   }
+
+  return { message: "Session revoked successfully" };
 }
 
 /**
@@ -918,9 +1111,9 @@ export async function deactivateSession(userId: string, sessionId: string) {
  */
 export async function forgotPassword(email: string, deviceInfo: DeviceInfo) {
   // Validate email format
-  const { validateEmail } = await import('@/utils/validation');
+  const { validateEmail } = await import("@/utils/validation");
   if (!email || !validateEmail(email)) {
-    throw new AppError('Invalid email format', 400);
+    throw new AppError("Invalid email format", 400);
   }
 
   // Find user by email
@@ -935,16 +1128,19 @@ export async function forgotPassword(email: string, deviceInfo: DeviceInfo) {
   if (error || !user) {
     // Log the attempt even if user doesn't exist (for security monitoring)
     await logAuthAttempt({
-      userId: '',
-      action: 'password_reset_request',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      userId: "",
+      action: "password_reset_request",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
 
     // Return success to prevent email enumeration
-    return { message: 'If an account with that email exists, a password reset link has been sent.' };
+    return {
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
+    };
   }
 
   // Check if user has password authentication enabled
@@ -952,19 +1148,22 @@ export async function forgotPassword(email: string, deviceInfo: DeviceInfo) {
     // Log the attempt
     await logAuthAttempt({
       userId: user.id,
-      action: 'password_reset_request_failed',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "password_reset_request_failed",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
 
     // Return success to prevent email enumeration
-    return { message: 'If an account with that email exists, a password reset link has been sent.' };
+    return {
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
+    };
   }
 
   // Generate reset token (cryptographically secure random token)
-  const resetToken = randomBytes(32).toString('hex');
+  const resetToken = randomBytes(32).toString("hex");
   const resetTokenExpiry = new Date();
   resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1); // Token expires in 1 hour
 
@@ -978,16 +1177,16 @@ export async function forgotPassword(email: string, deviceInfo: DeviceInfo) {
     .eq("id", user.id);
 
   if (updateError) {
-    throw new AppError('Failed to generate password reset token', 500);
+    throw new AppError("Failed to generate password reset token", 500);
   }
 
   // Send password reset email
   try {
-    const emailService = await import('./email.service');
+    const emailService = await import("./email.service");
     await emailService.sendPasswordResetEmail(user.email, resetToken);
   } catch (emailError: any) {
     // Log email error but don't fail the request
-    console.error('Failed to send password reset email:', emailError);
+    console.error("Failed to send password reset email:", emailError);
     // In production, you might want to throw here, but for now we'll continue
     // The token is still saved, so the user could potentially use it if they contact support
   }
@@ -995,14 +1194,17 @@ export async function forgotPassword(email: string, deviceInfo: DeviceInfo) {
   // Log successful password reset request
   await logAuthAttempt({
     userId: user.id,
-    action: 'password_reset_request',
-    resource: 'auth',
-    ipAddress: deviceInfo.ip_address || '',
-    userAgent: deviceInfo.user_agent || '',
+    action: "password_reset_request",
+    resource: "auth",
+    ipAddress: deviceInfo.ip_address || "",
+    userAgent: deviceInfo.user_agent || "",
     timestamp: new Date(),
   });
 
-  return { message: 'If an account with that email exists, a password reset link has been sent.' };
+  return {
+    message:
+      "If an account with that email exists, a password reset link has been sent.",
+  };
 }
 
 /**
@@ -1016,19 +1218,19 @@ export async function forgotPassword(email: string, deviceInfo: DeviceInfo) {
 export async function resetPassword(
   token: string,
   newPassword: string,
-  deviceInfo: DeviceInfo
+  deviceInfo: DeviceInfo,
 ) {
   // Validate inputs
-  if (!token || typeof token !== 'string') {
-    throw new AppError('Reset token is required', 400);
+  if (!token || typeof token !== "string") {
+    throw new AppError("Reset token is required", 400);
   }
 
-  if (!newPassword || typeof newPassword !== 'string') {
-    throw new AppError('New password is required', 400);
+  if (!newPassword || typeof newPassword !== "string") {
+    throw new AppError("New password is required", 400);
   }
 
   if (newPassword.length < 8) {
-    throw new AppError('Password must be at least 8 characters long', 400);
+    throw new AppError("Password must be at least 8 characters long", 400);
   }
 
   // Find user by reset token
@@ -1040,19 +1242,19 @@ export async function resetPassword(
 
   if (error || !user) {
     await logAuthAttempt({
-      userId: '',
-      action: 'password_reset_failed',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      userId: "",
+      action: "password_reset_failed",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
-    throw new AppError('Invalid or expired reset token', 400);
+    throw new AppError("Invalid or expired reset token", 400);
   }
 
   // Check if token has expired
   if (!user.password_reset_expires_at) {
-    throw new AppError('Invalid or expired reset token', 400);
+    throw new AppError("Invalid or expired reset token", 400);
   }
 
   const expiryDate = new Date(user.password_reset_expires_at);
@@ -1068,14 +1270,17 @@ export async function resetPassword(
 
     await logAuthAttempt({
       userId: user.id,
-      action: 'password_reset_failed',
-      resource: 'auth',
-      ipAddress: deviceInfo.ip_address || '',
-      userAgent: deviceInfo.user_agent || '',
+      action: "password_reset_failed",
+      resource: "auth",
+      ipAddress: deviceInfo.ip_address || "",
+      userAgent: deviceInfo.user_agent || "",
       timestamp: new Date(),
     });
 
-    throw new AppError('Reset token has expired. Please request a new password reset.', 400);
+    throw new AppError(
+      "Reset token has expired. Please request a new password reset.",
+      400,
+    );
   }
 
   // Hash new password
@@ -1092,18 +1297,18 @@ export async function resetPassword(
     .eq("id", user.id);
 
   if (updateError) {
-    throw new AppError('Failed to reset password', 500);
+    throw new AppError("Failed to reset password", 500);
   }
 
   // Log successful password reset
   await logAuthAttempt({
     userId: user.id,
-    action: 'password_reset_success',
-    resource: 'auth',
-    ipAddress: deviceInfo.ip_address || '',
-    userAgent: deviceInfo.user_agent || '',
+    action: "password_reset_success",
+    resource: "auth",
+    ipAddress: deviceInfo.ip_address || "",
+    userAgent: deviceInfo.user_agent || "",
     timestamp: new Date(),
   });
 
-  return { message: 'Password has been reset successfully' };
+  return { message: "Password has been reset successfully" };
 }
