@@ -26,6 +26,16 @@ export interface DebitReference {
   type: 'withdrawal' | 'payment' | 'fee';
 }
 
+export interface HoldReference {
+  id: string;
+  type: 'contract' | 'escrow';
+}
+
+export interface ReleaseReference {
+  id: string;
+  type: 'contract' | 'escrow';
+}
+
 export interface BalanceTransaction {
   id: string;
   user_id: string;
