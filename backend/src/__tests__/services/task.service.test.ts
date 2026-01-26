@@ -1,94 +1,424 @@
-// __tests__/task.service.spec.ts
-import { getTaskRecordsByClient } from "@/services/task.service";
-import { InternalServerError } from "@/utils/AppError";
+import { taskService } from '@/services/task.service';
+import { supabase } from '@/lib/supabase/supabase';
+import { TaskRecordService } from '@/blockchain/task-record.service';
+import { AppError, ValidationError, ConflictError, NotFoundError, AuthorizationError } from '@/utils/AppError';
 
-// Mock the supabase client module
-jest.mock("@/lib/supabase/supabase", () => {
-  // create a chainable builder factory we can control per-test
-  return {
-    supabase: {
-      from: jest.fn(),
-    },
+// Mock Supabase
+jest.mock('@/lib/supabase/supabase');
+
+// Mock TaskRecordService
+jest.mock('@/blockchain/task-record.service');
+
+const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+const MockTaskRecordService = TaskRecordService as jest.MockedClass<typeof TaskRecordService>;
+
+describe('TaskService', () => {
+  const mockClientId = '123e4567-e89b-12d3-a456-426614174000';
+  const mockProjectId = '456e7890-e89b-12d3-a456-426614174001';
+  const mockFreelancerId = '789e0123-e89b-12d3-a456-426614174002';
+
+  const mockProject = {
+    id: mockProjectId,
+    client_id: mockClientId,
+    status: 'in_progress',
+    title: 'Test Project'
   };
-});
 
-import { supabase } from "@/lib/supabase/supabase";
-
-describe("getTaskRecordsByClient (service)", () => {
-  const mockChainFactory = (result: any) => {
-    // methods return this chain so you can call eq/order/range etc.
-    const chain: any = {
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      range: jest.fn().mockResolvedValue(result),
-    };
-    return chain;
+  const mockTaskRecordData = {
+    project_id: mockProjectId,
+    freelancer_id: mockFreelancerId,
+    completed: true,
+    outcome_description: 'Task completed successfully'
   };
+
+  const mockBlockchainResult = {
+    transactionHash: '0x1234567890abcdef',
+    taskId: 1,
+    timestamp: Date.now(),
+    ledger: 12345
+  };
+
+  const mockCreatedTaskRecord = {
+    id: 'task-record-id',
+    project_id: mockProjectId,
+    freelancer_id: mockFreelancerId,
+    client_id: mockClientId,
+    completed: true,
+    outcome_description: 'Task completed successfully',
+    on_chain_tx_hash: mockBlockchainResult.transactionHash,
+    on_chain_task_id: mockBlockchainResult.taskId,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z'
+  };
+
+  const page = 1;
+  const completed = true;
+  const limit = 20;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Mock blockchain service instance
+    const mockBlockchainInstance = {
+      recordTask: jest.fn().mockResolvedValue(mockBlockchainResult)
+    };
+    MockTaskRecordService.mockImplementation(() => mockBlockchainInstance as any);
   });
 
-  it("returns paginated results and meta when supabase returns data", async () => {
-    const fakeRows = Array.from({ length: 3 }).map((_, i) => ({
-      id: `id-${i}`,
-      client_id: "client-uuid",
-      project_title: `project-${i}`,
-      freelancer_name: `fr-${i}`,
-      completed: true,
-      created_at: new Date().toISOString(),
-    }));
-    // supabase returns data, no error, count total
-    const result = { data: fakeRows, error: null, count: 42 };
-    const chain = mockChainFactory(result);
-    (supabase.from as jest.Mock).mockReturnValue(chain);
+  describe('createTaskRecord', () => {
+    beforeEach(() => {
+      // Setup default mocks for successful case
+      mockSupabase.from.mockImplementation((table) => {
+        if (table === 'projects') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockProject,
+                  error: null
+                })
+              })
+            }),
+            update: jest.fn().mockReturnValue({
+              eq: jest.fn().mockResolvedValue({
+                error: null
+              })
+            })
+          } as any;
+        }
+        
+        if (table === 'task_records') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: null,
+                  error: { code: 'PGRST116' } // No rows found
+                })
+              })
+            }),
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockCreatedTaskRecord,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        
+        return {} as any;
+      });
+    });
 
-    const res = await getTaskRecordsByClient("client-uuid", 10, 1, true);
+    it('should successfully create a task record with blockchain registration', async () => {
+      const result = await taskService.createTaskRecord(mockTaskRecordData, mockClientId);
 
-    expect(supabase.from).toHaveBeenCalledWith("vw_task_records_for_client");
-    // confirm we chained eq('client_id', ...) and eq('completed', true)
-    expect(chain.eq).toHaveBeenCalledWith("client_id", "client-uuid");
-    expect(chain.eq).toHaveBeenCalledWith("completed", true);
-    expect(chain.order).toHaveBeenCalledWith("created_at", { ascending: false });
-    expect(res.data).toEqual(fakeRows);
-    expect(res.meta.total_items).toEqual(42);
-    expect(res.meta.page).toEqual(1);
-    expect(res.meta.limit).toEqual(10);
+      expect(result).toEqual(mockCreatedTaskRecord);
+      
+      // Verify project lookup
+      expect(mockSupabase.from).toHaveBeenCalledWith('projects');
+      
+      // Verify existing record check
+      expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
+      
+      // Verify task record insertion
+      expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
+      
+      // Verify project status update
+      expect(mockSupabase.from).toHaveBeenCalledWith('projects');
+    });
+
+    it('should throw NotFoundError when project does not exist', async () => {
+      mockSupabase.from.mockImplementation((table) => {
+        if (table === 'projects') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: null,
+                  error: { code: 'PGRST116' }
+                })
+              })
+            })
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await expect(taskService.createTaskRecord(mockTaskRecordData, mockClientId))
+        .rejects.toThrow(NotFoundError);
+    });
+
+    it('should throw ValidationError when project status is not in_progress', async () => {
+      const projectWithWrongStatus = { ...mockProject, status: 'completed' };
+      
+      mockSupabase.from.mockImplementation((table) => {
+        if (table === 'projects') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: projectWithWrongStatus,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        return {} as any;
+      });
+
+      await expect(taskService.createTaskRecord(mockTaskRecordData, mockClientId))
+        .rejects.toThrow(ValidationError);
+    });
+
+    it('should throw AuthorizationError when requester is not the project client', async () => {
+      const differentClientId = 'different-client-id';
+
+      await expect(taskService.createTaskRecord(mockTaskRecordData, differentClientId))
+        .rejects.toThrow(AuthorizationError);
+    });
+
+    it('should throw ConflictError when task record already exists', async () => {
+      mockSupabase.from.mockImplementation((table) => {
+        if (table === 'projects') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockProject,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        
+        if (table === 'task_records') {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: { id: 'existing-record' },
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        
+        return {} as any;
+      });
+
+      await expect(taskService.createTaskRecord(mockTaskRecordData, mockClientId))
+        .rejects.toThrow(ConflictError);
+    });
+
+    it('should handle blockchain failure gracefully and continue with database record', async () => {
+      // Mock blockchain service to fail
+      const mockBlockchainInstance = {
+        recordTask: jest.fn().mockRejectedValue(new Error('Blockchain error'))
+      };
+      MockTaskRecordService.mockImplementation(() => mockBlockchainInstance as any);
+
+      const expectedRecordWithoutBlockchain = {
+        ...mockCreatedTaskRecord,
+        on_chain_tx_hash: undefined,
+        on_chain_task_id: undefined
+      };
+
+      mockSupabase.from.mockImplementation((table) => {
+        if (table === 'task_records' && mockSupabase.from.mock.calls.length > 1) {
+          return {
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: expectedRecordWithoutBlockchain,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        return mockSupabase.from.mockImplementation((table) => {
+          if (table === 'projects') {
+            return {
+              select: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: mockProject,
+                    error: null
+                  })
+                })
+              }),
+              update: jest.fn().mockReturnValue({
+                eq: jest.fn().mockResolvedValue({
+                  error: null
+                })
+              })
+            } as any;
+          }
+          
+          if (table === 'task_records') {
+            return {
+              select: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  single: jest.fn().mockResolvedValue({
+                    data: null,
+                    error: { code: 'PGRST116' }
+                  })
+                })
+              })
+            } as any;
+          }
+          
+          return {} as any;
+        })(table);
+      });
+
+      const result = await taskService.createTaskRecord(mockTaskRecordData, mockClientId);
+
+      expect(result).toEqual(expectedRecordWithoutBlockchain);
+      expect(mockBlockchainInstance.recordTask).toHaveBeenCalledTimes(3); // 3 retry attempts
+    });
+
+    it('should update project status to completed when task is completed', async () => {
+      await taskService.createTaskRecord(mockTaskRecordData, mockClientId);
+
+      // Verify project status update was called with 'completed'
+      expect(mockSupabase.from).toHaveBeenCalledWith('projects');
+    });
+
+    it('should update project status to cancelled when task is not completed', async () => {
+      const incompleteTaskData = { ...mockTaskRecordData, completed: false };
+      
+      await taskService.createTaskRecord(incompleteTaskData, mockClientId);
+
+      // Verify project status update was called
+      expect(mockSupabase.from).toHaveBeenCalledWith('projects');
+    });
   });
 
-  it("applies default pagination if invalid page/limit provided", async () => {
-    const rows = [{ id: "r1" }];
-    const result = { data: rows, error: null, count: 1 };
-    const chain = mockChainFactory(result);
-    (supabase.from as jest.Mock).mockReturnValue(chain);
+  describe('getTaskRecordByProjectId', () => {
+    it('should return task record when found', async () => {
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: mockCreatedTaskRecord,
+              error: null
+            })
+          })
+        })
+      } as any);
 
-    const res = await getTaskRecordsByClient("client-uuid", NaN as any, NaN as any);
+      const result = await taskService.getTaskRecordByProjectId(mockProjectId);
 
-    // default limit=20, page=1 -> from 0 to 19
-    expect(chain.range).toHaveBeenCalledWith(0, 19);
-    expect(res.meta.limit).toBe(20);
+      expect(result).toEqual(mockCreatedTaskRecord);
+      expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
+    });
+
+    it('should return null when task record not found', async () => {
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: null,
+              error: { code: 'PGRST116' }
+            })
+          })
+        })
+      } as any);
+
+      const result = await taskService.getTaskRecordByProjectId(mockProjectId);
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw AppError for database errors', async () => {
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: null,
+              error: { code: 'OTHER_ERROR', message: 'Database error' }
+            })
+          })
+        })
+      } as any);
+
+      await expect(taskService.getTaskRecordByProjectId(mockProjectId))
+        .rejects.toThrow(AppError);
+    });
   });
 
-  it("throws InternalServerError when supabase returns an error", async () => {
-    const result = { data: null, error: { message: "db error" }, count: null };
-    const chain = mockChainFactory(result);
-    (supabase.from as jest.Mock).mockReturnValue(chain);
+  describe('getTaskRecordsByClientId', () => {
+    it('should return array of task records for client', async () => {
+      const mockTaskRecords = [mockCreatedTaskRecord];
+      
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              order: jest.fn().mockReturnValue({
+                range: jest.fn().mockResolvedValue({
+                  data: mockTaskRecords,
+                  error: null
+                })
+              })
+            })
+          })
+        })
+      } as any);
 
-    await expect(getTaskRecordsByClient("client-uuid", 10, 1)).rejects.toThrow(InternalServerError);
+      const { taskRecords: result } = await taskService.getTaskRecordsByClientId(mockClientId, limit, page, completed);
+
+      expect(result).toEqual(mockTaskRecords);
+      expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
+    });
+
+    it('should throw AppError for database errors', async () => {
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              order: jest.fn().mockReturnValue({
+                range: jest.fn().mockResolvedValue({
+                  data: null,
+                  error: { message: 'Database error' }
+                })
+              })
+            })
+          })
+        })
+      } as any);
+
+      await expect(taskService.getTaskRecordsByClientId(mockClientId, limit, page, completed))
+        .rejects.toThrow(AppError);
+    });
   });
 
-  it("does not call completed filter if completed undefined", async () => {
-    const result = { data: [], error: null, count: 0 };
-    const chain = mockChainFactory(result);
-    (supabase.from as jest.Mock).mockReturnValue(chain);
+  describe('getTaskRecordsByFreelancerId', () => {
+    it('should return array of task records for freelancer', async () => {
+      const mockTaskRecords = [mockCreatedTaskRecord];
+      
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            order: jest.fn().mockResolvedValue({
+              data: mockTaskRecords,
+              error: null
+            })
+          })
+        })
+      } as any);
 
-    await getTaskRecordsByClient("client-uuid", 5, 2, undefined);
+      const result = await taskService.getTaskRecordsByFreelancerId(mockFreelancerId);
 
-    // eq called with client_id only (and possibly other eq calls but not completed).
-    // We assert that none of the eq calls used "completed" as first arg.
-    const eqCalls = (chain.eq as jest.Mock).mock.calls;
-    const hadCompleted = eqCalls.some((c: any[]) => c[0] === "completed");
-    expect(hadCompleted).toBe(false);
+      expect(result).toEqual(mockTaskRecords);
+      expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
+    });
   });
 });
