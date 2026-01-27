@@ -79,9 +79,11 @@ export interface ProjectFilters {
   limit?: number;
   search?: string;
   category?: string;
-  status?: ProjectStatus;
+  status?: string;
   clientId?: string;
   freelancerId?: string;
+  minBudget?: number;
+  maxBudget?: number;
 }
 
 /**

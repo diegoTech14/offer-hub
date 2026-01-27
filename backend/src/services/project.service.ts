@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/supabase";
 
-import { CreateProjectDTO, UpdateProjectDTO, Project, UpdateProjectResult, ProjectStatus } from '@/types/project.type';
+import { CreateProjectDTO, UpdateProjectDTO, UpdateProjectResult, Project } from '@/types/project.type';
 import {
   Project as ProjectModel,
   ProjectRow,
@@ -10,6 +10,7 @@ import {
 import { InternalServerError } from "@/utils/AppError";
 import { userService } from "./user.service";
 import { escrowService } from "./escrow.service";
+import type { ProjectFilters } from '@/types/project.types';
 
 // Status values that allow updates
 // Note: 'pending' is included for backward compatibility with existing data
@@ -235,10 +236,6 @@ export const deleteProject = async (id: string, client_id: string) => {
   return { success: true, status: 200, message: 'Project_deleted', data: deleted };
 };
 
-import { Project, ProjectSkill } from "@/types/project.types";
-import type { ProjectFilters } from '@/types/project.types';
-
-
 
 class ProjectService {
   /**
@@ -274,7 +271,7 @@ class ProjectService {
     };
 
     // Transform the data to include skills as array of strings
-    const skills = row.project_skills?.map((ps) => ps.skill_name) || [];
+    const skills = row.project_skills?.map((ps: ProjectSkillRow) => ps.skill_name) || [];
 
     return {
       id: row.id,
@@ -299,7 +296,7 @@ class ProjectService {
    * @param filters - Query filters including pagination, search, and field filters
    * @returns Paginated list of projects with total count
    */
-  async listProjects(filters: ProjectFilters): Promise<{ projects: Project[]; total: number }> {
+  async listProjects(filters: ProjectFilters): Promise<{ projects: ProjectModel[]; total: number }> {
     const {
       page = 1,
       limit = 20,
@@ -358,12 +355,12 @@ class ProjectService {
 
     //Transform projects to include skills array
     const projects = (projectsData || []).map((projectData: any) => {
-      const skills = projectData.project_skills?.map((ps: ProjectSkill) => ps.skill_name) || [];
+      const skills = projectData.project_skills?.map((ps: ProjectSkillRow) => ps.skill_name) || [];
       const { project_skills, ...project } = projectData;
       return {
         ...project,
         skills
-      } as Project;
+      } as ProjectModel;
     });
 
     return {

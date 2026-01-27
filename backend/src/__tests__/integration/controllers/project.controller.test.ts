@@ -208,14 +208,15 @@ describe('Project Controller - listProjectsHandler', () => {
   const mockProjects = [
     {
       id: '223e4567-e89b-12d3-a456-426614174001',
-      client_id: '456e7890-e89b-12d3-a456-426614174001',
+      clientId: '456e7890-e89b-12d3-a456-426614174001',
       title: 'Mobile App Development',
       description: 'Create a mobile app for iOS and Android',
       category: 'Development',
       subcategory: 'Mobile Development',
-      budget: 8000,
+      budgetAmount: 8000,
+      currency: 'XLM',
       budget_type: 'fixed' as const,
-      status: 'published' as const,
+      status: ProjectStatus.OPEN as const,
       visibility: 'public' as const,
       project_type: 'on-time' as const,
       experience_level: 'expert' as const,
@@ -225,20 +226,21 @@ describe('Project Controller - listProjectsHandler', () => {
       version: 1,
       featured: true,
       priority: 1,
-      created_at: '2024-01-16T10:00:00Z',
-      updated_at: '2024-01-16T10:00:00Z',
+      createdAt: '2024-01-16T10:00:00Z',
+      updatedAt: '2024-01-16T10:00:00Z',
       skills: ['Swift', 'Kotlin', 'React Native']
     },
     {
       id: '123e4567-e89b-12d3-a456-426614174000',
-      client_id: '456e7890-e89b-12d3-a456-426614174001',
+      clientId: '456e7890-e89b-12d3-a456-426614174001',
       title: 'Web Development Project',
       description: 'Build a modern web application',
       category: 'Development',
       subcategory: 'Web Development',
-      budget: 5000,
+      budgetAmount: 5000,
+      currency: 'XLM',
       budget_type: 'fixed' as const,
-      status: 'published' as const,
+      status: ProjectStatus.OPEN as const,
       visibility: 'public' as const,
       project_type: 'on-time' as const,
       experience_level: 'intermediate' as const,
@@ -248,8 +250,8 @@ describe('Project Controller - listProjectsHandler', () => {
       version: 1,
       featured: false,
       priority: 0,
-      created_at: '2024-01-15T10:00:00Z',
-      updated_at: '2024-01-15T10:00:00Z',
+      createdAt: '2024-01-15T10:00:00Z',
+      updatedAt: '2024-01-15T10:00:00Z',
       skills: ['JavaScript', 'React', 'Node.js']
     }
   ];
@@ -457,7 +459,7 @@ describe('Project Controller - listProjectsHandler', () => {
 
   describe('Status Filter', () => {
     it('should filter projects by status', async () => {
-      mockReq.query = { status: 'published' };
+      mockReq.query = { status: ProjectStatus.OPEN };
 
       mockProjectService.listProjects.mockResolvedValue({
         projects: mockProjects,
@@ -468,7 +470,7 @@ describe('Project Controller - listProjectsHandler', () => {
 
       expect(mockProjectService.listProjects).toHaveBeenCalledWith(
         expect.objectContaining({
-          status: 'published'
+          status: ProjectStatus.OPEN
         })
       );
     });
@@ -589,7 +591,7 @@ describe('Project Controller - listProjectsHandler', () => {
         page: '1',
         limit: '10',
         search: 'development',
-        status: 'published',
+        status: ProjectStatus.OPEN,
         category: 'Development',
         minBudget: '5000',
         maxBudget: '10000'
@@ -606,7 +608,7 @@ describe('Project Controller - listProjectsHandler', () => {
         page: 1,
         limit: 10,
         search: 'development',
-        status: 'published',
+        status: ProjectStatus.OPEN,
         category: 'Development',
         minBudget: 5000,
         maxBudget: 10000
@@ -695,7 +697,7 @@ describe('Project Controller - listProjectsHandler', () => {
       const response = mockRes.json.mock.calls[0][0];
       const projects = response.data;
 
-      expect(projects[0].created_at >= projects[1].created_at).toBe(true);
+      expect(projects[0].createdAt >= projects[1].createdAt).toBe(true);
     });
   });
 });

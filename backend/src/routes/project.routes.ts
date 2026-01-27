@@ -7,6 +7,7 @@ import {
   deleteProjectHandler,
   assignFreelancerHandler,
   getProjectHandler,
+  listProjectsHandler,
 } from "@/controllers/project.controller";
 import { authorizeRoles, verifyToken } from "@/middlewares/auth.middleware";
 import { UserRole } from "@/types/auth.types";
