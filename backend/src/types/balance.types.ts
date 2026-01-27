@@ -26,6 +26,16 @@ export interface DebitReference {
   type: 'withdrawal' | 'payment' | 'fee';
 }
 
+export interface HoldReference {
+  id: string;
+  type: 'contract' | 'escrow' | 'withdrawal';
+}
+
+export interface ReleaseReference {
+  id: string;
+  type: 'contract' | 'escrow';
+}
+
 export interface BalanceTransaction {
   id: string;
   user_id: string;
@@ -38,4 +48,27 @@ export interface BalanceTransaction {
   balance_after: number;
   description?: string;
   created_at: string;
+}
+
+export type TransactionType = 'credit' | 'debit' | 'hold' | 'release' | 'settle_in' | 'settle_out';
+
+export const TRANSACTION_TYPES: TransactionType[] = ['credit', 'debit', 'hold', 'release', 'settle_in', 'settle_out'];
+
+export interface TransactionFilters {
+  currency?: string;
+  type?: TransactionType;
+  from?: string; // ISO date string
+  to?: string; // ISO date string
+  page?: number;
+  limit?: number;
+}
+
+export interface TransactionHistoryResult {
+  transactions: BalanceTransaction[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }

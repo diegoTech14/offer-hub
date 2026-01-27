@@ -132,7 +132,6 @@ export async function register(data: RegisterDTO, deviceInfo: DeviceInfo) {
     // Generate invisible wallet (Stellar keypair) for the user
     const { wallet, publicKey } = await walletService.generateInvisibleWallet(
       newUser.id,
-      email,
     );
 
     // Update user with wallet address

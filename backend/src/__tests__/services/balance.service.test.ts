@@ -1042,3 +1042,1239 @@ describe('BalanceService - debitAvailable', () => {
     });
   });
 });
+describe('BalanceService - getTransactionHistory', () => {
+  const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
+
+  const mockTransactions = [
+    {
+      id: 'tx-1',
+      user_id: mockUserId,
+      amount: 100,
+      currency: 'USD',
+      type: 'credit',
+      reference_id: 'ref-1',
+      reference_type: 'topup',
+      balance_before: 0,
+      balance_after: 100,
+      description: 'Top up',
+      created_at: '2024-01-15T10:30:00Z'
+    },
+    {
+      id: 'tx-2',
+      user_id: mockUserId,
+      amount: 50,
+      currency: 'USD',
+      type: 'debit',
+      reference_id: 'ref-2',
+      reference_type: 'withdrawal',
+      balance_before: 100,
+      balance_after: 50,
+      description: 'Withdrawal',
+      created_at: '2024-01-14T09:00:00Z'
+    }
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('Success cases', () => {
+    it('should retrieve transaction history with no filters', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: 2
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockSupabase.from).toHaveBeenCalledWith('balance_transactions');
+      expect(mockQuery.select).toHaveBeenCalledWith('*', { count: 'exact' });
+      expect(mockQuery.eq).toHaveBeenCalledWith('user_id', mockUserId);
+      expect(mockQuery.order).toHaveBeenCalledWith('created_at', { ascending: false });
+      expect(mockQuery.range).toHaveBeenCalledWith(0, 19);
+
+      expect(result).toEqual({
+        transactions: mockTransactions,
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 2,
+          pages: 1
+        }
+      });
+    });
+
+    it('should filter by currency', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [mockTransactions[0]],
+          error: null,
+          count: 1
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        currency: 'USD',
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockQuery.eq).toHaveBeenCalledWith('user_id', mockUserId);
+      expect(mockQuery.eq).toHaveBeenCalledWith('currency', 'USD');
+      expect(result.transactions).toHaveLength(1);
+    });
+
+    it('should filter by transaction type', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [mockTransactions[0]],
+          error: null,
+          count: 1
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        type: 'credit',
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockQuery.eq).toHaveBeenCalledWith('type', 'credit');
+      expect(result.transactions).toHaveLength(1);
+    });
+
+    it('should filter by date range', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lt: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: 2
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        from: '2024-01-01',
+        to: '2024-01-31',
+        page: 1,
+        limit: 20
+      });
+
+      expect(mockQuery.gte).toHaveBeenCalledWith('created_at', '2024-01-01');
+      expect(mockQuery.lt).toHaveBeenCalledWith('created_at', expect.any(String));
+      expect(result.transactions).toHaveLength(2);
+    });
+
+    it('should handle pagination correctly', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [mockTransactions[1]],
+          error: null,
+          count: 10
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 2,
+        limit: 5
+      });
+
+      expect(mockQuery.range).toHaveBeenCalledWith(5, 9);
+      expect(result.pagination).toEqual({
+        page: 2,
+        limit: 5,
+        total: 10,
+        pages: 2
+      });
+    });
+
+    it('should use default pagination values when not provided', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: 2
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {});
+
+      expect(mockQuery.range).toHaveBeenCalledWith(0, 19);
+      expect(result.pagination).toEqual({
+        page: 1,
+        limit: 20,
+        total: 2,
+        pages: 1
+      });
+    });
+
+    it('should return empty array when no transactions found', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [],
+          error: null,
+          count: 0
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 1,
+        limit: 20
+      });
+
+      expect(result.transactions).toEqual([]);
+      expect(result.pagination.total).toBe(0);
+    });
+  });
+
+  describe('Validation errors', () => {
+    it('should throw BadRequestError for invalid user ID', async () => {
+      await expect(
+        balanceService.getTransactionHistory('invalid-uuid', {})
+      ).rejects.toThrow(BadRequestError);
+    });
+
+    it('should throw ValidationError for unsupported currency', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          currency: 'EUR'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for unsupported transaction type', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          type: 'invalid' as any
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError when from date is after to date', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          from: '2024-01-31',
+          to: '2024-01-01'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for invalid from date', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          from: 'invalid-date'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for invalid to date', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          to: 'invalid-date'
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for page less than 1', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          page: 0
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for limit less than 1', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          limit: 0
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError for limit greater than 100', async () => {
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          limit: 101
+        })
+      ).rejects.toThrow(ValidationError);
+    });
+  });
+
+  describe('Database errors', () => {
+    it('should throw InternalServerError on database error', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Database connection failed' },
+          count: null
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      await expect(
+        balanceService.getTransactionHistory(mockUserId, {
+          page: 1,
+          limit: 20
+        })
+      ).rejects.toThrow(InternalServerError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should handle null count gracefully', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: mockTransactions,
+          error: null,
+          count: null
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        page: 1,
+        limit: 20
+      });
+
+      expect(result.pagination.total).toBe(0);
+      expect(result.pagination.pages).toBe(0);
+    });
+  });
+
+  describe('Edge cases', () => {
+    it('should handle all transaction types', async () => {
+      const allTypes = ['credit', 'debit', 'hold', 'release', 'settle_in', 'settle_out'];
+
+      for (const type of allTypes) {
+        const mockQuery = {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          order: jest.fn().mockReturnThis(),
+          range: jest.fn().mockResolvedValue({
+            data: [],
+            error: null,
+            count: 0
+          })
+        };
+
+        (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+        await expect(
+          balanceService.getTransactionHistory(mockUserId, {
+            type: type as any
+          })
+        ).resolves.not.toThrow();
+      }
+    });
+
+    it('should handle all supported currencies', async () => {
+      const currencies = ['USD', 'XLM'];
+
+      for (const currency of currencies) {
+        const mockQuery = {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          order: jest.fn().mockReturnThis(),
+          range: jest.fn().mockResolvedValue({
+            data: [],
+            error: null,
+            count: 0
+          })
+        };
+
+        (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+        await expect(
+          balanceService.getTransactionHistory(mockUserId, {
+            currency
+          })
+        ).resolves.not.toThrow();
+      }
+    });
+
+    it('should handle combined filters', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lt: jest.fn().mockReturnThis(),
+        order: jest.fn().mockReturnThis(),
+        range: jest.fn().mockResolvedValue({
+          data: [],
+          error: null,
+          count: 0
+        })
+      };
+
+      (mockSupabase.from as jest.Mock).mockReturnValue(mockQuery);
+
+      const result = await balanceService.getTransactionHistory(mockUserId, {
+        currency: 'USD',
+        type: 'credit',
+        from: '2024-01-01',
+        to: '2024-01-31',
+        page: 2,
+        limit: 10
+      });
+
+      expect(mockQuery.eq).toHaveBeenCalledWith('currency', 'USD');
+      expect(mockQuery.eq).toHaveBeenCalledWith('type', 'credit');
+      expect(mockQuery.gte).toHaveBeenCalled();
+      expect(mockQuery.lt).toHaveBeenCalled();
+      expect(mockQuery.range).toHaveBeenCalledWith(10, 19);
+    });
+  });
+});
+describe('BalanceService - holdBalance', () => {
+  const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
+  const mockRef = { id: 'contract-123', type: 'contract' as const };
+
+  const mockBalanceData = {
+    id: 'bal-123',
+    user_id: mockUserId,
+    currency: 'USD',
+    available: 50.00000000,
+    held: 50.00000000,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('Success Cases', () => {
+    it('should call RPC and return updated balance on success', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 50.00000000,
+        held: 50.00000000,
+        updated_at: '2024-01-01T01:00:00Z',
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        50.00,
+        'USD',
+        mockRef,
+        'Hold funds for contract'
+      );
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('hold_balance', {
+        p_user_id: mockUserId,
+        p_amount: 50.00,
+        p_currency: 'USD',
+        p_ref_id: mockRef.id,
+        p_ref_type: mockRef.type,
+        p_description: 'Hold funds for contract',
+      });
+
+      expect(result).toEqual(updatedBalance);
+      expect(result.available).toBe(50.00000000);
+      expect(result.held).toBe(50.00000000);
+    });
+
+    it('should handle contract reference type', async () => {
+      const contractRef = { id: 'contract-456', type: 'contract' as const };
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 75.00000000,
+        held: 25.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        25.00,
+        'USD',
+        contractRef
+      );
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('hold_balance', {
+        p_user_id: mockUserId,
+        p_amount: 25.00,
+        p_currency: 'USD',
+        p_ref_id: contractRef.id,
+        p_ref_type: contractRef.type,
+        p_description: '',
+      });
+
+      expect(result.available).toBe(75.00000000);
+      expect(result.held).toBe(25.00000000);
+    });
+
+    it('should handle escrow reference type', async () => {
+      const escrowRef = { id: 'escrow-789', type: 'escrow' as const };
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 90.00000000,
+        held: 10.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        10.00,
+        'USD',
+        escrowRef,
+        'Escrow hold'
+      );
+
+      expect(result.available).toBe(90.00000000);
+      expect(result.held).toBe(10.00000000);
+    });
+
+    it('should work with XLM currency', async () => {
+      const xlmBalance = {
+        ...mockBalanceData,
+        currency: 'XLM',
+        available: 150.00000000,
+        held: 50.00000000,
+      };
+      const updatedBalance = {
+        ...xlmBalance,
+        available: 100.00000000,
+        held: 100.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        50.00,
+        'XLM',
+        mockRef
+      );
+
+      expect(result.currency).toBe('XLM');
+      expect(result.available).toBe(100.00000000);
+      expect(result.held).toBe(100.00000000);
+    });
+
+    it('should log operation with correlation ID', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: mockBalanceData,
+        error: null,
+      });
+
+      await balanceService.holdBalance(mockUserId, 10, 'USD', mockRef);
+
+      expect(mockLogger.info).toHaveBeenCalledTimes(2); // Start and success
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('[BalanceService] Starting holdBalance')
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('[BalanceService] Success')
+      );
+    });
+
+    it('should handle small amounts', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 99.99000000,
+        held: 0.01000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        0.01,
+        'USD',
+        mockRef
+      );
+
+      expect(result.held).toBe(0.01000000);
+    });
+
+    it('should handle large amounts', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 0.00000000,
+        held: 10000.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        10000.00,
+        'USD',
+        mockRef
+      );
+
+      expect(result.held).toBe(10000.00000000);
+    });
+
+    it('should default to empty description when not provided', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: mockBalanceData,
+        error: null,
+      });
+
+      await balanceService.holdBalance(mockUserId, 10, 'USD', mockRef);
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+        'hold_balance',
+        expect.objectContaining({
+          p_description: '',
+        })
+      );
+    });
+  });
+
+  describe('Validation Errors', () => {
+    it('should throw ValidationError for non-positive amount', async () => {
+      await expect(
+        balanceService.holdBalance(mockUserId, -10, 'USD', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for zero amount', async () => {
+      await expect(
+        balanceService.holdBalance(mockUserId, 0, 'USD', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestError for invalid UUID', async () => {
+      await expect(
+        balanceService.holdBalance('bad-id', 50, 'USD', mockRef)
+      ).rejects.toThrow(BadRequestError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for unsupported currency', async () => {
+      await expect(
+        balanceService.holdBalance(mockUserId, 50, 'EUR', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for invalid reference (missing id)', async () => {
+      const invalidRef = { id: '', type: 'contract' as const };
+      await expect(
+        balanceService.holdBalance(mockUserId, 50, 'USD', invalidRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for invalid reference (missing type)', async () => {
+      const invalidRef = { id: 'ref-123', type: '' as any };
+      await expect(
+        balanceService.holdBalance(mockUserId, 50, 'USD', invalidRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Insufficient Available Funds', () => {
+    it('should throw InsufficientFundsError when available balance is less than amount', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient available balance: required 150, but only 100 available',
+        },
+      });
+
+      await expect(
+        balanceService.holdBalance(mockUserId, 150, 'USD', mockRef)
+      ).rejects.toThrow(InsufficientFundsError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw InsufficientFundsError when user has no balance record', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient available balance: user has no balance record for currency USD',
+        },
+      });
+
+      await expect(
+        balanceService.holdBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InsufficientFundsError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should include error details in InsufficientFundsError', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient available balance: required 150, but only 100 available',
+        },
+      });
+
+      try {
+        await balanceService.holdBalance(mockUserId, 150, 'USD', mockRef);
+        fail('Should have thrown InsufficientFundsError');
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(InsufficientFundsError);
+        expect(error.errorCode).toBe('INSUFFICIENT_FUNDS');
+        expect(error.details).toMatchObject({
+          userId: mockUserId,
+          currency: 'USD',
+          requestedAmount: 150,
+        });
+        expect(error.details.correlationId).toBeDefined();
+      }
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should throw InternalServerError on RPC failure', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: { message: 'Database connection error' },
+      });
+
+      await expect(
+        balanceService.holdBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw InternalServerError when no data is returned', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: null,
+      });
+
+      await expect(
+        balanceService.holdBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+    });
+
+    it('should handle unexpected errors', async () => {
+      (mockSupabase.rpc as jest.Mock).mockRejectedValue(
+        new Error('Unexpected error')
+      );
+
+      await expect(
+        balanceService.holdBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle exact match of available balance', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 0.00000000,
+        held: 100.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        100.00,
+        'USD',
+        mockRef
+      );
+
+      expect(result.available).toBe(0.00000000);
+      expect(result.held).toBe(100.00000000);
+    });
+
+    it('should handle very small decimal amounts', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 99.99999999,
+        held: 0.00000001,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.holdBalance(
+        mockUserId,
+        0.00000001,
+        'USD',
+        mockRef
+      );
+
+      expect(result.held).toBe(0.00000001);
+    });
+  });
+});
+
+describe('BalanceService - releaseBalance', () => {
+  const mockUserId = '123e4567-e89b-12d3-a456-426614174000';
+  const mockRef = { id: 'contract-123', type: 'contract' as const };
+
+  const mockBalanceData = {
+    id: 'bal-123',
+    user_id: mockUserId,
+    currency: 'USD',
+    available: 50.00000000,
+    held: 50.00000000,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('Success Cases', () => {
+    it('should call RPC and return updated balance on success', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 100.00000000,
+        held: 0.00000000,
+        updated_at: '2024-01-01T01:00:00Z',
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        50.00,
+        'USD',
+        mockRef,
+        'Release funds from contract'
+      );
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('release_balance', {
+        p_user_id: mockUserId,
+        p_amount: 50.00,
+        p_currency: 'USD',
+        p_ref_id: mockRef.id,
+        p_ref_type: mockRef.type,
+        p_description: 'Release funds from contract',
+      });
+
+      expect(result).toEqual(updatedBalance);
+      expect(result.available).toBe(100.00000000);
+      expect(result.held).toBe(0.00000000);
+    });
+
+    it('should handle contract reference type', async () => {
+      const contractRef = { id: 'contract-456', type: 'contract' as const };
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 75.00000000,
+        held: 25.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        25.00,
+        'USD',
+        contractRef
+      );
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('release_balance', {
+        p_user_id: mockUserId,
+        p_amount: 25.00,
+        p_currency: 'USD',
+        p_ref_id: contractRef.id,
+        p_ref_type: contractRef.type,
+        p_description: '',
+      });
+
+      expect(result.available).toBe(75.00000000);
+      expect(result.held).toBe(25.00000000);
+    });
+
+    it('should handle escrow reference type', async () => {
+      const escrowRef = { id: 'escrow-789', type: 'escrow' as const };
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 60.00000000,
+        held: 40.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        10.00,
+        'USD',
+        escrowRef,
+        'Escrow release'
+      );
+
+      expect(result.available).toBe(60.00000000);
+      expect(result.held).toBe(40.00000000);
+    });
+
+    it('should work with XLM currency', async () => {
+      const xlmBalance = {
+        ...mockBalanceData,
+        currency: 'XLM',
+        available: 100.00000000,
+        held: 100.00000000,
+      };
+      const updatedBalance = {
+        ...xlmBalance,
+        available: 150.00000000,
+        held: 50.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        50.00,
+        'XLM',
+        mockRef
+      );
+
+      expect(result.currency).toBe('XLM');
+      expect(result.available).toBe(150.00000000);
+      expect(result.held).toBe(50.00000000);
+    });
+
+    it('should log operation with correlation ID', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: mockBalanceData,
+        error: null,
+      });
+
+      await balanceService.releaseBalance(mockUserId, 10, 'USD', mockRef);
+
+      expect(mockLogger.info).toHaveBeenCalledTimes(2); // Start and success
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('[BalanceService] Starting releaseBalance')
+      );
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        expect.stringContaining('[BalanceService] Success')
+      );
+    });
+
+    it('should handle small amounts', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 50.01000000,
+        held: 49.99000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        0.01,
+        'USD',
+        mockRef
+      );
+
+      expect(result.available).toBe(50.01000000);
+    });
+
+    it('should handle large amounts', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 10000.00000000,
+        held: 0.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        10000.00,
+        'USD',
+        mockRef
+      );
+
+      expect(result.available).toBe(10000.00000000);
+    });
+
+    it('should default to empty description when not provided', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: mockBalanceData,
+        error: null,
+      });
+
+      await balanceService.releaseBalance(mockUserId, 10, 'USD', mockRef);
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+        'release_balance',
+        expect.objectContaining({
+          p_description: '',
+        })
+      );
+    });
+  });
+
+  describe('Validation Errors', () => {
+    it('should throw ValidationError for non-positive amount', async () => {
+      await expect(
+        balanceService.releaseBalance(mockUserId, -10, 'USD', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for zero amount', async () => {
+      await expect(
+        balanceService.releaseBalance(mockUserId, 0, 'USD', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestError for invalid UUID', async () => {
+      await expect(
+        balanceService.releaseBalance('bad-id', 50, 'USD', mockRef)
+      ).rejects.toThrow(BadRequestError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for unsupported currency', async () => {
+      await expect(
+        balanceService.releaseBalance(mockUserId, 50, 'EUR', mockRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for invalid reference (missing id)', async () => {
+      const invalidRef = { id: '', type: 'contract' as const };
+      await expect(
+        balanceService.releaseBalance(mockUserId, 50, 'USD', invalidRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for invalid reference (missing type)', async () => {
+      const invalidRef = { id: 'ref-123', type: '' as any };
+      await expect(
+        balanceService.releaseBalance(mockUserId, 50, 'USD', invalidRef)
+      ).rejects.toThrow(ValidationError);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Insufficient Held Funds', () => {
+    it('should throw BusinessLogicError when held balance is less than amount', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient held balance: required 150, but only 100 held',
+        },
+      });
+
+      await expect(
+        balanceService.releaseBalance(mockUserId, 150, 'USD', mockRef)
+      ).rejects.toThrow(BusinessLogicError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw BusinessLogicError when user has no balance record', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient held balance: user has no balance record for currency USD',
+        },
+      });
+
+      await expect(
+        balanceService.releaseBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(BusinessLogicError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should include error code in BusinessLogicError', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: {
+          message: 'Insufficient held balance: required 150, but only 100 held',
+        },
+      });
+
+      try {
+        await balanceService.releaseBalance(mockUserId, 150, 'USD', mockRef);
+        fail('Should have thrown BusinessLogicError');
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(BusinessLogicError);
+        expect(error.errorCode).toBe('INSUFFICIENT_HELD_FUNDS');
+      }
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should throw InternalServerError on RPC failure', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: { message: 'Database connection error' },
+      });
+
+      await expect(
+        balanceService.releaseBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+
+    it('should throw InternalServerError when no data is returned', async () => {
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: null,
+        error: null,
+      });
+
+      await expect(
+        balanceService.releaseBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+    });
+
+    it('should handle unexpected errors', async () => {
+      (mockSupabase.rpc as jest.Mock).mockRejectedValue(
+        new Error('Unexpected error')
+      );
+
+      await expect(
+        balanceService.releaseBalance(mockUserId, 50, 'USD', mockRef)
+      ).rejects.toThrow(InternalServerError);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle exact match of held balance', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 100.00000000,
+        held: 0.00000000,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        100.00,
+        'USD',
+        mockRef
+      );
+
+      expect(result.available).toBe(100.00000000);
+      expect(result.held).toBe(0.00000000);
+    });
+
+    it('should handle very small decimal amounts', async () => {
+      const updatedBalance = {
+        ...mockBalanceData,
+        available: 50.00000001,
+        held: 49.99999999,
+      };
+
+      (mockSupabase.rpc as jest.Mock).mockResolvedValue({
+        data: updatedBalance,
+        error: null,
+      });
+
+      const result = await balanceService.releaseBalance(
+        mockUserId,
+        0.00000001,
+        'USD',
+        mockRef
+      );
+
+      expect(result.available).toBe(50.00000001);
+    });
+  });
+});
