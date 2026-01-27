@@ -384,88 +384,88 @@ export class BalanceService {
    * @param description - Optional description
    * @returns Updated Balance object
    */
-  async holdBalance(
-    userId: string,
-    amount: number,
-    currency: string,
-    reference: { id: string; type: 'withdrawal' | 'escrow' },
-    description?: string
-  ): Promise<Balance> {
-    const correlationId = crypto.randomUUID();
+  // async holdBalance(
+  //   userId: string,
+  //   amount: number,
+  //   currency: string,
+  //   reference: { id: string; type: 'withdrawal' | 'escrow' },
+  //   description?: string
+  // ): Promise<Balance> {
+  //   const correlationId = crypto.randomUUID();
 
-    try {
-      logger.info(
-        `[BalanceService] Starting holdBalance ${correlationId} - User: ${userId}, Amount: ${amount} ${currency}`
-      );
+  //   try {
+  //     logger.info(
+  //       `[BalanceService] Starting holdBalance ${correlationId} - User: ${userId}, Amount: ${amount} ${currency}`
+  //     );
 
-      // 1. Validation
-      if (!validateUUID(userId)) {
-        throw new BadRequestError("Invalid user ID format");
-      }
+  //     // 1. Validation
+  //     if (!validateUUID(userId)) {
+  //       throw new BadRequestError("Invalid user ID format");
+  //     }
 
-      if (amount <= 0) {
-        throw new ValidationError("Amount must be positive");
-      }
+  //     if (amount <= 0) {
+  //       throw new ValidationError("Amount must be positive");
+  //     }
 
-      if (!SUPPORTED_CURRENCIES.includes(currency as Currency)) {
-        throw new ValidationError(`Currency ${currency} is not supported`);
-      }
+  //     if (!SUPPORTED_CURRENCIES.includes(currency as Currency)) {
+  //       throw new ValidationError(`Currency ${currency} is not supported`);
+  //     }
 
-      if (!reference.id || !reference.type) {
-        throw new ValidationError("Invalid reference data");
-      }
+  //     if (!reference.id || !reference.type) {
+  //       throw new ValidationError("Invalid reference data");
+  //     }
 
-      // 2. Atomic Transaction (via RPC)
-      const { data, error } = await supabase.rpc('hold_balance', {
-        p_user_id: userId,
-        p_amount: amount,
-        p_currency: currency,
-        p_ref_id: reference.id,
-        p_ref_type: reference.type,
-        p_description: description || ''
-      });
+  //     // 2. Atomic Transaction (via RPC)
+  //     const { data, error } = await supabase.rpc('hold_balance', {
+  //       p_user_id: userId,
+  //       p_amount: amount,
+  //       p_currency: currency,
+  //       p_ref_id: reference.id,
+  //       p_ref_type: reference.type,
+  //       p_description: description || ''
+  //     });
 
-      if (error) {
-        logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
+  //     if (error) {
+  //       logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
 
-        if (error.message && (
-          error.message.includes('Insufficient funds') ||
-          error.message.includes('no balance record')
-        )) {
-          throw new InsufficientFundsError(
-            error.message,
-            {
-              userId,
-              currency,
-              requestedAmount: amount,
-              correlationId
-            }
-          );
-        }
+  //       if (error.message && (
+  //         error.message.includes('Insufficient funds') ||
+  //         error.message.includes('no balance record')
+  //       )) {
+  //         throw new InsufficientFundsError(
+  //           error.message,
+  //           {
+  //             userId,
+  //             currency,
+  //             requestedAmount: amount,
+  //             correlationId
+  //           }
+  //         );
+  //       }
 
-        throw new InternalServerError(`Balance hold failed: ${error.message}`);
-      }
+  //       throw new InternalServerError(`Balance hold failed: ${error.message}`);
+  //     }
 
-      if (!data) {
-        throw new InternalServerError("Balance update failed: No data returned");
-      }
+  //     if (!data) {
+  //       throw new InternalServerError("Balance update failed: No data returned");
+  //     }
 
-      logger.info(`[BalanceService] Success ${correlationId} - New Balance: ${data.available} (Held: ${data.held})`);
+  //     logger.info(`[BalanceService] Success ${correlationId} - New Balance: ${data.available} (Held: ${data.held})`);
 
-      return data as Balance;
+  //     return data as Balance;
 
-    } catch (err: any) {
-      if (
-        err instanceof ValidationError ||
-        err instanceof BadRequestError ||
-        err instanceof InternalServerError ||
-        err instanceof InsufficientFundsError
-      ) {
-        throw err;
-      }
-      throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
-    }
-  }
+  //   } catch (err: any) {
+  //     if (
+  //       err instanceof ValidationError ||
+  //       err instanceof BadRequestError ||
+  //       err instanceof InternalServerError ||
+  //       err instanceof InsufficientFundsError
+  //     ) {
+  //       throw err;
+  //     }
+  //     throw new InternalServerError(`Unexpected error in balance service: ${err.message}`);
+  //   }
+  // }
 
   /**
    * Retrieves transaction history for a user with filtering and pagination.
