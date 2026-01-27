@@ -13,6 +13,9 @@ import { UserRole } from "@/types/auth.types";
 
 const router = Router();
 
+// GET /api/projects - List projects with filtering and pagination
+router.get("/", listProjectsHandler);
+
 // GET /api/projects/:projectId - Get project by ID
 router.get("/:projectId", getProjectHandler);
 

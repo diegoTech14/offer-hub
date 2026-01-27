@@ -106,4 +106,9 @@ export interface ProjectRow {
 
 export interface ProjectSkillRow {
   skill_name: string;
+  status?: string;
+  client_id?: string;
+  minBudget?: number;
+  maxBudget?: number;
+
 }

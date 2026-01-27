@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/supabase";
+
 import { CreateProjectDTO, UpdateProjectDTO, Project, UpdateProjectResult, ProjectStatus } from '@/types/project.type';
 import {
   Project as ProjectModel,
@@ -234,6 +235,11 @@ export const deleteProject = async (id: string, client_id: string) => {
   return { success: true, status: 200, message: 'Project_deleted', data: deleted };
 };
 
+import { Project, ProjectSkill } from "@/types/project.types";
+import type { ProjectFilters } from '@/types/project.types';
+
+
+
 class ProjectService {
   /**
    * Get a project by ID with related skills
@@ -285,6 +291,84 @@ class ProjectService {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       skills,
+    };
+  }
+
+/**
+   * List projects with filtering, searching, and pagination
+   * @param filters - Query filters including pagination, search, and field filters
+   * @returns Paginated list of projects with total count
+   */
+  async listProjects(filters: ProjectFilters): Promise<{ projects: Project[]; total: number }> {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      status,
+      category,
+      minBudget,
+      maxBudget
+    } = filters;
+
+    //Start building the query
+    let query = supabase
+      .from("projects")
+      .select(`
+        *,
+        project_skills(skill_name)
+      `, { count: 'exact' });
+
+    //Apply search filter (title and description)
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+    }
+
+    //Apply status filter
+    if (status) {
+      query = query.eq("status", status);
+    }
+
+    //Apply category filter
+    if (category) {
+      query = query.eq("category", category);
+    }
+
+    //Apply budget range filters
+    if (minBudget !== undefined) {
+      query = query.gte("budget", minBudget);
+    }
+
+    if (maxBudget !== undefined) {
+      query = query.lte("budget", maxBudget);
+    }
+
+    //Apply pagination
+    const offset = (page - 1) * limit;
+    query = query.range(offset, offset + limit - 1);
+
+    //Order by created_at descending (newest first)
+    query = query.order("created_at", { ascending: false });
+
+    //Execute query
+    const { data: projectsData, error, count } = await query;
+
+    if (error) {
+      throw new Error(`Database error: ${error.message}`);
+    }
+
+    //Transform projects to include skills array
+    const projects = (projectsData || []).map((projectData: any) => {
+      const skills = projectData.project_skills?.map((ps: ProjectSkill) => ps.skill_name) || [];
+      const { project_skills, ...project } = projectData;
+      return {
+        ...project,
+        skills
+      } as Project;
+    });
+
+    return {
+      projects,
+      total: count || 0
     };
   }
 }
