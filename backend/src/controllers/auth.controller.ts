@@ -692,7 +692,7 @@ export async function revokeSession(
     }
 
     // Validate UUID format
-    if (!validateUUID(id)) {
+    if (!validateUUID(id as string)) {
       return res.status(400).json({
         success: false,
         message: "Invalid session ID format",
@@ -704,13 +704,47 @@ export async function revokeSession(
     const currentSessionId =
       (req as any).user?.session_id || (req as any).sessionId;
 
-    await authService.revokeSession(userId, id, currentSessionId);
+    await authService.revokeSession(userId, id as string, currentSessionId);
 
     res.status(200).json({
       success: true,
       message: "Session revoked successfully",
       metadata: {
         timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * DELETE /api/v1/auth/sessions
+ * Revoke all user sessions (global logout)
+ */
+export async function revokeAllSessionsHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userId = req.user.id;
+    const currentSessionId = req.refreshTokenRecord?.id;
+
+    const exceptCurrent =
+      String(req.query.except_current).toLowerCase() !== "false";
+
+    const revokedCount = await authService.revokeAllSessions(
+      userId,
+      exceptCurrent,
+      currentSessionId,
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `${revokedCount} session${revokedCount === 1 ? "" : "s"} revoked successfully`,
+      data: {
+        revoked_count: revokedCount,
       },
     });
   } catch (err) {

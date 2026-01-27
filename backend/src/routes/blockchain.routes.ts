@@ -52,64 +52,70 @@ router.post("/record", async (req: Request, res: Response) => {
  * @desc    Get all tasks for a specific freelancer
  * @access  Public
  */
-router.get("/freelancer/:freelancerId", async (req: Request, res: Response) => {
-  try {
-    const { freelancerId } = req.params;
+router.get(
+  "/freelancer/:freelancerId",
+  async (req: Request<{ freelancerId: string }>, res: Response) => {
+    try {
+      const { freelancerId } = req.params;
 
-    if (!freelancerId) {
-      return res.status(400).json({
+      if (!freelancerId) {
+        return res.status(400).json({
+          success: false,
+          error: "Freelancer ID is required",
+        });
+      }
+
+      const tasks = await taskRecordService.getTasksForFreelancer(freelancerId);
+
+      return res.status(200).json({
+        success: true,
+        data: tasks,
+        count: tasks.length,
+      });
+    } catch (error: any) {
+      console.error("Error fetching freelancer tasks:", error);
+      return res.status(500).json({
         success: false,
-        error: "Freelancer ID is required",
+        error: error.message || "Failed to fetch freelancer tasks",
       });
     }
-
-    const tasks = await taskRecordService.getTasksForFreelancer(freelancerId);
-
-    return res.status(200).json({
-      success: true,
-      data: tasks,
-      count: tasks.length,
-    });
-  } catch (error: any) {
-    console.error("Error fetching freelancer tasks:", error);
-    return res.status(500).json({
-      success: false,
-      error: error.message || "Failed to fetch freelancer tasks",
-    });
-  }
-});
+  },
+);
 
 /**
  * @route   GET /api/tasks/client/:clientId
  * @desc    Get all tasks for a specific client
  * @access  Public
  */
-router.get("/client/:clientId", async (req: Request, res: Response) => {
-  try {
-    const { clientId } = req.params;
+router.get(
+  "/client/:clientId",
+  async (req: Request<{ clientId: string }>, res: Response) => {
+    try {
+      const { clientId } = req.params;
 
-    if (!clientId) {
-      return res.status(400).json({
+      if (!clientId) {
+        return res.status(400).json({
+          success: false,
+          error: "Client ID is required",
+        });
+      }
+
+      const tasks = await taskRecordService.getTasksForClient(clientId);
+
+      return res.status(200).json({
+        success: true,
+        data: tasks,
+        count: tasks.length,
+      });
+    } catch (error: any) {
+      console.error("Error fetching client tasks:", error);
+      return res.status(500).json({
         success: false,
-        error: "Client ID is required",
+        error: error.message || "Failed to fetch client tasks",
       });
     }
-
-    const tasks = await taskRecordService.getTasksForClient(clientId);
-
-    return res.status(200).json({
-      success: true,
-      data: tasks,
-      count: tasks.length,
-    });
-  } catch (error: any) {
-    console.error("Error fetching client tasks:", error);
-    return res.status(500).json({
-      success: false,
-      error: error.message || "Failed to fetch client tasks",
-    });
-  }
-});
+  },
+);
 
 /**
  * @route   GET /api/tasks/freelancer/:freelancerId/stats
@@ -118,7 +124,7 @@ router.get("/client/:clientId", async (req: Request, res: Response) => {
  */
 router.get(
   "/freelancer/:freelancerId/stats",
-  async (req: Request, res: Response) => {
+  async (req: Request<{ freelancerId: string }>, res: Response) => {
     try {
       const { freelancerId } = req.params;
 
@@ -150,30 +156,33 @@ router.get(
  * @desc    Get statistics for a client
  * @access  Public
  */
-router.get("/client/:clientId/stats", async (req: Request, res: Response) => {
-  try {
-    const { clientId } = req.params;
+router.get(
+  "/client/:clientId/stats",
+  async (req: Request<{ clientId: string }>, res: Response) => {
+    try {
+      const { clientId } = req.params;
 
-    if (!clientId) {
-      return res.status(400).json({
+      if (!clientId) {
+        return res.status(400).json({
+          success: false,
+          error: "Client ID is required",
+        });
+      }
+
+      const stats = await taskRecordService.getClientStats(clientId);
+
+      return res.status(200).json({
+        success: true,
+        data: stats,
+      });
+    } catch (error: any) {
+      console.error("Error fetching client stats:", error);
+      return res.status(500).json({
         success: false,
-        error: "Client ID is required",
+        error: error.message || "Failed to fetch client statistics",
       });
     }
-
-    const stats = await taskRecordService.getClientStats(clientId);
-
-    return res.status(200).json({
-      success: true,
-      data: stats,
-    });
-  } catch (error: any) {
-    console.error("Error fetching client stats:", error);
-    return res.status(500).json({
-      success: false,
-      error: error.message || "Failed to fetch client statistics",
-    });
-  }
-});
+  },
+);
 
 export default router;

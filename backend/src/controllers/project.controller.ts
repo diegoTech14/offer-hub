@@ -11,16 +11,19 @@ import {
   getProjectById as getProjectByIdService,
   updateProject,
   deleteProject,
-  assignFreelancer
+  assignFreelancer,
 } from "@/services/project.service";
 import { NotFoundError, BadRequestError } from "@/utils/AppError";
-import { buildSuccessResponse, buildErrorResponse } from "../utils/responseBuilder";
+import {
+  buildSuccessResponse,
+  buildErrorResponse,
+} from "../utils/responseBuilder";
 import { validateUUID } from "@/utils/validation";
 
 export const getProjectHandler = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { projectId } = req.params;
@@ -43,9 +46,9 @@ export const getProjectHandler = async (
     }
 
     // Return 200 with project data
-    res.status(200).json(
-      buildSuccessResponse(project, "Project retrieved successfully")
-    );
+    res
+      .status(200)
+      .json(buildSuccessResponse(project, "Project retrieved successfully"));
   } catch (error: any) {
     if (next) {
       next(error);
@@ -58,13 +61,13 @@ export const getProjectHandler = async (
 export const createProjectHandler = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const project = await createProject(req.body);
-    res.status(201).json(
-      buildSuccessResponse(project, "Project created successfully")
-    );
+    res
+      .status(201)
+      .json(buildSuccessResponse(project, "Project created successfully"));
   } catch (error: any) {
     if (next) {
       next(error);
@@ -77,14 +80,14 @@ export const createProjectHandler = async (
 export const getAllProjectsHandler = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const filters = req.query;
     const projects = await getAllProjects(filters);
-    res.status(200).json(
-      buildSuccessResponse(projects, "Projects retrieved successfully")
-    );
+    res
+      .status(200)
+      .json(buildSuccessResponse(projects, "Projects retrieved successfully"));
   } catch (error: any) {
     if (next) {
       next(error);
@@ -95,9 +98,9 @@ export const getAllProjectsHandler = async (
 };
 
 export const getProjectByIdHandler = async (
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { id } = req.params;
@@ -112,9 +115,9 @@ export const getProjectByIdHandler = async (
       throw new NotFoundError("Project not found");
     }
 
-    res.status(200).json(
-      buildSuccessResponse(project, "Project retrieved successfully")
-    );
+    res
+      .status(200)
+      .json(buildSuccessResponse(project, "Project retrieved successfully"));
   } catch (error: any) {
     if (next) {
       next(error);
@@ -125,9 +128,9 @@ export const getProjectByIdHandler = async (
 };
 
 export const updateProjectHandler = async (
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
-  next?: NextFunction
+  next?: NextFunction,
 ) => {
   try {
     const { id } = req.params;
@@ -145,14 +148,19 @@ export const updateProjectHandler = async (
     const result = await updateProject(id, updates, client_id);
 
     if (!result.success) {
-      return res.status(result.status).json(
-        buildErrorResponse(result.message || 'Update failed')
-      );
+      return res
+        .status(result.status)
+        .json(buildErrorResponse(result.message || "Update failed"));
     }
 
-    res.status(result.status).json(
-      buildSuccessResponse(result.data, result.message || 'Project updated successfully')
-    );
+    res
+      .status(result.status)
+      .json(
+        buildSuccessResponse(
+          result.data,
+          result.message || "Project updated successfully",
+        ),
+      );
   } catch (error: any) {
     if (next) {
       next(error);
@@ -163,9 +171,9 @@ export const updateProjectHandler = async (
 };
 
 export const deleteProjectHandler = async (
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
-  next?: NextFunction
+  next?: NextFunction,
 ) => {
   try {
     const { id } = req.params;
@@ -182,14 +190,19 @@ export const deleteProjectHandler = async (
     const result = await deleteProject(id, client_id);
 
     if (!result.success) {
-      return res.status(result.status).json(
-        buildErrorResponse(result.message || 'Delete failed')
-      );
+      return res
+        .status(result.status)
+        .json(buildErrorResponse(result.message || "Delete failed"));
     }
 
-    res.status(result.status).json(
-      buildSuccessResponse(result.data, result.message || 'Project deleted successfully')
-    );
+    res
+      .status(result.status)
+      .json(
+        buildSuccessResponse(
+          result.data,
+          result.message || "Project deleted successfully",
+        ),
+      );
   } catch (error: any) {
     if (next) {
       next(error);
@@ -200,9 +213,9 @@ export const deleteProjectHandler = async (
 };
 
 export const assignFreelancerHandler = async (
-  req: Request,
+  req: Request<{ projectId: string; freelancerId: string }>,
   res: Response,
-  next?: NextFunction
+  next?: NextFunction,
 ) => {
   try {
     const { projectId, freelancerId } = req.params;
@@ -210,7 +223,9 @@ export const assignFreelancerHandler = async (
 
     // Validate UUIDs
     if (!validateUUID(projectId) || !validateUUID(freelancerId)) {
-      throw new BadRequestError("Invalid UUID format for projectId or freelancerId");
+      throw new BadRequestError(
+        "Invalid UUID format for projectId or freelancerId",
+      );
     }
 
     // Validate client_id exists
@@ -219,21 +234,24 @@ export const assignFreelancerHandler = async (
     }
 
     // Call service method
-    const result = await assignFreelancer(
-      projectId,
-      freelancerId,
-      client_id
-    );
+    const result = await assignFreelancer(projectId, freelancerId, client_id);
 
     // Return appropriate HTTP status based on service result
     if (result.success) {
-      return res.status(result.status).json(
-        buildSuccessResponse(result.data, result.message || 'Freelancer assigned successfully')
-      );
+      return res
+        .status(result.status)
+        .json(
+          buildSuccessResponse(
+            result.data,
+            result.message || "Freelancer assigned successfully",
+          ),
+        );
     } else {
-      return res.status(result.status).json(
-        buildErrorResponse(result.message || 'Failed to assign freelancer')
-      );
+      return res
+        .status(result.status)
+        .json(
+          buildErrorResponse(result.message || "Failed to assign freelancer"),
+        );
     }
   } catch (error: any) {
     if (next) {
