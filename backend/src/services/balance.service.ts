@@ -336,7 +336,7 @@ export class BalanceService {
 
         // Check if error is about insufficient funds
         if (error.message && (
-          error.message.includes('Insufficient funds') ||
+          error.message.toLowerCase().includes('insufficient') ||
           error.message.includes('no balance record')
         )) {
           throw new InsufficientFundsError(
@@ -388,7 +388,7 @@ export class BalanceService {
     userId: string,
     amount: number,
     currency: string,
-    reference: { id: string; type: 'withdrawal' | 'escrow' },
+    reference: HoldReference,
     description?: string
   ): Promise<Balance> {
     const correlationId = crypto.randomUUID();
@@ -429,7 +429,7 @@ export class BalanceService {
         logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
 
         if (error.message && (
-          error.message.includes('Insufficient funds') ||
+          error.message.toLowerCase().includes('insufficient') ||
           error.message.includes('no balance record')
         )) {
           throw new InsufficientFundsError(
