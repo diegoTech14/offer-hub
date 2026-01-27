@@ -149,7 +149,8 @@ export default function Navbar({
               <Link href="/profile/role" className="hidden sm:block">
                 <Badge 
                   variant="outline" 
-                  className="gap-1.5 hover:bg-accent transition-colors cursor-pointer"
+                  className="gap-1.5 hover:bg-accent transition-colors cursor-pointer
+                   text-gray-700 dark:text-gray-300 font-medium text-sm md:flex items-center"
                 >
                   {isFreelancer ? (
                     <>

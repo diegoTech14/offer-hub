@@ -37,12 +37,11 @@ export default function RolePage() {
         description: `You can now access ${targetRole} features`,
       });
       setShowDialog(false);
-      
-    //   setTimeout(() => {
-    //     window.location.href = targetRole === 'freelancer' 
-    //       ? '/freelancer/dashboard' 
-    //       : '/client/dashboard';
-    //   }, 500);
+      localStorage.setItem("userRole", targetRole);
+
+      setTimeout(() => {
+        window.location.href = '/onboarding/dashboard';
+      }, 500);
     } catch (error) {
       toast.error('Failed to switch role', {
         description: 'Please try again later',
@@ -88,19 +87,17 @@ export default function RolePage() {
         {/* Role Cards Grid */}
         <div className="grid gap-6 lg:gap-8 md:grid-cols-2 mb-8">
           {/* Client Card */}
-          <Card 
-            className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl ${
-              !isFreelancer 
-                ? 'ring-2 ring-primary shadow-lg scale-[1.02]' 
+          <Card
+            className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl ${!isFreelancer
+                ? 'ring-2 ring-primary shadow-lg scale-[1.02]'
                 : 'hover:scale-[1.02]'
-            }`}
+              }`}
             onClick={() => handleRoleClick(false)}
           >
             {/* Gradient Background */}
-            <div className={`absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-              !isFreelancer ? 'opacity-100' : ''
-            }`} />
-            
+            <div className={`absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${!isFreelancer ? 'opacity-100' : ''
+              }`} />
+
             <CardHeader className="relative space-y-4 pb-4">
               <div className="flex items-start justify-between">
                 <div className="p-3 rounded-xl bg-blue-500/10 ring-1 ring-blue-500/20">
@@ -113,7 +110,7 @@ export default function RolePage() {
                   </Badge>
                 )}
               </div>
-              
+
               <div>
                 <CardTitle className="text-2xl mb-2">Client</CardTitle>
                 <CardDescription className="text-base">
@@ -124,7 +121,7 @@ export default function RolePage() {
 
             <CardContent className="relative space-y-6">
               <Separator />
-              
+
               <div className="space-y-3">
                 <p className="text-sm font-medium text-muted-foreground">Features included:</p>
                 <ul className="space-y-2.5">
@@ -143,7 +140,7 @@ export default function RolePage() {
                 </ul>
               </div>
 
-              <Button 
+              <Button
                 className="w-full group/btn"
                 size="lg"
                 variant={!isFreelancer ? 'default' : 'outline'}
@@ -165,19 +162,17 @@ export default function RolePage() {
           </Card>
 
           {/* Freelancer Card */}
-          <Card 
-            className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl ${
-              isFreelancer 
-                ? 'ring-2 ring-primary shadow-lg scale-[1.02]' 
+          <Card
+            className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl ${isFreelancer
+                ? 'ring-2 ring-primary shadow-lg scale-[1.02]'
                 : 'hover:scale-[1.02]'
-            }`}
+              }`}
             onClick={() => handleRoleClick(true)}
           >
             {/* Gradient Background */}
-            <div className={`absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-              isFreelancer ? 'opacity-100' : ''
-            }`} />
-            
+            <div className={`absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isFreelancer ? 'opacity-100' : ''
+              }`} />
+
             <CardHeader className="relative space-y-4 pb-4">
               <div className="flex items-start justify-between">
                 <div className="p-3 rounded-xl bg-green-500/10 ring-1 ring-green-500/20">
@@ -190,7 +185,7 @@ export default function RolePage() {
                   </Badge>
                 )}
               </div>
-              
+
               <div>
                 <CardTitle className="text-2xl mb-2">Freelancer</CardTitle>
                 <CardDescription className="text-base">
@@ -201,7 +196,7 @@ export default function RolePage() {
 
             <CardContent className="relative space-y-6">
               <Separator />
-              
+
               <div className="space-y-3">
                 <p className="text-sm font-medium text-muted-foreground">Features included:</p>
                 <ul className="space-y-2.5">
@@ -220,7 +215,7 @@ export default function RolePage() {
                 </ul>
               </div>
 
-              <Button 
+              <Button
                 className="w-full group/btn"
                 size="lg"
                 variant={isFreelancer ? 'default' : 'outline'}
@@ -275,7 +270,7 @@ export default function RolePage() {
               Switch to {targetRole} mode?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              {targetRole === 'freelancer' 
+              {targetRole === 'freelancer'
                 ? 'You\'ll be redirected to the freelancer dashboard where you can browse jobs and submit proposals.'
                 : 'You\'ll be redirected to the client dashboard where you can post jobs and review proposals.'}
             </AlertDialogDescription>
