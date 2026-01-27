@@ -15,6 +15,7 @@ import {
   ResetPasswordDTO,
 } from "@/types/auth.types";
 import { validateUUID } from "@/utils/validation";
+import { parseDeviceInfo } from "@/utils/auth.utils";
 
 export async function getNonce(
   req: Request,
@@ -126,16 +127,10 @@ export async function register(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.register(data, deviceInfo);
 
@@ -211,16 +206,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.loginWithEmail(
       { email, password },
@@ -255,16 +244,10 @@ export async function loginWithWallet(
 ) {
   try {
     // Get device info for audit logging and session tracking
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const { user, tokens } = await authService.login(req.body, deviceInfo);
     res.status(200).json({
@@ -433,16 +416,10 @@ export async function registerWithEmail(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.registerWithEmail(data, deviceInfo);
 
@@ -527,16 +504,10 @@ export async function registerWithWallet(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.registerWithWallet(data, deviceInfo);
 
@@ -609,16 +580,10 @@ export async function loginWithEmail(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.loginWithEmail(
       { email, password },
@@ -855,16 +820,10 @@ export async function forgotPassword(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.forgotPassword(email, deviceInfo);
 
@@ -928,16 +887,10 @@ export async function resetPassword(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.resetPassword(token, password, deviceInfo);
 
