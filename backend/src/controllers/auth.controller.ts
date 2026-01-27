@@ -676,7 +676,7 @@ export async function getSessions(
  * DELETE /api/auth/sessions/:id
  */
 export async function revokeSession(
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
   next: NextFunction,
 ) {
@@ -692,7 +692,7 @@ export async function revokeSession(
     }
 
     // Validate UUID format
-    if (!validateUUID(id as string)) {
+    if (!validateUUID(id)) {
       return res.status(400).json({
         success: false,
         message: "Invalid session ID format",
@@ -704,7 +704,7 @@ export async function revokeSession(
     const currentSessionId =
       (req as any).user?.session_id || (req as any).sessionId;
 
-    await authService.revokeSession(userId, id as string, currentSessionId);
+    await authService.revokeSession(userId, id, currentSessionId);
 
     res.status(200).json({
       success: true,
