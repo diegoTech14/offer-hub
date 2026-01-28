@@ -188,13 +188,6 @@ export async function sendWithdrawalRefundEmail(
   amount: number,
   currency: string
 ): Promise<void> {
- * Send account deletion confirmation email
- * @param email - Recipient email address (original email before anonymization)
- */
-export async function sendAccountDeletionEmail(email: string): Promise<void> {
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-  const supportEmail = process.env.SUPPORT_EMAIL || 'support@offer-hub.org';
-
   const html = `
     <!DOCTYPE html>
     <html>
@@ -210,7 +203,7 @@ export async function sendAccountDeletionEmail(email: string): Promise<void> {
         <p>Your withdrawal request has been refunded due to a processing failure. The funds have been returned to your available balance.</p>
         <div style="background-color: #e7f3ff; padding: 20px; border-left: 4px solid #007bff; margin: 20px 0;">
           <p style="margin: 0;"><strong>Refunded Amount:</strong> ${amount.toFixed(2)} ${currency}</p>
-        </p>
+        </div>
         <p>The funds are now available in your account and you can initiate a new withdrawal request or use them for other transactions.</p>
         <p style="color: #666; font-size: 14px; margin-top: 30px;">
           If you have any questions or concerns, please contact our support team.
@@ -218,6 +211,32 @@ export async function sendAccountDeletionEmail(email: string): Promise<void> {
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
         <p style="color: #999; font-size: 12px; margin-bottom: 0;">
           This is an automated message from Offer Hub. Please do not reply to this email.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  await sendEmail({
+    to: email,
+    subject: 'Withdrawal Refunded - Funds Returned to Your Account',
+    html,
+  });
+}
+
+/**
+ * Send account deletion confirmation email
+ * @param email - Recipient email address (original email before anonymization)
+ */
+export async function sendAccountDeletionEmail(email: string): Promise<void> {
+  const supportEmail = process.env.SUPPORT_EMAIL || 'support@offer-hub.org';
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Account Deletion Confirmation</title>
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -253,7 +272,7 @@ export async function sendAccountDeletionEmail(email: string): Promise<void> {
 
   await sendEmail({
     to: email,
-    subject: 'Withdrawal Refunded - Funds Returned to Your Account',
+    subject: 'Account Deletion Confirmation',
     html,
   });
 }
@@ -263,8 +282,5 @@ export const emailService = {
   sendEmail,
   sendPasswordResetEmail,
   sendWithdrawalRefundEmail,
+  sendAccountDeletionEmail,
 };
-    subject: 'Offer Hub Account Deletion Confirmation',
-    html,
-  });
-}

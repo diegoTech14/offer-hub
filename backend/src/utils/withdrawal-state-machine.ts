@@ -19,10 +19,26 @@ export class WithdrawalStateMachine {
       WithdrawalStatus.WITHDRAWAL_CANCELED,
       WithdrawalStatus.WITHDRAWAL_FAILED,
     ],
+    [WithdrawalStatus.WITHDRAWAL_CREATED]: [
+      WithdrawalStatus.PENDING_VERIFICATION,
+      WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION,
+      WithdrawalStatus.WITHDRAWAL_CANCELED,
+      WithdrawalStatus.WITHDRAWAL_FAILED,
+      WithdrawalStatus.FAILED,
+    ],
     [WithdrawalStatus.PENDING_VERIFICATION]: [
       WithdrawalStatus.WITHDRAWAL_COMPLETED,
       WithdrawalStatus.WITHDRAWAL_CANCELED,
       WithdrawalStatus.WITHDRAWAL_FAILED,
+    ],
+    [WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION]: [
+      WithdrawalStatus.WITHDRAWAL_COMPLETED,
+      WithdrawalStatus.WITHDRAWAL_CANCELED,
+      WithdrawalStatus.WITHDRAWAL_FAILED,
+      WithdrawalStatus.FAILED,
+    ],
+    [WithdrawalStatus.FAILED]: [
+      WithdrawalStatus.WITHDRAWAL_REFUNDED,
     ],
     [WithdrawalStatus.WITHDRAWAL_FAILED]: [
       WithdrawalStatus.WITHDRAWAL_REFUNDED,
