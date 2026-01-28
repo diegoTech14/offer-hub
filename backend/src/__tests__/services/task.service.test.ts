@@ -51,6 +51,10 @@ describe('TaskService', () => {
     updated_at: '2024-01-15T10:00:00Z'
   };
 
+  const page = 1;
+  const completed = true;
+  const limit = 20;
+
   beforeEach(() => {
     jest.clearAllMocks();
     
@@ -357,15 +361,19 @@ describe('TaskService', () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({
-              data: mockTaskRecords,
-              error: null
+            eq: jest.fn().mockReturnValue({
+              order: jest.fn().mockReturnValue({
+                range: jest.fn().mockResolvedValue({
+                  data: mockTaskRecords,
+                  error: null
+                })
+              })
             })
           })
         })
       } as any);
 
-      const result = await taskService.getTaskRecordsByClientId(mockClientId);
+      const { taskRecords: result } = await taskService.getTaskRecordsByClientId(mockClientId, limit, page, completed);
 
       expect(result).toEqual(mockTaskRecords);
       expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
@@ -375,15 +383,19 @@ describe('TaskService', () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({
-              data: null,
-              error: { message: 'Database error' }
+            eq: jest.fn().mockReturnValue({
+              order: jest.fn().mockReturnValue({
+                range: jest.fn().mockResolvedValue({
+                  data: null,
+                  error: { message: 'Database error' }
+                })
+              })
             })
           })
         })
       } as any);
 
-      await expect(taskService.getTaskRecordsByClientId(mockClientId))
+      await expect(taskService.getTaskRecordsByClientId(mockClientId, limit, page, completed))
         .rejects.toThrow(AppError);
     });
   });

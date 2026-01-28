@@ -46,6 +46,7 @@ import { generalLimiter, authLimiter } from "./middlewares/ratelimit.middleware"
 import { authenticateToken } from "./middlewares/auth.middleware";
 import { loggerMiddleware } from "./middlewares/logger.middleware";
 import { logger } from "./utils/logger";
+import taskRecordsRoute from "@/routes/task.route"
 
 // Setup global error handlers
 setupGlobalErrorHandlers();
@@ -115,6 +116,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/task-records", taskRoutes);
 app.use("/api/profile", authenticateToken(), profileRoutes);
 app.use("/api/profiles", profileRoutes);
+app.use("/api/task-records", taskRecordsRoute)
 
 // Error Handling
 app.use(errorHandlerMiddleware);
