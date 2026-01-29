@@ -429,7 +429,7 @@ export class BalanceService {
         logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
 
         if (error.message && (
-          error.message.toLowerCase().includes('insufficient') ||
+          error.message.includes('Insufficient funds') ||
           error.message.includes('no balance record')
         )) {
           throw new InsufficientFundsError(
