@@ -1131,6 +1131,43 @@ export async function revokeSession(
 }
 
 /**
+ * Revoke all sessions for a user
+ * @param userId - User ID
+ * @param exceptCurrent - If true, skips revoking the current session
+ * @param currentSessionId - ID of the current session (optional)
+ * @returns Number of sessions revoked
+ */
+export async function revokeAllSessions(
+  userId: string,
+  exceptCurrent = true,
+  currentSessionId?: string,
+): Promise<number> {
+  const now = new Date().toISOString();
+
+  const filter = supabase
+    .from("refresh_tokens")
+    .update({
+      is_revoked: true,
+      revoked_at: now,
+    })
+    .eq("user_id", userId)
+    .eq("is_revoked", false)
+    .gt("expires_at", now);
+
+  if (exceptCurrent && currentSessionId) {
+    filter.neq("id", currentSessionId);
+  }
+
+  const { data, error } = await filter.select("id");
+
+  if (error) {
+    throw new AppError(`Failed to revoke sessions: ${error.message}`, 500);
+  }
+
+  return data?.length || 0;
+}
+
+/**
  * Initiate password reset process
  * Generates a reset token and sends it via email
  * @param email - User's email address

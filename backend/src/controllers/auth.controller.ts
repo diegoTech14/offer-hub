@@ -641,7 +641,7 @@ export async function getSessions(
  * DELETE /api/auth/sessions/:id
  */
 export async function revokeSession(
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
   next: NextFunction,
 ) {
@@ -681,6 +681,95 @@ export async function revokeSession(
   } catch (err) {
     next(err);
   }
+}
+
+/**
+ * DELETE /api/v1/auth/sessions
+ * Revoke all user sessions (global logout)
+ */
+export async function revokeAllSessionsHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userId = req.user.id;
+    const currentSessionId = req.refreshTokenRecord?.id;
+
+    const exceptCurrent =
+      String(req.query.except_current).toLowerCase() !== "false";
+
+    const revokedCount = await authService.revokeAllSessions(
+      userId,
+      exceptCurrent,
+      currentSessionId,
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `${revokedCount} session${revokedCount === 1 ? "" : "s"} revoked successfully`,
+      data: {
+        revoked_count: revokedCount,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Determine device type from user agent
+ * @param userAgent - User agent string
+ * @returns Device type
+ */
+function getDeviceType(userAgent: string): string {
+  const ua = userAgent.toLowerCase();
+
+  if (
+    ua.includes("mobile") ||
+    ua.includes("android") ||
+    ua.includes("iphone")
+  ) {
+    return "mobile";
+  } else if (ua.includes("tablet") || ua.includes("ipad")) {
+    return "tablet";
+  } else {
+    return "desktop";
+  }
+}
+
+/**
+ * Get OS from user agent
+ * @param userAgent - User agent string
+ * @returns OS name
+ */
+function getOSFromUserAgent(userAgent: string): string {
+  const ua = userAgent.toLowerCase();
+
+  if (ua.includes("windows")) return "Windows";
+  if (ua.includes("macintosh") || ua.includes("mac os x")) return "macOS";
+  if (ua.includes("linux")) return "Linux";
+  if (ua.includes("android")) return "Android";
+  if (ua.includes("iphone") || ua.includes("ipad")) return "iOS";
+
+  return "Unknown";
+}
+
+/**
+ * Get browser from user agent
+ * @param userAgent - User agent string
+ * @returns Browser name
+ */
+function getBrowserFromUserAgent(userAgent: string): string {
+  const ua = userAgent.toLowerCase();
+
+  if (ua.includes("chrome") && !ua.includes("edg")) return "Chrome";
+  if (ua.includes("firefox")) return "Firefox";
+  if (ua.includes("safari") && !ua.includes("chrome")) return "Safari";
+  if (ua.includes("edg")) return "Edge";
+  if (ua.includes("opera")) return "Opera";
+
+  return "Unknown";
 }
 
 /**

@@ -18,6 +18,7 @@ import {
   revokeSession,
   forgotPassword,
   resetPassword,
+  revokeAllSessionsHandler,
 } from "@/controllers/auth.controller";
 import {
   authenticateToken,
@@ -53,5 +54,6 @@ router.get("/sessions", authenticateToken(), getSessions);
 
 // Revoke Session Route
 router.delete("/sessions/:id", authenticateToken(), revokeSession);
+router.delete("/sessions", authenticateToken(), revokeAllSessionsHandler);
 
 export default router;

@@ -8,7 +8,12 @@ import { taskService } from "@/services/task.service";
 import { CreateTaskRecordDTO } from "@/types/task.types";
 import { AuthenticatedRequest } from "@/types/auth.types";
 import { validateCreateTaskRecord } from "@/validators/task.validator";
-import { AppError, BadRequestError, mapSupabaseError, ValidationError } from "@/utils/AppError";
+import {
+  AppError,
+  BadRequestError,
+  mapSupabaseError,
+  ValidationError,
+} from "@/utils/AppError";
 import { validateUUID } from "@/utils/validation";
 import { buildPaginatedResponse } from "@/utils/responseBuilder";
 
@@ -54,11 +59,11 @@ import { buildPaginatedResponse } from "@/utils/responseBuilder";
 export async function recordTaskOutcome(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const authReq = req as AuthenticatedRequest;
-    
+
     // Ensure user is authenticated
     if (!authReq.user) {
       return next(new AppError("Authentication required", 401));
@@ -69,31 +74,33 @@ export async function recordTaskOutcome(
 
     // Validate request body
     const validationResult = validateCreateTaskRecord(requestData);
-    
+
     if (!validationResult.success) {
-      const errorMessages = validationResult.error.issues.map((err: any) => 
-        `${err.path.join('.')}: ${err.message}`
-      ).join(', ');
-      
+      const errorMessages = validationResult.error.issues
+        .map((err: any) => `${err.path.join(".")}: ${err.message}`)
+        .join(", ");
+
       return next(new ValidationError(`Validation failed: ${errorMessages}`));
     }
 
     // Create task record
-    const taskRecord = await taskService.createTaskRecord(validationResult.data, clientId);
+    const taskRecord = await taskService.createTaskRecord(
+      validationResult.data,
+      clientId,
+    );
 
     // Build success response
     res.status(201).json({
       success: true,
       message: "Task outcome recorded successfully",
       data: {
-        taskRecord
+        taskRecord,
       },
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: authReq.securityContext?.requestId || 'unknown',
-      }
+        requestId: authReq.securityContext?.requestId || "unknown",
+      },
     });
-
   } catch (error) {
     next(error);
   }
@@ -107,13 +114,13 @@ export async function recordTaskOutcome(
  * @param next - Express next function
  */
 export async function getTaskRecordByProject(
-  req: Request,
+  req: Request<{ projectId: string }>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const authReq = req as AuthenticatedRequest;
-    
+
     if (!authReq.user) {
       return next(new AppError("Authentication required", 401));
     }
@@ -132,8 +139,8 @@ export async function getTaskRecordByProject(
         message: "Task record not found for this project",
         metadata: {
           timestamp: new Date().toISOString(),
-          requestId: authReq.securityContext?.requestId || 'unknown',
-        }
+          requestId: authReq.securityContext?.requestId || "unknown",
+        },
       });
     }
 
@@ -141,14 +148,13 @@ export async function getTaskRecordByProject(
       success: true,
       message: "Task record retrieved successfully",
       data: {
-        taskRecord
+        taskRecord,
       },
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: authReq.securityContext?.requestId || 'unknown',
-      }
+        requestId: authReq.securityContext?.requestId || "unknown",
+      },
     });
-
   } catch (error) {
     next(error);
   }
@@ -164,11 +170,11 @@ export async function getTaskRecordByProject(
 export async function getClientTaskRecords(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const authReq = req as AuthenticatedRequest;
-    
+
     if (!authReq.user) {
       return next(new AppError("Authentication required", 401));
     }
@@ -180,10 +186,18 @@ export async function getClientTaskRecords(
     }
 
     const limit = req.query.limit ? Number(req.query.limit) : 20;
-    const page = req.query.page? Number(req.query.page) : 1;
-    const completed = req.query.completed === undefined ? undefined : (req.query.completed === 'true');
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const completed =
+      req.query.completed === undefined
+        ? undefined
+        : req.query.completed === "true";
 
-    const { taskRecords, meta } = await taskService.getTaskRecordsByClientId(clientId, limit, page, completed);
+    const { taskRecords, meta } = await taskService.getTaskRecordsByClientId(
+      clientId,
+      limit,
+      page,
+      completed,
+    );
 
     res.status(200).json(
       buildPaginatedResponse(
@@ -193,11 +207,10 @@ export async function getClientTaskRecords(
           current_page: meta.page,
           total_pages: Math.ceil(meta.total_items / (limit || 20)),
           total_items: meta.total_items,
-          per_page: meta.limit || 20
-        }
-      )
-    )
-
+          per_page: meta.limit || 20,
+        },
+      ),
+    );
   } catch (error: any) {
     if (error.code && error.message) {
       throw mapSupabaseError(error);
@@ -216,31 +229,31 @@ export async function getClientTaskRecords(
 export async function getFreelancerTaskRecords(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const authReq = req as AuthenticatedRequest;
-    
+
     if (!authReq.user) {
       return next(new AppError("Authentication required", 401));
     }
 
     const freelancerId = authReq.user.id;
-    const taskRecords = await taskService.getTaskRecordsByFreelancerId(freelancerId);
+    const taskRecords =
+      await taskService.getTaskRecordsByFreelancerId(freelancerId);
 
     res.status(200).json({
       success: true,
       message: "Freelancer task records retrieved successfully",
       data: {
         taskRecords,
-        count: taskRecords.length
+        count: taskRecords.length,
       },
       metadata: {
         timestamp: new Date().toISOString(),
-        requestId: authReq.securityContext?.requestId || 'unknown',
-      }
+        requestId: authReq.securityContext?.requestId || "unknown",
+      },
     });
-
   } catch (error) {
     next(error);
   }
