@@ -20,7 +20,7 @@ import { toast } from "sonner";
 export default function AssignFreelancerPage() {
     const params = useParams();
     const router = useRouter();
-    const projectId = params.projectId as string;
+    const projectId = params.id as string;
     const { project, loading: projectLoading } = useProjectDetails(projectId);
     const [searchTerm, setSearchTerm] = useState("");
     const [isAssigning, setIsAssigning] = useState<string | null>(null);
