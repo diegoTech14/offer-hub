@@ -37,6 +37,33 @@ export async function getNonce(
   }
 }
 
+export async function logoutV1(req: Request, res: Response, next: NextFunction) {
+  try {
+    const logout_all = Boolean(req.body?.logout_all);
+    const userId = req.user.id;
+    const ip = req.ip || req.connection.remoteAddress || "unknown";
+    const userAgent = req.get("User-Agent") || "unknown";
+    const refreshToken = (req as any).cookies?.refreshToken as string | undefined;
+
+    if (logout_all) {
+      await authService.logoutAllUserSessions(userId);
+    } else {
+      await authService.logoutCurrentSession(userId, {
+        refreshToken,
+        ip,
+        userAgent,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 /**
  * Register a new user with email and password
  * Creates a smart wallet (contract account) for the user
