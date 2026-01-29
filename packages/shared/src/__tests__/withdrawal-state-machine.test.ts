@@ -261,7 +261,9 @@ describe("WithdrawalStateMachine", () => {
         stateMachine.getAllowedTransitions(WithdrawalState.WITHDRAWAL_CANCELED),
       ).toEqual([]);
       expect(
-        stateMachine.getAllowedTransitions(WithdrawalState.WITHDRAWAL_SUCCEEDED),
+        stateMachine.getAllowedTransitions(
+          WithdrawalState.WITHDRAWAL_SUCCEEDED,
+        ),
       ).toEqual([]);
       expect(
         stateMachine.getAllowedTransitions(WithdrawalState.WITHDRAWAL_REFUNDED),
@@ -282,7 +284,9 @@ describe("WithdrawalStateMachine", () => {
         WithdrawalState.WITHDRAWAL_PENDING_VERIFICATION,
       );
 
-      expect(result.status).toBe(WithdrawalState.WITHDRAWAL_PENDING_VERIFICATION);
+      expect(result.status).toBe(
+        WithdrawalState.WITHDRAWAL_PENDING_VERIFICATION,
+      );
       expect(result.id).toBe("test-123");
       expect(result.amount).toBe(100);
     });
@@ -309,7 +313,10 @@ describe("WithdrawalStateMachine", () => {
       };
 
       expect(() => {
-        stateMachine.transition(withdrawal, WithdrawalState.WITHDRAWAL_PROCESSING);
+        stateMachine.transition(
+          withdrawal,
+          WithdrawalState.WITHDRAWAL_PROCESSING,
+        );
       }).toThrow(InvalidStateTransitionError);
     });
 
@@ -320,7 +327,10 @@ describe("WithdrawalStateMachine", () => {
       };
 
       try {
-        stateMachine.transition(withdrawal, WithdrawalState.WITHDRAWAL_PROCESSING);
+        stateMachine.transition(
+          withdrawal,
+          WithdrawalState.WITHDRAWAL_PROCESSING,
+        );
         fail("Expected InvalidStateTransitionError to be thrown");
       } catch (error) {
         expect(error).toBeInstanceOf(InvalidStateTransitionError);
@@ -506,7 +516,9 @@ describe("WithdrawalStateMachine", () => {
 
       expect(allStates).toHaveLength(9);
       expect(allStates).toContain(WithdrawalState.WITHDRAWAL_CREATED);
-      expect(allStates).toContain(WithdrawalState.WITHDRAWAL_PENDING_VERIFICATION);
+      expect(allStates).toContain(
+        WithdrawalState.WITHDRAWAL_PENDING_VERIFICATION,
+      );
       expect(allStates).toContain(WithdrawalState.WITHDRAWAL_PROCESSING);
       expect(allStates).toContain(WithdrawalState.WITHDRAWAL_REJECTED);
       expect(allStates).toContain(WithdrawalState.WITHDRAWAL_CANCELED);
@@ -535,8 +547,12 @@ describe("WithdrawalStateMachine", () => {
       expect(terminalStates).not.toContain(
         WithdrawalState.WITHDRAWAL_PENDING_VERIFICATION,
       );
-      expect(terminalStates).not.toContain(WithdrawalState.WITHDRAWAL_PROCESSING);
-      expect(terminalStates).not.toContain(WithdrawalState.WITHDRAWAL_COMMITTED);
+      expect(terminalStates).not.toContain(
+        WithdrawalState.WITHDRAWAL_PROCESSING,
+      );
+      expect(terminalStates).not.toContain(
+        WithdrawalState.WITHDRAWAL_COMMITTED,
+      );
       expect(terminalStates).not.toContain(WithdrawalState.WITHDRAWAL_FAILED);
     });
   });
