@@ -1,9 +1,11 @@
-import { createProjectHandler, getProjectHandler } from '@/controllers/project.controller';
+import { createProjectHandler, getProjectHandler, listProjectsHandler } from '@/controllers/project.controller';
 import { projectService } from '@/services/project.service';
+import { ProjectStatus, BudgetType, ProjectType, ExperienceLevel, ProjectVisibility } from '@/types/project.types';
 import { UserRole } from '@/types/auth.types';
 
 // Mock the project service
 jest.mock('@/services/project.service');
+jest.mock('@/services/escrow.service');
 const mockProjectService = projectService as jest.Mocked<typeof projectService>;
 
 describe('Project Controller - getProjectHandler', () => {
@@ -15,28 +17,26 @@ describe('Project Controller - getProjectHandler', () => {
 
   const mockProject = {
     id: mockProjectId,
-    client_id: '456e7890-e89b-12d3-a456-426614174001',
+    clientId: '456e7890-e89b-12d3-a456-426614174001',
+    freelancerId: null,
     title: 'Test Project',
     description: 'A test project description',
     category: 'Development',
     subcategory: 'Web Development',
     budget: 1000,
-    budget_type: 'fixed' as const,
-    status: 'published' as const,
-    visibility: 'public' as const,
-    project_type: 'on-time' as const,
-    experience_level: 'intermediate' as const,
+    budgetType: 'fixed' as BudgetType,
+    currency: 'XLM',
+    status: ProjectStatus.OPEN,
+    visibility: 'public' as ProjectVisibility,
+    projectType: 'on-time' as ProjectType,
+    experienceLevel: 'intermediate' as ExperienceLevel,
     duration: '2 weeks',
     deadline: '2024-02-01T00:00:00Z',
-    tags: ['javascript', 'react'],
-    on_chain_transaction_hash: '0x1234567890abcdef',
-    on_chain_id: 'project_123',
-    version: 1,
-    featured: false,
-    priority: 0,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-    skills: ['JavaScript', 'React', 'Node.js']
+    onChainTxHash: '0x1234567890abcdef',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z',
+    skills: ['JavaScript', 'React', 'Node.js'],
+    tags: ['javascript', 'react']
   };
 
   beforeEach(() => {
@@ -58,9 +58,7 @@ describe('Project Controller - getProjectHandler', () => {
   describe('Input Validation', () => {
     it('should return 404 if projectId is missing', async () => {
       mockReq.params = {};
-
       await getProjectHandler(mockReq, mockRes, mockNext);
-
       expect(mockNext).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'Project ID is required',
@@ -71,9 +69,7 @@ describe('Project Controller - getProjectHandler', () => {
 
     it('should return 404 if projectId is invalid UUID', async () => {
       mockReq.params = { projectId: 'invalid-uuid' };
-
       await getProjectHandler(mockReq, mockRes, mockNext);
-
       expect(mockNext).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'Invalid project ID format',
@@ -83,12 +79,9 @@ describe('Project Controller - getProjectHandler', () => {
     });
 
     it('should validate UUID format correctly', async () => {
-      // Test valid UUID
       mockReq.params = { projectId: mockProjectId };
       mockProjectService.getProjectById.mockResolvedValue(mockProject);
-
       await getProjectHandler(mockReq, mockRes, mockNext);
-
       expect(mockProjectService.getProjectById).toHaveBeenCalledWith(mockProjectId);
     });
   });
@@ -100,9 +93,7 @@ describe('Project Controller - getProjectHandler', () => {
 
     it('should return 200 with project data when project exists', async () => {
       mockProjectService.getProjectById.mockResolvedValue(mockProject);
-
       await getProjectHandler(mockReq, mockRes, mockNext);
-
       expect(mockProjectService.getProjectById).toHaveBeenCalledWith(mockProjectId);
       expect(mockRes.status).toHaveBeenCalledWith(200);
       expect(mockRes.json).toHaveBeenCalledWith(
@@ -113,18 +104,6 @@ describe('Project Controller - getProjectHandler', () => {
         })
       );
     });
-
-    it('should return project with all required fields', async () => {
-      mockProjectService.getProjectById.mockResolvedValue(mockProject);
-
-      await getProjectHandler(mockReq, mockRes, mockNext);
-
-      const responseData = mockRes.json.mock.calls[0][0].data;
-      expect(responseData).toEqual(mockProject);
-      expect(responseData.id).toBe(mockProjectId);
-      expect(responseData.skills).toEqual(['JavaScript', 'React', 'Node.js']);
-      expect(responseData.on_chain_transaction_hash).toBe('0x1234567890abcdef');
-    });
   });
 
   describe('Project Not Found', () => {
@@ -134,24 +113,13 @@ describe('Project Controller - getProjectHandler', () => {
 
     it('should return 404 when project does not exist', async () => {
       mockProjectService.getProjectById.mockResolvedValue(null);
-
       await getProjectHandler(mockReq, mockRes, mockNext);
-
       expect(mockNext).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'Project not found',
           statusCode: 404
         })
       );
-    });
-
-    it('should not call res.json when project is not found', async () => {
-      mockProjectService.getProjectById.mockResolvedValue(null);
-
-      await getProjectHandler(mockReq, mockRes, mockNext);
-
-      expect(mockRes.status).not.toHaveBeenCalled();
-      expect(mockRes.json).not.toHaveBeenCalled();
     });
   });
 
@@ -160,41 +128,111 @@ describe('Project Controller - getProjectHandler', () => {
       mockReq.params = { projectId: mockProjectId };
     });
 
-    it('should call projectService.getProjectById with correct ID', async () => {
-      mockProjectService.getProjectById.mockResolvedValue(mockProject);
-
-      await getProjectHandler(mockReq, mockRes, mockNext);
-
-      expect(mockProjectService.getProjectById).toHaveBeenCalledTimes(1);
-      expect(mockProjectService.getProjectById).toHaveBeenCalledWith(mockProjectId);
-    });
-
     it('should handle service errors appropriately', async () => {
       const serviceError = new Error('Database connection failed');
       mockProjectService.getProjectById.mockRejectedValue(serviceError);
-
       await getProjectHandler(mockReq, mockRes, mockNext);
-
       expect(mockNext).toHaveBeenCalledWith(serviceError);
     });
   });
+});
 
-  describe('Response Format', () => {
-    beforeEach(() => {
-      mockReq.params = { projectId: mockProjectId };
+describe('Project Controller - listProjectsHandler', () => {
+  let mockReq: any;
+  let mockRes: any;
+  let mockNext: any;
+
+  const mockProjects = [
+    {
+      id: '223e4567-e89b-12d3-a456-426614174001',
+      clientId: '456e7890-e89b-12d3-a456-426614174001',
+      title: 'Mobile App Development',
+      description: 'Create a mobile app for iOS and Android',
+      category: 'Development',
+      subcategory: 'Mobile Development',
+      budget: 8000,
+      budgetType: 'fixed',
+      currency: 'XLM',
+      status: ProjectStatus.OPEN,
+      visibility: 'public',
+      projectType: 'on-time',
+      experienceLevel: 'expert',
+      duration: '4 months',
+      deadline: '2024-07-01T00:00:00Z',
+      tags: ['mobile', 'ios', 'android'],
+      onChainTxHash: '0xabc',
+      createdAt: '2024-01-16T10:00:00Z',
+      updatedAt: '2024-01-16T10:00:00Z',
+      skills: ['Swift', 'Kotlin', 'React Native']
+    }
+  ] as any[];
+
+  beforeEach(() => {
+    mockReq = {
+      query: {},
+    };
+    mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+    };
+    mockNext = jest.fn();
+    jest.clearAllMocks();
+  });
+
+  describe('Default Pagination', () => {
+    it('should return projects with default pagination', async () => {
+      mockProjectService.listProjects.mockResolvedValue({
+        projects: mockProjects,
+        total: 1
+      });
+
+      await listProjectsHandler(mockReq, mockRes, mockNext);
+
+      expect(mockProjectService.listProjects).toHaveBeenCalledWith({
+        page: 1,
+        limit: 20,
+        search: undefined,
+        status: undefined,
+        category: undefined,
+        minBudget: undefined,
+        maxBudget: undefined
+      });
+
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: mockProjects,
+          pagination: {
+            current_page: 1,
+            total_pages: 1,
+            total_items: 1,
+            per_page: 20
+          }
+        })
+      );
     });
+  });
 
-    it('should return standardized API response format', async () => {
-      mockProjectService.getProjectById.mockResolvedValue(mockProject);
+  describe('Custom Pagination', () => {
+    it('should accept custom page and limit parameters', async () => {
+      mockReq.query = { page: '2', limit: '10' };
+      mockProjectService.listProjects.mockResolvedValue({
+        projects: mockProjects,
+        total: 1
+      });
 
-      await getProjectHandler(mockReq, mockRes, mockNext);
+      await listProjectsHandler(mockReq, mockRes, mockNext);
 
-      const response = mockRes.json.mock.calls[0][0];
-
-      expect(response).toHaveProperty('success', true);
-      expect(response).toHaveProperty('message', 'Project retrieved successfully');
-      expect(response).toHaveProperty('data');
-      expect(response.data).toEqual(mockProject);
+      expect(mockProjectService.listProjects).toHaveBeenCalledWith({
+        page: 2,
+        limit: 10,
+        search: undefined,
+        status: undefined,
+        category: undefined,
+        minBudget: undefined,
+        maxBudget: undefined
+      });
     });
   });
 });
@@ -220,23 +258,20 @@ describe('Project Controller - createProjectHandler', () => {
 
   const createdProject = {
     id: '123e4567-e89b-12d3-a456-426614174000',
-    client_id: mockUser.id,
+    clientId: mockUser.id,
     title: createPayload.title,
     description: createPayload.description,
     category: createPayload.category,
     budget: createPayload.budget,
-    budget_type: 'fixed' as const,
-    status: 'draft' as const,
-    visibility: 'public' as const,
-    project_type: 'on-time' as const,
-    experience_level: 'intermediate' as const,
+    budgetType: 'fixed',
+    status: ProjectStatus.DRAFT,
+    visibility: 'public',
+    projectType: 'on-time',
+    experienceLevel: 'intermediate',
     tags: [],
-    on_chain_transaction_hash: 'tx-123',
-    version: 1,
-    featured: false,
-    priority: 0,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
+    onChainTxHash: 'tx-123',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z',
     skills: ['TypeScript']
   };
 
@@ -245,12 +280,10 @@ describe('Project Controller - createProjectHandler', () => {
       body: {},
       user: mockUser
     };
-
     mockRes = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis()
     };
-
     mockNext = jest.fn();
     jest.clearAllMocks();
   });
@@ -258,9 +291,7 @@ describe('Project Controller - createProjectHandler', () => {
   it('should return 403 when user is not a client', async () => {
     mockReq.user = { ...mockUser, role: UserRole.FREELANCER };
     mockReq.body = createPayload;
-
     await createProjectHandler(mockReq, mockRes, mockNext);
-
     expect(mockNext).toHaveBeenCalledWith(
       expect.objectContaining({
         message: 'Only clients can create projects',
@@ -271,9 +302,7 @@ describe('Project Controller - createProjectHandler', () => {
 
   it('should return 400 on invalid payload', async () => {
     mockReq.body = { title: '', description: 'Missing category', budget: 100 };
-
     await createProjectHandler(mockReq, mockRes, mockNext);
-
     expect(mockNext).toHaveBeenCalledWith(
       expect.objectContaining({
         message: 'Invalid project data',

@@ -3,67 +3,168 @@
  * @author Offer Hub Team
  */
 
-export interface ProjectSkill {
-  id: string;
-  project_id: string;
-  skill_name: string;
-  created_at: string;
+/**
+ * Enum aligned with DB enum `project_status`
+ */
+export enum ProjectStatus {
+  DRAFT = "draft",
+  PENDING = "pending",
+  PUBLISHED = "published",
+  OPEN = "open",
+  ACTIVE = "active",
+  IN_PROGRESS = "in_progress",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
+  ARCHIVED = "archived",
+  DELETED = "deleted",
 }
-
-export type ProjectStatus =
-  | "draft"
-  | "pending"
-  | "published"
-  | "active"
-  | "in_progress"
-  | "completed"
-  | "cancelled"
-  | "archived"
-  | "deleted";
 
 export type ProjectVisibility = "public" | "private";
 export type ProjectType = "on-time" | "ongoing";
 export type ExperienceLevel = "entry" | "intermediate" | "expert";
 export type BudgetType = "fixed" | "hourly";
 
+/**
+ * Project entity (camelCase) - Domain Model
+ */
+export interface Project {
+  id: string;
+  clientId: string;
+  freelancerId?: string | null;
+
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+
+  budget: number; // Domain uses budget
+  budgetType: BudgetType;
+  currency: string;
+
+  status: ProjectStatus;
+  visibility: ProjectVisibility;
+  projectType: ProjectType;
+  experienceLevel: ExperienceLevel;
+
+  duration?: string;
+  deadline?: string | null;
+
+  tags: string[];
+  skills: string[];
+
+  onChainTxHash?: string | null;
+
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+  archivedAt?: string;
+  deletedAt?: string;
+}
+
+/**
+ * DTO for creating a project (User's shape)
+ */
 export interface CreateProjectDTO {
   title: string;
   description: string;
   category: string;
-  budget: number;
   subcategory?: string;
+  budget: number;
+  budgetType?: BudgetType;
+  currency?: string;
   skills?: string[];
   experienceLevel?: ExperienceLevel;
   projectType?: ProjectType;
   visibility?: ProjectVisibility;
-  budgetType?: BudgetType;
   duration?: string;
   tags?: string[];
   deadline?: string;
   status?: ProjectStatus;
 }
 
-const PROJECT_STATUSES: ProjectStatus[] = [
-  "draft",
-  "pending",
-  "published",
-  "active",
-  "in_progress",
-  "completed",
-  "cancelled",
-  "archived",
-  "deleted",
-];
+/**
+ * DTO for updating a project
+ */
+export interface UpdateProjectDTO {
+  freelancerId?: string | null;
+  title?: string;
+  description?: string;
+  category?: string;
+  subcategory?: string;
+  budget?: number;
+  budgetType?: BudgetType;
+  currency?: string;
+  status?: ProjectStatus;
+  deadline?: string;
+  visibility?: ProjectVisibility;
+  projectType?: ProjectType;
+  experienceLevel?: ExperienceLevel;
+  duration?: string;
+  tags?: string[];
+  skills?: string[];
+  onChainTxHash?: string | null;
+}
 
-const PROJECT_VISIBILITIES: ProjectVisibility[] = ["public", "private"];
+export interface UpdateProjectResult {
+  success: boolean;
+  status: number;
+  message?: string;
+  data?: Project;
+}
+
+export interface ProjectFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  status?: string;
+  clientId?: string;
+  freelancerId?: string;
+  minBudget?: number;
+  maxBudget?: number;
+}
+
+/**
+ * DB row shapes (snake_case)
+ */
+export interface ProjectRow {
+  id: string;
+  client_id: string;
+  freelancer_id: string | null;
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  budget_amount: number; // Mapped from budget
+  budget_type: string;
+  currency: string;
+  status: string;
+  visibility: string;
+  project_type: string;
+  experience_level: string;
+  duration?: string;
+  deadline: string | null;
+  on_chain_tx_hash: string | null;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  published_at?: string;
+  archived_at?: string;
+  deleted_at?: string;
+}
+
+export interface ProjectSkillRow {
+  skill_name: string;
+  project_id: string;
+}
+
+const EXPERIENCE_LEVELS: ExperienceLevel[] = ["entry", "intermediate", "expert"];
 const PROJECT_TYPES: ProjectType[] = ["on-time", "ongoing"];
-const EXPERIENCE_LEVELS: ExperienceLevel[] = [
-  "entry",
-  "intermediate",
-  "expert",
-];
+const VISIBILITIES: ProjectVisibility[] = ["public", "private"];
 const BUDGET_TYPES: BudgetType[] = ["fixed", "hourly"];
+const PROJECT_STATUSES = Object.values(ProjectStatus);
 
+// User's guard implementation
 export function isCreateProjectDTO(obj: any): obj is CreateProjectDTO {
   if (typeof obj !== "object" || obj === null) {
     return false;
@@ -114,7 +215,7 @@ export function isCreateProjectDTO(obj: any): obj is CreateProjectDTO {
 
   if (
     obj.visibility !== undefined &&
-    !PROJECT_VISIBILITIES.includes(obj.visibility)
+    !VISIBILITIES.includes(obj.visibility)
   ) {
     return false;
   }
@@ -150,54 +251,4 @@ export function isCreateProjectDTO(obj: any): obj is CreateProjectDTO {
   }
 
   return true;
-}
-
-export interface Project {
-  id: string;
-  client_id: string;
-  title: string;
-  description: string;
-  category: string;
-  subcategory?: string;
-  budget: number;
-  budget_type: 'fixed' | 'hourly';
-  status: 'draft' | 'pending' | 'published' | 'active' | 'in_progress' | 'completed' | 'cancelled' | 'archived' | 'deleted';
-  visibility: 'public' | 'private';
-  project_type: 'on-time' | 'ongoing';
-  experience_level: 'entry' | 'intermediate' | 'expert';
-  duration?: string;
-  deadline?: string;
-  tags: string[];
-  on_chain_transaction_hash?: string;
-  on_chain_id?: string;
-  version: number;
-  featured: boolean;
-  priority: number;
-  created_at: string;
-  updated_at: string;
-  published_at?: string;
-  archived_at?: string;
-  deleted_at?: string;
-  skills: string[]; // Populated from project_skills relation
-}
-
-export interface ProjectWithDetails extends Project {
-  // Include any additional fields that might be needed for detailed view
-  attachments?: any[];
-  milestones?: any[];
-  client?: {
-    id: string;
-    name?: string;
-    email?: string;
-    avatar?: string;
-  };
-}
-
-export interface ProjectFilters {
-  page?: number;
-  limit?: number;
-  search?: string;
-  category?: string;
-  status?: string;
-  client_id?: string;
 }

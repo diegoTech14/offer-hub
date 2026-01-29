@@ -46,7 +46,8 @@ export class TaskRecordService {
       "CDZXIUP53QYH23AZSQZIDMQKD7QPDLTJMISC3X6NNT4BUUMQ4UC4UYZ7";
     const adminSecret =
       process.env.SECRET ||
-      "CDZXIUP53QYH23AZSQZIDMQKD7QPDLTJMISC3X6NNT4BUUMQ4UC4UYZ7";
+      process.env.STELLAR_ADMIN_SECRET_KEY ||
+      "SAO2XTN656P3TGVGQFUMYVH4DYT44EEQW6L2ITWXVNMAHXIUP6H4DQRZ";
     this.rpcUrl = this.rpcUrl =
       process.env.SOROBAN_RPC_URL || "https://soroban-testnet.stellar.org";
 
@@ -318,6 +319,24 @@ export class TaskRecordService {
       failedTasks,
       completionRate,
     };
+  }
+
+  /**
+   * Record a task outcome on the blockchain (wrapper method for service compatibility)
+   */
+  async recordTask(taskData: {
+    project_id: string;
+    freelancer_id: string;
+    client_id: string;
+    completed: boolean;
+    outcome_description: string;
+  }): Promise<RecordTaskResult> {
+    return this.recordTaskOutcome(
+      taskData.project_id,
+      taskData.freelancer_id,
+      taskData.client_id,
+      taskData.completed
+    );
   }
 
   /**

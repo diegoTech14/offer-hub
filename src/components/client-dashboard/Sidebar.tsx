@@ -10,12 +10,14 @@ import {
   Settings,
   User,
   TrendingUp,
+  History,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { VerificationBadge } from "@/components/dashboard/verification-badge";
 import { useUserVerification } from "@/hooks/use-user-verification";
+import { useAuth } from "@/providers/auth-provider";
 
 const navigationItems = [
   {
@@ -61,6 +63,12 @@ const navigationItems = [
     href: "/onboarding/dashboard/analytics",
     description: "Insights",
   },
+  {
+    title: "Task History",
+    icon: History,
+    href: "/tasks/client",
+    description: "Order & ratings",
+  },
 ];
 
 const accountItems = [
@@ -78,7 +86,12 @@ const accountItems = [
 
 export function ClientSidebar() {
   const pathname = usePathname();
-  const { verificationStatus, loading: verificationLoading } = useUserVerification();
+  const { user } = useAuth();
+  const { verificationStatus, loading: verificationLoading } =
+    useUserVerification();
+
+  const taskHistoryHref =
+    user?.role?.toLowerCase() === "freelancer" ? "/tasks/freelancer" : "/tasks/client";
 
   return (
     <div className="bg-white border-r border-gray-200 flex flex-col h-full">
@@ -89,27 +102,32 @@ export function ClientSidebar() {
             Main Menu
           </p>
           {navigationItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            const href = item.title === "Task History" ? taskHistoryHref : item.href;
+            const isActive = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={href}
                 className={cn(
                   "flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
                   isActive
                     ? "bg-[#149A9B]/10 text-[#149A9B]"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <item.icon className={cn(
-                    "w-5 h-5 transition-transform group-hover:scale-110",
-                    isActive ? "text-[#149A9B]" : "text-gray-500"
-                  )} />
+                  <item.icon
+                    className={cn(
+                      "w-5 h-5 transition-transform group-hover:scale-110",
+                      isActive ? "text-[#149A9B]" : "text-gray-500",
+                    )}
+                  />
                   <div className="flex flex-col">
                     <span>{item.title}</span>
                     {item.description && (
-                      <span className="text-xs text-gray-500">{item.description}</span>
+                      <span className="text-xs text-gray-500">
+                        {item.description}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -139,13 +157,15 @@ export function ClientSidebar() {
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                     isActive
                       ? "bg-[#149A9B]/10 text-[#149A9B]"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
                   )}
                 >
-                  <item.icon className={cn(
-                    "w-5 h-5",
-                    isActive ? "text-[#149A9B]" : "text-gray-500"
-                  )} />
+                  <item.icon
+                    className={cn(
+                      "w-5 h-5",
+                      isActive ? "text-[#149A9B]" : "text-gray-500",
+                    )}
+                  />
                   <span>{item.title}</span>
                 </Link>
               );
@@ -162,7 +182,9 @@ export function ClientSidebar() {
               <span className="text-white font-semibold text-sm">J</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">Josué Araya</p>
+              <p className="text-sm font-medium text-gray-900 truncate">
+                Josué Araya
+              </p>
               <p className="text-xs text-gray-500 truncate">Developer</p>
             </div>
           </div>
