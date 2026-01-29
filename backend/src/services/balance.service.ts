@@ -429,7 +429,7 @@ export class BalanceService {
         logger.error(`[BalanceService] RPC Error ${correlationId}`, error);
 
         if (error.message && (
-          error.message.toLowerCase().includes('insufficient') ||
+          error.message.includes('Insufficient funds') ||
           error.message.includes('no balance record')
         )) {
           throw new InsufficientFundsError(
@@ -611,6 +611,12 @@ export class BalanceService {
 
 
   /**
+   * Returns held funds back to a user's available balance.
+   * Used when canceling a withdrawal or refunding a failed withdrawal.
+   * @param userId - The user to release funds for
+   * @param amount - Amount to release (must be positive)
+   * @param currency - Currency code (USD, XLM)
+   * @param reference - Source of the release
    * Moves funds from held balance back to available balance.
    * Used when a contract is cancelled and funds need to be released back to the client.
    * @param userId - The user whose funds will be released
@@ -624,11 +630,11 @@ export class BalanceService {
     userId: string,
     amount: number,
     currency: string,
-    reference: ReleaseReference,
+    reference: CreditReference,
     description?: string
   ): Promise<Balance> {
     const correlationId = crypto.randomUUID();
-
+    
     try {
       logger.info(
         `[BalanceService] Starting releaseBalance ${correlationId} - User: ${userId}, Amount: ${amount} ${currency}`
@@ -652,8 +658,8 @@ export class BalanceService {
       }
 
       // 2. Atomic Transaction (via RPC)
-      // We rely on a database function to lock the row, validate held funds,
-      // move funds from held to available, AND insert the log in one go.
+      // We rely on a database function to lock the row, update balance,
+      // AND insert the log in one go.
       const { data, error } = await supabase.rpc('release_balance', {
         p_user_id: userId,
         p_amount: amount,

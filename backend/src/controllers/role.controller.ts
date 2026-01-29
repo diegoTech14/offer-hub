@@ -6,19 +6,24 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/types/auth.types";
 import { becomeFreelancer, becomeClient } from "@/services/role.service";
-import { NotFoundError, AuthorizationError, BadRequestError, AuthenticationError } from "@/utils/AppError";
+import {
+  NotFoundError,
+  AuthorizationError,
+  BadRequestError,
+  AuthenticationError,
+} from "@/utils/AppError";
 import { buildSuccessResponse } from "@/utils/responseBuilder";
 import { validateUUID } from "@/utils/validation";
 
 /**
  * Handler for switching user to freelancer role
  * POST /api/users/:userId/become-freelancer
- * 
+ *
  * Validates:
  * - User ID is provided and valid UUID
  * - User is authenticated
  * - Authenticated user matches the userId in params (users can only switch their own role)
- * 
+ *
  * @param req - Express request with userId in params
  * @param res - Express response
  * @param next - Express next function for error handling
@@ -26,7 +31,7 @@ import { validateUUID } from "@/utils/validation";
 export const becomeFreelancerHandler = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authReq = req as AuthenticatedRequest;
@@ -38,7 +43,7 @@ export const becomeFreelancerHandler = async (
     }
 
     // Validate UUID format
-    if (!validateUUID(userId)) {
+    if (!validateUUID(String(userId))) {
       throw new BadRequestError("Invalid user ID format", "INVALID_UUID");
     }
 
@@ -51,7 +56,7 @@ export const becomeFreelancerHandler = async (
     if (authReq.user.id !== userId) {
       throw new AuthorizationError(
         "Access denied. You can only switch your own role.",
-        "FORBIDDEN"
+        "FORBIDDEN",
       );
     }
 
@@ -59,12 +64,14 @@ export const becomeFreelancerHandler = async (
     const updatedUser = await becomeFreelancer(userId);
 
     // Return success response
-    res.status(200).json(
-      buildSuccessResponse(
-        updatedUser,
-        "Role switched to freelancer successfully"
-      )
-    );
+    res
+      .status(200)
+      .json(
+        buildSuccessResponse(
+          updatedUser,
+          "Role switched to freelancer successfully",
+        ),
+      );
   } catch (error) {
     next(error);
   }
@@ -73,12 +80,12 @@ export const becomeFreelancerHandler = async (
 /**
  * Handler for switching user to client role
  * POST /api/users/:userId/become-client
- * 
+ *
  * Validates:
  * - User ID is provided and valid UUID
  * - User is authenticated
  * - Authenticated user matches the userId in params (users can only switch their own role)
- * 
+ *
  * @param req - Express request with userId in params
  * @param res - Express response
  * @param next - Express next function for error handling
@@ -86,7 +93,7 @@ export const becomeFreelancerHandler = async (
 export const becomeClientHandler = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authReq = req as AuthenticatedRequest;
@@ -98,7 +105,7 @@ export const becomeClientHandler = async (
     }
 
     // Validate UUID format
-    if (!validateUUID(userId)) {
+    if (!validateUUID(String(userId))) {
       throw new BadRequestError("Invalid user ID format", "INVALID_UUID");
     }
 
@@ -111,7 +118,7 @@ export const becomeClientHandler = async (
     if (authReq.user.id !== userId) {
       throw new AuthorizationError(
         "Access denied. You can only switch your own role.",
-        "FORBIDDEN"
+        "FORBIDDEN",
       );
     }
 
@@ -119,12 +126,14 @@ export const becomeClientHandler = async (
     const updatedUser = await becomeClient(userId);
 
     // Return success response
-    res.status(200).json(
-      buildSuccessResponse(
-        updatedUser,
-        "Role switched to client successfully"
-      )
-    );
+    res
+      .status(200)
+      .json(
+        buildSuccessResponse(
+          updatedUser,
+          "Role switched to client successfully",
+        ),
+      );
   } catch (error) {
     next(error);
   }
