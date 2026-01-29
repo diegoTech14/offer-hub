@@ -4,6 +4,7 @@ import taskRoutes from '@/routes/task.routes';
 import { authenticateToken } from '@/middlewares/auth.middleware';
 import { errorHandlerMiddleware } from '@/middlewares/errorHandler.middleware';
 import { taskService } from '@/services/task.service';
+import { TaskRecord } from '@/types/task.types';
 
 // Mock the task service
 jest.mock('@/services/task.service');
@@ -23,7 +24,7 @@ describe('Task Integration Tests', () => {
     role: 'client'
   };
 
-  const mockTaskRecord = {
+  const mockTaskRecord: TaskRecord = {
     id: 'task-record-id',
     project_id: '456e7890-e89b-12d3-a456-426614174001',
     freelancer_id: '789e0123-e89b-12d3-a456-426614174002',
@@ -198,7 +199,14 @@ describe('Task Integration Tests', () => {
   describe('GET /api/task-records/client', () => {
     it('should return client task records', async () => {
       const mockTaskRecords = [mockTaskRecord];
-      mockTaskService.getTaskRecordsByClientId.mockResolvedValue(mockTaskRecords);
+      mockTaskService.getTaskRecordsByClientId.mockResolvedValue({
+        taskRecords: mockTaskRecords,
+        meta: {
+          page: 1,
+          limit: 20,
+          total_items: 20
+        }
+      });
 
       const response = await request(app)
         .get('/api/task-records/client')
@@ -217,7 +225,14 @@ describe('Task Integration Tests', () => {
     });
 
     it('should return empty array when no records found', async () => {
-      mockTaskService.getTaskRecordsByClientId.mockResolvedValue([]);
+      mockTaskService.getTaskRecordsByClientId.mockResolvedValue({
+        taskRecords: [],
+        meta: {
+          page: 1,
+          limit: 0,
+          total_items: 0
+        }
+      });
 
       const response = await request(app)
         .get('/api/task-records/client')

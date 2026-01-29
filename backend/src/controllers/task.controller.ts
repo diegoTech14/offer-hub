@@ -8,7 +8,9 @@ import { taskService } from "@/services/task.service";
 import { CreateTaskRecordDTO } from "@/types/task.types";
 import { AuthenticatedRequest } from "@/types/auth.types";
 import { validateCreateTaskRecord } from "@/validators/task.validator";
-import { AppError, ValidationError } from "@/utils/AppError";
+import { AppError, BadRequestError, mapSupabaseError, ValidationError } from "@/utils/AppError";
+import { validateUUID } from "@/utils/validation";
+import { buildPaginatedResponse } from "@/utils/responseBuilder";
 
 /**
  * Record task outcome with blockchain registration
@@ -172,22 +174,34 @@ export async function getClientTaskRecords(
     }
 
     const clientId = authReq.user.id;
-    const taskRecords = await taskService.getTaskRecordsByClientId(clientId);
 
-    res.status(200).json({
-      success: true,
-      message: "Client task records retrieved successfully",
-      data: {
+    if (!validateUUID(clientId)) {
+      throw new BadRequestError("Invalid Client id format", "INVALID_UUID");
+    }
+
+    const limit = req.query.limit ? Number(req.query.limit) : 20;
+    const page = req.query.page? Number(req.query.page) : 1;
+    const completed = req.query.completed === undefined ? undefined : (req.query.completed === 'true');
+
+    const { taskRecords, meta } = await taskService.getTaskRecordsByClientId(clientId, limit, page, completed);
+
+    res.status(200).json(
+      buildPaginatedResponse(
         taskRecords,
-        count: taskRecords.length
-      },
-      metadata: {
-        timestamp: new Date().toISOString(),
-        requestId: authReq.securityContext?.requestId || 'unknown',
-      }
-    });
+        "Client task records retrieved successfully",
+        {
+          current_page: meta.page,
+          total_pages: Math.ceil(meta.total_items / (limit || 20)),
+          total_items: meta.total_items,
+          per_page: meta.limit || 20
+        }
+      )
+    )
 
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code && error.message) {
+      throw mapSupabaseError(error);
+    }
     next(error);
   }
 }

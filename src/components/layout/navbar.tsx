@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, User, LogOut, Settings, Wallet } from "lucide-react";
+import { Menu, X, User, LogOut, Settings, Wallet, Users, Briefcase } from "lucide-react";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import {
   DropdownMenu,
@@ -13,8 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
+import { useRoleStore } from "@/stores/use-role-store";
 import { Button } from "@/components/ui/button";
 
 interface NavbarProps {
@@ -28,6 +30,7 @@ interface NavbarProps {
  * Features:
  * - Responsive design (mobile & desktop)
  * - Profile dropdown menu on the right
+ * - Role indicator badge
  * - Smooth animations and transitions
  * - Dark mode support
  * - Sticky on scroll with backdrop blur
@@ -42,6 +45,7 @@ export default function Navbar({
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuth();
+  const { isFreelancer } = useRoleStore();
 
   // Handle scroll effect
   useEffect(() => {
@@ -138,8 +142,31 @@ export default function Navbar({
             ))}
           </div>
 
-          {/* Right Section: Theme Toggle, Wallet, Profile */}
+          {/* Right Section: Role Indicator, Theme Toggle, Wallet, Profile */}
           <div className="flex items-center gap-3">
+            {/* Role Indicator - Only show when authenticated */}
+            {isAuthenticated && (
+              <Link href="/profile/role" className="hidden sm:block">
+                <Badge 
+                  variant="outline" 
+                  className="gap-1.5 hover:bg-accent transition-colors cursor-pointer
+                   text-gray-700 dark:text-gray-300 font-medium text-sm md:flex items-center"
+                >
+                  {isFreelancer ? (
+                    <>
+                      <Users className="h-3.5 w-3.5" />
+                      Freelancer
+                    </>
+                  ) : (
+                    <>
+                      <Briefcase className="h-3.5 w-3.5" />
+                      Client
+                    </>
+                  )}
+                </Badge>
+              </Link>
+            )}
+
             {/* Theme Toggle */}
             <div className="hidden sm:block">
               <ThemeToggle />
@@ -208,19 +235,19 @@ export default function Navbar({
                         <span>Settings</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="sm:hidden cursor-pointer gap-2">
-                    <Wallet className="w-4 h-4" />
-                    <span>Wallet</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="cursor-pointer gap-2 text-red-600 dark:text-red-400 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                        <Wallet className="w-4 h-4" />
+                        <span>Wallet</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={handleLogout}
+                        className="cursor-pointer gap-2 text-red-600 dark:text-red-400 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   /* Sign In / Sign Up buttons for non-authenticated users */
                   <div className="hidden sm:flex items-center gap-2">
@@ -268,6 +295,25 @@ export default function Navbar({
             "
           >
             <div className="flex flex-col space-y-1">
+              {/* Role Indicator Mobile - Only show when authenticated */}
+              {isAuthenticated && (
+                <Link href="/profile/role" className="px-4 py-3">
+                  <Badge variant="outline" className="gap-1.5 w-full justify-center">
+                    {isFreelancer ? (
+                      <>
+                        <Users className="h-3.5 w-3.5" />
+                        Freelancer Mode
+                      </>
+                    ) : (
+                      <>
+                        <Briefcase className="h-3.5 w-3.5" />
+                        Client Mode
+                      </>
+                    )}
+                  </Badge>
+                </Link>
+              )}
+
               {/* Theme Toggle Mobile */}
               <div className="flex items-center justify-between px-4 py-3 mb-2 sm:hidden">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -318,4 +364,3 @@ export default function Navbar({
     </header>
   );
 }
-
