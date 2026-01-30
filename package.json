@@ -24,7 +24,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "postinstall": "npm rebuild sharp"
+    "postinstall": "npm rebuild sharp",
+    "bindings:generate": "$(which bash) scripts/generate-bindings.sh 2>/dev/null || /opt/homebrew/bin/bash scripts/generate-bindings.sh",
+    "bindings:build": "pnpm --filter './packages/*' run build"
   },
   "dependencies": {
     "@creit.tech/stellar-wallets-kit": "^1.9.5",
