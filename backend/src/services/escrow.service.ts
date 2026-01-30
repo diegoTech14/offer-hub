@@ -1,61 +1,22 @@
-import { 
-  Keypair, 
-  Networks, 
-  Address as SorobanAddress,
-} from "@stellar/stellar-sdk";
-// @ts-expect-error - Client is exported from /contract subpath but TypeScript resolution has issues
-import { Client } from "@stellar/stellar-sdk/contract";
+import { Address as SorobanAddress } from "@stellar/stellar-sdk";
 import { InternalServerError } from "@/utils/AppError";
 import { randomBytes, createHash } from "crypto";
+import { getStellarClientFactory } from "@/services/stellar";
+import { getContractAddress } from "@/config/stellar-contracts";
 
 /**
  * Escrow Service
- * Handles interaction with the Soroban escrow-factory contract
+ * Handles interaction with the Stellar escrow-factory contract using typed bindings
  */
 export class EscrowService {
-  private escrowFactoryAddress: string;
   private feeManagerAddress: string;
-  private networkPassphrase: string;
-  private rpcUrl: string;
-  private signerKeypair: Keypair;
 
   constructor() {
-    // Load configuration from environment variables
-    this.escrowFactoryAddress = process.env.ESCROW_FACTORY_CONTRACT_ADDRESS || "";
-    this.feeManagerAddress = process.env.FEE_MANAGER_CONTRACT_ADDRESS || "";
-    const network = (process.env.SOROBAN_NETWORK || "testnet").toLowerCase();
+    // Load fee manager address from configuration
+    this.feeManagerAddress = getContractAddress("feeManager");
     
-    // Set network passphrase
-    if (process.env.SOROBAN_NETWORK_PASSPHRASE) {
-      this.networkPassphrase = process.env.SOROBAN_NETWORK_PASSPHRASE;
-    } else {
-      this.networkPassphrase = network === "mainnet" 
-        ? Networks.PUBLIC 
-        : Networks.TESTNET;
-    }
-
-    // Set RPC URL
-    if (process.env.SOROBAN_RPC_URL) {
-      this.rpcUrl = process.env.SOROBAN_RPC_URL;
-    } else {
-      this.rpcUrl = network === "mainnet"
-        ? "https://soroban-rpc.mainnet.stellar.org"
-        : "https://soroban-testnet.stellar.org";
-    }
-
-    // Load signer keypair
-    const signerSecretKey = process.env.ESCROW_SIGNER_SECRET_KEY;
-    if (!signerSecretKey) {
-      throw new Error("ESCROW_SIGNER_SECRET_KEY is required in environment variables");
-    }
-    this.signerKeypair = Keypair.fromSecret(signerSecretKey);
-
-    // Validate required configuration
-    if (!this.escrowFactoryAddress) {
-      throw new Error("ESCROW_FACTORY_CONTRACT_ADDRESS is required in environment variables");
-    }
     if (!this.feeManagerAddress) {
-      throw new Error("FEE_MANAGER_CONTRACT_ADDRESS is required in environment variables");
+      throw new Error("FEE_MANAGER_CONTRACT_ID is required in environment variables");
     }
   }
 
@@ -112,6 +73,10 @@ export class EscrowService {
     projectId: string; // For salt generation
   }): Promise<string> {
     try {
+      // Get the typed escrow factory client from the factory
+      const clientFactory = getStellarClientFactory();
+      const escrowFactoryClient = await clientFactory.getEscrowFactory();
+
       // Convert addresses to Soroban Address types
       const clientAddr = this.addressToSorobanAddress(params.clientAddress);
       const freelancerAddr = this.addressToSorobanAddress(params.freelancerAddress);
@@ -123,22 +88,8 @@ export class EscrowService {
       // Generate unique salt
       const saltBytes = this.generateSalt(params.projectId);
 
-      // Initialize Soroban client for escrow-factory contract
-      const client = await Client.from({
-        contractId: this.escrowFactoryAddress,
-        networkPassphrase: this.networkPassphrase,
-        rpcUrl: this.rpcUrl,
-        publicKey: this.signerKeypair.publicKey(),
-        signTransaction: async (tx: any) => {
-          // Sign the transaction with the signer keypair
-          tx.sign(this.signerKeypair);
-          return tx;
-        },
-      });
-
       // Prepare EscrowCreateParams struct
       // The contract expects a struct with: client, freelancer, amount, fee_manager, salt
-      // The SDK's client.methods API automatically handles struct serialization
       const escrowParams = {
         client: clientAddr,
         freelancer: freelancerAddr,
@@ -147,31 +98,27 @@ export class EscrowService {
         salt: saltBytes, // BytesN<32>
       };
 
-      // Invoke deploy_new_escrow method
-      // The SDK will automatically serialize the struct parameter
-      const invokeTx = await client.methods.deploy_new_escrow(escrowParams);
-      
-      // Sign and send the transaction
-      const result = await invokeTx.signAndSend();
+      // Invoke deploy_new_escrow method using the typed client
+      // This provides IntelliSense and compile-time type checking
+      const result = await escrowFactoryClient.deployNewEscrow(escrowParams);
 
       // Extract the escrow contract address from the result
-      // The method returns an Address (SorobanAddress)
-      if (!result.returnValue) {
+      if (!result.result) {
         throw new InternalServerError("Escrow deployment returned no address");
       }
 
       // The return value is a SorobanAddress, convert to string
       let escrowAddress: string;
-      if (result.returnValue instanceof SorobanAddress) {
-        escrowAddress = result.returnValue.toString();
+      if (result.result instanceof SorobanAddress) {
+        escrowAddress = result.result.toString();
       } else {
-        // Fallback: try to extract address from ScVal if needed
-        escrowAddress = String(result.returnValue);
+        // Fallback: try to extract address from the result
+        escrowAddress = String(result.result);
       }
       
       return escrowAddress;
     } catch (error) {
-      // Handle Soroban-specific errors and convert to AppError
+      // Handle Stellar-specific errors and convert to AppError
       if (error instanceof Error) {
         throw new InternalServerError(
           `Failed to create escrow: ${error.message}`,
