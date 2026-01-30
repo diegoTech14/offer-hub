@@ -6,6 +6,7 @@ import {
   CreateWalletDTO,
   GenerateWalletResult,
   WalletType,
+  WalletDetailsResponse,
 } from "@/types/wallet.types";
 import { AppError } from "@/utils/AppError";
 
@@ -359,6 +360,43 @@ export async function getWalletById(walletId: string): Promise<Wallet | null> {
       500,
     );
   }
+}
+
+/**
+ * Get wallet details for an authenticated user (ownership validated).
+ * Returns safe response without enc_private_key.
+ * @param walletId - The wallet UUID
+ * @param userId - The authenticated user's ID
+ * @returns Wallet details for API response
+ * @throws AppError 404 WALLET_NOT_FOUND if wallet does not exist
+ * @throws AppError 403 WALLET_ACCESS_DENIED if wallet belongs to another user
+ */
+export async function getWalletDetailsForUser(
+  walletId: string,
+  userId: string,
+): Promise<WalletDetailsResponse> {
+  const wallet = await getWalletById(walletId);
+
+  if (!wallet) {
+    throw new AppError("Wallet not found", 404, "WALLET_NOT_FOUND");
+  }
+
+  if (wallet.user_id !== userId) {
+    throw new AppError(
+      "You do not have permission to access this wallet",
+      403,
+      "WALLET_ACCESS_DENIED",
+    );
+  }
+
+  return {
+    id: wallet.id,
+    public_key: wallet.address,
+    type: wallet.type,
+    provider: wallet.type === "invisible" ? "internal" : (wallet.provider ?? "other"),
+    is_primary: wallet.is_primary ?? false,
+    created_at: wallet.created_at,
+  };
 }
 
 /**
