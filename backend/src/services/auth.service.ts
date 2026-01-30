@@ -796,6 +796,161 @@ export async function logoutUser(tokenRecord: RefreshTokenRecord) {
   return { message: "Logged out successfully" };
 }
 
+function normalizeTokenHashToHex(tokenHash: any): string | null {
+  if (!tokenHash) return null;
+
+  if (tokenHash instanceof Buffer) {
+    return tokenHash.toString("hex");
+  }
+
+  if (typeof tokenHash === "string") {
+    let processedString = tokenHash;
+
+    if (processedString.startsWith("\\x")) {
+      processedString = processedString.substring(2);
+    } else if (
+      processedString.startsWith("0x") ||
+      processedString.startsWith("0X")
+    ) {
+      processedString = processedString.substring(2);
+    }
+
+    if (processedString.startsWith("7b2274797065223a2242756666657222")) {
+      try {
+        const jsonString = Buffer.from(processedString, "hex").toString("utf8");
+        const bufferData = JSON.parse(jsonString);
+        if (bufferData.type === "Buffer" && Array.isArray(bufferData.data)) {
+          return Buffer.from(bufferData.data).toString("hex");
+        }
+      } catch {
+        return processedString;
+      }
+    }
+
+    if (processedString.startsWith("{") && processedString.includes('"type":"Buffer"')) {
+      try {
+        const bufferData = JSON.parse(processedString);
+        if (bufferData.type === "Buffer" && Array.isArray(bufferData.data)) {
+          return Buffer.from(bufferData.data).toString("hex");
+        }
+      } catch {
+        return processedString;
+      }
+    }
+
+    return processedString;
+  }
+
+  if (typeof tokenHash === "object") {
+    try {
+      return Buffer.from(tokenHash).toString("hex");
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+}
+
+export async function logoutAllUserSessions(userId: string) {
+  const { error } = await supabase
+    .from("refresh_tokens")
+    .update({
+      is_revoked: true,
+      revoked_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId)
+    .eq("is_revoked", false);
+
+  if (error) {
+    throw new AppError(`Failed to revoke sessions: ${error.message}`, 500);
+  }
+}
+
+export async function logoutCurrentSession(
+  userId: string,
+  options: { refreshToken?: string; ip?: string; userAgent?: string },
+) {
+  if (options.refreshToken) {
+    const refreshTokenHash = hashToken(options.refreshToken);
+
+    const { data: userTokens, error: fetchError } = await supabase
+      .from("refresh_tokens")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_revoked", false)
+      .is("replaced_by_token_id", null);
+
+    if (fetchError) {
+      throw new AppError(`Failed to fetch sessions: ${fetchError.message}`, 500);
+    }
+
+    const tokenRecord = (userTokens || []).find((token: any) => {
+      const tokenHashHex = normalizeTokenHashToHex(token.token_hash);
+      return tokenHashHex === refreshTokenHash;
+    });
+
+    if (!tokenRecord) {
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from("refresh_tokens")
+      .update({
+        is_revoked: true,
+        revoked_at: new Date().toISOString(),
+      })
+      .eq("id", tokenRecord.id)
+      .eq("user_id", userId);
+
+    if (updateError) {
+      throw new AppError(`Failed to revoke session: ${updateError.message}`, 500);
+    }
+
+    return;
+  }
+
+  const ip_hash = options.ip ? hashIP(options.ip) : undefined;
+
+  const { data: userTokens, error: fetchError } = await supabase
+    .from("refresh_tokens")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("is_revoked", false)
+    .is("replaced_by_token_id", null)
+    .order("created_at", { ascending: false });
+
+  if (fetchError) {
+    throw new AppError(`Failed to fetch sessions: ${fetchError.message}`, 500);
+  }
+
+  const tokenRecord = (userTokens || []).find((token: any) => {
+    const uaMatch =
+      Boolean(options.userAgent) &&
+      Boolean(token.user_agent) &&
+      token.user_agent === options.userAgent;
+    const ipMatch = Boolean(ip_hash) && Boolean(token.ip_hash) && token.ip_hash === ip_hash;
+    return uaMatch && ipMatch;
+  });
+
+  if (!tokenRecord) {
+    return;
+  }
+
+  const { error: updateError } = await supabase
+    .from("refresh_tokens")
+    .update({
+      is_revoked: true,
+      revoked_at: new Date().toISOString(),
+    })
+    .eq("id", tokenRecord.id)
+    .eq("user_id", userId);
+
+  if (updateError) {
+    throw new AppError(`Failed to revoke session: ${updateError.message}`, 500);
+  }
+}
+
 export async function getMe(userId: string) {
   const { data: user, error } = await supabase
     .from("users")
