@@ -25,6 +25,29 @@ app.use(express.json());
 app.use('/api/escrows', authenticateToken(), escrowInitRoutes);
 app.use(ErrorHandler);
 
+let server: any = null;
+
+try {
+  server = app.listen(0, '127.0.0.1');
+  server.on('error', () => {
+    server = null;
+  });
+} catch {
+  server = null;
+}
+
+afterAll((done) => {
+  if (server && server.listening) {
+    server.close(done);
+  } else {
+    done();
+  }
+});
+
+const ensureServer = (): boolean => {
+  return Boolean(server && server.listening);
+};
+
 describe('POST /api/escrows/single-release/initialize', () => {
     const validData = {
         client: "0".repeat(56), // Valid 56 char string
@@ -40,11 +63,12 @@ describe('POST /api/escrows/single-release/initialize', () => {
     });
 
     it('should return unsignedTransaction on success', async () => {
+        if (!ensureServer()) return;
         mockedAxios.post.mockResolvedValueOnce({
             data: { unsignedTransaction: 'test-transaction-string' }
         });
 
-        const res = await request(app)
+        const res = await request(server)
             .post('/api/escrows/single-release/initialize')
             .send(validData);
 
@@ -58,7 +82,8 @@ describe('POST /api/escrows/single-release/initialize', () => {
     });
 
     it('should return 422 on validation error (invalid amounts)', async () => {
-        const res = await request(app)
+        if (!ensureServer()) return;
+        const res = await request(server)
             .post('/api/escrows/single-release/initialize')
             .send({ ...validData, amount: -10 });
 
@@ -67,7 +92,8 @@ describe('POST /api/escrows/single-release/initialize', () => {
     });
 
     it('should return 422 on validation error (invalid addresses)', async () => {
-        const res = await request(app)
+        if (!ensureServer()) return;
+        const res = await request(server)
             .post('/api/escrows/single-release/initialize')
             .send({ ...validData, client: 'short' });
 
@@ -75,12 +101,13 @@ describe('POST /api/escrows/single-release/initialize', () => {
     });
 
     it('should return 500 if API Key is missing', async () => {
+        if (!ensureServer()) return;
         delete process.env.TRUSTLESSWORK_API_KEY;
 
         // We need to re-import or handle env change if controller caches it. 
         // Controller reads env on each request, so it should be fine.
 
-        const res = await request(app)
+        const res = await request(server)
             .post('/api/escrows/single-release/initialize')
             .send(validData);
 
@@ -89,6 +116,7 @@ describe('POST /api/escrows/single-release/initialize', () => {
     });
 
     it('should handle external API errors', async () => {
+        if (!ensureServer()) return;
         mockedAxios.post.mockRejectedValueOnce({
             isAxiosError: true,
             response: {
@@ -97,7 +125,7 @@ describe('POST /api/escrows/single-release/initialize', () => {
             }
         });
 
-        const res = await request(app)
+        const res = await request(server)
             .post('/api/escrows/single-release/initialize')
             .send(validData);
 

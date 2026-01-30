@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 
 // User Role Types (defined locally to avoid circular imports)
 export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  MODERATOR = 'moderator',
-  FREELANCER = 'freelancer',
-  CLIENT = 'client'
+  ADMIN = "admin",
+  USER = "user",
+  MODERATOR = "moderator",
+  FREELANCER = "freelancer",
+  CLIENT = "client",
 }
 
 // Permission Types (defined locally to avoid circular imports)
@@ -54,17 +54,17 @@ export interface AuthError {
 
 // Auth Error Codes
 export enum AuthErrorCode {
-  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
-  USER_NOT_FOUND = 'USER_NOT_FOUND',
-  ACCOUNT_LOCKED = 'ACCOUNT_LOCKED',
-  ACCOUNT_DISABLED = 'ACCOUNT_DISABLED',
-  INVALID_TOKEN = 'INVALID_TOKEN',
-  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
-  INSUFFICIENT_PERMISSIONS = 'INSUFFICIENT_PERMISSIONS',
-  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+  INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
+  USER_NOT_FOUND = "USER_NOT_FOUND",
+  ACCOUNT_LOCKED = "ACCOUNT_LOCKED",
+  ACCOUNT_DISABLED = "ACCOUNT_DISABLED",
+  INVALID_TOKEN = "INVALID_TOKEN",
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
+  INSUFFICIENT_PERMISSIONS = "INSUFFICIENT_PERMISSIONS",
+  RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED",
+  NETWORK_ERROR = "NETWORK_ERROR",
+  VALIDATION_ERROR = "VALIDATION_ERROR",
+  UNKNOWN_ERROR = "UNKNOWN_ERROR",
 }
 
 // Database Model Types
@@ -106,7 +106,7 @@ export interface SessionModel {
     region: string;
   };
   deviceInfo: {
-    type: 'desktop' | 'mobile' | 'tablet';
+    type: "desktop" | "mobile" | "tablet";
     os: string;
     browser: string;
   };
@@ -149,14 +149,20 @@ export interface AuthService {
   verifyEmail(token: string): Promise<void>;
 
   // Two-factor authentication
-  setupTwoFactor(userId: string): Promise<{ secret: string; qrCodeUrl: string }>;
+  setupTwoFactor(
+    userId: string,
+  ): Promise<{ secret: string; qrCodeUrl: string }>;
   verifyTwoFactorSetup(userId: string, code: string): Promise<void>;
   verifyTwoFactorCode(userId: string, code: string): Promise<boolean>;
   disableTwoFactor(userId: string): Promise<void>;
   generateBackupCodes(userId: string): Promise<string[]>;
 
   // Session management
-  createSession(userId: string, userAgent: string, ipAddress: string): Promise<SessionModel>;
+  createSession(
+    userId: string,
+    userAgent: string,
+    ipAddress: string,
+  ): Promise<SessionModel>;
   findSessionById(sessionId: string): Promise<SessionModel | null>;
   revokeSession(sessionId: string): Promise<void>;
   revokeAllUserSessions(userId: string): Promise<void>;
@@ -191,7 +197,11 @@ export interface TokenService {
 }
 
 export interface SessionService {
-  createSession(userId: string, userAgent: string, ipAddress: string): Promise<SessionModel>;
+  createSession(
+    userId: string,
+    userAgent: string,
+    ipAddress: string,
+  ): Promise<SessionModel>;
   findSessionById(sessionId: string): Promise<SessionModel | null>;
   findSessionByToken(token: string): Promise<SessionModel | null>;
   updateSessionActivity(sessionId: string): Promise<void>;
@@ -221,7 +231,7 @@ export interface TokenInfo {
   needsRefresh: boolean;
 }
 
-export interface AuthenticatedRequest extends Omit<Request, 'user'> {
+export interface AuthenticatedRequest extends Omit<Request, "user"> {
   user?: AuthUser;
   session?: SessionModel;
   permissions?: Permission[];
@@ -231,17 +241,53 @@ export interface AuthenticatedRequest extends Omit<Request, 'user'> {
 }
 
 export interface AuthMiddleware {
-  authenticate: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-  authorize: (permissions: string[]) => (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
-  requireRole: (roles: UserRole[]) => (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
-  optionalAuth: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-  refreshAuth: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+  authenticate: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
+  authorize: (
+    permissions: string[],
+  ) => (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
+  requireRole: (
+    roles: UserRole[],
+  ) => (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
+  optionalAuth: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
+  refreshAuth: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
 }
 
 export interface RateLimitMiddleware {
-  loginAttempts: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-  apiRequests: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-  passwordReset: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+  loginAttempts: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
+  apiRequests: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
+  passwordReset: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
 }
 
 // Controller Types
@@ -305,7 +351,9 @@ export interface UpdateProfileValidation {
 
 // Repository Types
 export interface UserRepository {
-  create(user: Omit<UserModel, 'id' | 'createdAt' | 'updatedAt'>): Promise<UserModel>;
+  create(
+    user: Omit<UserModel, "id" | "createdAt" | "updatedAt">,
+  ): Promise<UserModel>;
   findById(id: string): Promise<UserModel | null>;
   findByEmail(email: string): Promise<UserModel | null>;
   update(id: string, updates: Partial<UserModel>): Promise<UserModel>;
@@ -315,7 +363,9 @@ export interface UserRepository {
 }
 
 export interface SessionRepository {
-  create(session: Omit<SessionModel, 'id' | 'createdAt' | 'lastActivityAt'>): Promise<SessionModel>;
+  create(
+    session: Omit<SessionModel, "id" | "createdAt" | "lastActivityAt">,
+  ): Promise<SessionModel>;
   findById(id: string): Promise<SessionModel | null>;
   findByUserId(userId: string): Promise<SessionModel[]>;
   update(id: string, updates: Partial<SessionModel>): Promise<SessionModel>;
@@ -325,7 +375,9 @@ export interface SessionRepository {
 }
 
 export interface RefreshTokenRepository {
-  create(token: Omit<RefreshTokenModel, 'id' | 'createdAt'>): Promise<RefreshTokenModel>;
+  create(
+    token: Omit<RefreshTokenModel, "id" | "createdAt">,
+  ): Promise<RefreshTokenModel>;
   findByTokenHash(tokenHash: string): Promise<RefreshTokenModel | null>;
   revoke(tokenHash: string): Promise<void>;
   revokeAllUserTokens(userId: string): Promise<void>;
@@ -343,7 +395,7 @@ export interface UserFilter {
   limit?: number;
   offset?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface SessionFilter {
@@ -386,19 +438,19 @@ export interface AuthEvent {
 }
 
 export enum AuthEventType {
-  USER_LOGIN = 'USER_LOGIN',
-  USER_LOGOUT = 'USER_LOGOUT',
-  USER_REGISTER = 'USER_REGISTER',
-  PASSWORD_CHANGE = 'PASSWORD_CHANGE',
-  PASSWORD_RESET = 'PASSWORD_RESET',
-  EMAIL_VERIFICATION = 'EMAIL_VERIFICATION',
-  TWO_FACTOR_SETUP = 'TWO_FACTOR_SETUP',
-  TWO_FACTOR_DISABLE = 'TWO_FACTOR_DISABLE',
-  SESSION_REVOKE = 'SESSION_REVOKE',
-  TOKEN_REFRESH = 'TOKEN_REFRESH',
-  LOGIN_ATTEMPT_FAILED = 'LOGIN_ATTEMPT_FAILED',
-  ACCOUNT_LOCKED = 'ACCOUNT_LOCKED',
-  ACCOUNT_UNLOCKED = 'ACCOUNT_UNLOCKED'
+  USER_LOGIN = "USER_LOGIN",
+  USER_LOGOUT = "USER_LOGOUT",
+  USER_REGISTER = "USER_REGISTER",
+  PASSWORD_CHANGE = "PASSWORD_CHANGE",
+  PASSWORD_RESET = "PASSWORD_RESET",
+  EMAIL_VERIFICATION = "EMAIL_VERIFICATION",
+  TWO_FACTOR_SETUP = "TWO_FACTOR_SETUP",
+  TWO_FACTOR_DISABLE = "TWO_FACTOR_DISABLE",
+  SESSION_REVOKE = "SESSION_REVOKE",
+  TOKEN_REFRESH = "TOKEN_REFRESH",
+  LOGIN_ATTEMPT_FAILED = "LOGIN_ATTEMPT_FAILED",
+  ACCOUNT_LOCKED = "ACCOUNT_LOCKED",
+  ACCOUNT_UNLOCKED = "ACCOUNT_UNLOCKED",
 }
 
 // Configuration Types
@@ -434,7 +486,7 @@ export interface AuthConfig {
   };
   twoFactor: {
     issuer: string;
-    algorithm: 'SHA1' | 'SHA256' | 'SHA512';
+    algorithm: "SHA1" | "SHA256" | "SHA512";
     digits: number;
     period: number;
   };
@@ -446,9 +498,14 @@ export class AuthenticationError extends Error {
   public readonly statusCode: number;
   public readonly details?: Record<string, unknown>;
 
-  constructor(message: string, code: string, statusCode: number = 401, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    code: string,
+    statusCode: number = 401,
+    details?: Record<string, unknown>,
+  ) {
     super(message);
-    this.name = 'AuthenticationError';
+    this.name = "AuthenticationError";
     this.code = code;
     this.statusCode = statusCode;
     this.details = details;
@@ -466,10 +523,10 @@ export class AuthorizationError extends Error {
     code: string,
     statusCode: number = 403,
     requiredPermissions?: string[],
-    requiredRoles?: UserRole[]
+    requiredRoles?: UserRole[],
   ) {
     super(message);
-    this.name = 'AuthorizationError';
+    this.name = "AuthorizationError";
     this.code = code;
     this.statusCode = statusCode;
     this.requiredPermissions = requiredPermissions;
@@ -482,9 +539,14 @@ export class ValidationError extends Error {
   public readonly statusCode: number;
   public readonly field?: string;
 
-  constructor(message: string, code: string, statusCode: number = 400, field?: string) {
+  constructor(
+    message: string,
+    code: string,
+    statusCode: number = 400,
+    field?: string,
+  ) {
     super(message);
-    this.name = 'ValidationError';
+    this.name = "ValidationError";
     this.code = code;
     this.statusCode = statusCode;
     this.field = field;
@@ -580,6 +642,13 @@ export interface RefreshTokenRecord {
   user_id?: string; // For backward compatibility
   token_hash?: string; // For backward compatibility
   created_at?: Date; // For backward compatibility
+  device_info?: any; // JSONB
+  user_agent?: string;
+  ip_hash?: string;
+  last_used_at?: Date;
+  device_type?: string;
+  browser?: string;
+  os?: string;
 }
 
 export interface AuditLogEntry {
@@ -594,12 +663,14 @@ export interface AuditLogEntry {
 }
 
 export interface DeviceInfo {
-  type: 'desktop' | 'mobile' | 'tablet';
+  type: "desktop" | "mobile" | "tablet";
   os: string;
   browser: string;
   version?: string;
   ip_address?: string; // For backward compatibility
   user_agent?: string; // For backward compatibility
+  ip_hash?: string;
+  last_used_at?: Date;
 }
 
 export interface JWTPayload {

@@ -43,9 +43,17 @@ next-env.d.ts
 # Claude
 .claude/
 
-#IDE/Editors 
+#IDE/Editors
 ./vscode
 ./idea
+settings.json
 
 # Freelance matching service dependencies
 /services/freelance-matching/node_modules/
+
+bun.lock
+# Development helper files (not meant to be committed)
+commit.sh
+pr_description.md
+backend/test-balance.sh
+backend/TEST_BALANCE.md

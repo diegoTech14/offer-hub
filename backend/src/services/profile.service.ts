@@ -3,40 +3,198 @@
  * @author Offer Hub Team
  */
 
-import { supabase } from "../lib/supabase/supabase";
-import { InternalServerError } from "../utils/AppError";
-import { Profile } from "../types/profile.types";
+import { supabase } from "@/lib/supabase/supabase";
+import { AppError, NotFoundError, InternalServerError, BadRequestError } from "@/utils/AppError";
+import { CreateProfileDTO, UpdateProfileDTO, Profile, ProfileConstraints } from "@/types/profile.types";
 
 class ProfileService {
   /**
+   * Create a new profile for the authenticated user
+   *
+   * @returns The created Profile object or null if creation failed
+   */
+  async createProfile(data: CreateProfileDTO): Promise<Profile | void> {
+    // Check if user already exists
+    const { data: existingProfile, error } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("user_id", data.userId)
+      .single();
+
+    if (existingProfile) {
+      throw new AppError("Your profile has already been created", 409);
+    }
+
+    if (error && error.code !== "PGRST116") {
+      throw new AppError(
+        "Failed to check existing profile: " + error.message,
+        500,
+      );
+    }
+
+    // Insert new profile
+    const { data: profileData, error: insertError } = await supabase
+      .from("profiles")
+      .insert([
+        {
+          user_id: data.userId,
+          display_name: data.displayName,
+          bio: data.bio,
+          website: data.website,
+          skills: data.skills,
+          date_of_birth: data.dateOfBirth,
+          location: data.location,
+        },
+      ])
+      .select()
+      .single();
+
+    if (insertError) {
+      throw new AppError(
+        "Failed to create profile: " + insertError.message,
+        500,
+      );
+    }
+
+    if (!profileData) {
+      return;
+    }
+
+    // Map database columns (snake_case) to Profile interface (camelCase)
+    return {
+      id: profileData.id,
+      userId: profileData.user_id,
+      displayName: profileData.display_name,
+      bio: profileData.bio,
+      avatarUrl: profileData.avatar_url,
+      dateOfBirth: profileData.date_of_birth ? new Date(profileData.date_of_birth) : null,
+      location: profileData.location,
+      skills: profileData.skills || [],
+      website: profileData.website,
+      createdAt: new Date(profileData.created_at),
+      updatedAt: new Date(profileData.updated_at),
+    };
+  }
+
+  /**
    * Get profile by user ID
-   * @param userId - User ID to fetch profile for
-   * @returns Profile data or null if not found
+   * @param userId - The user ID to fetch profile for
+   * @returns Profile or null if not found
    */
   async getProfileByUserId(userId: string): Promise<Profile | null> {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("userId", userId)
-        .single();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
 
-      if (error) {
-        // Return null if profile not found (PGRST116 is "not found" error)
-        if (error.code === "PGRST116") {
-          return null;
-        }
-        throw error;
-      }
-
-      return data;
-    } catch (error: any) {
-      // If it's a "not found" error, return null
+    if (error) {
+      // If no rows found, return null
       if (error.code === "PGRST116") {
         return null;
       }
       throw new InternalServerError(`Failed to fetch profile: ${error.message}`);
     }
+
+    if (!data) {
+      return null;
+    }
+
+    // Map database columns (snake_case) to Profile interface (camelCase)
+    return {
+      id: data.id,
+      userId: data.user_id,
+      displayName: data.display_name,
+      bio: data.bio,
+      avatarUrl: data.avatar_url,
+      dateOfBirth: data.date_of_birth ? new Date(data.date_of_birth) : null,
+      location: data.location,
+      skills: data.skills || [],
+      website: data.website,
+      createdAt: new Date(data.created_at),
+      updatedAt: new Date(data.updated_at),
+    };
+  }
+
+  /**
+   * Update profile by user ID
+   * @param userId - The user ID whose profile to update
+   * @param updateData - The update data (UpdateProfileDTO)
+   * @returns Updated profile
+   */
+  async updateProfile(userId: string, updateData: UpdateProfileDTO): Promise<Profile> {
+    // Validate profile exists
+    const existingProfile = await this.getProfileByUserId(userId);
+    if (!existingProfile) {
+      throw new NotFoundError("Profile not found", "PROFILE_NOT_FOUND");
+    }
+
+    // Protect user_id and id from modification
+    if ("userId" in updateData || "id" in updateData) {
+      throw new BadRequestError("Cannot update user_id or id fields", "RESTRICTED_FIELD_UPDATE");
+    }
+
+    // Prepare update payload - convert camelCase to snake_case and handle empty strings
+    const updatePayload: Record<string, any> = {};
+
+    if (updateData.displayName !== undefined) {
+      updatePayload.display_name = updateData.displayName === "" ? null : updateData.displayName;
+    }
+
+    if (updateData.bio !== undefined) {
+      updatePayload.bio = updateData.bio === "" ? null : updateData.bio;
+    }
+
+    if (updateData.avatarUrl !== undefined) {
+      updatePayload.avatar_url = updateData.avatarUrl === "" ? null : updateData.avatarUrl;
+    }
+
+    if (updateData.dateOfBirth !== undefined) {
+      updatePayload.date_of_birth = updateData.dateOfBirth === null ? null : updateData.dateOfBirth;
+    }
+
+    if (updateData.location !== undefined) {
+      updatePayload.location = updateData.location === "" ? null : updateData.location;
+    }
+
+    if (updateData.skills !== undefined) {
+      updatePayload.skills = updateData.skills;
+    }
+
+    if (updateData.website !== undefined) {
+      updatePayload.website = updateData.website === "" ? null : updateData.website;
+    }
+
+    // Update the profile - updated_at is automatically updated by database trigger
+    const { data, error } = await supabase
+      .from("profiles")
+      .update(updatePayload)
+      .eq("user_id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new InternalServerError(`Failed to update profile: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new NotFoundError("Profile not found after update", "PROFILE_NOT_FOUND");
+    }
+
+    // Map database columns (snake_case) to Profile interface (camelCase)
+    return {
+      id: data.id,
+      userId: data.user_id,
+      displayName: data.display_name,
+      bio: data.bio,
+      avatarUrl: data.avatar_url,
+      dateOfBirth: data.date_of_birth ? new Date(data.date_of_birth) : null,
+      location: data.location,
+      skills: data.skills || [],
+      website: data.website,
+      createdAt: new Date(data.created_at),
+      updatedAt: new Date(data.updated_at),
+    };
   }
 }
 

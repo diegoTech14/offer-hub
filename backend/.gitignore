@@ -15,6 +15,7 @@ yarn-error.log*
 
 # Environment variables
 .env
+.env.test
 
 # Optional dotenv override file
 .env.local
@@ -37,3 +38,5 @@ supabase/temp/
 
 # Application logs
 logs/
+
+bun.lock

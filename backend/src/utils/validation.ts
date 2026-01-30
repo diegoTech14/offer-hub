@@ -45,39 +45,39 @@ export const validateUsername = (username: string): boolean => {
 
 export const validateMonetaryAmount = (amount: number | string): boolean => {
   if (amount === null || amount === undefined) return false;
-  
+
   const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  
+
   if (isNaN(numAmount) || numAmount <= 0) return false;
-  
+
   // Check for reasonable maximum amount (1 billion)
   if (numAmount > 1000000000) return false;
-  
+
   // Check decimal places (max 6 decimal places)
   const decimalPlaces = numAmount.toString().split('.')[1]?.length || 0;
   if (decimalPlaces > 6) return false;
-  
+
   return true;
 };
 
 export const validateDateRange = (startDate: Date | string, endDate: Date | string): boolean => {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  
+
   if (isNaN(start.getTime()) || isNaN(end.getTime())) return false;
-  
+
   return start < end;
 };
 
 export const validateRequiredFields = (obj: Record<string, any>, fields: string[]): string[] => {
   const missingFields: string[] = [];
-  
+
   for (const field of fields) {
     if (obj[field] === undefined || obj[field] === null || obj[field] === '') {
       missingFields.push(field);
     }
   }
-  
+
   return missingFields;
 };
 
@@ -117,14 +117,14 @@ export interface ValidationError {
 
 // Comprehensive validation function
 export const validateObject = (
-  obj: Record<string, any>, 
+  obj: Record<string, any>,
   schema: Record<string, ValidationRule>
 ): ValidationResult => {
   const errors: ValidationError[] = [];
-  
+
   for (const [field, rule] of Object.entries(schema)) {
     const value = obj[field];
-    
+
     // Check required fields
     if (rule.required && (value === undefined || value === null || value === '')) {
       errors.push({
@@ -135,12 +135,12 @@ export const validateObject = (
       });
       continue;
     }
-    
+
     // Skip validation if field is not required and empty
     if (!rule.required && (value === undefined || value === null || value === '')) {
       continue;
     }
-    
+
     // Type validation
     if (rule.type && typeof value !== rule.type) {
       errors.push({
@@ -151,7 +151,7 @@ export const validateObject = (
       });
       continue;
     }
-    
+
     // Custom validation
     if (rule.validator && !rule.validator(value)) {
       errors.push({
@@ -162,7 +162,7 @@ export const validateObject = (
       });
     }
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors
@@ -258,8 +258,144 @@ export const CONTRACT_CREATION_SCHEMA: Record<string, ValidationRule> = {
   }
 };
 
+export const PROFILE_CREATION_SCHEMA: Record<string, ValidationRule> = {
+  display_name: {
+    required: false,
+    type: "string",
+    validator: (value) => validateStringLength(value, 1, 100),
+    errorMessage: "Display name must be between 1 and 100 characters",
+    errorCode: "INVALID_DISPLAY_NAME_LENGTH",
+  },
+  location: {
+    required: false,
+    type: "string",
+    validator: (value) => validateStringLength(value, 1, 100),
+    errorMessage: "Location must be between 1 and 100 characters",
+    errorCode: "INVALID_LOCATION_LENGTH",
+  },
+  date_of_birth: {
+    required: false,
+    type: "string",
+    validator: (value) => DATE_REGEX.test(value),
+    errorMessage: "Date of birth must be in YYYY-MM-DD format",
+    errorCode: "INVALID_DATE_OF_BIRTH",
+  },
+  website: {
+    required: false,
+    type: "string",
+    validator: (value) =>
+      /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(value) &&
+      validateStringLength(value, 1, 255),
+    errorMessage: "Invalid website format",
+    errorCode: "INVALID_WEBSITE",
+  },
+  bio: {
+    required: false,
+    type: "string",
+    validator: (value) => validateStringLength(value, 1, 500),
+    errorMessage: "Bio must be less than 500 characters",
+    errorCode: "INVALID_BIO_LENGTH",
+  },
+  skills: {
+    required: false,
+    type: "object",
+    validator: (value) =>
+      Array.isArray(value) && validateStringLength(value.join(", "), 0, 500),
+    errorMessage: "Skills must be less than 500 characters in total",
+    errorCode: "INVALID_SKILLS_LENGTH",
+  },
+};
+
+export const PROFILE_UPDATE_SCHEMA: Record<string, ValidationRule> = {
+  displayName: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      if (value === '' || value === null) return true;
+      return validateStringLength(value, 0, 100);
+    },
+    errorMessage: 'Display name must be less than 100 characters',
+    errorCode: 'INVALID_DISPLAY_NAME_LENGTH'
+  },
+  bio: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      if (value === '' || value === null) return true;
+      return validateStringLength(value, 0, 500);
+    },
+    errorMessage: 'Bio must be less than 500 characters',
+    errorCode: 'INVALID_BIO_LENGTH'
+  },
+  avatarUrl: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      if (value === '' || value === null) return true;
+      return validateAvatarUrl(value);
+    },
+    errorMessage: 'Invalid avatar URL format. Must be a valid URL ending with .jpg, .jpeg, .png, .gif, or .webp',
+    errorCode: 'INVALID_AVATAR_URL'
+  },
+  dateOfBirth: {
+    required: false,
+    validator: (value) => {
+      if (value === null || value === undefined) return true;
+      if (value instanceof Date) {
+        return !isNaN(value.getTime());
+      }
+      if (typeof value === 'string') {
+        const date = new Date(value);
+        return !isNaN(date.getTime());
+      }
+      return false;
+    },
+    errorMessage: 'Date of birth must be a valid date',
+    errorCode: 'INVALID_DATE_OF_BIRTH'
+  },
+  location: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      if (value === '' || value === null) return true;
+      return validateStringLength(value, 0, 100);
+    },
+    errorMessage: 'Location must be less than 100 characters',
+    errorCode: 'INVALID_LOCATION_LENGTH'
+  },
+  skills: {
+    required: false,
+    type: 'object',
+    validator: (value) => {
+      if (value === null || value === undefined) return true;
+      if (!Array.isArray(value)) return false;
+      return value.every(item => typeof item === 'string');
+    },
+    errorMessage: 'Skills must be an array of strings',
+    errorCode: 'INVALID_SKILLS_FORMAT'
+  },
+  website: {
+    required: false,
+    type: 'string',
+    validator: (value) => {
+      if (value === '' || value === null) return true;
+      if (!validateStringLength(value, 0, 255)) return false;
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    errorMessage: 'Website must be a valid URL and less than 255 characters',
+    errorCode: 'INVALID_WEBSITE_URL'
+  }
+};
+
 // Avatar URL validation
-export const AVATAR_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const;
+export const AVATAR_IMAGE_EXTENSIONS = Object.freeze(
+  ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const
+);
 export const AVATAR_URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
 
 export const validateAvatarUrl = (url: string): boolean => {
@@ -270,7 +406,11 @@ export const validateAvatarUrl = (url: string): boolean => {
   // Check if it's a valid URL format
   if (!AVATAR_URL_REGEX.test(trimmedUrl)) return false;
 
-  // Check if URL ends with allowed image extensions
-  const urlLower = trimmedUrl.toLowerCase();
-  return AVATAR_IMAGE_EXTENSIONS.some(ext => urlLower.endsWith(ext));
+  try {
+    const parsedUrl = new URL(trimmedUrl);
+    const pathLower = parsedUrl.pathname.toLowerCase();
+    return AVATAR_IMAGE_EXTENSIONS.some(ext => pathLower.endsWith(ext));
+  } catch {
+    return false;
+  }
 };
