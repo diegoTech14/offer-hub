@@ -4,13 +4,24 @@
  */
 
 import { Router } from "express";
-import { connectExternalWalletHandler, disconnectWallet } from "@/controllers/wallet.controller";
+import {
+  connectExternalWalletHandler,
+  disconnectWallet,
+  getWalletByIdHandler,
+} from "@/controllers/wallet.controller";
 import { verifyToken } from "@/middlewares/auth.middleware";
 
 const router = Router();
 
 // Wallet management routes
 // All routes require authentication (applied at app level in index.ts)
+
+/**
+ * GET /api/v1/wallets/:id
+ * Get wallet details for the authenticated user (ownership validated).
+ * Returns 404 if wallet not found, 403 if wallet belongs to another user.
+ */
+router.get("/:id", getWalletByIdHandler);
 
 /**
  * POST /api/v1/wallets/external
