@@ -11,7 +11,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from "@/utils/AppError";
-import { CreateUserDTO, User, UserFilters } from "@/types/user.types";
+import { CreateUserDTO, User, UserFilters, PublicUserResponse } from "@/types/user.types";
 import bcrypt from "bcryptjs";
 
 class UserService {
@@ -67,6 +67,27 @@ class UserService {
     if (error) return null;
 
     return data;
+  }
+
+  async getPublicUserProfile(id: string): Promise<PublicUserResponse | null> {
+    const { data, error } = await supabase
+      .from("users")
+      .select("id, username, avatar_url, created_at, verification_level, is_active")
+      .eq("id", id)
+      .single();
+
+    if (error || !data) return null;
+
+    // Don't show deleted or suspended users
+    if (!data.is_active) return null;
+
+    return {
+      id: data.id,
+      username: data.username,
+      avatar_url: data.avatar_url || undefined,
+      member_since: data.created_at,
+      is_verified: (data.verification_level || 0) > 0,
+    };
   }
 
   async updateUser(id: string, updates: Partial<CreateUserDTO>) {

@@ -1,5 +1,17 @@
 type PublicUser = Omit<User, "nonce" | "created_at">;
 
+/**
+ * Public user profile response - only includes fields safe for public viewing
+ * Used by GET /users/:id/public endpoint
+ */
+export interface PublicUserResponse {
+  id: string;
+  username: string;
+  avatar_url?: string;
+  member_since: string;
+  is_verified: boolean;
+}
+
 export interface CreateUserDTO {
   wallet_address: string;
   username: string;
