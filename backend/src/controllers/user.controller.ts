@@ -388,3 +388,32 @@ export const deleteOwnAccountHandler = async (
     next(error);
   }
 };
+
+export const getPublicUserProfileHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new ValidationError("User ID is required");
+    }
+
+    if (!validateUUID(id)) {
+      throw new BadRequestError("Invalid user ID format", "INVALID_UUID");
+    }
+
+    const user = await userService.getPublicUserProfile(id);
+
+    if (!user) {
+      throw new NotFoundError("User not found", "USER_NOT_FOUND");
+    }
+
+    res.setHeader('Cache-Control', 'public, max-age=300');
+    res.status(200).json(buildSuccessResponse(user, "Public profile fetched successfully"));
+  } catch (error: any) {
+    next(error);
+  }
+};
