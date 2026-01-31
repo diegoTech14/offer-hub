@@ -1,6 +1,10 @@
-import { getStellarBalance } from "../wallet.service";
+import {
+  getStellarBalance,
+  getWalletDetailsForUser,
+} from "../wallet.service";
 import { Horizon } from "@stellar/stellar-sdk";
 import { supabase } from "@/lib/supabase/supabase";
+import { AppError } from "@/utils/AppError";
 
 // Mock dependencies
 jest.mock("@/lib/supabase/supabase", () => ({
@@ -209,5 +213,109 @@ describe("WalletService - getStellarBalance", () => {
     await expect(getStellarBalance(newWalletId, mockUserId)).rejects.toThrow(
       "Account not found on Stellar network",
     );
+  });
+});
+
+describe("WalletService - getWalletDetailsForUser", () => {
+  const mockWalletId = "123e4567-e89b-12d3-a456-426614174000";
+  const mockUserId = "user-uuid-123";
+  const otherUserId = "other-user-uuid-456";
+  const mockWalletAddress =
+    "GABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ABCDEFGHIJKLMNOPQRSTUV";
+
+  const setupSupabaseMock = (data: object | null, error: object | null) => {
+    const mockFrom = jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data, error }),
+        }),
+      }),
+    });
+    mockedSupabase.from = mockFrom as any;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns wallet details when wallet exists and belongs to user", async () => {
+    const wallet = {
+      id: mockWalletId,
+      user_id: mockUserId,
+      address: mockWalletAddress,
+      type: "external",
+      provider: "freighter",
+      is_primary: true,
+      created_at: "2024-01-01T00:00:00Z",
+      encrypted_private_key: null,
+    };
+    setupSupabaseMock(wallet, null);
+
+    const result = await getWalletDetailsForUser(mockWalletId, mockUserId);
+
+    expect(result).toEqual({
+      id: mockWalletId,
+      public_key: mockWalletAddress,
+      type: "external",
+      provider: "freighter",
+      is_primary: true,
+      created_at: "2024-01-01T00:00:00Z",
+    });
+    expect(result).not.toHaveProperty("enc_private_key");
+    expect(result).not.toHaveProperty("encrypted_private_key");
+  });
+
+  it("maps invisible wallet to provider 'internal'", async () => {
+    const wallet = {
+      id: mockWalletId,
+      user_id: mockUserId,
+      address: mockWalletAddress,
+      type: "invisible",
+      provider: null,
+      is_primary: true,
+      created_at: "2024-01-01T00:00:00Z",
+      encrypted_private_key: "encrypted-data-not-exposed",
+    };
+    setupSupabaseMock(wallet, null);
+
+    const result = await getWalletDetailsForUser(mockWalletId, mockUserId);
+
+    expect(result.type).toBe("invisible");
+    expect(result.provider).toBe("internal");
+    expect(result).not.toHaveProperty("enc_private_key");
+    expect(result).not.toHaveProperty("encrypted_private_key");
+  });
+
+  it("throws WALLET_NOT_FOUND when wallet does not exist", async () => {
+    setupSupabaseMock(null, { code: "PGRST116" });
+
+    await expect(
+      getWalletDetailsForUser(mockWalletId, mockUserId),
+    ).rejects.toMatchObject({
+      message: "Wallet not found",
+      statusCode: 404,
+      errorCode: "WALLET_NOT_FOUND",
+    });
+  });
+
+  it("throws WALLET_ACCESS_DENIED when wallet belongs to another user", async () => {
+    const wallet = {
+      id: mockWalletId,
+      user_id: otherUserId,
+      address: mockWalletAddress,
+      type: "external",
+      provider: "freighter",
+      is_primary: false,
+      created_at: "2024-01-01T00:00:00Z",
+    };
+    setupSupabaseMock(wallet, null);
+
+    await expect(
+      getWalletDetailsForUser(mockWalletId, mockUserId),
+    ).rejects.toMatchObject({
+      message: "You do not have permission to access this wallet",
+      statusCode: 403,
+      errorCode: "WALLET_ACCESS_DENIED",
+    });
   });
 });

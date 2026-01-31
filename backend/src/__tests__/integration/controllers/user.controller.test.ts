@@ -1,4 +1,4 @@
-import { updateAvatarHandler, deleteOwnAccountHandler,updateProfileHandler } from '@/controllers/user.controller';
+import { updateAvatarHandler, deleteOwnAccountHandler, updateProfileHandler, getPublicUserProfileHandler } from '@/controllers/user.controller';
 import { userService } from '@/services/user.service';
 import { AppError, BadRequestError } from '@/utils/AppError';
 
@@ -792,6 +792,133 @@ describe('User Controller - updateProfileHandler', () => {
       await updateProfileHandler(mockReq, mockRes, mockNext);
 
       expect(mockRes.status).toHaveBeenCalledWith(200);
+    });
+  });
+});
+
+describe('User Controller - getPublicUserProfileHandler', () => {
+  let mockReq: any;
+  let mockRes: any;
+  let mockNext: any;
+
+  beforeEach(() => {
+    mockReq = {
+      params: {},
+    };
+
+    mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+      setHeader: jest.fn().mockReturnThis(),
+    };
+
+    mockNext = jest.fn();
+    jest.clearAllMocks();
+  });
+
+  describe('Success Cases', () => {
+    it('should return public user profile successfully', async () => {
+      const userId = '123e4567-e89b-12d3-a456-426614174000';
+      mockReq.params = { id: userId };
+
+      const mockPublicProfile = {
+        id: userId,
+        username: 'testuser',
+        avatar_url: 'https://example.com/avatar.jpg',
+        member_since: '2024-01-21T16:00:00Z',
+        is_verified: true,
+      };
+
+      mockUserService.getPublicUserProfile.mockResolvedValue(mockPublicProfile);
+
+      await getPublicUserProfileHandler(mockReq, mockRes, mockNext);
+
+      expect(mockUserService.getPublicUserProfile).toHaveBeenCalledWith(userId);
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Cache-Control', 'public, max-age=300');
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+      expect(mockRes.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          data: mockPublicProfile,
+        })
+      );
+    });
+
+    it('should return profile without avatar_url if not set', async () => {
+      const userId = '123e4567-e89b-12d3-a456-426614174000';
+      mockReq.params = { id: userId };
+
+      const mockPublicProfile = {
+        id: userId,
+        username: 'testuser',
+        member_since: '2024-01-21T16:00:00Z',
+        is_verified: false,
+      };
+
+      mockUserService.getPublicUserProfile.mockResolvedValue(mockPublicProfile);
+
+      await getPublicUserProfileHandler(mockReq, mockRes, mockNext);
+
+      expect(mockRes.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Validation', () => {
+    it('should return 400 if user ID is missing', async () => {
+      mockReq.params = {};
+
+      await getPublicUserProfileHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'User ID is required',
+        })
+      );
+    });
+
+    it('should return 400 if user ID is invalid UUID', async () => {
+      mockReq.params = { id: 'invalid-uuid' };
+
+      await getPublicUserProfileHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Invalid user ID format',
+        })
+      );
+    });
+  });
+
+  describe('Not Found Cases', () => {
+    it('should return 404 if user does not exist', async () => {
+      const userId = '123e4567-e89b-12d3-a456-426614174000';
+      mockReq.params = { id: userId };
+
+      mockUserService.getPublicUserProfile.mockResolvedValue(null);
+
+      await getPublicUserProfileHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'User not found',
+          statusCode: 404,
+        })
+      );
+    });
+
+    it('should return 404 if user is deleted or suspended', async () => {
+      const userId = '123e4567-e89b-12d3-a456-426614174000';
+      mockReq.params = { id: userId };
+
+      mockUserService.getPublicUserProfile.mockResolvedValue(null);
+
+      await getPublicUserProfileHandler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: 404,
+        })
+      );
     });
   });
 });

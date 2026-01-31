@@ -73,6 +73,7 @@ backend/
 For detailed documentation on standards, error handling, and API formats, please check the `docs/` directory:
 
 - [Supabase Setup](docs/SUPABASE_SETUP.md) - Quick guide to configure Supabase for local development
+- [Generate Bindings](../docs/GENERATE_BINDINGS.md) - **START HERE** - How to generate TypeScript bindings for Stellar contracts
 - [Error Handling & Validation](docs/ERROR_HANDLING_AND_VALIDATION.md)
 - [API Response Format](docs/API_RESPONSE_FORMAT.md)
 
@@ -81,6 +82,47 @@ For detailed documentation on standards, error handling, and API formats, please
 - **Authentication**: Email/Password & Wallet-based registration/login.
 - **User Management**: Profile management.
 - **Wallets**: Stellar wallet integration (Invisible & External).
+- **Smart Contracts**: TypeScript bindings for Stellar smart contracts (Escrow Factory, Fee Manager, User Registry).
+
+## 🌟 Working with Smart Contracts
+
+The backend uses TypeScript bindings for type-safe smart contract interactions.
+
+### Quick Start
+
+1. **Add your contract IDs** to `backend/.env`:
+   ```bash
+   ESCROW_FACTORY_CONTRACT_ID=CXXXXXX...
+   FEE_MANAGER_CONTRACT_ID=CXXXXXX...
+   USER_REGISTRY_CONTRACT_ID=CXXXXXX...
+   ```
+
+2. **Generate bindings**:
+   ```bash
+   pnpm run bindings:generate
+   ```
+
+3. **Use in your code**:
+   ```typescript
+   import { getStellarClientFactory } from "@/services/stellar";
+   
+   const factory = getStellarClientFactory();
+   const client = await factory.getEscrowFactory();
+   ```
+
+📖 **See full guide**: [Generate Bindings Documentation](../docs/GENERATE_BINDINGS.md)
+
+**Commands:**
+```bash
+# Generate all bindings
+pnpm run bindings:generate
+
+# Generate specific contract
+pnpm run bindings:generate -- --contract escrow-factory
+
+# Test setup
+cd backend && ./test-contracts.sh
+```
 
 ## 🤝 Contributing
 
