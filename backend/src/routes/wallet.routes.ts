@@ -8,6 +8,7 @@ import {
   connectExternalWalletHandler,
   disconnectWallet,
   getWalletByIdHandler,
+  getWalletsHandler,
 } from "@/controllers/wallet.controller";
 import { verifyToken } from "@/middlewares/auth.middleware";
 
@@ -22,6 +23,12 @@ const router = Router();
  * Returns 404 if wallet not found, 403 if wallet belongs to another user.
  */
 router.get("/:id", getWalletByIdHandler);
+
+/**
+ * GET /api/v1/wallets
+ * List all wallets for authenticated user
+ */
+router.get("/", verifyToken, getWalletsHandler);
 
 /**
  * POST /api/v1/wallets/external
