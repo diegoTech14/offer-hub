@@ -6,33 +6,23 @@ import { WithdrawalStatus } from "@/types/withdrawal.types";
 import { AppError } from "@/utils/AppError";
 
 export class WithdrawalStateMachine {
-    private static readonly transitions: Record<WithdrawalStatus, WithdrawalStatus[]> = (() => {
-        const t: Partial<Record<WithdrawalStatus, WithdrawalStatus[]>> = {
-            [WithdrawalStatus.PENDING]: [WithdrawalStatus.PROCESSING, WithdrawalStatus.CANCELLED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
-            [WithdrawalStatus.PROCESSING]: [WithdrawalStatus.COMMITTED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
-            [WithdrawalStatus.COMMITTED]: [],
-            [WithdrawalStatus.FAILED]: [WithdrawalStatus.WITHDRAWAL_REFUNDED],
-            [WithdrawalStatus.CANCELLED]: [],
+    private static readonly transitions: Record<WithdrawalStatus, WithdrawalStatus[]> = {
+        [WithdrawalStatus.PENDING]: [WithdrawalStatus.PROCESSING, WithdrawalStatus.CANCELLED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
+        [WithdrawalStatus.PROCESSING]: [WithdrawalStatus.COMMITTED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
+        [WithdrawalStatus.COMMITTED]: [],
+        [WithdrawalStatus.FAILED]: [WithdrawalStatus.WITHDRAWAL_REFUNDED],
+        [WithdrawalStatus.CANCELLED]: [],
 
-            // Initiation flow statuses
-            [WithdrawalStatus.CREATED]: [WithdrawalStatus.PENDING_VERIFICATION, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED],
-            [WithdrawalStatus.WITHDRAWAL_CREATED]: [WithdrawalStatus.PENDING_VERIFICATION, WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
-            [WithdrawalStatus.PENDING_VERIFICATION]: [WithdrawalStatus.WITHDRAWAL_COMPLETED, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED],
-            [WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION]: [WithdrawalStatus.WITHDRAWAL_COMPLETED, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
-            [WithdrawalStatus.WITHDRAWAL_CANCELED]: [],
-            [WithdrawalStatus.WITHDRAWAL_REFUNDED]: [],
-            [WithdrawalStatus.WITHDRAWAL_COMPLETED]: [],
-        };
-
-        // Map aliases
-        t[WithdrawalStatus.WITHDRAWAL_PENDING] = t[WithdrawalStatus.PENDING];
-        t[WithdrawalStatus.WITHDRAWAL_PROCESSING] = t[WithdrawalStatus.PROCESSING];
-        t[WithdrawalStatus.WITHDRAWAL_COMMITTED] = t[WithdrawalStatus.COMMITTED];
-        t[WithdrawalStatus.WITHDRAWAL_CANCELLED] = t[WithdrawalStatus.CANCELLED];
-        t[WithdrawalStatus.WITHDRAWAL_FAILED] = t[WithdrawalStatus.FAILED];
-
-        return t as Record<WithdrawalStatus, WithdrawalStatus[]>;
-    })();
+        // Initiation flow statuses
+        [WithdrawalStatus.CREATED]: [WithdrawalStatus.PENDING_VERIFICATION, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED],
+        [WithdrawalStatus.WITHDRAWAL_CREATED]: [WithdrawalStatus.PENDING_VERIFICATION, WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
+        [WithdrawalStatus.PENDING_VERIFICATION]: [WithdrawalStatus.WITHDRAWAL_COMPLETED, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED],
+        [WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION]: [WithdrawalStatus.WITHDRAWAL_COMPLETED, WithdrawalStatus.WITHDRAWAL_CANCELED, WithdrawalStatus.WITHDRAWAL_FAILED, WithdrawalStatus.FAILED],
+        [WithdrawalStatus.WITHDRAWAL_CANCELED]: [],
+        [WithdrawalStatus.WITHDRAWAL_REFUNDED]: [],
+        [WithdrawalStatus.WITHDRAWAL_COMPLETED]: [],
+        [WithdrawalStatus.WITHDRAWAL_FAILED]: [WithdrawalStatus.WITHDRAWAL_REFUNDED],
+    };
 
     /**
      * Validates if a transition from current status to next status is allowed
