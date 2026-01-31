@@ -11,7 +11,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from "@/utils/AppError";
-import { CreateUserDTO, User, UserFilters, PublicUserResponse } from "@/types/user.types";
+import { CreateUserDTO, User, UserFilters, CurrentUserProfile, PublicUserResponse } from "@/types/user.types";
 import bcrypt from "bcryptjs";
 
 class UserService {
@@ -361,6 +361,78 @@ class UserService {
       console.error("Failed to delete user account:", updateError);
       throw new InternalServerError("Failed to delete account");
     }
+  }
+
+  /**
+   * Get current user's complete profile including wallets and OAuth providers
+   * @param userId - The authenticated user's ID
+   * @returns Complete user profile with wallets and OAuth providers
+   * @throws NotFoundError if user doesn't exist or is deleted/suspended
+   */
+  async getCurrentUserProfile(userId: string): Promise<CurrentUserProfile> {
+    // 1. Fetch user data (excluding password_hash)
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select(`
+        id,
+        email,
+        username,
+        is_email_verified,
+        is_active,
+        last_login_at,
+        created_at,
+        updated_at
+      `)
+      .eq("id", userId)
+      .single();
+
+    if (userError || !user) {
+      throw new NotFoundError("User not found", "USER_NOT_FOUND");
+    }
+
+    // 2. Check if user account is deleted/suspended
+    if (!user.is_active) {
+      throw new NotFoundError("User account is deleted or suspended", "USER_NOT_FOUND");
+    }
+
+    // 3. Fetch user's wallets (excluding encrypted_private_key)
+    const { data: wallets, error: walletsError } = await supabase
+      .from("wallets")
+      .select("id, address, type, is_primary")
+      .eq("user_id", userId);
+
+    if (walletsError) {
+      throw new InternalServerError("Failed to fetch user wallets");
+    }
+
+    // 4. Fetch connected OAuth providers (only provider names)
+    const { data: oauthProviders, error: oauthError } = await supabase
+      .from("oauth_providers")
+      .select("provider")
+      .eq("user_id", userId);
+
+    if (oauthError) {
+      throw new InternalServerError("Failed to fetch OAuth providers");
+    }
+
+    // 5. Transform data to match expected response format
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      email_verified: user.is_email_verified,
+      status: user.is_active ? "active" : "inactive",
+      last_login: user.last_login_at,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      wallets: (wallets || []).map(wallet => ({
+        id: wallet.id,
+        public_key: wallet.address,
+        type: wallet.type,
+        is_primary: wallet.is_primary,
+      })),
+      oauth_providers: (oauthProviders || []).map(op => op.provider),
+    };
   }
 }
 

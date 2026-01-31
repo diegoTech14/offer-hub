@@ -67,3 +67,29 @@ export interface ApiResponse<T> {
 export interface UsersListResponse extends ApiResponse<PublicUser[]> {
   pagination: PaginationInfo;
 }
+
+/**
+ * Wallet data in user profile response (sensitive fields excluded)
+ */
+export interface UserWalletProfile {
+  id: string;
+  public_key: string;
+  type: 'invisible' | 'external';
+  is_primary: boolean;
+}
+
+/**
+ * Complete user profile response for GET /api/v1/users/me
+ */
+export interface CurrentUserProfile {
+  id: string;
+  email: string;
+  username: string;
+  email_verified: boolean;
+  status: 'active' | 'inactive';
+  last_login: string | null;
+  created_at: string;
+  updated_at: string;
+  wallets: UserWalletProfile[];
+  oauth_providers: string[];
+}

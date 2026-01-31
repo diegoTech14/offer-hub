@@ -231,6 +231,38 @@ export const updateAvatarHandler = async (
 
 
 
+/**
+ * Get current authenticated user's complete profile
+ * Includes user data, wallets, and connected OAuth providers
+ * Requires JWT authentication
+ */
+export const getCurrentUserHandler = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedError("Authentication required");
+    }
+
+    // Call service to get complete user profile
+    const userProfile = await userService.getCurrentUserProfile(userId);
+
+    res.status(200).json(
+      buildSuccessResponse(userProfile, "User profile retrieved successfully")
+    );
+  } catch (error: any) {
+    // Handle Supabase errors
+    if (error.code && error.message && !error.statusCode) {
+      return next(mapSupabaseError(error));
+    }
+    next(error);
+  }
+};
+
 export const updateProfileHandler = async (
   req: AuthenticatedRequest,
   res: Response,
