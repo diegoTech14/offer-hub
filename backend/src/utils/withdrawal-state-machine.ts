@@ -14,6 +14,7 @@ export class WithdrawalStateMachine {
    * Each status maps to an array of valid next statuses
    */
   private static readonly VALID_TRANSITIONS: Record<WithdrawalStatus, WithdrawalStatus[]> = {
+    // Initiation flow
     [WithdrawalStatus.CREATED]: [
       WithdrawalStatus.PENDING_VERIFICATION,
       WithdrawalStatus.WITHDRAWAL_CANCELED,
@@ -37,15 +38,32 @@ export class WithdrawalStateMachine {
       WithdrawalStatus.WITHDRAWAL_FAILED,
       WithdrawalStatus.FAILED,
     ],
+    [WithdrawalStatus.WITHDRAWAL_COMPLETED]: [],
+    [WithdrawalStatus.WITHDRAWAL_CANCELED]: [],
+    [WithdrawalStatus.WITHDRAWAL_REFUNDED]: [],
+
+    // Processing flow (Issue #958)
+    [WithdrawalStatus.PENDING]: [
+      WithdrawalStatus.PROCESSING,
+      WithdrawalStatus.CANCELLED,
+      WithdrawalStatus.WITHDRAWAL_FAILED,
+      WithdrawalStatus.FAILED,
+    ],
+    [WithdrawalStatus.PROCESSING]: [
+      WithdrawalStatus.COMMITTED,
+      WithdrawalStatus.WITHDRAWAL_FAILED,
+      WithdrawalStatus.FAILED,
+    ],
+    [WithdrawalStatus.COMMITTED]: [],
+    [WithdrawalStatus.CANCELLED]: [],
+
+    // Joint Statuses
     [WithdrawalStatus.FAILED]: [
       WithdrawalStatus.WITHDRAWAL_REFUNDED,
     ],
     [WithdrawalStatus.WITHDRAWAL_FAILED]: [
       WithdrawalStatus.WITHDRAWAL_REFUNDED,
     ],
-    [WithdrawalStatus.WITHDRAWAL_CANCELED]: [],
-    [WithdrawalStatus.WITHDRAWAL_REFUNDED]: [],
-    [WithdrawalStatus.WITHDRAWAL_COMPLETED]: [],
   };
 
   /**
@@ -67,7 +85,7 @@ export class WithdrawalStateMachine {
    * @param currentStatus - Current withdrawal status
    * @returns Array of valid next statuses
    */
-  static getValidTransitions(currentStatus: WithdrawalStatus): WithdrawalStatus[] {
+  static getValidTransitions(currentStatus: WithdrawalStatus): Array<WithdrawalStatus> {
     return this.VALID_TRANSITIONS[currentStatus] || [];
   }
 
@@ -77,7 +95,8 @@ export class WithdrawalStateMachine {
    * @returns true if cancellation is allowed
    */
   static canCancel(currentStatus: WithdrawalStatus): boolean {
-    return this.canTransition(currentStatus, WithdrawalStatus.WITHDRAWAL_CANCELED);
+    return this.canTransition(currentStatus, WithdrawalStatus.WITHDRAWAL_CANCELED) ||
+      this.canTransition(currentStatus, WithdrawalStatus.CANCELLED);
   }
 
   /**

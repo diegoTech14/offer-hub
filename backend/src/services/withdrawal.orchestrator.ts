@@ -1,15 +1,22 @@
-import { supabase } from "../lib/supabase/supabase";
-import { logger } from "../utils/logger";
+/**
+ * @fileoverview Withdrawal Orchestrator for managing the withdrawal process
+ */
+
+import { supabase } from "@/lib/supabase/supabase";
+import { Withdrawal, WithdrawalStatus } from "@/types/withdrawal.types";
+import { WithdrawalStateMachine } from "./withdrawal.state-machine";
+import { airtmPayoutClient } from "./airtm.client";
 import {
+    AppError,
     BadRequestError,
     InternalServerError,
     ValidationError,
     InsufficientFundsError
-} from "../utils/AppError";
-import { validateUUID, validateEmail } from "../utils/validation";
+} from "@/utils/AppError";
+import { logger } from "@/utils/logger";
+import { validateUUID, validateEmail } from "@/utils/validation";
 import { balanceService } from "./balance.service";
-import { airtmUserClient } from "../lib/airtm.client";
-import { Withdrawal, WithdrawalStatus } from "../types/withdrawal.types";
+import { airtmUserClient } from "@/lib/airtm.client";
 
 export class WithdrawalOrchestrator {
     private readonly MIN_AMOUNT = 5;
@@ -50,9 +57,6 @@ export class WithdrawalOrchestrator {
             }
 
             // 2. Check Sufficient Balance (Preliminary check)
-            // Note: usage of balanceService.getUserBalances or let holdBalance handle it. 
-            // The requirement says "Validates user has sufficient available balance"
-            // calling getUserBalances is safer to fail fast before creating DB record.
             const balances = await balanceService.getUserBalances(userId, currency);
             const userBalance = balances.find(b => b.currency === currency);
             const available = userBalance ? Number(userBalance.available) : 0;
@@ -91,37 +95,30 @@ export class WithdrawalOrchestrator {
             withdrawalId = withdrawal.id;
 
             // 5. Hold Balance
-            // If this fails, we must rollback the withdrawal record (set to FAILED or delete)
             try {
                 await balanceService.holdBalance(
                     userId,
                     amount,
                     currency,
-                    { id: withdrawalId!, type: 'withdrawal' }, // Use 'withdrawal' as type for generic reference
+                    { id: withdrawalId!, type: 'withdrawal' },
                     `Withdrawal hold for ${withdrawalId}`
                 );
             } catch (holdError) {
                 logger.error(`[WithdrawalOrchestrator] Failed to hold balance ${correlationId}`, holdError);
                 // Rollback: Update status to FAILED
-                await this.updateWithdrawalStatus(withdrawalId!, WithdrawalStatus.FAILED);
+                await this.updateWithdrawalStatusRaw(withdrawalId!, WithdrawalStatus.FAILED);
                 throw holdError;
             }
 
             // 6. Transition to PENDING_VERIFICATION
             try {
-                await this.updateWithdrawalStatus(withdrawalId!, WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION);
+                await this.updateWithdrawalStatusRaw(withdrawalId!, WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION);
             } catch (updateError) {
-                // Critical error: Funds held but status not updated.
-                // In a real system we might need an admin alert or auto-refund. 
-                // For now, we try to mark FAILED but the hold remains? 
-                // Ideally we should release hold properly, but we don't have releaseHold yet.
-                // We will log critical error.
                 logger.error(`[WithdrawalOrchestrator] CRITICAL: Funds held but status update failed ${correlationId}`, updateError);
                 throw new InternalServerError("Withdrawal processed but status update failed. Please contact support.");
             }
 
             // Return updated object
-            // We can fetch it again or construct it. Let's fetch to be sure.
             const { data: updatedWithdrawal, error: fetchError } = await supabase
                 .from('withdrawals')
                 .select('*')
@@ -136,15 +133,132 @@ export class WithdrawalOrchestrator {
             return updatedWithdrawal as Withdrawal;
 
         } catch (error: any) {
-            // If basic validation failed, we just rethrow.
-            // If step 4 failed, nothing to rollback.
-            // If step 5 failed, we handled rollback inside.
             logger.error(`[WithdrawalOrchestrator] Error ${correlationId}`, error);
             throw error;
         }
     }
 
-    private async updateWithdrawalStatus(id: string, status: WithdrawalStatus): Promise<void> {
+    /**
+     * Processes a pending withdrawal by creating and committing a payout in Airtm.
+     * @param withdrawalId - The ID of the withdrawal to process
+     * @returns Updated Withdrawal object
+     */
+    async processWithdrawal(withdrawalId: string): Promise<Withdrawal> {
+        const correlationId = crypto.randomUUID();
+        logger.info(`[WithdrawalOrchestrator] Starting processWithdrawal ${withdrawalId} (${correlationId})`);
+
+        try {
+            // 1. Validates withdrawal exists and belongs to valid state
+            const { data: withdrawal, error: fetchError } = await supabase
+                .from('withdrawals')
+                .select('*, users(email)')
+                .eq('id', withdrawalId)
+                .single();
+
+            if (fetchError || !withdrawal) {
+                throw new AppError(`Withdrawal ${withdrawalId} not found`, 404, 'WITHDRAWAL_NOT_FOUND');
+            }
+
+            // 2. Validates state transition is allowed via WithdrawalStateMachine
+            WithdrawalStateMachine.validateTransition(withdrawal.status as WithdrawalStatus, WithdrawalStatus.PROCESSING);
+
+            // 3. Transitions to WITHDRAWAL_PROCESSING & creates audit log
+            await this.updateStatus(withdrawalId, withdrawal.status as WithdrawalStatus, WithdrawalStatus.PROCESSING, correlationId);
+
+            // 4. Calls AirtmPayoutClient.createPayout()
+            const userEmail = (withdrawal.users as any)?.email;
+            if (!userEmail) {
+                throw new AppError('User email not found for withdrawal', 400, 'USER_EMAIL_MISSING');
+            }
+
+            let payoutResponse;
+            try {
+                payoutResponse = await airtmPayoutClient.createPayout(withdrawalId, withdrawal.amount, userEmail);
+            } catch (airtmError: any) {
+                logger.error(`[WithdrawalOrchestrator] Airtm createPayout error: ${airtmError.message}`);
+                await this.handleAirtmError(withdrawalId, WithdrawalStatus.PROCESSING, airtmError);
+                throw airtmError;
+            }
+
+            // 5. Calls AirtmPayoutClient.commitPayout() with received ID
+            try {
+                await airtmPayoutClient.commitPayout(payoutResponse.id);
+            } catch (airtmError: any) {
+                logger.error(`[WithdrawalOrchestrator] Airtm commitPayout error: ${airtmError.message}`);
+                await this.handleAirtmError(withdrawalId, WithdrawalStatus.PROCESSING, airtmError);
+                throw airtmError;
+            }
+
+            // 6. Transitions to WITHDRAWAL_COMMITTED & creates audit log
+            const updatedWithdrawal = await this.updateStatus(
+                withdrawalId,
+                WithdrawalStatus.PROCESSING,
+                WithdrawalStatus.COMMITTED,
+                correlationId,
+                { external_payout_id: payoutResponse.id }
+            );
+
+            logger.info(`[WithdrawalOrchestrator] Withdrawal ${withdrawalId} successfully committed`);
+            return updatedWithdrawal;
+
+        } catch (error: any) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(
+                `Failed to process withdrawal: ${error.message}`,
+                500,
+                'WITHDRAWAL_PROCESSING_FAILED'
+            );
+        }
+    }
+
+    /**
+     * Updates withdrawal status and creates an audit log entry
+     */
+    private async updateStatus(
+        withdrawalId: string,
+        fromStatus: WithdrawalStatus,
+        toStatus: WithdrawalStatus,
+        correlationId: string,
+        additionalData: any = {}
+    ): Promise<Withdrawal> {
+        // Update withdrawal record
+        const { data: updatedWithdrawal, error: updateError } = await supabase
+            .from('withdrawals')
+            .update({
+                status: toStatus,
+                ...additionalData,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', withdrawalId)
+            .select()
+            .single();
+
+        if (updateError) {
+            throw new AppError(`Failed to update withdrawal status: ${updateError.message}`, 500);
+        }
+
+        // Create audit log entry
+        const { error: logError } = await supabase
+            .from('withdrawal_audit_logs')
+            .insert({
+                withdrawal_id: withdrawalId,
+                from_status: fromStatus,
+                to_status: toStatus,
+                metadata: { correlationId, ...additionalData },
+                created_at: new Date().toISOString()
+            });
+
+        if (logError) {
+            logger.error(`[WithdrawalOrchestrator] Failed to create audit log: ${logError.message}`);
+        }
+
+        return updatedWithdrawal as Withdrawal;
+    }
+
+    /**
+     * Simple status update without audit log (Internal use)
+     */
+    private async updateWithdrawalStatusRaw(id: string, status: WithdrawalStatus): Promise<void> {
         const { error } = await supabase
             .from('withdrawals')
             .update({ status, updated_at: new Date() })
@@ -152,6 +266,20 @@ export class WithdrawalOrchestrator {
 
         if (error) {
             throw error;
+        }
+    }
+
+    /**
+     * Handles Airtm API errors by transitioning to FAILED state
+     */
+    private async handleAirtmError(withdrawalId: string, currentStatus: WithdrawalStatus, error: any): Promise<void> {
+        try {
+            await this.updateStatus(withdrawalId, currentStatus, WithdrawalStatus.FAILED, 'ERROR_HANDLER', {
+                error_message: error.message,
+                error_context: 'AIRTM_API_FAILURE'
+            });
+        } catch (logError) {
+            logger.error(`[WithdrawalOrchestrator] Failed to log Airtm error: ${logError}`);
         }
     }
 }
