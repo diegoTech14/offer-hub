@@ -2,6 +2,7 @@ import { taskService } from '@/services/task.service';
 import { supabase } from '@/lib/supabase/supabase';
 import { TaskRecordService } from '@/blockchain/task-record.service';
 import { AppError, ValidationError, ConflictError, NotFoundError, AuthorizationError } from '@/utils/AppError';
+import { validateUpdateTaskRating } from '@/validators/task.validator';
 
 // Mock Supabase
 jest.mock('@/lib/supabase/supabase');
@@ -217,11 +218,11 @@ describe('TaskService', () => {
     });
 
     it('should handle blockchain failure gracefully and continue with database record', async () => {
-      // Mock blockchain service to fail
+      // Override the blockchain service on the existing singleton instance
       const mockBlockchainInstance = {
         recordTask: jest.fn().mockRejectedValue(new Error('Blockchain error'))
       };
-      MockTaskRecordService.mockImplementation(() => mockBlockchainInstance as any);
+      (taskService as any).blockchainService = mockBlockchainInstance;
 
       const expectedRecordWithoutBlockchain = {
         ...mockCreatedTaskRecord,
@@ -229,39 +230,30 @@ describe('TaskService', () => {
         on_chain_task_id: undefined
       };
 
-      mockSupabase.from.mockImplementation((table) => {
-        if (table === 'task_records' && mockSupabase.from.mock.calls.length > 1) {
+      let taskRecordsCallCount = 0;
+      mockSupabase.from.mockImplementation((table: string) => {
+        if (table === 'projects') {
           return {
-            insert: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnValue({
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
                 single: jest.fn().mockResolvedValue({
-                  data: expectedRecordWithoutBlockchain,
+                  data: mockProject,
                   error: null
                 })
+              })
+            }),
+            update: jest.fn().mockReturnValue({
+              eq: jest.fn().mockResolvedValue({
+                error: null
               })
             })
           } as any;
         }
-        return mockSupabase.from.mockImplementation((table) => {
-          if (table === 'projects') {
-            return {
-              select: jest.fn().mockReturnValue({
-                eq: jest.fn().mockReturnValue({
-                  single: jest.fn().mockResolvedValue({
-                    data: mockProject,
-                    error: null
-                  })
-                })
-              }),
-              update: jest.fn().mockReturnValue({
-                eq: jest.fn().mockResolvedValue({
-                  error: null
-                })
-              })
-            } as any;
-          }
-          
-          if (table === 'task_records') {
+
+        if (table === 'task_records') {
+          taskRecordsCallCount++;
+          // First call: check for existing record
+          if (taskRecordsCallCount === 1) {
             return {
               select: jest.fn().mockReturnValue({
                 eq: jest.fn().mockReturnValue({
@@ -273,9 +265,20 @@ describe('TaskService', () => {
               })
             } as any;
           }
-          
-          return {} as any;
-        })(table);
+          // Second call: insert new record
+          return {
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: expectedRecordWithoutBlockchain,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+
+        return {} as any;
       });
 
       const result = await taskService.createTaskRecord(mockTaskRecordData, mockClientId);
@@ -403,7 +406,7 @@ describe('TaskService', () => {
   describe('getTaskRecordsByFreelancerId', () => {
     it('should return array of task records for freelancer', async () => {
       const mockTaskRecords = [mockCreatedTaskRecord];
-      
+
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
@@ -420,5 +423,224 @@ describe('TaskService', () => {
       expect(result).toEqual(mockTaskRecords);
       expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
     });
+  });
+
+  describe('updateTaskRating', () => {
+    const mockRecordId = 'task-record-id';
+    const mockRatingData = { rating: 5, comment: 'Great work!' };
+
+    const mockExistingRecord = {
+      ...mockCreatedTaskRecord,
+      rating: null,
+      rating_comment: null
+    };
+
+    const mockUpdatedRecord = {
+      ...mockCreatedTaskRecord,
+      rating: 5,
+      rating_comment: 'Great work!',
+      updated_at: expect.any(String)
+    };
+
+    it('should successfully update task rating', async () => {
+      // First call: fetch task record; second call: update
+      let callCount = 0;
+      mockSupabase.from.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockExistingRecord,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        return {
+          update: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockUpdatedRecord,
+                  error: null
+                })
+              })
+            })
+          })
+        } as any;
+      });
+
+      const result = await taskService.updateTaskRating(mockRecordId, mockRatingData, mockClientId);
+
+      expect(result).toEqual(mockUpdatedRecord);
+      expect(mockSupabase.from).toHaveBeenCalledWith('task_records');
+    });
+
+    it('should throw NotFoundError when task record does not exist', async () => {
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: null,
+              error: { code: 'PGRST116' }
+            })
+          })
+        })
+      } as any);
+
+      await expect(taskService.updateTaskRating(mockRecordId, mockRatingData, mockClientId))
+        .rejects.toThrow(NotFoundError);
+    });
+
+    it('should throw AuthorizationError when requester is not the task client', async () => {
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: mockExistingRecord,
+              error: null
+            })
+          })
+        })
+      } as any);
+
+      await expect(taskService.updateTaskRating(mockRecordId, mockRatingData, 'different-client-id'))
+        .rejects.toThrow(AuthorizationError);
+    });
+
+    it('should throw ConflictError when rating is already set', async () => {
+      const alreadyRatedRecord = { ...mockExistingRecord, rating: 4 };
+
+      mockSupabase.from.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          eq: jest.fn().mockReturnValue({
+            single: jest.fn().mockResolvedValue({
+              data: alreadyRatedRecord,
+              error: null
+            })
+          })
+        })
+      } as any);
+
+      await expect(taskService.updateTaskRating(mockRecordId, mockRatingData, mockClientId))
+        .rejects.toThrow(ConflictError);
+    });
+
+    it('should throw AppError when database update fails', async () => {
+      let callCount = 0;
+      mockSupabase.from.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockExistingRecord,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        return {
+          update: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: null,
+                  error: { message: 'Database update failed' }
+                })
+              })
+            })
+          })
+        } as any;
+      });
+
+      await expect(taskService.updateTaskRating(mockRecordId, mockRatingData, mockClientId))
+        .rejects.toThrow(AppError);
+    });
+
+    it('should update without comment when comment is not provided', async () => {
+      const ratingWithoutComment = { rating: 3 };
+      const updatedWithoutComment = { ...mockCreatedTaskRecord, rating: 3, rating_comment: null };
+
+      let callCount = 0;
+      mockSupabase.from.mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: mockExistingRecord,
+                  error: null
+                })
+              })
+            })
+          } as any;
+        }
+        return {
+          update: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({
+                  data: updatedWithoutComment,
+                  error: null
+                })
+              })
+            })
+          })
+        } as any;
+      });
+
+      const result = await taskService.updateTaskRating(mockRecordId, ratingWithoutComment, mockClientId);
+
+      expect(result.rating).toBe(3);
+    });
+  });
+});
+
+describe('validateUpdateTaskRating', () => {
+  it('should accept valid rating without comment', () => {
+    const result = validateUpdateTaskRating({ rating: 3 });
+    expect(result.success).toBe(true);
+  });
+
+  it('should accept valid rating with comment', () => {
+    const result = validateUpdateTaskRating({ rating: 5, comment: 'Great work!' });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject rating below 1', () => {
+    const result = validateUpdateTaskRating({ rating: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject rating above 5', () => {
+    const result = validateUpdateTaskRating({ rating: 6 });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject non-integer rating', () => {
+    const result = validateUpdateTaskRating({ rating: 3.5 });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject missing rating', () => {
+    const result = validateUpdateTaskRating({ comment: 'No rating' });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject comment over 500 characters', () => {
+    const result = validateUpdateTaskRating({ rating: 4, comment: 'a'.repeat(501) });
+    expect(result.success).toBe(false);
+  });
+
+  it('should accept comment at exactly 500 characters', () => {
+    const result = validateUpdateTaskRating({ rating: 4, comment: 'a'.repeat(500) });
+    expect(result.success).toBe(true);
   });
 });
