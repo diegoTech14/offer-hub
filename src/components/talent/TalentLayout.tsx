@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface TalentLayoutProps {
   children: ReactNode;
@@ -62,7 +63,7 @@ export default function TalentLayout({ children }: TalentLayoutProps) {
         {/* Logo */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="Offer Hub Logo" className="w-8 h-8" />
+            <Image src="/logo.svg" alt="Offer Hub Logo" width={32} height={32} className="w-8 h-8" />
             <span className="text-xl font-bold text-gray-900">Offer Hub</span>
           </div>
         </div>

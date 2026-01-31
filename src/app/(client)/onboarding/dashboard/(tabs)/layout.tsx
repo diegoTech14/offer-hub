@@ -17,7 +17,7 @@ export default function TabsLayout({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   const tabs = [
-    { label: 'Active project', value: 'active', href: '/onboarding/dashboard/active', component: <div /> },
+    { label: 'Active Projects', value: 'active', href: '/onboarding/dashboard/active', component: <div /> },
     { label: 'Completed', value: 'completed', href: '/onboarding/dashboard/completed', component: <div /> },
     { label: 'Analytics', value: 'analytics', href: '/onboarding/dashboard/analytics', component: <div /> },
     { label: 'Dispute', value: 'dispute', href: '/onboarding/dashboard/dispute', component: <div /> },
@@ -28,36 +28,41 @@ export default function TabsLayout({ children }: { children: ReactNode }) {
       case 'active':
         return 'Manage Projects';
       case 'completed':
-        return 'Manage Projects';
+        return 'Completed Projects';
       case 'analytics':
-        return 'Mobile App UI/UX design';
+        return 'Analytics Overview';
       case 'dispute':
-        return 'Manage Projects';
+        return 'Dispute Management';
       default:
-        return '';
+        return 'Projects';
     }
   }, [current]);
 
   return (
-    <>
-      <h1 className="text-sm text-gray-700 bg-white p-4 rounded-lg text-center mb-6 font-semibold">{sectionTitle}</h1>
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg overflow-hidden">
-        <PillTabs
-          tabs={tabs}
-          value={current}
-          onValueChange={(v) => {
-            const target = tabs.find(t => t.value === v)?.href;
-            if (target) router.push(target);
-          }}
-          renderContent={false}
-          tabsListclassName="bg-[#002333] rounded-[8px] px-1 py-6 text-white"
-          triggerClassName="text-white"
-          activeTriggerClassName="data-[state=active]:bg-[#15949C] data-[state=active]:text-white"
-          inactiveTriggerClassName="data-[state=inactive]:text-white/90"
-        />
-        <div className="mt-8 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">{children}</div>
+    <div className="space-y-4">
+      <div className="bg-white px-6 py-4 rounded-lg shadow-sm border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900">{sectionTitle}</h2>
       </div>
-    </>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-4 pt-4">
+          <PillTabs
+            tabs={tabs}
+            value={current}
+            onValueChange={(v) => {
+              const target = tabs.find(t => t.value === v)?.href;
+              if (target) router.push(target);
+            }}
+            renderContent={false}
+            tabsListclassName="bg-gray-100 rounded-lg p-1"
+            triggerClassName="text-gray-700 font-medium"
+            activeTriggerClassName="data-[state=active]:bg-[#149A9B] data-[state=active]:text-white data-[state=active]:shadow-sm"
+            inactiveTriggerClassName="data-[state=inactive]:text-gray-600 hover:text-gray-900"
+          />
+        </div>
+        <div className="p-4">{children}</div>
+      </div>
+    </div>
   );
 }
 

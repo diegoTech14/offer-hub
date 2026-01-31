@@ -1,5 +1,5 @@
-use soroban_sdk::{Address, Env};
 use crate::error::Error;
+use soroban_sdk::{Address, Env};
 
 // Validation constants
 const MIN_FEE_PERCENTAGE: i128 = 0; // 0%
@@ -83,21 +83,19 @@ pub fn validate_fee_rates(
     validate_fee_percentage(escrow_fee_percentage)?;
     validate_fee_percentage(dispute_fee_percentage)?;
     validate_fee_percentage(arbitrator_fee_percentage)?;
-    
+
     // Additional business logic: total fees shouldn't exceed reasonable limits
     let total_fees = escrow_fee_percentage + dispute_fee_percentage + arbitrator_fee_percentage;
-    if total_fees > 1500 { // 15% total maximum
+    if total_fees > 1500 {
+        // 15% total maximum
         return Err(Error::InvalidFeePercentage);
     }
-    
+
     Ok(())
 }
 
 /// Comprehensive validation for fee calculation
-pub fn validate_fee_calculation(
-    amount: i128,
-    user: &Address,
-) -> Result<(), Error> {
+pub fn validate_fee_calculation(amount: i128, user: &Address) -> Result<(), Error> {
     validate_amount(amount)?;
     validate_address(user)?;
     Ok(())

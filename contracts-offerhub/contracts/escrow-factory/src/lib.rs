@@ -7,8 +7,8 @@ mod types;
 
 use soroban_sdk::{contract, contractimpl, Address, BytesN, Env, Vec};
 use types::{
-    DisputeParams, EscrowCreateParams, MilestoneCreateParams, MilestoneCreateResult,
-    MilestoneParams, EscrowStatus, EscrowData,
+    DisputeParams, EscrowCreateParams, EscrowData, EscrowStatus, MilestoneCreateParams,
+    MilestoneCreateResult, MilestoneParams,
 };
 
 // TODO: Fix WASM import issues
@@ -79,17 +79,11 @@ impl EscrowFactory {
         contract::batch_archive_escrows(env, escrow_ids)
     }
 
-    pub fn batch_check_escrow_status(
-        env: Env,
-        escrow_ids: Vec<u32>,
-    ) -> Vec<EscrowStatus> {
+    pub fn batch_check_escrow_status(env: Env, escrow_ids: Vec<u32>) -> Vec<EscrowStatus> {
         contract::batch_check_escrow_status(env, escrow_ids)
     }
 
-    pub fn batch_get_escrow_information(
-        env: Env,
-        escrow_ids: Vec<u32>,
-    ) -> Vec<EscrowData> {
+    pub fn batch_get_escrow_information(env: Env, escrow_ids: Vec<u32>) -> Vec<EscrowData> {
         contract::batch_get_escrow_information(env, escrow_ids)
     }
 

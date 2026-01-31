@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import { VALIDATION_LIMITS } from "@/constants/magic-numbers"
 import type React from "react"
 
 import { Button } from "@/components/ui/button"
@@ -17,8 +18,8 @@ function UserAddBioActiveState({ userData, updateUserData, nextStep, prevStep }:
     const newBio = e.target.value
     setBio(newBio)
     updateUserData({ bio: newBio })
-    if (newBio.length < 100) {
-      setBioError("Bio must be at least 100 characters")
+    if (newBio.length < VALIDATION_LIMITS.MIN_BIO_LENGTH) {
+      setBioError(`Bio must be at least ${VALIDATION_LIMITS.MIN_BIO_LENGTH} characters`)
     } else {
       setBioError("")
     }
@@ -26,10 +27,10 @@ function UserAddBioActiveState({ userData, updateUserData, nextStep, prevStep }:
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (bio.length >= 100) {
+    if (bio.length >= VALIDATION_LIMITS.MIN_BIO_LENGTH) {
       nextStep()
     } else {
-      setBioError("Bio must be at least 100 characters")
+      setBioError(`Bio must be at least ${VALIDATION_LIMITS.MIN_BIO_LENGTH} characters`)
     }
   }
 
@@ -59,8 +60,8 @@ function UserAddBioActiveState({ userData, updateUserData, nextStep, prevStep }:
               />
               <div className="flex justify-between mt-2">
                 {bioError && <span className="text-red-500 text-xs">{bioError}</span>}
-                <span className={`text-xs ml-auto ${bio.length < 100 ? "text-gray-500" : "text-green-600"}`}>
-                  At least 100 characters ({bio.length}/100)
+                <span className={`text-xs ml-auto ${bio.length < VALIDATION_LIMITS.MIN_BIO_LENGTH ? "text-gray-500" : "text-green-600"}`}>
+                  At least {VALIDATION_LIMITS.MIN_BIO_LENGTH} characters ({bio.length}/{VALIDATION_LIMITS.MIN_BIO_LENGTH})
                 </span>
               </div>
             </div>
@@ -88,7 +89,7 @@ function UserAddBioActiveState({ userData, updateUserData, nextStep, prevStep }:
             type="submit"
             form="add-bio-form"
             className="gap-1 bg-[#149A9B] text-white rounded-full md:min-w-36"
-            disabled={bio.length < 100}
+            disabled={bio.length < VALIDATION_LIMITS.MIN_BIO_LENGTH}
           >
             Set your rate
           </Button>

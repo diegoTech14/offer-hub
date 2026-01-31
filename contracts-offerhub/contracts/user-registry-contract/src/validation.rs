@@ -1,5 +1,6 @@
+use crate::error::Error;
+use crate::types::{VerificationLevel};
 use soroban_sdk::{Address, Env, String, Vec};
-use crate::types::{Error, VerificationLevel};
 
 // Validation constants
 const MAX_METADATA_LENGTH: u32 = 500;
@@ -19,9 +20,9 @@ pub fn validate_metadata(metadata: &String) -> Result<(), Error> {
 /// Validate verification level
 pub fn validate_verification_level(level: &VerificationLevel) -> Result<(), Error> {
     match level {
-        VerificationLevel::Basic | 
-        VerificationLevel::Premium | 
-        VerificationLevel::Enterprise => Ok(()),
+        VerificationLevel::Basic | VerificationLevel::Premium | VerificationLevel::Enterprise => {
+            Ok(())
+        }
         // Add any invalid cases if needed
     }
 }
@@ -31,25 +32,25 @@ pub fn validate_expiration(env: &Env, expires_at: u64) -> Result<(), Error> {
     if expires_at == 0 {
         return Ok(()); // 0 means no expiration
     }
-    
+
     let current_time = env.ledger().timestamp();
-    
+
     // Check if expiration is in the past
     if expires_at <= current_time {
         return Err(Error::ValidationFailed);
     }
-    
+
     // Check if expiration is too far in the future
     let duration = expires_at - current_time;
     if duration > MAX_EXPIRATION_DURATION {
         return Err(Error::ValidationFailed);
     }
-    
+
     // Check if expiration is too soon
     if duration < MIN_EXPIRATION_DURATION {
         return Err(Error::ValidationFailed);
     }
-    
+
     Ok(())
 }
 
@@ -125,14 +126,14 @@ pub fn validate_bulk_verification(
     validate_verification_level(level)?;
     validate_expiration(env, expires_at)?;
     validate_metadata(metadata)?;
-    
+
     // Validate each user address
     for i in 0..users.len() {
         let user = users.get(i).unwrap();
         validate_address(&user)?;
         validate_different_addresses(admin, &user)?;
     }
-    
+
     Ok(())
 }
 

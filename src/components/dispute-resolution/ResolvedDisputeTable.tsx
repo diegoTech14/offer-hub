@@ -33,8 +33,8 @@ export default function ResolvedDisputeTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {resolvedDisputes.map((item, index) => (
-            <TableRow key={index}>
+          {resolvedDisputes.map((item) => (
+            <TableRow key={item.ticketId}>
               <TableCell>{item.date}</TableCell>
               <TableCell>{item.name}</TableCell>
               <TableCell className="flex items-center gap-2 text-primary font-medium">

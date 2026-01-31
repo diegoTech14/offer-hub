@@ -103,6 +103,12 @@ export class ForbiddenError extends AppError {
 	}
 }
 
+export class InsufficientFundsError extends AppError {
+	constructor(message: string, details?: any) {
+		super(message, 400, 'INSUFFICIENT_FUNDS', details);
+	}
+}
+
 export class UnauthorizedError extends AppError {
 	constructor(message: string, details?: any) {
 		super(message, 401, 'UNAUTHORIZED', details);
@@ -187,6 +193,7 @@ export function ErrorHandler(
 			message,
 			details,
 			code: errorCode,
+			statusCode,
 			timestamp: new Date().toISOString(),
 			...(process.env.NODE_ENV === 'development' && {
 				stack: err instanceof Error ? err.stack : undefined,

@@ -18,7 +18,14 @@ import { InitializeContractPayload } from "../types/escrow.types";
 /**
  * When you want to create a contract between client and freelancer, you need to deploy an escrow contract by using this hook. You just need to pass the payload.
  */
-export const useInitializeContract = () => {
+
+interface UseInitializeContractReturn {
+  deployEscrow: unknown;
+  sendTransaction: unknown;
+  handleSubmit: (payload: InitializeContractPayload) => Promise<void>;
+}
+
+export const useInitializeContract = (): UseInitializeContractReturn => {
   const { deployEscrow } = useInitializeEscrow();
   const { sendTransaction } = useSendTransaction();
 
@@ -42,5 +49,9 @@ export const useInitializeContract = () => {
     }
   };
 
-  return { handleSubmit };
+  return { 
+    deployEscrow,
+    sendTransaction,
+    handleSubmit 
+  };
 };

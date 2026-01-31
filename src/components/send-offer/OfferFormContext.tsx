@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useReducer, useCallback, ReactNode } from "react";
-import { OfferFormData, defaultOfferFormData, PaymentMilestone } from "@/lib/mockData/offer-form-mock";
+import { OfferFormData, defaultOfferFormData, PaymentMilestone } from "@/__mocks__/offer-form-mock";
 
 interface OfferFormState {
   formData: OfferFormData;

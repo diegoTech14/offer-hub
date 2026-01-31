@@ -1,5 +1,7 @@
 "use client"
 
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 interface Tab {
   key: string
   label: string
@@ -14,22 +16,19 @@ interface ProjectTabsProps {
 export function ProjectTabs({ tabs, activeTab, onTabChange }: ProjectTabsProps) {
   return (
     <div className="mx-auto w-full max-w-[680px]">
-      <div className="flex items-center justify-evenly gap-2 rounded-none bg-slate-700 px-4 py-2">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => onTabChange(t.key)}
-            className={[
-              "rounded-none px-4 py-2 text-[15px] sm:text-base font-semibold transition",
-              activeTab === t.key ? "bg-teal-500 text-white shadow-sm" : "text-slate-100/90 hover:bg-slate-800",
-            ].join(" ")}
-            aria-pressed={activeTab === t.key}
-            aria-label={`Tab ${t.label}`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <Tabs value={activeTab} onValueChange={onTabChange}>
+        <TabsList className="flex items-center justify-evenly gap-2 rounded-none bg-slate-700 px-4 py-2 h-auto">
+          {tabs.map((t) => (
+            <TabsTrigger
+              key={t.key}
+              value={t.key}
+              className="rounded-none px-4 py-2 text-[15px] sm:text-base font-semibold transition data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:text-slate-100/90 data-[state=inactive]:hover:bg-slate-800"
+            >
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </div>
   )
 }

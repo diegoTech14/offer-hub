@@ -1,4 +1,5 @@
 import React from 'react';
+import withErrorBoundary from "@/components/shared/WithErrorBoundary";
 import DisputesList from './DisputesList';
 import DisputesEmptyState from './DisputesEmptyState';
 import StartDisputeButton from './StartDisputeButton';
@@ -63,4 +64,4 @@ const DisputesDashboard = ({disputes}: DisputesDashboardProps ) => {
   );
 };
 
-export default DisputesDashboard;
+export default withErrorBoundary(DisputesDashboard);

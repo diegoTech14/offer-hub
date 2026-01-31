@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { type Conversation } from "../../types/messages-types";
 import { ImageIcon, Paperclip } from "lucide-react";
+import { VALIDATION_LIMITS } from "@/constants/magic-numbers";
 
 function trimWithEllipsis(text: string, max = 120) {
   if (!text) return "";
@@ -86,7 +87,7 @@ export function ConversationList({
                         {c.participant.name
                           .split(" ")
                           .map((n) => n[0])
-                          .slice(0, 2)
+                          .slice(0, VALIDATION_LIMITS.MAX_AVATAR_INITIALS)
                           .join("")
                           .toUpperCase()}
                       </AvatarFallback>

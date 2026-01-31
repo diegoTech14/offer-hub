@@ -1,11 +1,9 @@
 #![cfg(test)]
 
 use super::*;
-use crate::{
-    contract::PublicationContractClient, error::ContractError, storage::DataKey
-};
+use crate::{contract::PublicationContractClient, error::ContractError, storage::DataKey, types::PublicationState};
 use soroban_sdk::{
-    testutils::{Address as _, Events as _},
+    testutils::{Address as _, Ledger, Events as _},
     vec, Address, Env, IntoVal, String, Symbol, TryFromVal,
 };
 
@@ -23,7 +21,7 @@ impl<'a> PublicationTest<'a> {
         let env = Env::default();
         env.mock_all_auths();
 
-        let contract_address = env.register_contract(None, Contract);
+        let contract_address = env.register(Contract, ());
         let contract = PublicationContractClient::new(&env, &contract_address);
 
         let user1 = Address::generate(&env);
@@ -81,7 +79,6 @@ fn test_publish_service_success() {
     let event_data_u32 = u32::try_from_val(&test.env, &data).unwrap();
     assert_eq!(event_data_u32, 1);
 
-
     // Verify stored data using the getter
     let publication = test.contract.get_publication(&test.user1, &1).unwrap();
     assert_eq!(publication.publication_type, pub_type);
@@ -118,7 +115,12 @@ fn test_publish_project_and_user_counter() {
     // Verify the user's post count in storage by accessing it from within the contract's context.
     test.env.as_contract(&test.contract.address, || {
         let user_post_count_key = DataKey::UserPostCount(test.user1.clone());
-        let count: u32 = test.env.storage().instance().get(&user_post_count_key).unwrap();
+        let count: u32 = test
+            .env
+            .storage()
+            .instance()
+            .get(&user_post_count_key)
+            .unwrap();
         assert_eq!(count, 2);
     });
 }
@@ -196,4 +198,144 @@ fn test_publish_fails_on_negative_amount() {
     );
 
     assert_eq!(result, Err(Ok(ContractError::InvalidAmount)));
+}
+
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #2)")]
+fn test_title_too_short() {
+    let test = PublicationTest::setup();
+
+    let pub_type = Symbol::new(&test.env, "service");
+    let title = String::from_str(&test.env, "Bu");
+    let category = String::from_str(&test.env, "Web Development");
+    let amount = 1000;
+    let timestamp = test.env.ledger().timestamp();
+
+    let _ = test.contract.publish(
+        &test.user1,
+        &pub_type,
+        &title,
+        &category,
+        &amount,
+        &timestamp,
+    );
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #4)")]
+fn test_max_len() {
+    let test = PublicationTest::setup();
+
+    let pub_type = Symbol::new(&test.env, "service");
+    let title = String::from_str(&test.env, "Build a WebsiteBuild a WebsiteBuild a WebsiteBuild a WebsiteBuild a WebsiteBuild a WebsiteBuild a WebsiteBuild a WebsiteBuild a Website");
+    let category = String::from_str(&test.env, "Web Development");
+    let amount = 1000;
+    let timestamp = test.env.ledger().timestamp();
+
+    let _ = test.contract.publish(
+        &test.user1,
+        &pub_type,
+        &title,
+        &category,
+        &amount,
+        &timestamp,
+    );
+}
+
+
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #4)")]
+fn test_min_category() {
+    let test = PublicationTest::setup();
+
+    let pub_type = Symbol::new(&test.env, "service");
+    let title = String::from_str(&test.env, "Build a Website");
+    let category = String::from_str(&test.env, "");
+    let amount = 1000;
+    let timestamp = test.env.ledger().timestamp();
+
+    let _ = test.contract.publish(
+        &test.user1,
+        &pub_type,
+        &title,
+        &category,
+        &amount,
+        &timestamp,
+    );
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_max_amount_invalid_amount() {
+    let test = PublicationTest::setup();
+
+    let pub_type = Symbol::new(&test.env, "service");
+    let title = String::from_str(&test.env, "Build a website");
+    let category = String::from_str(&test.env, "Web Development");
+    let amount = 1_000_000_000_001;
+    let timestamp = test.env.ledger().timestamp();
+
+    let _ = test.contract.publish(
+        &test.user1,
+        &pub_type,
+        &title,
+        &category,
+        &amount,
+        &timestamp,
+    );
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #1)")]
+fn test_invalid_publication_type() {
+    let test = PublicationTest::setup();
+
+    let pub_type = Symbol::new(&test.env, "none");
+    let title = String::from_str(&test.env, "Build a website");
+    let category = String::from_str(&test.env, "Web Development");
+    let amount = 1_000;
+    let timestamp = test.env.ledger().timestamp();
+
+    let _ = test.contract.publish(
+        &test.user1,
+        &pub_type,
+        &title,
+        &category,
+        &amount,
+        &timestamp,
+    );
+}
+
+#[test]
+fn test_expiration_triggers_expired_state() {
+    let test = PublicationTest::setup();
+    let env = &test.env;
+    let user = test.user1.clone();
+    let timestamp = env.ledger().timestamp();
+    let expiration_period: u64 = 2_592_000; // Default expiration period (30 days)
+    
+    // Publish a new publication
+    let id = test.contract.publish(
+        &user,
+        &Symbol::new(env, "service"),
+        &"Test Service".into_val(env),
+        &"Category A".into_val(env),
+        &100,
+        &timestamp,
+    );
+    assert_eq!(id, 1);
+
+    // Verify initial state is Published
+    let publication = test.contract.get_publication(&user.clone(), &id).unwrap();
+    assert_eq!(publication.state, PublicationState::Published);
+
+    // Simulate expiration by advancing ledger timestamp beyond expiration
+    let expiration = timestamp + expiration_period;
+    env.ledger().with_mut(|l| l.timestamp = expiration + 1);
+
+    // Retrieve publication again to trigger check_expiration
+    let updated_publication = test.contract.get_publication(&user.clone(), &id).unwrap();
+    assert_eq!(updated_publication.state, PublicationState::Expired);
 }

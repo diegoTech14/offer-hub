@@ -1,5 +1,5 @@
-use crate::types::Error;
 use soroban_sdk::{Address, Env, String};
+use crate::{error::{Error}};
 
 // Validation constants
 const MIN_REASON_LENGTH: u32 = 10;
@@ -58,13 +58,14 @@ pub fn validate_timeout_duration(timeout_secs: u64) -> Result<(), Error> {
 }
 
 /// Validate address is not zero address
-pub fn validate_address(address: &Address) -> Result<(), Error> {
+pub fn validate_address(_address: &Address) -> Result<(), Error> {
     // In Soroban, we can't easily check for zero address, but we can validate it's not the same as caller
     // This is a basic validation - in production you might want more sophisticated checks
     Ok(())
 }
 
 /// Validate addresses are different
+#[allow(dead_code)]
 pub fn validate_different_addresses(addr1: &Address, addr2: &Address) -> Result<(), Error> {
     if addr1 == addr2 {
         return Err(Error::Unauthorized);

@@ -3,11 +3,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { User } from "@/interfaces/user.interface"
 
-export function UserAnalyticsModal({ user, open, onClose }: {
-    user: User | null,
-    open: boolean,
-    onClose: () => void
-  }) {
+interface UserAnalyticsModalProps {
+  user: User | null;
+  open: boolean;
+  onClose: () => void;
+}
+
+export function UserAnalyticsModal({ user, open, onClose }: UserAnalyticsModalProps) {
     const formatCurrency = (amount: number) => {
       return new Intl.NumberFormat("en-US", {
         style: "currency",

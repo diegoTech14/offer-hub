@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
+import ProgressiveImage from "@/components/ui/progressive-image";
+import StarRating from "@/components/ui/star-rating";
+import { useReviewsApi } from "@/hooks/api-connections/use-reviews-api";
 
 const portfolioItems = [
   {
@@ -45,31 +48,16 @@ const portfolioItems = [
   },
 ];
 
-const reviews = [
-  {
-    id: 1,
-    name: "John Doe",
-    date: "March 20, 2024",
-    rating: 4,
-    text: "Very helpful, and insightful. We look forward to a long lasting relationship with Mohsin and his team of lead generation experts.",
-  },
-  {
-    id: 2,
-    name: "Alex Smith",
-    date: "April 15, 2025",
-    rating: 5,
-    text: "Incredibly useful and enlightening. We are excited about building a lasting partnership with Sarah and her team of marketing specialists.",
-  },
-  {
-    id: 3,
-    name: "Emily Johnson",
-    date: "April 15, 2025",
-    rating: 5,
-    text: "Incredibly useful and enlightening. We are excited about building a lasting partnership with Sarah and her team of marketing specialists.",
-  },
-];
+// Freelancer ID - TODO: Replace with actual freelancer ID from props or context
+const FREELANCER_ID = "default-freelancer-id";
 
 export default function FreelancerProfile() {
+  // Fetch real reviews data
+  const { useUserReviews, computeAverage } = useReviewsApi();
+  const { data: reviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(FREELANCER_ID);
+  
+  const averageRating = computeAverage(reviews);
+
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 6;
   const totalPages = Math.ceil(portfolioItems.length / itemsPerPage);
@@ -161,7 +149,7 @@ export default function FreelancerProfile() {
               key={item.id}
               className="bg-white border rounded-lg overflow-hidden shadow-sm"
             >
-              <Image
+              <ProgressiveImage
                 src={item.image}
                 alt={item.title}
                 width={400}
@@ -210,36 +198,71 @@ export default function FreelancerProfile() {
 
       {/* --- REVIEWS SECTION --- */}
       <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Reviews</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900">Reviews</h2>
+          {reviews.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <StarRating rating={averageRating} size="sm" />
+              <span className="text-sm font-medium text-gray-700">{averageRating}</span>
+              <span className="text-sm text-gray-500">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+            </div>
+          )}
+        </div>
 
         <div className="space-y-6 mb-6">
-          {visibleReviews.map((review) => (
-            <div key={review.id} className="border-b border-gray-200 pb-4">
-              <div className="flex justify-between items-start mb-1">
-                <div>
-                  <p className="font-semibold text-gray-900">{review.name}</p>
-                  <p className="text-sm text-gray-500">{review.date}</p>
+          {reviewsLoading ? (
+            <div className="space-y-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="border-b border-gray-200 pb-4 animate-pulse">
+                  <div className="flex justify-between items-start mb-1">
+                    <div>
+                      <div className="h-5 bg-gray-300 rounded w-32 mb-2"></div>
+                      <div className="h-4 bg-gray-300 rounded w-24"></div>
+                    </div>
+                    <div className="h-4 bg-gray-300 rounded w-20"></div>
+                  </div>
+                  <div className="h-12 bg-gray-300 rounded w-full"></div>
                 </div>
-                <div className="flex">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <svg
-                      key={i}
-                      className={`w-4 h-4 fill-current ${
-                        i < review.rating ? "text-yellow-400" : "text-gray-300"
-                      }`}
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M10 15l-5.878 3.09L5.64 12.09.763 7.91l6.36-.924L10 1l2.877 5.986 6.36.924-4.878 4.18 1.518 5.998z" />
-                    </svg>
-                  ))}
-                </div>
-              </div>
-              <p className="text-gray-700 text-base leading-relaxed">
-                {review.text}
-              </p>
+              ))}
             </div>
-          ))}
+          ) : reviewsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-600 mb-2">Failed to load reviews</p>
+              <p className="text-gray-500 text-sm">{reviewsError}</p>
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-lg">No reviews yet</p>
+              <p className="text-gray-400 text-sm mt-1">Reviews from completed contracts will appear here</p>
+            </div>
+          ) : (
+            visibleReviews.map((review) => {
+              const reviewDate = new Date(review.created_at);
+              const formattedDate = reviewDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              });
+
+              return (
+                <div key={review.id} className="border-b border-gray-200 pb-4">
+                  <div className="flex justify-between items-start mb-1">
+                    <div>
+                      <p className="font-semibold text-gray-900">Client Review</p>
+                      <p className="text-sm text-gray-500">{formattedDate}</p>
+                    </div>
+                    <StarRating rating={review.rating} size="sm" />
+                  </div>
+                  {review.comment && (
+                    <p className="text-gray-700 text-base leading-relaxed">
+                      "{review.comment}"
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">Contract: {review.contract_id.slice(-8)}</p>
+                </div>
+              );
+            })
+          )}
         </div>
 
         <div className="flex items-center justify-center gap-6">

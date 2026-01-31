@@ -3,9 +3,21 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { VALIDATION_LIMITS } from "@/constants/magic-numbers"
 import type { ProfileStepProps } from "@/app/types/freelancer-profile"
 
-export function useFreelancerSkills({ userData, updateUserData }: ProfileStepProps) {
+interface UseFreelancerSkillsReturn {
+  skills: string[];
+  searchInput: string;
+  setSearchInput: (input: string) => void;
+  handleAddSkill: (skill: string) => void;
+  handleRemoveSkill: (skillToRemove: string) => void;
+  handleSearchSubmit: (e: React.FormEvent) => void;
+  handleClearSearch: () => void;
+  isMaxSkillsReached: boolean;
+}
+
+export function useFreelancerSkills({ userData, updateUserData }: ProfileStepProps): UseFreelancerSkillsReturn {
   const [skills, setSkills] = useState<string[]>(userData?.skills || [])
   const [searchInput, setSearchInput] = useState("")
 
@@ -14,7 +26,7 @@ export function useFreelancerSkills({ userData, updateUserData }: ProfileStepPro
   }, [skills, updateUserData])
 
   const handleAddSkill = (skill: string) => {
-    if (skills.length >= 15) return
+    if (skills.length >= VALIDATION_LIMITS.MAX_SKILLS_PER_USER) return
     if (!skills.includes(skill)) {
       setSkills([...skills, skill])
     }
@@ -32,6 +44,12 @@ export function useFreelancerSkills({ userData, updateUserData }: ProfileStepPro
     }
   }
 
+  const handleClearSearch = () => {
+    setSearchInput("")
+  }
+
+  const isMaxSkillsReached = skills.length >= VALIDATION_LIMITS.MAX_SKILLS_PER_USER
+
   return {
     skills,
     searchInput,
@@ -39,5 +57,7 @@ export function useFreelancerSkills({ userData, updateUserData }: ProfileStepPro
     handleAddSkill,
     handleRemoveSkill,
     handleSearchSubmit,
+    handleClearSearch,
+    isMaxSkillsReached,
   }
 }

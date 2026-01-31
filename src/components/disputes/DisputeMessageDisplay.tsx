@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { DisputeMessage } from '@/lib/mockData/dispute-messages-mock';
+import { DisputeMessage } from '@/__mocks__/dispute-messages-mock';
 
 interface DisputeMessageDisplayProps {
   messages: DisputeMessage[];

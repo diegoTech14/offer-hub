@@ -1,5 +1,5 @@
-use soroban_sdk::{Address, Env, String, Symbol};
 use crate::error::ContractError;
+use soroban_sdk::{Address, Env, String, Symbol};
 
 // Validation constants
 const MIN_TITLE_LENGTH: u32 = 3;
@@ -45,7 +45,10 @@ pub fn validate_amount(amount: i128) -> Result<(), ContractError> {
 }
 
 /// Validate publication type
-pub fn validate_publication_type(env: &Env, publication_type: &Symbol) -> Result<(), ContractError> {
+pub fn validate_publication_type(
+    env: &Env,
+    publication_type: &Symbol,
+) -> Result<(), ContractError> {
     // Define valid publication types
     let valid_types = [
         Symbol::new(env, "service"),
@@ -53,13 +56,13 @@ pub fn validate_publication_type(env: &Env, publication_type: &Symbol) -> Result
         Symbol::new(env, "gig"),
         Symbol::new(env, "consultation"),
     ];
-    
+
     for valid_type in valid_types.iter() {
         if publication_type == valid_type {
             return Ok(());
         }
     }
-    
+
     Err(ContractError::InvalidPublicationType)
 }
 

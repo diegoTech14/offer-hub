@@ -1,6 +1,10 @@
 #![cfg(test)]
 
-use crate::{Contract, types::{Error, VerificationLevel}};
+use crate::{
+    types::{VerificationLevel},
+    error::Error,
+    Contract,
+};
 use soroban_sdk::{testutils::Address as _, Address, Env, String};
 
 #[test]
@@ -13,7 +17,7 @@ fn test_basic_legacy_functionality() {
         // Test unregistered user is not verified
         let is_verified = Contract::is_verified(env.clone(), user.clone());
         assert!(!is_verified);
-        
+
         // Test get_user_status for unregistered user
         let status = Contract::get_user_status(env.clone(), user.clone());
         assert!(!status.is_verified);
@@ -103,15 +107,15 @@ fn test_get_verification_level_for_nonexistent_user() {
 #[test]
 fn test_error_types() {
     // Test that error types are properly defined
-    assert_eq!(Error::Unauthorized as u32, 1);
-    assert_eq!(Error::AlreadyRegistered as u32, 2);
-    assert_eq!(Error::UserNotFound as u32, 3);
-    assert_eq!(Error::AlreadyBlacklisted as u32, 4);
-    assert_eq!(Error::NotBlacklisted as u32, 5);
-    assert_eq!(Error::InvalidVerificationLevel as u32, 6);
-    assert_eq!(Error::VerificationExpired as u32, 7);
-    assert_eq!(Error::NotInitialized as u32, 8);
-    assert_eq!(Error::AlreadyInitialized as u32, 9);
+    assert_eq!(Error::AlreadyInitialized as u32, 1);
+    assert_eq!(Error::NotInitialized as u32, 2);
+    assert_eq!(Error::Unauthorized as u32, 3);
+    assert_eq!(Error::AlreadyRegistered as u32, 4);
+    assert_eq!(Error::UserNotFound as u32, 5);
+    assert_eq!(Error::AlreadyBlacklisted as u32, 6);
+    assert_eq!(Error::NotBlacklisted as u32, 7);
+    assert_eq!(Error::InvalidVerificationLevel as u32, 8);
+    assert_eq!(Error::VerificationExpired as u32, 9);
     assert_eq!(Error::CannotBlacklistAdmin as u32, 10);
     assert_eq!(Error::CannotBlacklistModerator as u32, 11);
 }
@@ -124,7 +128,7 @@ fn test_user_status_structure() {
 
     env.as_contract(&contract_id, || {
         let status = Contract::get_user_status(env.clone(), user.clone());
-        
+
         // Verify UserStatus has all expected fields
         assert!(!status.is_verified);
         assert_eq!(status.verification_level, VerificationLevel::Basic); // Default for non-verified

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { MdGavel } from 'react-icons/md';
 import { MessagesMainPlus } from '@/components/messaging/messages-main-plus';
 import { useMessages } from '@/hooks/useMessages';
-import { useMockDisputes } from '@/data/generic-mock-data';
+import { useMockDisputes } from '@/__mocks__/generic-mock-data';
 import { useState } from 'react';
 import type { Conversation as MessagesConversation, Message as MessagesMessage } from '@/types/messages.types';
 

@@ -68,7 +68,12 @@ export function DisputeMessageBubble({
   return (
     <div className={`flex gap-3 mb-4 ${isAdminMessage ? "flex-row-reverse" : ""}`}>
       <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
-        <AvatarImage src={sender.avatar} alt={sender.name} />
+        <AvatarImage 
+          src={sender.avatar} 
+          alt={sender.name}
+          className="object-cover"
+          progressive={false}
+        />
         <AvatarFallback className="text-xs">
           {sender.name.split(" ").map(n => n[0]).join("").toUpperCase()}
         </AvatarFallback>
@@ -92,9 +97,9 @@ export function DisputeMessageBubble({
 
         {attachments && attachments.length > 0 && (
           <div className="mt-2 space-y-2">
-            {attachments.map((attachment, index) => (
+            {attachments.map((attachment) => (
               <div
-                key={index}
+                key={`${attachment.name}-${attachment.url}`}
                 className="border border-gray-200 rounded-lg p-3 bg-white max-w-xs"
               >
                 {attachment.type === "image" ? (

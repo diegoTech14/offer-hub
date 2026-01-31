@@ -1,0 +1,20 @@
+[package]
+name = "stat-contract"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["lib", "cdylib"]
+doctest = false
+
+[dependencies]
+soroban-sdk = { workspace = true }
+rating-contract = { workspace = true }
+user-registry-contract = { workspace = true }
+escrow-contract = { workspace = true }
+dispute-contract = { workspace = true }
+fee-manager-contract = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] } 

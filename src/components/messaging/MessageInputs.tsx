@@ -43,7 +43,7 @@ export function MessageInputs({ onSendMessage, placeholder = "Message" }: Messag
         <div className="flex-1 relative">
           <Input
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}

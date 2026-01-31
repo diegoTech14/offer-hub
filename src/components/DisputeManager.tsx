@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Component for managing dispute resolution workflow
+ * @author Offer Hub Team
+ */
+
 import React from 'react';
 import { StartDisputeForm } from './forms/StartDisputeForm';
 

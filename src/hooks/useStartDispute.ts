@@ -9,7 +9,14 @@ import { toast } from "sonner";
 import { StartDisputePayload, DisputeResponse } from "../types/escrow.types";
 import { isDisputeResponse, isErrorWithMessage } from "../utils/type-guards";
 
-export const useStartDisputeForm = () => {
+interface UseStartDisputeFormReturn {
+  loading: boolean;
+  response: DisputeResponse | null;
+  form: any;
+  onSubmit: (payload: StartDisputePayload) => Promise<void>;
+}
+
+export const useStartDisputeForm = (): UseStartDisputeFormReturn => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<DisputeResponse | null>(null);
   // const { startDispute } = useStartDisputeHook(); // Temporarily commented

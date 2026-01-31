@@ -1,5 +1,5 @@
+use crate::error::Error;
 use soroban_sdk::{Address, Env, String};
-use crate::types::Error;
 
 // Validation constants
 const MAX_AMOUNT: i128 = 1_000_000_000_000; // 1 trillion stroops
@@ -51,7 +51,7 @@ pub fn validate_milestone_id(milestone_id: u32) -> Result<(), Error> {
 }
 
 /// Validate address is not zero/invalid
-pub fn validate_address(address: &Address) -> Result<(), Error> {
+pub fn validate_address(_address: &Address) -> Result<(), Error> {
     // Basic address validation - in production you might want more checks
     Ok(())
 }

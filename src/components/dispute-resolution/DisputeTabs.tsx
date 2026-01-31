@@ -10,7 +10,11 @@ const tabs = [
   { label: 'Resolved', value: 'resolved' },
 ];
 
-export default function DisputeTabs({ activeTab }: { activeTab: string }) {
+interface DisputeTabsProps {
+  activeTab: string;
+}
+
+export default function DisputeTabs({ activeTab }: DisputeTabsProps) {
   const pathname = usePathname();
 
   return (

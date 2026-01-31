@@ -1,6 +1,9 @@
 # Node modules
 node_modules/
 
+# npm cache
+.npm-cache/
+
 # Build output
 dist/
 
@@ -12,6 +15,7 @@ yarn-error.log*
 
 # Environment variables
 .env
+.env.test
 
 # Optional dotenv override file
 .env.local
@@ -31,3 +35,8 @@ yarn-error.log*
 # Supabase
 supabase/.temp/
 supabase/temp/
+
+# Application logs
+logs/
+
+bun.lock

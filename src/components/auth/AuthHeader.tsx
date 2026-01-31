@@ -3,12 +3,27 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 
-export function AuthHeader() {
+interface AuthHeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function AuthHeader({ onMenuClick }: AuthHeaderProps) {
   return (
-    <header className="w-full bg-white border-b border-gray-200 px-6 py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <header className="w-full bg-white border-b border-gray-200 px-4 md:px-6 py-4">
+      <div className="max-w-[1600px] mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-3">
+          {onMenuClick && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden -ml-2 text-gray-600"
+              onClick={onMenuClick}
+            >
+              <Menu className="w-6 h-6" />
+            </Button>
+          )}
           <div className="w-8 h-8 rounded-full flex items-center justify-center">
             <Image
               src="/dark_logo.svg"
@@ -18,7 +33,7 @@ export function AuthHeader() {
               className="text-white"
             />
           </div>
-          <span className="text-xl font-semibold text-gray-900">Offer Hub</span>
+          <span className="text-lg md:text-xl font-semibold text-gray-900">Offer Hub</span>
         </div>
 
         <Button

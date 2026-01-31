@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { ProfileStepProps } from "@/app/types/freelancer-profile"
 import { useFreelancerSkills } from "@/hooks/use-freelancer-skills"
+import { VALIDATION_LIMITS } from "@/constants/magic-numbers"
 
 const SUGGESTED_SKILLS = [
   "Solidity",
@@ -65,7 +66,7 @@ export default function UserSelectInterestedCategory(props: ProfileStepProps) {
               <button
                 key={skill}
                 onClick={() => handleAddSkill(skill)}
-                disabled={skills.includes(skill) || skills.length >= 15}
+                disabled={skills.includes(skill) || skills.length >= VALIDATION_LIMITS.MAX_SKILLS_PER_USER}
                 className={cn(
                   "px-4 py-2 rounded-full border transition-colors",
                   skills.includes(skill)

@@ -1,132 +1,121 @@
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/7799a3c4-ccec-42fc-80d0-226309b8169b" alt="O-H" width="200">
-</div>
+# 🌟 OfferHub - Decentralized Freelance Platform
 
-# 🌟 OFFER-HUB | Decentralized Freelance Platform
+OfferHub is a decentralized freelance marketplace built on Stellar blockchain, featuring smart contract-based escrow, user registry, and fee management.
 
+## 🚀 Quick Start
 
-[![Backend CI/CD](https://github.com/OFFER-HUB/offer-hub/workflows/Backend%20CI%20CD/badge.svg)](https://github.com/OFFER-HUB/offer-hub/actions/workflows/backend-ci.yml)
+### Prerequisites
 
-[![Frontend CI/CD](https://github.com/OFFER-HUB/offer-hub/workflows/Frontend%20CI%20CD/badge.svg)](https://github.com/OFFER-HUB/offer-hub/actions/workflows/frontend-ci.yml)
+- Node.js 18.18.0+
+- pnpm 9.15.4+
+- Stellar CLI
+- Rust & Cargo (for contract building)
 
-
-Welcome to **OFFER-HUB**! This platform aims to revolutionize the freelance marketplace by leveraging **blockchain technology**, **cryptocurrency payments**, and **smart contracts** to create a secure and efficient environment for freelancers and clients worldwide.
-
-Our mission is to remove intermediaries, reduce fees, and empower users with tools to collaborate seamlessly in areas like design, programming, writing, and consulting. 🚀
-
----
-
-## 📘 Getting Started
-
-Please read carefully and follow our contribution guide step by step — this will allow everything to flow in the best way:
-
-👉 [CONTRIBUTORS\_GUIDELINE.md](https://github.com/OFFER-HUB/offer-hub/blob/main/docs/CONTRIBUTORS_GUIDELINE.md)
-
----
-
-## 🚀 Prerequisites
-
-Before contributing, ensure your system meets these requirements:
-
-* **Node.js**: v23.3.0
-* **npm**: v10+
-
----
-
-## 🛠 Installation Guide
-
-1️⃣ **Fork this repository** to your GitHub account.
-
-2️⃣ Clone your forked repo locally:
+### Installation
 
 ```bash
-git clone https://github.com/<your_user>/offer-hub
+# Clone repository
+git clone <your-repo-url>
+cd offer-hub-monorepo
+
+# Install dependencies
+pnpm install
 ```
 
-3️⃣ Navigate into the project directory:
+### Configuration
+
+1. **Backend Setup**:
+   ```bash
+   cd backend
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+2. **Add Contract IDs**:
+   After deploying your Stellar contracts, add their IDs to `backend/.env`:
+   ```bash
+   ESCROW_FACTORY_CONTRACT_ID=CXXXXXX...
+   FEE_MANAGER_CONTRACT_ID=CXXXXXX...
+   USER_REGISTRY_CONTRACT_ID=CXXXXXX...
+   ```
+
+3. **Generate TypeScript Bindings**:
+   ```bash
+   pnpm run bindings:generate
+   ```
+
+4. **Start Development**:
+   ```bash
+   # Backend
+   cd backend && pnpm run dev
+   
+   # Frontend
+   pnpm run dev
+   ```
+
+## 📂 Project Structure
+
+```
+offer-hub-monorepo/
+├── backend/              # Node.js/Express backend
+├── src/                  # Next.js frontend
+├── contracts-offerhub/   # Stellar smart contracts (Rust)
+├── packages/             # Generated TypeScript bindings
+├── docs/                 # Documentation
+└── scripts/              # Build and deployment scripts
+```
+
+## 🔧 Smart Contracts Integration
+
+This project uses TypeScript bindings for type-safe smart contract interactions.
+
+### Contract IDs Configuration
+
+Contract IDs are configured in `backend/src/config/contract-ids.ts` and loaded from environment variables.
+
+### Generating Bindings
 
 ```bash
-cd offer-hub
+# Generate all bindings
+pnpm run bindings:generate
+
+# Generate specific contract
+pnpm run bindings:generate -- --contract escrow-factory
+
+# Test setup
+cd backend && ./test-contracts.sh
 ```
 
-4️⃣ Install frontend dependencies:
+📖 **Full Guide**: [Generate Bindings Documentation](./docs/GENERATE_BINDINGS.md)
 
+## 📚 Documentation
+
+- [Generate Bindings Guide](./docs/GENERATE_BINDINGS.md) - TypeScript bindings for Stellar contracts
+- [Backend Documentation](./backend/README.md) - Backend API documentation
+- [Stellar Bindings Reference](./docs/STELLAR_BINDINGS.md) - Complete reference guide
+
+## 🛠️ Available Scripts
+
+### Root Level
 ```bash
-npm install
+pnpm run dev              # Start frontend dev server
+pnpm run build            # Build frontend
+pnpm run bindings:generate # Generate contract bindings
+pnpm run bindings:build   # Build bindings packages
 ```
 
-5️⃣ Run the development server:
-
+### Backend
 ```bash
-npm run dev
+cd backend
+pnpm run dev              # Start backend dev server
+pnpm run build            # Build backend
+pnpm run test             # Run tests
 ```
 
-6️⃣ Open the app in your browser at:
+## 🤝 Contributing
 
-```
-http://localhost:3000
-```
+Please read our contributing guidelines before submitting PRs.
 
----
+## 📄 License
 
-## 🧩 Backend Setup
-
-The backend lives in the `/backend` folder and includes all APIs and database migration logic using **Supabase**.
-
-👉 For full instructions, refer to the dedicated backend guide:
-[`/backend/README.md`](./backend/README.md)
-
----
-
-## 📋 Smart Contracts Documentation
-
-The Offer Hub platform is powered by a comprehensive suite of Soroban smart contracts. Each contract serves a specific purpose in creating a secure, decentralized freelance marketplace.
-
-### 📚 Contract Documentation
-
-#### Core Infrastructure
-- **[Contracts Overview](./docs/CONTRACTS_OVERVIEW.md)** - Complete system architecture and contract interactions
-- **[User Registry Contract](./docs/USER_REGISTRY_CONTRACT.md)** - User verification and access control system
-- **[Emergency Contract](./docs/EMERGENCY_CONTRACT.md)** - Platform safety and crisis management
-
-#### Payment System
-- **[Escrow Contract](./docs/ESCROW_CONTRACT.md)** - Secure payment management with milestone support
-- **[Escrow Factory](./docs/ESCROW_FACTORY.md)** - Standardized deployment and batch management
-- **[Fee Manager Contract](./docs/FEE_MANAGER_CONTRACT.md)** - Centralized fee calculation and collection
-
-#### Dispute & Content
-- **[Dispute Resolution Contract](./docs/DISPUTE_CONTRACT.md)** - Two-tier mediation and arbitration system
-- **[Publication Contract](./docs/PUBLICATION_CONTRACT.md)** - On-chain registry for services and projects
-
-#### Reputation System
-- **[Rating System Integration](./docs/RATING_SYSTEM_INTEGRATION.md)** - User rating and feedback system
-- **[Reputation NFT Contract](./docs/REPUTATION_NFT_CONTRACT.md)** - Achievement-based NFT rewards
-
-### 🔗 Contract Interactions
-
-The contracts work together to create a seamless platform experience:
-
-```
-User Registration → Service/Project Publication → Escrow Creation → 
-Payment Processing → Work Completion → Rating & Reputation → NFT Rewards
-```
-
-For disputes: `Escrow → Dispute Resolution → Mediation/Arbitration → Resolution`
-
-### 🛠 Development Resources
-
-- **[Freelancer Profile Implementation](./docs/FREELANCER_PROFILE_IMPLEMENTATION.md)** - Frontend profile system
-- **[Contributors Guidelines](./docs/CONTRIBUTORS_GUIDELINE.md)** - Development standards and practices
-
----
-
-## 💬 Need Help?
-
-If you get stuck or want to discuss implementation ideas, open an issue or start a discussion in the repo. Let's build something amazing together 💫
-
----
-
-## 🧠 Maintained by
-
-**[@Josué](https://github.com/Josue1908)** 
-**[@Kevin](https://github.com/KevinMB0220)** 
+[Your License Here]

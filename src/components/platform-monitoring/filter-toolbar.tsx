@@ -13,6 +13,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useState } from "react";
+import type { ChangeEvent } from "react";
 import { format } from "date-fns";
 
 export default function FilterToolbar() {
@@ -61,7 +62,7 @@ export default function FilterToolbar() {
             placeholder="Search by customer name"
             className="pl-9 h-10 border-[#B4B9C9] focus-visible:ring-offset-0 w-full"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.currentTarget.value)}
           />
         </div>
       </div>

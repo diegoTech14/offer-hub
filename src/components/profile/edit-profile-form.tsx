@@ -94,7 +94,7 @@ export default function EditProfileForm({ user, onBack, onSave }: EditProfileFor
                   id="firstName"
                   type="text"
                   value={formData.firstName}
-                  onChange={(e) => handleChange("firstName", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("firstName", e.target.value)}
                   className="mt-1 h-12"
                   required
                 />
@@ -108,7 +108,7 @@ export default function EditProfileForm({ user, onBack, onSave }: EditProfileFor
                   id="lastName"
                   type="text"
                   value={formData.lastName}
-                  onChange={(e) => handleChange("lastName", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("lastName", e.target.value)}
                   className="mt-1 h-12"
                   required
                 />
@@ -122,7 +122,7 @@ export default function EditProfileForm({ user, onBack, onSave }: EditProfileFor
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("email", e.target.value)}
                   className="mt-1 h-12"
                   required
                 />
@@ -136,7 +136,7 @@ export default function EditProfileForm({ user, onBack, onSave }: EditProfileFor
                   id="username"
                   type="text"
                   value={formData.username}
-                  onChange={(e) => handleChange("username", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("username", e.target.value)}
                   placeholder="Username"
                   className="mt-1 h-12"
                   required
@@ -150,7 +150,7 @@ export default function EditProfileForm({ user, onBack, onSave }: EditProfileFor
                 <textarea
                   id="bio"
                   value={formData.bio}
-                  onChange={(e) => handleChange("bio", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange("bio", e.target.value)}
                   placeholder="Tell us about yourself..."
                   className="mt-1 w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-800 resize-none min-h-[80px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />

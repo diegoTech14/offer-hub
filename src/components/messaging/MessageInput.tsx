@@ -1,10 +1,12 @@
 'use client';
 import React, { useState } from 'react';
 
-export default function MessageInput({ onSend, onAttach }: {
+interface MessageInputProps {
   onSend: (text: string) => void;
   onAttach?: (file: File) => void;
-}) {
+}
+
+export default function MessageInput({ onSend, onAttach }: MessageInputProps) {
   const [value, setValue] = useState('');
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && value.trim()) {

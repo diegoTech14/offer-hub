@@ -7,7 +7,8 @@ import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import type { MessagesMainProps } from '@/types';
 import { cn } from '@/lib/utils';
-import { useMessages } from '@/hooks/use-message';
+import { useMessageComposer } from '@/hooks/use-message';
+import { TIMEOUTS, VALIDATION_LIMITS } from '@/constants/magic-numbers';
 
 import { useEffect, useRef, useState } from 'react';
 import TypingIndicator from '@/components/messaging/TypingIndicator';
@@ -30,7 +31,8 @@ export function MessagesMainPlus({
     handleSendMessage,
     handleFileUpload,
     handleKeyPress,
-  } = useMessages(onSendMessage);
+    isLoading: composerIsLoading,
+  } = useMessageComposer(onSendMessage);
 
   const [statusById, setStatusById] = useState<Record<string, MsgStatus>>({});
   const [typing, setTyping] = useState(false);
@@ -40,8 +42,8 @@ export function MessagesMainPlus({
       const id = String(m.id);
       if (!id || !m.isOutgoing || statusById[id]) return;
       setStatusById((s) => ({ ...s, [id]: 'sent' }));
-      const t1 = setTimeout(() => setStatusById((s) => ({ ...s, [id]: 'delivered' })), 600);
-      const t2 = setTimeout(() => setStatusById((s) => ({ ...s, [id]: 'read' })), 1400);
+      const t1 = setTimeout(() => setStatusById((s) => ({ ...s, [id]: 'delivered' })), TIMEOUTS.MESSAGE_STATUS_DELIVERED_DELAY);
+      const t2 = setTimeout(() => setStatusById((s) => ({ ...s, [id]: 'read' })), TIMEOUTS.MESSAGE_STATUS_READ_DELAY);
       return () => { clearTimeout(t1); clearTimeout(t2); };
     });
   }, [messages, statusById]);
@@ -49,8 +51,8 @@ export function MessagesMainPlus({
   useEffect(() => {
     const i = setInterval(() => {
       setTyping(true);
-      setTimeout(() => setTyping(false), 1000);
-    }, 6500);
+      setTimeout(() => setTyping(false), TIMEOUTS.TYPING_INDICATOR_DURATION);
+    }, TIMEOUTS.TYPING_SIMULATION_INTERVAL);
     return () => clearInterval(i);
   }, []);
 
@@ -86,7 +88,7 @@ export function MessagesMainPlus({
           </div>
           <h2 className="font-medium text-gray-900">
             {dispute?.parties
-              ? dispute.parties.map((e) => e.name).join(', ').slice(0, 45) + '...'
+              ? dispute.parties.map((e) => e.name).join(', ').slice(0, VALIDATION_LIMITS.MAX_DISPUTE_PARTY_NAME_LENGTH) + '...'
               : activeConversation.name}
           </h2>
         </div>
@@ -190,6 +192,7 @@ export function MessagesMainPlus({
                 size="icon"
                 className="w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-transparent"
                 onClick={() => fileInputRef.current?.click()}
+                disabled={composerIsLoading}
               >
                 <Upload className="w-4 h-4" />
               </Button>
@@ -197,6 +200,7 @@ export function MessagesMainPlus({
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-transparent"
+                disabled={composerIsLoading}
               >
                 <Camera className="w-4 h-4" />
               </Button>
@@ -204,10 +208,14 @@ export function MessagesMainPlus({
           </div>
           <Button
             onClick={handleSendMessage}
-            disabled={!newMessage.trim()}
-            className="flex items-center justify-center w-10 h-10 p-0 text-white bg-black rounded-full hover:bg-gray-800"
+            disabled={composerIsLoading || !newMessage.trim()}
+            className="flex items-center justify-center w-10 h-10 p-0 text-white bg-black rounded-full hover:bg-gray-800 disabled:opacity-60"
           >
-            <Send className="w-4 h-4" />
+            {composerIsLoading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
 

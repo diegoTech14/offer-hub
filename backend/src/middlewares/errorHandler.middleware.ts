@@ -83,6 +83,7 @@ export class ErrorHandlerMiddleware {
         message,
         details,
         code: errorCode,
+        statusCode,
         timestamp: new Date().toISOString(),
         ...(process.env.NODE_ENV === 'development' && {
           stack: error instanceof Error ? error.stack : undefined,
@@ -178,6 +179,7 @@ export class ErrorHandlerMiddleware {
       case ErrorCodes.INVALID_WALLET_ADDRESS:
       case ErrorCodes.INVALID_USERNAME:
       case ErrorCodes.INVALID_UUID:
+      case ErrorCodes.INVALID_WALLET_ID:
       case ErrorCodes.INVALID_AMOUNT:
       case ErrorCodes.INVALID_DATE:
       case ErrorCodes.INVALID_ENUM_VALUE:
@@ -185,6 +187,7 @@ export class ErrorHandlerMiddleware {
 
       case ErrorCodes.BUSINESS_LOGIC_ERROR:
       case ErrorCodes.USER_NOT_FOUND:
+      case ErrorCodes.WALLET_NOT_FOUND:
       case ErrorCodes.CONTRACT_NOT_FOUND:
       case ErrorCodes.PROJECT_NOT_FOUND:
       case ErrorCodes.SERVICE_NOT_FOUND:
@@ -203,6 +206,7 @@ export class ErrorHandlerMiddleware {
       case ErrorCodes.INVALID_CREDENTIALS:
       case ErrorCodes.INSUFFICIENT_PERMISSIONS:
       case ErrorCodes.RESOURCE_ACCESS_DENIED:
+      case ErrorCodes.WALLET_ACCESS_DENIED:
       case ErrorCodes.ADMIN_REQUIRED:
         return ErrorSeverity.HIGH;
 

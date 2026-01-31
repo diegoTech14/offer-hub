@@ -5,8 +5,17 @@ import {
 	allowAllModules,
 } from "@creit.tech/stellar-wallets-kit";
 
-export const kit: StellarWalletsKit = new StellarWalletsKit({
-	network: WalletNetwork.TESTNET,
-	selectedWalletId: FREIGHTER_ID,
-	modules: allowAllModules(),
-});
+let kit: StellarWalletsKit;
+
+if (typeof window !== 'undefined') {
+	kit = new StellarWalletsKit({
+		network: WalletNetwork.TESTNET,
+		selectedWalletId: FREIGHTER_ID,
+		modules: allowAllModules(),
+	});
+} else {
+	// Provide a dummy kit for server-side rendering
+	kit = {} as StellarWalletsKit;
+}
+
+export { kit };

@@ -230,7 +230,7 @@ const Filter: React.FC<FilterProps> = ({ isOpen, onClose, onApply }) => {
                   <input
                     type="number"
                     value={priceRange.min}
-                    onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) || 0 }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPriceRange(prev => ({ ...prev, min: parseInt(e.target.value) || 0 }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                     placeholder="0"
                   />
@@ -240,7 +240,7 @@ const Filter: React.FC<FilterProps> = ({ isOpen, onClose, onApply }) => {
                   <input
                     type="number"
                     value={priceRange.max}
-                    onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) || 1000 }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) || 1000 }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                     placeholder="1000"
                   />

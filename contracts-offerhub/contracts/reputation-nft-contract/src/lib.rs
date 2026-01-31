@@ -1,18 +1,19 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, Address, Env, String, Symbol, Vec};
+use soroban_sdk::{contract, contractimpl, Address, Env, Map, String, Symbol, Vec};
 
 mod access;
+mod contract;
 mod events;
 mod metadata;
-mod contract;
 mod storage;
 mod test;
 mod types;
+mod error;
 
 pub use crate::contract::ReputationNFTContract;
-pub use types::Error;
+pub use error::Error;
 pub use types::Metadata;
-pub use types::TokenId;
+pub use types::{AchievementType, RarityLevel, TokenId};
 
 #[contract]
 pub struct Contract;
@@ -22,6 +23,18 @@ impl Contract {
     #[allow(clippy::too_many_arguments)]
     pub fn init(env: Env, admin: Address) -> Result<(), Error> {
         ReputationNFTContract::init(env, admin)
+    }
+
+    pub fn pause(env: Env, admin: Address) -> Result<(), Error> {
+        ReputationNFTContract::pause(&env, admin)
+    }
+
+    pub fn is_paused(env: Env) -> bool {
+        ReputationNFTContract::is_paused(&env)
+    }
+
+    pub fn unpause(env: Env, admin: Address) -> Result<(), Error> {
+        ReputationNFTContract::unpause(&env, admin)
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -89,7 +102,12 @@ impl Contract {
         Ok(())
     }
 
-    pub fn mint_achv(env: Env, caller: Address, to: Address, nft_type: Symbol) -> Result<(), Error> {
+    pub fn mint_achv(
+        env: Env,
+        caller: Address,
+        to: Address,
+        nft_type: Symbol,
+    ) -> Result<(), Error> {
         ReputationNFTContract::mint_achv(env, caller, to, nft_type)
     }
 
@@ -101,13 +119,36 @@ impl Contract {
         achievement_type: String,
         rating_data: String,
     ) -> Result<(), Error> {
-        ReputationNFTContract::mint_rating_achievement(env, caller, to, achievement_type, rating_data)
+        ReputationNFTContract::mint_rating_achievement(
+            env,
+            caller,
+            to,
+            achievement_type,
+            rating_data,
+        )
     }
 
     pub fn get_user_achievements(env: Env, user: Address) -> Result<Vec<TokenId>, Error> {
         ReputationNFTContract::get_user_achievements(env, user)
     }
 
+    pub fn upd_reput(
+        env: Env,
+        caller: Address,
+        user: Address,
+        rating_average: u32,
+        total_ratings: u32,
+    ) -> Result<(), Error> {
+        ReputationNFTContract::update_reputation_score(
+            env,
+            caller,
+            user,
+            rating_average,
+            total_ratings,
+        )
+    }
+
+    // Back-compat alias to preserve the old external symbol
     pub fn update_reputation_score(
         env: Env,
         caller: Address,
@@ -115,6 +156,74 @@ impl Contract {
         rating_average: u32,
         total_ratings: u32,
     ) -> Result<(), Error> {
-        ReputationNFTContract::update_reputation_score(env, caller, user, rating_average, total_ratings)
+        ReputationNFTContract::update_reputation_score(
+            env,
+            caller,
+            user,
+            rating_average,
+            total_ratings,
+        )
+    }
+
+    pub fn burn(env: Env, caller: Address, token_id: TokenId) -> Result<(), Error> {
+        ReputationNFTContract::burn(env, caller, token_id)
+    }
+
+    pub fn batch_m(
+        env: Env,
+        caller: Address,
+        tos: Vec<Address>,
+        names: Vec<String>,
+        descriptions: Vec<String>,
+        uris: Vec<String>,
+    ) -> Result<(), Error> {
+        ReputationNFTContract::batch_mint(env, caller, tos, names, descriptions, uris)
+    }
+
+    // Achievement statistics and leaderboard functions
+    pub fn ach_stats(env: Env) -> Map<AchievementType, u32> {
+        ReputationNFTContract::get_achievement_statistics(env)
+    }
+
+    pub fn leader(env: Env) -> Map<Address, u32> {
+        ReputationNFTContract::get_achievement_leaderboard(env)
+    }
+
+    pub fn get_rank(env: Env, user: Address) -> u32 {
+        ReputationNFTContract::get_user_achievement_rank(env, user)
+    }
+
+    // Dynamic metadata update
+    pub fn update_metadata_dynamically(
+        env: Env,
+        caller: Address,
+        token_id: TokenId,
+        new_name: Option<String>,
+        new_description: Option<String>,
+        new_uri: Option<String>,
+    ) -> Result<(), Error> {
+        ReputationNFTContract::update_metadata_dynamically(
+            env,
+            caller,
+            token_id,
+            new_name,
+            new_description,
+            new_uri,
+        )
+    }
+
+    // Set achievement prerequisites
+    pub fn set_achievement_prerequisite(
+        env: Env,
+        caller: Address,
+        achievement_type: AchievementType,
+        prerequisite: AchievementType,
+    ) -> Result<(), Error> {
+        ReputationNFTContract::set_achievement_prerequisite(
+            env,
+            caller,
+            achievement_type,
+            prerequisite,
+        )
     }
 }

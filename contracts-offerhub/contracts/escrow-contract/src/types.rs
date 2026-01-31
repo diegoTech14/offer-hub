@@ -1,14 +1,29 @@
-use soroban_sdk::{contracterror, contracttype, Address, String, Vec};
+use soroban_sdk::{contracttype, Address, String, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[repr(u32)]
-pub enum EscrowStatus {
-    Initialized,
+pub enum EscrowState {
+    Created,
     Funded,
     Released,
+    Refunded,
     Disputed,
-    Resolved,
+}
+
+impl EscrowState {
+    pub fn can_transition_to(&self, next: &EscrowState) -> bool {
+        use EscrowState::*;
+        match (self, next) {
+            (Created, Funded) => true,
+            (Funded, Released) => true,
+            (Funded, Refunded) => true,
+            (Funded, Disputed) => true,
+            (Disputed, Released) => true,
+            (Disputed, Refunded) => true,
+            _ => false,
+        }
+    }
 }
 
 #[contracttype]
@@ -50,7 +65,7 @@ pub struct EscrowData {
     pub arbitrator: Option<Address>,
     pub token: Option<Address>,
     pub amount: i128,
-    pub status: EscrowStatus,
+    pub state: EscrowState,
     pub dispute_result: u32,
     pub created_at: u64,
     pub funded_at: Option<u64>,
@@ -66,19 +81,36 @@ pub struct EscrowData {
     pub net_amount: i128,     // Amount after fees
 }
 
-#[contracterror]
-#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
-#[repr(u32)]
-pub enum Error {
-    AlreadyInitialized = 1,
-    NotInitialized = 2,
-    Unauthorized = 3,
-    InvalidAmount = 4,
-    InsufficientFunds = 5,
-    InvalidStatus = 6,
-    DisputeNotOpen = 7,
-    InvalidDisputeResult = 8,
-    MilestoneNotFound = 9,
-    RateLimitExceeded = 10,
-    UnexpectedError = 11,
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ContractConfig {
+    pub min_escrow_amount: i128,          // Minimum escrow amount
+    pub max_escrow_amount: i128,          // Maximum escrow amount
+    pub default_timeout_days: u32,        // Default timeout in days
+    pub max_milestones: u32,              // Maximum number of milestones
+    pub fee_percentage: i128,             // Fee percentage (in basis points)
+    pub rate_limit_calls: u32,            // Rate limit calls per window
+    pub rate_limit_window_hours: u32,     // Rate limit window in hours
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct EscrowDataExport {
+    pub contract_id: String,
+    pub escrow_data: EscrowData,
+    pub milestones: Vec<Milestone>,
+    pub milestone_history: Vec<MilestoneHistory>,
+    pub export_timestamp: u64,
+    pub export_version: String,
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct EscrowSummary {
+    pub client: Address,
+    pub freelancer: Address,
+    pub amount: i128,
+    pub status: String,
+    pub created_at: u64,
+    pub milestone_count: u32,
 }

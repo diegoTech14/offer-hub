@@ -1,6 +1,11 @@
 #![cfg(test)]
 
-use crate::{Contract, storage::{get_verified_users, set_verified_users}, types::{Error, VerificationLevel}};
+use crate::{
+    storage::{get_verified_users, set_verified_users},
+    error::Error,
+    types::{VerificationLevel},
+    Contract, ContractClient
+};
 use soroban_sdk::{testutils::Address as _, Address, Env, String, Vec};
 
 // ==================== LEGACY TESTS ====================
@@ -81,7 +86,7 @@ fn test_multiple_users_verification() {
 fn test_admin_initialization() {
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let contract_id = env.register(Contract, ());
     let admin = Address::generate(&env);
 
@@ -119,7 +124,7 @@ fn test_user_verification_with_levels() {
     env.as_contract(&contract_id, || {
         let metadata = String::from_str(&env, "Test user metadata");
         let expires_at = env.ledger().timestamp() + 365 * 24 * 60 * 60; // 1 year
-        
+
         let result = Contract::verify_user(
             env.clone(),
             admin.clone(),
@@ -152,7 +157,7 @@ fn test_user_verification_with_levels() {
 fn test_blacklist_functionality() {
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let contract_id = env.register(Contract, ());
     let admin = Address::generate(&env);
     let user = Address::generate(&env);
@@ -160,14 +165,14 @@ fn test_blacklist_functionality() {
     env.as_contract(&contract_id, || {
         // Initialize admin
         Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
-        
+
         // For now, test blacklist status checking functions which don't require auth
         assert!(!Contract::is_user_blacklisted(env.clone(), user.clone()));
-        
+
         // Test user status for non-blacklisted user
         let status = Contract::get_user_status(env.clone(), user.clone());
         assert!(!status.is_blacklisted);
-        
+
         // Test that admin exists
         let current_admin = Contract::get_admin(env.clone());
         assert_eq!(current_admin, Some(admin.clone()));
@@ -244,7 +249,7 @@ fn test_verification_expiration() {
     env.as_contract(&contract_id, || {
         let metadata = String::from_str(&env, "Short-lived verification");
         let expires_at = env.ledger().timestamp() + 86400; // 1 day (minimum allowed)
-        
+
         Contract::verify_user(
             env.clone(),
             admin.clone(),
@@ -252,7 +257,8 @@ fn test_verification_expiration() {
             VerificationLevel::Basic,
             expires_at,
             metadata,
-        ).unwrap();
+        )
+        .unwrap();
 
         // User should be verified initially
         assert!(Contract::is_verified(env.clone(), user.clone()));
@@ -266,7 +272,8 @@ fn test_verification_expiration() {
     env.mock_all_auths();
     env.as_contract(&contract_id, || {
         let new_expires_at = env.ledger().timestamp() + 365 * 24 * 60 * 60; // 1 year
-        let result = Contract::renew_verification(env.clone(), admin.clone(), user.clone(), new_expires_at);
+        let result =
+            Contract::renew_verification(env.clone(), admin.clone(), user.clone(), new_expires_at);
         assert!(result.is_ok());
 
         let status = Contract::get_user_status(env.clone(), user.clone());
@@ -278,10 +285,10 @@ fn test_verification_expiration() {
 fn test_bulk_verification() {
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let contract_id = env.register(Contract, ());
     let admin = Address::generate(&env);
-    
+
     let user1 = Address::generate(&env);
     let user2 = Address::generate(&env);
     let user3 = Address::generate(&env);
@@ -300,7 +307,7 @@ fn test_bulk_verification() {
 
         let metadata = String::from_str(&env, "Bulk verified");
         let expires_at = env.ledger().timestamp() + 365 * 24 * 60 * 60; // 1 year
-        
+
         let result = Contract::bulk_verify_users(
             env.clone(),
             admin.clone(),
@@ -365,14 +372,16 @@ fn test_unauthorized_access() {
     // Test unauthorized user tries to blacklist someone
     env.mock_all_auths();
     env.as_contract(&contract_id, || {
-        let result = Contract::blacklist_user(env.clone(), unauthorized_user.clone(), target_user.clone());
+        let result =
+            Contract::blacklist_user(env.clone(), unauthorized_user.clone(), target_user.clone());
         assert_eq!(result, Err(Error::Unauthorized));
     });
 
     // Test unauthorized user tries to add moderator
     env.mock_all_auths();
     env.as_contract(&contract_id, || {
-        let result = Contract::add_moderator(env.clone(), unauthorized_user.clone(), target_user.clone());
+        let result =
+            Contract::add_moderator(env.clone(), unauthorized_user.clone(), target_user.clone());
         assert_eq!(result, Err(Error::Unauthorized));
     });
 }
@@ -403,7 +412,7 @@ fn test_cannot_blacklist_admin_or_moderator() {
         assert_eq!(result, Err(Error::CannotBlacklistAdmin));
     });
 
-    // Test: Try to blacklist moderator - should fail  
+    // Test: Try to blacklist moderator - should fail
     env.mock_all_auths();
     env.as_contract(&contract_id, || {
         let result = Contract::blacklist_user(env.clone(), admin.clone(), moderator.clone());
@@ -415,7 +424,7 @@ fn test_cannot_blacklist_admin_or_moderator() {
 fn test_admin_transfer() {
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let contract_id = env.register(Contract, ());
     let old_admin = Address::generate(&env);
     let new_admin = Address::generate(&env);
@@ -423,7 +432,7 @@ fn test_admin_transfer() {
     env.as_contract(&contract_id, || {
         // Initialize admin first
         Contract::initialize_admin(env.clone(), old_admin.clone()).unwrap();
-        
+
         // Verify admin is set
         let current_admin = Contract::get_admin(env.clone());
         assert_eq!(current_admin, Some(old_admin.clone()));
@@ -465,7 +474,8 @@ fn test_metadata_update() {
             VerificationLevel::Basic,
             0,
             initial_metadata.clone(),
-        ).unwrap();
+        )
+        .unwrap();
 
         // Check initial metadata
         let profile = Contract::get_user_profile(env.clone(), user.clone()).unwrap();
@@ -576,4 +586,509 @@ fn test_additional_security_scenarios() {
         let result = Contract::blacklist_user(env.clone(), attacker.clone(), user.clone());
         assert_eq!(result, Err(Error::Unauthorized));
     });
-} 
+}
+
+#[test]
+fn test_user_get_total_users() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+    let user3 = Address::generate(&env);
+
+    // Initialize admin in first context
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Bulk verify in second context
+    env.as_contract(&contract_id, || {
+        let mut users = Vec::new(&env);
+        users.push_back(user1.clone());
+        users.push_back(user2.clone());
+        users.push_back(user3.clone());
+
+        let metadata = String::from_str(&env, "Bulk verified");
+        let expires_at = env.ledger().timestamp() + 365 * 24 * 60 * 60; // 1 year
+
+        let result = Contract::bulk_verify_users(
+            env.clone(),
+            admin.clone(),
+            users,
+            VerificationLevel::Premium,
+            expires_at,
+            metadata,
+        );
+        assert!(result.is_ok());
+    });
+
+    env.as_contract(&contract_id, || {
+        let metadata = String::from_str(&env, "Bulk verified");
+        let expires_at = env.ledger().timestamp() + 365 * 24 * 60 * 60; // 1 year
+
+        let user4 = Address::generate(&env);
+        let result = Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user4,
+            VerificationLevel::Premium,
+            expires_at,
+            metadata,
+        );
+        assert!(result.is_ok());
+
+        let total_users_count = Contract::get_total_users(&env).unwrap();
+        assert_eq!(total_users_count, 4);
+    });
+}
+
+// ==================== DATA EXPORT TESTS ====================
+
+#[test]
+fn test_export_user_data_self() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let user = Address::generate(&env);
+
+    // Initialize admin
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Verify user
+    env.as_contract(&contract_id, || {
+        let metadata = String::from_str(&env, "Test user for export");
+        Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user.clone(),
+            VerificationLevel::Premium,
+            0,
+            metadata,
+        )
+        .unwrap();
+    });
+
+    // User exports their own data
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_user_data(env.clone(), user.clone(), user.clone());
+        assert!(result.is_ok());
+
+        let export_data = result.unwrap();
+        assert_eq!(export_data.user_address, user);
+        assert!(export_data.has_profile);
+        assert_eq!(
+            export_data.status.verification_level,
+            VerificationLevel::Premium
+        );
+        assert_eq!(export_data.export_version, String::from_str(&env, "1.0"));
+    });
+}
+
+#[test]
+fn test_export_user_data_admin() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let user = Address::generate(&env);
+
+    // Initialize admin
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Verify user
+    env.as_contract(&contract_id, || {
+        let metadata = String::from_str(&env, "Test user for admin export");
+        Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user.clone(),
+            VerificationLevel::Basic,
+            0,
+            metadata,
+        )
+        .unwrap();
+    });
+
+    // Admin exports user data
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_user_data(env.clone(), admin.clone(), user.clone());
+        assert!(result.is_ok());
+
+        let export_data = result.unwrap();
+        assert_eq!(export_data.user_address, user);
+        assert!(export_data.has_profile);
+        assert_eq!(
+            export_data.status.verification_level,
+            VerificationLevel::Basic
+        );
+    });
+}
+
+#[test]
+fn test_export_user_data_unauthorized() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let user = Address::generate(&env);
+    let unauthorized = Address::generate(&env);
+
+    // Initialize admin
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Verify user
+    env.as_contract(&contract_id, || {
+        let metadata = String::from_str(&env, "Test user");
+        Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user.clone(),
+            VerificationLevel::Basic,
+            0,
+            metadata,
+        )
+        .unwrap();
+    });
+
+    // Unauthorized user tries to export data
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_user_data(env.clone(), unauthorized.clone(), user.clone());
+        assert_eq!(result, Err(Error::Unauthorized));
+    });
+}
+
+#[test]
+fn test_export_all_data() {
+    let env = Env::default();
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+    let blacklisted_user = Address::generate(&env);
+
+    // Initialize admin
+    env.mock_all_auths();
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Verify user 1
+    env.mock_all_auths();
+    env.as_contract(&contract_id, || {
+        let metadata = String::from_str(&env, "Test user 1");
+        Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user1.clone(),
+            VerificationLevel::Basic,
+            0,
+            metadata,
+        )
+        .unwrap();
+    });
+
+    // Verify user 2
+    env.mock_all_auths();
+    env.as_contract(&contract_id, || {
+        let metadata2 = String::from_str(&env, "Test user 2");
+        Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user2.clone(),
+            VerificationLevel::Premium,
+            0,
+            metadata2,
+        )
+        .unwrap();
+    });
+
+    // Blacklist user
+    env.mock_all_auths();
+    env.as_contract(&contract_id, || {
+        Contract::blacklist_user(env.clone(), admin.clone(), blacklisted_user.clone()).unwrap();
+    });
+
+    // Export all data
+    env.mock_all_auths();
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_all_data(env.clone(), admin.clone(), 10);
+        assert!(result.is_ok());
+
+        let export_data = result.unwrap();
+        assert_eq!(export_data.total_users, 2); // Only verified users count
+        assert!(export_data.verified_users.len() >= 2);
+        assert!(export_data.blacklisted_users.len() >= 1);
+        assert_eq!(export_data.export_version, String::from_str(&env, "1.0"));
+        assert!(!export_data.data_size_limit_reached); // Should be false for small dataset
+    });
+}
+
+#[test]
+fn test_export_all_data_unauthorized() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let unauthorized = Address::generate(&env);
+
+    // Initialize admin
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Unauthorized user tries to export all data
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_all_data(env.clone(), unauthorized.clone(), 10);
+        assert_eq!(result, Err(Error::Unauthorized));
+    });
+}
+
+#[test]
+fn test_export_data_size_limits() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+
+    // Initialize admin
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Test with limit of 0 (should use default max limit)
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_all_data(env.clone(), admin.clone(), 0);
+        assert!(result.is_ok());
+
+        let export_data = result.unwrap();
+        // Should use default limit, not unlimited
+        assert_eq!(export_data.export_version, String::from_str(&env, "1.0"));
+    });
+
+    // Test with very high limit (should be capped)
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_all_data(env.clone(), admin.clone(), 1000);
+        assert!(result.is_ok());
+
+        let export_data = result.unwrap();
+        // Should be capped to max limit
+        assert_eq!(export_data.export_version, String::from_str(&env, "1.0"));
+    });
+}
+
+#[test]
+fn test_export_platform_data_unauthorized() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let unauthorized = Address::generate(&env);
+
+    // Initialize admin
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Unauthorized user tries to export platform data
+    env.as_contract(&contract_id, || {
+        let result = Contract::export_platform_data(env.clone(), unauthorized.clone(), 10);
+        assert_eq!(result, Err(Error::Unauthorized));
+    });
+}
+
+#[test]
+fn test_export_platform_data() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    // Initialize admin
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Add user 1
+    env.as_contract(&contract_id, || {
+        let metadata = String::from_str(&env, "Test user 1");
+        Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user1.clone(),
+            VerificationLevel::Basic,
+            0,
+            metadata,
+        )
+        .unwrap();
+    });
+
+    // Add user 2
+    env.as_contract(&contract_id, || {
+        let metadata2 = String::from_str(&env, "Test user 2");
+        Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user2.clone(),
+            VerificationLevel::Premium,
+            0,
+            metadata2,
+        )
+        .unwrap();
+    });
+
+    // Export platform data
+    env.as_contract(&contract_id, || {
+        let platform_data = Contract::export_platform_data(env.clone(), admin.clone(), 10).unwrap();
+        assert_eq!(platform_data.total_contracts_processed, 1);
+        assert_eq!(platform_data.successful_exports, 1);
+        assert_eq!(platform_data.failed_exports, 0);
+        assert_eq!(platform_data.export_version, String::from_str(&env, "1.0"));
+        assert_eq!(platform_data.user_registry_summary.total_users, 2);
+        assert!(platform_data.platform_statistics.len() > 0);
+    });
+}
+
+#[test]
+fn test_get_user_profile_formatted() {
+    let env = Env::default();
+    let contract_id = env.register(Contract, ());
+    let admin = Address::generate(&env);
+    let user = Address::generate(&env);
+
+    // Initialize admin
+    env.mock_all_auths();
+    env.as_contract(&contract_id, || {
+        Contract::initialize_admin(env.clone(), admin.clone()).unwrap();
+    });
+
+    // Verify user with premium level
+    env.mock_all_auths();
+    env.as_contract(&contract_id, || {
+        let metadata = String::from_str(&env, "Test user metadata");
+        let expires_at = env.ledger().timestamp() + 365 * 24 * 60 * 60; // 1 year
+
+        let result = Contract::verify_user(
+            env.clone(),
+            admin.clone(),
+            user.clone(),
+            VerificationLevel::Premium,
+            expires_at,
+            metadata.clone(),
+        );
+        assert!(result.is_ok());
+
+        // Check user status
+        let status = Contract::get_user_status(env.clone(), user.clone());
+        assert!(status.is_verified);
+        assert_eq!(status.verification_level, VerificationLevel::Premium);
+        assert!(!status.is_blacklisted);
+        assert_eq!(status.verification_expires_at, expires_at);
+        assert!(!status.is_expired);
+
+        // Check user profile
+        let profile = Contract::get_user_profile_formatted(env.clone(), user.clone());
+        assert!(profile.is_ok());
+        let profile = profile.unwrap();
+        assert_eq!(profile.verification_level, String::from_str(&env, "Premium"));
+        assert_eq!(profile.publication_status, String::from_str(&env, "Private"));
+        assert_eq!(profile.metadata, metadata);
+        assert!(!profile.is_blacklisted);
+    });
+}
+
+
+fn create_contract(env: &Env) -> (ContractClient<'_>, Address) {
+    let contract_id = env.register(Contract, ());
+    let client = ContractClient::new(env, &contract_id);
+    let admin = Address::generate(env);
+
+    // client.initialize(&admin, &86400_u64, &escrow_contract, &fee_manager);
+    client.initialize_admin(&admin.clone());
+    (client, admin)
+}
+
+#[test]
+fn test_pause_unpause() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, admin) = create_contract(&env);
+    // Test pause
+    client.pause(&admin.clone());
+    assert_eq!(client.is_paused(), true);
+
+    // Test unpause
+    client.unpause(&admin.clone());
+    assert_eq!(client.is_paused(), false);  
+}
+
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_pause_unpause_unauthorized() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, _admin) = create_contract(&env);
+    let unauthorized = Address::generate(&env);
+    
+    client.pause(&unauthorized.clone());
+    assert_eq!(client.is_paused(), true);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #20)")]
+fn test_moderator_management_panic() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, admin) = create_contract(&env);
+    let moderator = Address::generate(&env);
+    client.pause(&admin);
+
+    client.add_moderator(&admin, &moderator);    
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #20)")]
+fn test_add_verified_user() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let (client, admin) = create_contract(&env);
+    let user = Address::generate(&env);
+
+
+    let metadata = String::from_str(&env, "Test user metadata");
+    let expires_at = env.ledger().timestamp() + 365 * 24 * 60 * 60; // 1 year
+
+    client.pause(&admin);
+
+    let _ = client.verify_user(
+        &admin.clone(),
+        &user.clone(),
+        &VerificationLevel::Premium,
+        &expires_at,
+        &metadata.clone(),
+    );   
+}

@@ -302,7 +302,8 @@ class ContractService {
     }
 
     // Transform the data to include user info
-    const contractsWithUsers: ContractWithUsers[] = (contracts || []).map((contract: ContractWithUsers) => {
+    // Supabase returns arrays for joined relations, so we need to type it as any first
+    const contractsWithUsers: ContractWithUsers[] = (contracts || []).map((contract: any) => {
       const freelancer = Array.isArray(contract.freelancer)
         ? contract.freelancer[0]
         : contract.freelancer;
@@ -376,7 +377,8 @@ class ContractService {
     }
 
     // Transform the data to include user info
-    const contractsWithUsers: ContractWithUsers[] = (contracts || []).map((contract: ContractWithUsers) => {
+    // Supabase returns arrays for joined relations, so we need to type it as any first
+    const contractsWithUsers: ContractWithUsers[] = (contracts || []).map((contract: any) => {
       const freelancer = Array.isArray(contract.freelancer)
         ? contract.freelancer[0]
         : contract.freelancer;

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import type { ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Bold, Italic, Link, Image, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, Code, Eye } from "lucide-react";
 
@@ -70,7 +71,7 @@ export default function NotificationModal({ isOpen, onClose, user }: Notificatio
       <div 
         ref={modalRef}
         className="bg-white rounded-md w-full max-w-xl mx-4 shadow-lg" 
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b p-4">
@@ -136,7 +137,7 @@ export default function NotificationModal({ isOpen, onClose, user }: Notificatio
           {/* Text editor area */}
           <textarea
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
             className="w-full h-40 p-3 border rounded-md focus:ring-blue-500 focus:border-blue-500 resize-none"
             placeholder="Type your message here..."
           />

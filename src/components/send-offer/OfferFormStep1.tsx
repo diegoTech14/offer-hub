@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useOfferForm } from "./OfferFormContext";
+import { AutoSaveForm } from "@/components/forms/auto-save-form";
 
 interface OfferFormStep1Props {
   onNext: () => void;
@@ -45,6 +46,11 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
     }
   };
 
+  const handleAutoSave = (data: any) => {
+    // Auto-save form data to localStorage
+    localStorage.setItem('offer-form-draft', JSON.stringify(data));
+  };
+
   return (
     <div className="flex-1 flex items-center justify-center p-8">
       <div className="w-full max-w-md space-y-8">
@@ -59,6 +65,7 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
         </div>
 
         {/* Form */}
+        <AutoSaveForm onAutoSave={handleAutoSave}>
         <div className="space-y-6">
           {/* Job Title */}
           <div className="space-y-2">
@@ -69,7 +76,7 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
               id="jobTitle"
               placeholder="Give your job a title"
               value={formData.offerTitle}
-              onChange={(e) => updateField("offerTitle", e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateField("offerTitle", e.target.value)}
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 errors.offerTitle ? "border-red-500" : ""
               }`}
@@ -88,7 +95,7 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
               id="jobDescription"
               placeholder="Enter a description..."
               value={formData.projectDescription}
-              onChange={(e) => updateField("projectDescription", e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateField("projectDescription", e.target.value)}
               rows={6}
               className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none ${
                 errors.projectDescription ? "border-red-500" : ""
@@ -108,7 +115,7 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
               id="budget"
               placeholder="$0"
               value={formData.budgetAmount ? `$${formData.budgetAmount}` : ""}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value.replace(/[^0-9]/g, "");
                 updateField("budgetAmount", value ? parseInt(value) : 0);
               }}
@@ -121,6 +128,7 @@ export function OfferFormStep1({ onNext, onBack, freelancerId }: OfferFormStep1P
             )}
           </div>
         </div>
+        </AutoSaveForm>
 
         {/* Buttons */}
         <div className="space-y-3 pt-4">
