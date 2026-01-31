@@ -13,40 +13,68 @@ export class WithdrawalStateMachine {
    * Map of valid state transitions
    * Each status maps to an array of valid next statuses
    */
-  private static readonly VALID_TRANSITIONS: Record<WithdrawalStatus, WithdrawalStatus[]> = {
-    [WithdrawalStatus.CREATED]: [
-      WithdrawalStatus.PENDING_VERIFICATION,
-      WithdrawalStatus.WITHDRAWAL_CANCELED,
-      WithdrawalStatus.WITHDRAWAL_FAILED,
-    ],
-    [WithdrawalStatus.WITHDRAWAL_CREATED]: [
-      WithdrawalStatus.PENDING_VERIFICATION,
-      WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION,
-      WithdrawalStatus.WITHDRAWAL_CANCELED,
-      WithdrawalStatus.WITHDRAWAL_FAILED,
-      WithdrawalStatus.FAILED,
-    ],
-    [WithdrawalStatus.PENDING_VERIFICATION]: [
-      WithdrawalStatus.WITHDRAWAL_COMPLETED,
-      WithdrawalStatus.WITHDRAWAL_CANCELED,
-      WithdrawalStatus.WITHDRAWAL_FAILED,
-    ],
-    [WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION]: [
-      WithdrawalStatus.WITHDRAWAL_COMPLETED,
-      WithdrawalStatus.WITHDRAWAL_CANCELED,
-      WithdrawalStatus.WITHDRAWAL_FAILED,
-      WithdrawalStatus.FAILED,
-    ],
-    [WithdrawalStatus.FAILED]: [
-      WithdrawalStatus.WITHDRAWAL_REFUNDED,
-    ],
-    [WithdrawalStatus.WITHDRAWAL_FAILED]: [
-      WithdrawalStatus.WITHDRAWAL_REFUNDED,
-    ],
-    [WithdrawalStatus.WITHDRAWAL_CANCELED]: [],
-    [WithdrawalStatus.WITHDRAWAL_REFUNDED]: [],
-    [WithdrawalStatus.WITHDRAWAL_COMPLETED]: [],
-  };
+  private static readonly VALID_TRANSITIONS: Record<WithdrawalStatus, WithdrawalStatus[]> = (() => {
+    const t: Partial<Record<WithdrawalStatus, WithdrawalStatus[]>> = {
+      // Initiation flow
+      [WithdrawalStatus.CREATED]: [
+        WithdrawalStatus.PENDING_VERIFICATION,
+        WithdrawalStatus.WITHDRAWAL_CANCELED,
+        WithdrawalStatus.WITHDRAWAL_FAILED,
+      ],
+      [WithdrawalStatus.WITHDRAWAL_CREATED]: [
+        WithdrawalStatus.PENDING_VERIFICATION,
+        WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION,
+        WithdrawalStatus.WITHDRAWAL_CANCELED,
+        WithdrawalStatus.WITHDRAWAL_FAILED,
+        WithdrawalStatus.FAILED,
+      ],
+      [WithdrawalStatus.PENDING_VERIFICATION]: [
+        WithdrawalStatus.WITHDRAWAL_COMPLETED,
+        WithdrawalStatus.WITHDRAWAL_CANCELED,
+        WithdrawalStatus.WITHDRAWAL_FAILED,
+      ],
+      [WithdrawalStatus.WITHDRAWAL_PENDING_VERIFICATION]: [
+        WithdrawalStatus.WITHDRAWAL_COMPLETED,
+        WithdrawalStatus.WITHDRAWAL_CANCELED,
+        WithdrawalStatus.WITHDRAWAL_FAILED,
+        WithdrawalStatus.FAILED,
+      ],
+      [WithdrawalStatus.WITHDRAWAL_COMPLETED]: [],
+      [WithdrawalStatus.WITHDRAWAL_CANCELED]: [],
+      [WithdrawalStatus.WITHDRAWAL_REFUNDED]: [],
+
+      // Processing flow (Issue #958)
+      [WithdrawalStatus.PENDING]: [
+        WithdrawalStatus.PROCESSING,
+        WithdrawalStatus.CANCELLED,
+        WithdrawalStatus.WITHDRAWAL_FAILED,
+        WithdrawalStatus.FAILED,
+      ],
+      [WithdrawalStatus.PROCESSING]: [
+        WithdrawalStatus.COMMITTED,
+        WithdrawalStatus.WITHDRAWAL_FAILED,
+        WithdrawalStatus.FAILED,
+      ],
+      [WithdrawalStatus.COMMITTED]: [],
+      [WithdrawalStatus.CANCELLED]: [],
+
+      // Joint Statuses
+      [WithdrawalStatus.FAILED]: [
+        WithdrawalStatus.WITHDRAWAL_REFUNDED,
+      ],
+      [WithdrawalStatus.WITHDRAWAL_FAILED]: [
+        WithdrawalStatus.WITHDRAWAL_REFUNDED,
+      ],
+    };
+
+    // Map aliases
+    t[WithdrawalStatus.WITHDRAWAL_PENDING] = t[WithdrawalStatus.PENDING];
+    t[WithdrawalStatus.WITHDRAWAL_PROCESSING] = t[WithdrawalStatus.PROCESSING];
+    t[WithdrawalStatus.WITHDRAWAL_COMMITTED] = t[WithdrawalStatus.COMMITTED];
+    t[WithdrawalStatus.WITHDRAWAL_CANCELLED] = t[WithdrawalStatus.CANCELLED];
+
+    return t as Record<WithdrawalStatus, WithdrawalStatus[]>;
+  })();
 
   /**
    * Checks if a state transition is valid
@@ -55,10 +83,7 @@ export class WithdrawalStateMachine {
    * @returns true if transition is allowed, false otherwise
    */
   static canTransition(from: WithdrawalStatus, to: WithdrawalStatus): boolean {
-    const validNextStates = this.VALID_TRANSITIONS[from];
-    if (!validNextStates) {
-      return false;
-    }
+    const validNextStates = this.getValidTransitions(from);
     return validNextStates.includes(to);
   }
 
@@ -77,7 +102,8 @@ export class WithdrawalStateMachine {
    * @returns true if cancellation is allowed
    */
   static canCancel(currentStatus: WithdrawalStatus): boolean {
-    return this.canTransition(currentStatus, WithdrawalStatus.WITHDRAWAL_CANCELED);
+    return this.canTransition(currentStatus, WithdrawalStatus.WITHDRAWAL_CANCELED) ||
+      this.canTransition(currentStatus, WithdrawalStatus.CANCELLED);
   }
 
   /**

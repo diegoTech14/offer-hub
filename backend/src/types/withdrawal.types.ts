@@ -8,10 +8,15 @@
 export enum WithdrawalStatus {
     // Workflow Issue #958
     PENDING = 'WITHDRAWAL_PENDING',
+    WITHDRAWAL_PENDING = 'WITHDRAWAL_PENDING', // Alias
     PROCESSING = 'WITHDRAWAL_PROCESSING',
+    WITHDRAWAL_PROCESSING = 'WITHDRAWAL_PROCESSING', // Alias
     COMMITTED = 'WITHDRAWAL_COMMITTED',
-    FAILED = 'WITHDRAWAL_FAILED',
+    WITHDRAWAL_COMMITTED = 'WITHDRAWAL_COMMITTED', // Alias
+    FAILED = 'FAILED', // Key from main
+    WITHDRAWAL_FAILED = 'WITHDRAWAL_FAILED', // Key from main and my FAILED value
     CANCELLED = 'WITHDRAWAL_CANCELLED',
+    WITHDRAWAL_CANCELLED = 'WITHDRAWAL_CANCELLED', // Alias
 
     // Workflow from main/initiation
     CREATED = 'CREATED',
@@ -33,6 +38,7 @@ export interface Withdrawal {
     currency: string;
     status: WithdrawalStatus;
     external_payout_id?: string;
+    destination_email?: string;
     cancellation_reason?: string;
     created_at: string;
     updated_at: string;
