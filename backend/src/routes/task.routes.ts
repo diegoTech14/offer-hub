@@ -8,7 +8,8 @@ import {
   recordTaskOutcome,
   getTaskRecordByProject,
   getClientTaskRecords,
-  getFreelancerTaskRecords
+  getFreelancerTaskRecords,
+  updateTaskRating
 } from "@/controllers/task.controller";
 import { authenticateToken } from "@/middlewares/auth.middleware";
 import { generalLimiter } from "@/middlewares/ratelimit.middleware";
@@ -48,5 +49,12 @@ router.get("/client", getClientTaskRecords);
  * @access Private (Freelancer)
  */
 router.get("/freelancer", getFreelancerTaskRecords);
+
+/**
+ * @route PATCH /api/task-records/:recordId/rating
+ * @desc Update task rating (client only, one-time)
+ * @access Private (Client)
+ */
+router.patch("/:recordId/rating", updateTaskRating);
 
 export default router;

@@ -7,7 +7,7 @@ import { NextFunction, Request, Response } from "express";
 import { taskService } from "@/services/task.service";
 import { CreateTaskRecordDTO } from "@/types/task.types";
 import { AuthenticatedRequest } from "@/types/auth.types";
-import { validateCreateTaskRecord } from "@/validators/task.validator";
+import { validateCreateTaskRecord, validateUpdateTaskRating } from "@/validators/task.validator";
 import {
   AppError,
   BadRequestError,
@@ -248,6 +248,64 @@ export async function getFreelancerTaskRecords(
       data: {
         taskRecords,
         count: taskRecords.length,
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: authReq.securityContext?.requestId || "unknown",
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Update task rating
+ * @route PATCH /api/task-records/:recordId/rating
+ * @param req - Express request object with authenticated user
+ * @param res - Express response object
+ * @param next - Express next function
+ */
+export async function updateTaskRating(
+  req: Request<{ recordId: string }>,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const authReq = req as AuthenticatedRequest;
+
+    if (!authReq.user) {
+      return next(new AppError("Authentication required", 401));
+    }
+
+    const { recordId } = req.params;
+
+    if (!recordId) {
+      return next(new ValidationError("Record ID is required"));
+    }
+
+    const validationResult = validateUpdateTaskRating(req.body);
+
+    if (!validationResult.success) {
+      const errorMessages = validationResult.error.issues
+        .map((err: any) => `${err.path.join(".")}: ${err.message}`)
+        .join(", ");
+
+      return next(new ValidationError(`Validation failed: ${errorMessages}`));
+    }
+
+    const clientId = authReq.user.id;
+    const updatedRecord = await taskService.updateTaskRating(
+      recordId,
+      validationResult.data,
+      clientId,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Task rating updated successfully",
+      data: {
+        taskRecord: updatedRecord,
       },
       metadata: {
         timestamp: new Date().toISOString(),
