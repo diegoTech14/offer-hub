@@ -4,7 +4,7 @@
  */
 
 import { supabase } from "@/lib/supabase/supabase";
-import { TaskRecord, CreateTaskRecordDTO, BlockchainTaskResult } from "@/types/task.types";
+import { TaskRecord, CreateTaskRecordDTO, BlockchainTaskResult, UpdateTaskRatingDTO } from "@/types/task.types";
 import { Project } from "@/types/project.types";
 import { AppError, ValidationError, ConflictError, NotFoundError, AuthorizationError } from "@/utils/AppError";
 import { TaskRecordService } from "@/blockchain/task-record.service";
@@ -205,6 +205,59 @@ class TaskService {
         total_items: count ?? 0
       }
     };
+  }
+
+  /**
+   * Update task rating
+   * @param recordId - Task record ID
+   * @param data - Rating data (rating, comment)
+   * @param clientId - ID of the client submitting the rating
+   * @returns Updated task record
+   */
+  async updateTaskRating(recordId: string, data: UpdateTaskRatingDTO, clientId: string): Promise<TaskRecord> {
+    // Fetch the task record
+    const { data: taskRecord, error: fetchError } = await supabase
+      .from("task_records")
+      .select("*")
+      .eq("id", recordId)
+      .single();
+
+    if (fetchError || !taskRecord) {
+      throw new NotFoundError("Task record not found");
+    }
+
+    // Validate requester is the task client
+    if (taskRecord.client_id !== clientId) {
+      throw new AuthorizationError("Only the project client can rate the task");
+    }
+
+    // Validate rating not already set
+    if (taskRecord.rating !== null && taskRecord.rating !== undefined) {
+      throw new ConflictError("Task rating has already been set and cannot be changed");
+    }
+
+    // Update the rating
+    const updateData: Record<string, any> = {
+      rating: data.rating,
+      updated_at: new Date().toISOString()
+    };
+
+    if (data.comment !== undefined) {
+      updateData.rating_comment = data.comment;
+    }
+
+    const { data: updatedRecord, error: updateError } = await supabase
+      .from("task_records")
+      .update(updateData)
+      .eq("id", recordId)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw new AppError(`Failed to update task rating: ${updateError.message}`, 500);
+    }
+
+    return updatedRecord as TaskRecord;
   }
 
   /**
