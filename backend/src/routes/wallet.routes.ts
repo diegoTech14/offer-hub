@@ -4,10 +4,11 @@
  */
 
 import { Router } from "express";
-import { 
-  connectExternalWalletHandler, 
+import {
+  connectExternalWalletHandler,
   disconnectWallet,
-  setPrimaryWallet
+  getWalletByIdHandler,
+  getWalletsHandler,
 } from "@/controllers/wallet.controller";
 import { verifyToken } from "@/middlewares/auth.middleware";
 
@@ -17,27 +18,25 @@ const router = Router();
 // All routes require authentication (applied at app level in index.ts)
 
 /**
+ * GET /api/v1/wallets/:id
+ * Get wallet details for the authenticated user (ownership validated).
+ * Returns 404 if wallet not found, 403 if wallet belongs to another user.
+ */
+router.get("/:id", getWalletByIdHandler);
+
+/**
+ * GET /api/v1/wallets
+ * List all wallets for authenticated user
+ */
+router.get("/", verifyToken, getWalletsHandler);
+
+/**
  * POST /api/v1/wallets/external
  * Connect an external Stellar wallet to the authenticated user
  * Requires: JWT authentication
  * Body: { public_key: string, provider: string }
  */
 router.post("/external", verifyToken, connectExternalWalletHandler);
-
-/**
- * PUT /api/v1/wallets/:id/primary
- * Set a wallet as the primary wallet for the authenticated user
- * - Requires valid JWT authentication
- * - Validates UUID format for :id parameter
- * - Uses database transaction for atomicity
- * - Sets is_primary = false on ALL user's wallets
- * - Sets is_primary = true on the selected wallet
- * - Returns 404 if wallet not found
- * - Returns 403 if wallet belongs to another user
- * - Returns 400 if invalid UUID format
- * - Returns 200 with updated wallet data on success
- */
-router.put("/:id/primary", verifyToken, setPrimaryWallet);
 
 /**
  * DELETE /api/v1/wallets/:id
@@ -49,6 +48,6 @@ router.put("/:id/primary", verifyToken, setPrimaryWallet);
  * - Returns 403 if wallet belongs to another user
  * - Returns 400 if trying to delete invisible wallet or last wallet
  */
-router.delete("/:id", verifyToken, disconnectWallet);
+router.delete("/:id", disconnectWallet);
 
 export default router;

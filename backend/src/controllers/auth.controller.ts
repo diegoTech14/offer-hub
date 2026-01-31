@@ -14,6 +14,8 @@ import {
   ForgotPasswordDTO,
   ResetPasswordDTO,
 } from "@/types/auth.types";
+import { validateUUID } from "@/utils/validation";
+import { parseDeviceInfo } from "@/utils/auth.utils";
 
 export async function getNonce(
   req: Request,
@@ -35,6 +37,33 @@ export async function getNonce(
   }
 }
 
+export async function logoutV1(req: Request, res: Response, next: NextFunction) {
+  try {
+    const logout_all = Boolean(req.body?.logout_all);
+    const userId = req.user.id;
+    const ip = req.ip || req.connection.remoteAddress || "unknown";
+    const userAgent = req.get("User-Agent") || "unknown";
+    const refreshToken = (req as any).cookies?.refreshToken as string | undefined;
+
+    if (logout_all) {
+      await authService.logoutAllUserSessions(userId);
+    } else {
+      await authService.logoutCurrentSession(userId, {
+        refreshToken,
+        ip,
+        userAgent,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 /**
  * Register a new user with email and password
  * Creates a smart wallet (contract account) for the user
@@ -45,29 +74,29 @@ export async function getNonce(
  *
  * Expected request body:
  * {
- *   "email": "string (required) - User's email address",
- *   "password": "string (required) - User's password (min 8 characters)"
+ * "email": "string (required) - User's email address",
+ * "password": "string (required) - User's password (min 8 characters)"
  * }
  *
  * Response format:
  * {
- *   "success": true,
- *   "message": "User registered successfully",
- *   "data": {
- *     "user": { ... },
- *     "wallet": {
- *       "address": "string - Smart wallet contract address",
- *       "type": "smart_wallet" | "invisible"
- *     },
- *     "tokens": {
- *       "accessToken": "string",
- *       "refreshToken": "string"
- *     }
- *   },
- *   "metadata": {
- *     "timestamp": "string",
- *     "requestId": "string"
- *   }
+ * "success": true,
+ * "message": "User registered successfully",
+ * "data": {
+ * "user": { ... },
+ * "wallet": {
+ * "address": "string - Smart wallet contract address",
+ * "type": "smart_wallet" | "invisible"
+ * },
+ * "tokens": {
+ * "accessToken": "string",
+ * "refreshToken": "string"
+ * }
+ * },
+ * "metadata": {
+ * "timestamp": "string",
+ * "requestId": "string"
+ * }
  * }
  */
 export async function register(
@@ -125,16 +154,10 @@ export async function register(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.register(data, deviceInfo);
 
@@ -210,16 +233,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.loginWithEmail(
       { email, password },
@@ -254,16 +271,10 @@ export async function loginWithWallet(
 ) {
   try {
     // Get device info for audit logging and session tracking
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const { user, tokens } = await authService.login(req.body, deviceInfo);
     res.status(200).json({
@@ -432,16 +443,10 @@ export async function registerWithEmail(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.registerWithEmail(data, deviceInfo);
 
@@ -526,16 +531,10 @@ export async function registerWithWallet(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.registerWithWallet(data, deviceInfo);
 
@@ -608,16 +607,10 @@ export async function loginWithEmail(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.loginWithEmail(
       { email, password },
@@ -671,27 +664,79 @@ export async function getSessions(
 }
 
 /**
- * Deactivate a user session
- * DELETE /api/auth/sessions/:sessionId
+ * Revoke a specific session
+ * DELETE /api/auth/sessions/:id
  */
-export async function deactivateSession(
+export async function revokeSession(
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userId = (req as any).user.id;
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Session ID is required",
+      });
+    }
+
+    // Validate UUID format
+    if (!validateUUID(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid session ID format",
+        error: { code: "INVALID_UUID" },
+      });
+    }
+
+    // Attempt to identify current session ID to prevent self-revocation
+    const currentSessionId =
+      (req as any).user?.session_id || (req as any).sessionId;
+
+    await authService.revokeSession(userId, id, currentSessionId);
+
+    res.status(200).json({
+      success: true,
+      message: "Session revoked successfully",
+      metadata: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * DELETE /api/v1/auth/sessions
+ * Revoke all user sessions (global logout)
+ */
+export async function revokeAllSessionsHandler(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
     const userId = req.user.id;
-    const sessionId = Array.isArray(req.params.sessionId)
-      ? req.params.sessionId[0]
-      : req.params.sessionId;
+    const currentSessionId = req.refreshTokenRecord?.id;
 
-    await authService.deactivateSession(userId, sessionId);
+    const exceptCurrent =
+      String(req.query.except_current).toLowerCase() !== "false";
 
-    res.status(200).json({
+    const revokedCount = await authService.revokeAllSessions(
+      userId,
+      exceptCurrent,
+      currentSessionId,
+    );
+
+    return res.status(200).json({
       success: true,
-      message: "Session deactivated successfully",
-      metadata: {
-        timestamp: new Date().toISOString(),
+      message: `${revokedCount} session${revokedCount === 1 ? "" : "s"} revoked successfully`,
+      data: {
+        revoked_count: revokedCount,
       },
     });
   } catch (err) {
@@ -802,16 +847,10 @@ export async function forgotPassword(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.forgotPassword(email, deviceInfo);
 
@@ -875,16 +914,10 @@ export async function resetPassword(
     }
 
     // Get device info for audit logging
-    const deviceInfo: DeviceInfo = {
-      type: getDeviceType(req.get("User-Agent") || "") as
-        | "desktop"
-        | "mobile"
-        | "tablet",
-      os: getOSFromUserAgent(req.get("User-Agent") || ""),
-      browser: getBrowserFromUserAgent(req.get("User-Agent") || ""),
-      ip_address: req.ip || req.connection.remoteAddress || "unknown",
-      user_agent: req.get("User-Agent") || "unknown",
-    };
+    const deviceInfo = parseDeviceInfo(
+      req.get("User-Agent") || "unknown",
+      req.ip || req.connection.remoteAddress || "unknown",
+    );
 
     const result = await authService.resetPassword(token, password, deviceInfo);
 

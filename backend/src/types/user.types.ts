@@ -1,5 +1,17 @@
 type PublicUser = Omit<User, "nonce" | "created_at">;
 
+/**
+ * Public user profile response - only includes fields safe for public viewing
+ * Used by GET /users/:id/public endpoint
+ */
+export interface PublicUserResponse {
+  id: string;
+  username: string;
+  avatar_url?: string;
+  member_since: string;
+  is_verified: boolean;
+}
+
 export interface CreateUserDTO {
   wallet_address: string;
   username: string;
@@ -54,4 +66,30 @@ export interface ApiResponse<T> {
 
 export interface UsersListResponse extends ApiResponse<PublicUser[]> {
   pagination: PaginationInfo;
+}
+
+/**
+ * Wallet data in user profile response (sensitive fields excluded)
+ */
+export interface UserWalletProfile {
+  id: string;
+  public_key: string;
+  type: 'invisible' | 'external';
+  is_primary: boolean;
+}
+
+/**
+ * Complete user profile response for GET /api/v1/users/me
+ */
+export interface CurrentUserProfile {
+  id: string;
+  email: string;
+  username: string;
+  email_verified: boolean;
+  status: 'active' | 'inactive';
+  last_login: string | null;
+  created_at: string;
+  updated_at: string;
+  wallets: UserWalletProfile[];
+  oauth_providers: string[];
 }

@@ -1,4 +1,4 @@
-import { getUserSessions } from "../auth.service";
+import { getUserSessions, logoutAllUserSessions, logoutCurrentSession } from "../auth.service";
 import { supabase } from "@/lib/supabase/supabase";
 
 jest.mock("@/lib/supabase/supabase", () => ({
@@ -24,6 +24,14 @@ jest.mock("bcryptjs", () => ({
 jest.mock("../user.service", () => ({
   userService: {},
 }));
+
+jest.mock("@/utils/auth.utils", () => ({
+  hashIP: jest.fn(),
+  parseDeviceInfo: jest.fn(),
+}));
+
+import { hashToken } from "@/utils/jwt.utils";
+import { hashIP } from "@/utils/auth.utils";
 
 const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
 
@@ -129,5 +137,145 @@ describe("getUserSessions", () => {
     expect(result[0].id).toBe("session-3");
     expect(result[0].is_current).toBe(false);
     expect(result[0].device_info.browser).toBe("Unknown");
+  });
+});
+
+describe("logoutAllUserSessions", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should revoke all active sessions for a user", async () => {
+    const mockEq2 = jest.fn().mockResolvedValue({ error: null });
+    const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+    const mockUpdate = jest.fn().mockReturnValue({ eq: mockEq1 });
+    const mockFrom = jest.fn().mockReturnValue({ update: mockUpdate });
+
+    mockedSupabase.from = mockFrom as any;
+
+    await logoutAllUserSessions("user-1");
+
+    expect(mockedSupabase.from).toHaveBeenCalledWith("refresh_tokens");
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        is_revoked: true,
+        revoked_at: expect.any(String),
+      }),
+    );
+    expect(mockEq1).toHaveBeenCalledWith("user_id", "user-1");
+    expect(mockEq2).toHaveBeenCalledWith("is_revoked", false);
+  });
+});
+
+describe("logoutCurrentSession", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should revoke current session when refreshToken matches", async () => {
+    (hashToken as jest.Mock).mockReturnValue("a1b2");
+
+    const userTokens = [
+      {
+        id: "token-1",
+        user_id: "user-1",
+        token_hash: Buffer.from("a1b2", "hex"),
+      },
+    ];
+
+    const mockIs = jest.fn().mockResolvedValue({ data: userTokens, error: null });
+    const mockEq2 = jest.fn().mockReturnValue({ is: mockIs });
+    const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+    const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+
+    const mockUpdateEq2 = jest.fn().mockResolvedValue({ error: null });
+    const mockUpdateEq1 = jest.fn().mockReturnValue({ eq: mockUpdateEq2 });
+    const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq1 });
+
+    mockedSupabase.from = jest.fn().mockImplementation(() => {
+      return {
+        select: mockSelect,
+        update: mockUpdate,
+      };
+    }) as any;
+
+    await logoutCurrentSession("user-1", { refreshToken: "rt" });
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        is_revoked: true,
+        revoked_at: expect.any(String),
+      }),
+    );
+    expect(mockUpdateEq1).toHaveBeenCalledWith("id", "token-1");
+    expect(mockUpdateEq2).toHaveBeenCalledWith("user_id", "user-1");
+  });
+
+  it("should be idempotent when refreshToken does not match", async () => {
+    (hashToken as jest.Mock).mockReturnValue("a1b2");
+
+    const userTokens = [
+      {
+        id: "token-1",
+        user_id: "user-1",
+        token_hash: Buffer.from("ffff", "hex"),
+      },
+    ];
+
+    const mockIs = jest.fn().mockResolvedValue({ data: userTokens, error: null });
+    const mockEq2 = jest.fn().mockReturnValue({ is: mockIs });
+    const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+    const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+
+    const mockUpdate = jest.fn();
+
+    mockedSupabase.from = jest.fn().mockImplementation(() => {
+      return {
+        select: mockSelect,
+        update: mockUpdate,
+      };
+    }) as any;
+
+    await logoutCurrentSession("user-1", { refreshToken: "rt" });
+
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it("should revoke current session by IP hash and User-Agent when no refreshToken provided", async () => {
+    (hashIP as jest.Mock).mockReturnValue("iphash");
+
+    const userTokens = [
+      {
+        id: "token-2",
+        user_id: "user-1",
+        user_agent: "ua",
+        ip_hash: "iphash",
+      },
+    ];
+
+    const mockOrder = jest.fn().mockResolvedValue({ data: userTokens, error: null });
+    const mockIs = jest.fn().mockReturnValue({ order: mockOrder });
+    const mockEq2 = jest.fn().mockReturnValue({ is: mockIs });
+    const mockEq1 = jest.fn().mockReturnValue({ eq: mockEq2 });
+    const mockSelect = jest.fn().mockReturnValue({ eq: mockEq1 });
+
+    const mockUpdateEq2 = jest.fn().mockResolvedValue({ error: null });
+    const mockUpdateEq1 = jest.fn().mockReturnValue({ eq: mockUpdateEq2 });
+    const mockUpdate = jest.fn().mockReturnValue({ eq: mockUpdateEq1 });
+
+    mockedSupabase.from = jest.fn().mockImplementation(() => {
+      return {
+        select: mockSelect,
+        update: mockUpdate,
+      };
+    }) as any;
+
+    await logoutCurrentSession("user-1", {
+      ip: "1.2.3.4",
+      userAgent: "ua",
+    });
+
+    expect(mockUpdateEq1).toHaveBeenCalledWith("id", "token-2");
+    expect(mockUpdateEq2).toHaveBeenCalledWith("user_id", "user-1");
   });
 });

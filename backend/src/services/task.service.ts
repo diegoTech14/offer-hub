@@ -159,18 +159,52 @@ class TaskService {
    * @param clientId - Client ID to get task records for
    * @returns Array of task records
    */
-  async getTaskRecordsByClientId(clientId: string): Promise<TaskRecord[]> {
-    const { data: taskRecords, error } = await supabase
+  async getTaskRecordsByClientId(clientId: string, limit: number, page: number, completed?: boolean): Promise<{
+    taskRecords: TaskRecord[],
+    meta: {
+      page: number,
+      limit: number,
+      total_items: number
+    }
+  }> {
+    const pageInt = Math.max(1, Number(page) || 1);
+    const limitInt = Math.min(100, Math.max(1, Number(limit) || 20));
+    const from = (pageInt - 1) * limitInt;
+    const to = from + limitInt - 1;
+
+    let query;
+
+    if (typeof completed === 'boolean') {
+      query = supabase
+        .from("task_records")
+        .select("*")
+        .eq("client_id", clientId)
+        .eq('completed', completed)
+        .order("created_at", { ascending: false })
+        .range(from, to);
+    } else {
+      query = supabase
       .from("task_records")
       .select("*")
       .eq("client_id", clientId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .range(from, to);
+    }
+
+    const { data: taskRecords, error, count } = await query;
 
     if (error) {
       throw new AppError(`Database error: ${error.message}`, 500);
     }
 
-    return taskRecords as TaskRecord[];
+    return {
+      taskRecords: taskRecords as TaskRecord[],
+      meta: {
+        page: pageInt,
+        limit: limitInt,
+        total_items: count ?? 0
+      }
+    };
   }
 
   /**

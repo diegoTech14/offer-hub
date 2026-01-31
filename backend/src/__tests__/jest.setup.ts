@@ -14,6 +14,10 @@ declare global {
 // Load test environment variables
 config({ path: '.env.test' });
 
+// Provide minimal required env vars for modules that validate on import
+process.env.SUPABASE_URL ||= 'https://example.supabase.co';
+process.env.SUPABASE_SERVICE_ROLE_KEY ||= 'test-service-role-key';
+
 // Set test environment
 process.env.NODE_ENV = 'test';
 

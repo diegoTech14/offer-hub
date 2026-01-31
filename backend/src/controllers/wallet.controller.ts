@@ -9,6 +9,8 @@ import {
   connectExternalWallet,
   disconnectWallet as disconnectWalletService,
   setPrimaryWallet as setPrimaryWalletService,
+  getWalletDetailsForUser,
+  getWalletsByUserId,
 } from "@/services/wallet.service";
 import {
   AppError,
@@ -20,8 +22,41 @@ import {
 import {
   buildSuccessResponse,
   buildSuccessResponseWithoutData,
+  buildListResponse,
 } from "@/utils/responseBuilder";
 import { validateUUID } from "@/utils/validation";
+
+/**
+ * Get wallet details for the authenticated user
+ * GET /api/v1/wallets/:id
+ * - Requires valid JWT
+ * - Validates UUID format for :id
+ * - Returns 404 if wallet not found, 403 if wallet belongs to another user
+ */
+export async function getWalletByIdHandler(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+    }
+
+    const id = req.params.id as string;
+    if (!id || !validateUUID(id)) {
+      throw new BadRequestError("Invalid wallet ID format", "INVALID_WALLET_ID");
+    }
+
+    const data = await getWalletDetailsForUser(id, userId);
+    return res
+      .status(200)
+      .json(buildSuccessResponse(data, "Wallet retrieved successfully"));
+  } catch (error) {
+    next(error);
+  }
+}
 
 /**
  * Connect an external wallet to the authenticated user
@@ -139,6 +174,50 @@ export async function disconnectWallet(
       .json(
         buildSuccessResponseWithoutData("Wallet disconnected successfully"),
       );
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Get all wallets for the authenticated user
+ * GET /api/v1/wallets
+ * - Requires valid JWT
+ * - Returns list of wallets belonging to authenticated user
+ * - NEVER returns encrypted private keys
+ * - Orders by is_primary DESC then created_at DESC
+ */
+export async function getWalletsHandler(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new AppError("Authentication required", 401, "UNAUTHORIZED");
+    }
+
+    const wallets = await getWalletsByUserId(userId);
+
+    const formatted = (wallets || []).map((w: any) => ({
+      id: w.id,
+      public_key: w.address,
+      type: w.type,
+      provider: w.type === "invisible" ? "internal" : (w.provider ?? "other"),
+      is_primary: w.is_primary ?? false,
+      created_at: w.created_at,
+    }));
+
+    // Sort: is_primary DESC (true first), then created_at DESC
+    formatted.sort((a: any, b: any) => {
+      if (a.is_primary === b.is_primary) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return a.is_primary ? -1 : 1;
+    });
+
+    return res.status(200).json(buildListResponse(formatted, "Wallets retrieved successfully"));
   } catch (error) {
     next(error);
   }

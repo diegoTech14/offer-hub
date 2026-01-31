@@ -45,4 +45,17 @@ export interface GenerateWalletResult {
   privateKey?: string; // Only returned for invisible wallets during generation
 }
 
+/**
+ * Safe wallet details for API response (never includes enc_private_key).
+ * GET /api/v1/wallets/:id response shape.
+ */
+export interface WalletDetailsResponse {
+  id: string;
+  public_key: string;
+  type: WalletType;
+  provider: string; // "internal" for invisible, or freighter/albedo/rabet/xbull/other for external
+  is_primary: boolean;
+  created_at: string;
+}
+
 
