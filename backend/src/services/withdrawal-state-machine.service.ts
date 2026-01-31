@@ -14,9 +14,8 @@ export class WithdrawalStateMachine implements IWithdrawalStateMachine {
    * State transition matrix
    * Defines valid transitions from each status based on events
    */
-  private static readonly TRANSITIONS: Record<
-    WithdrawalStatus,
-    Partial<Record<WithdrawalEvent, WithdrawalStatus>>
+  private static readonly TRANSITIONS: Partial<
+    Record<WithdrawalStatus, Partial<Record<WithdrawalEvent, WithdrawalStatus>>>
   > = {
     [WithdrawalStatus.PENDING]: {
       [WithdrawalEvent.PROCESS]: WithdrawalStatus.PROCESSING,

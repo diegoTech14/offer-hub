@@ -4,10 +4,27 @@
  */
 
 export enum WithdrawalStatus {
+  // Processing flow
   PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
+  COMMITTED = 'COMMITTED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+
+  // Initiation flow
+  CREATED = 'CREATED',
+  PENDING_VERIFICATION = 'PENDING_VERIFICATION',
+  WITHDRAWAL_CREATED = 'WITHDRAWAL_CREATED',
+  WITHDRAWAL_PENDING_VERIFICATION = 'WITHDRAWAL_PENDING_VERIFICATION',
+
+  // Outcome flow
   WITHDRAWAL_SUCCEEDED = 'WITHDRAWAL_SUCCEEDED',
   WITHDRAWAL_FAILED = 'WITHDRAWAL_FAILED',
+  WITHDRAWAL_CANCELED = 'WITHDRAWAL_CANCELED',
+  WITHDRAWAL_COMPLETED = 'WITHDRAWAL_COMPLETED',
+  WITHDRAWAL_REFUNDED = 'WITHDRAWAL_REFUNDED',
+
+  // Refund flow
   REFUNDING = 'REFUNDING',
   REFUNDED = 'REFUNDED',
 }
@@ -27,11 +44,14 @@ export interface Withdrawal {
   amount: number;
   currency: string;
   status: WithdrawalStatus;
+  destination_email?: string | null;
   airtm_reference_id: string | null;
   airtm_transaction_id: string | null;
+  external_payout_id?: string | null;
   webhook_processed_at: string | null;
   webhook_event_id: string | null;
   failure_reason: string | null;
+  cancellation_reason?: string | null;
   created_at: string;
   updated_at: string;
 }

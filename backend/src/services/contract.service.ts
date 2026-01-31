@@ -4,13 +4,14 @@ import {
   UpdateContractDTO,
   Contract,
   ContractWithUsers,
+  UserInfo,
 } from "@/types/contract.types";
 import { UUID_REGEX } from "@/utils/validation";
 import { MissingFieldsError ,ValidationError,ForbiddenError,NotFoundError,InternalServerError, BadRequestError} from "@/utils/AppError";
 
 type ContractWithUsersRow = Omit<ContractWithUsers, "freelancer" | "client"> & {
-  freelancer: ContractWithUsers["freelancer"] | ContractWithUsers["freelancer"][] | null;
-  client: ContractWithUsers["client"] | ContractWithUsers["client"][] | null;
+  freelancer: UserInfo | UserInfo[] | null;
+  client: UserInfo | UserInfo[] | null;
 };
 
 const normalizeContractWithUsers = (
