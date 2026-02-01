@@ -1,19 +1,22 @@
 import request from 'supertest';
 import express from 'express';
 import taskRoutes from '@/routes/task.routes';
-import { authenticateToken } from '@/middlewares/auth.middleware';
 import { errorHandlerMiddleware } from '@/middlewares/errorHandler.middleware';
 import { taskService } from '@/services/task.service';
 import { TaskRecord } from '@/types/task.types';
+import { NotFoundError, AuthorizationError, ConflictError } from '@/utils/AppError';
 
 // Mock the task service
 jest.mock('@/services/task.service');
 
-// Mock authentication middleware
-jest.mock('@/middlewares/auth.middleware');
+// Shared auth middleware reference that can be swapped per test
+let authMiddleware: (req: any, res: any, next: any) => void = (_req, _res, next) => next();
+
+jest.mock('@/middlewares/auth.middleware', () => ({
+  authenticateToken: jest.fn(() => (req: any, res: any, next: any) => authMiddleware(req, res, next))
+}));
 
 const mockTaskService = taskService as jest.Mocked<typeof taskService>;
-const mockAuthenticateToken = authenticateToken as jest.MockedFunction<typeof authenticateToken>;
 
 describe('Task Integration Tests', () => {
   let app: express.Application;
@@ -38,22 +41,19 @@ describe('Task Integration Tests', () => {
   };
 
   beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Set auth middleware to attach mock user by default
+    authMiddleware = (req: any, _res: any, next: any) => {
+      req.user = mockUser;
+      req.securityContext = { requestId: 'test-request-id' };
+      next();
+    };
+
     app = express();
     app.use(express.json());
-    
-    // Mock authentication middleware to add user to request
-    mockAuthenticateToken.mockImplementation(() => {
-      return async (req: any, res: any, next: any) => {
-        req.user = mockUser;
-        req.securityContext = { requestId: 'test-request-id' };
-        next();
-      };
-    });
-    
     app.use('/api/task-records', taskRoutes);
     app.use(errorHandlerMiddleware);
-    
-    jest.clearAllMocks();
   });
 
   describe('POST /api/task-records', () => {
@@ -215,13 +215,12 @@ describe('Task Integration Tests', () => {
       expect(response.body).toMatchObject({
         success: true,
         message: 'Client task records retrieved successfully',
-        data: {
-          taskRecords: mockTaskRecords,
-          count: 1
-        }
+        data: mockTaskRecords
       });
 
-      expect(mockTaskService.getTaskRecordsByClientId).toHaveBeenCalledWith(mockUser.id);
+      expect(mockTaskService.getTaskRecordsByClientId).toHaveBeenCalledWith(
+        mockUser.id, 20, 1, undefined
+      );
     });
 
     it('should return empty array when no records found', async () => {
@@ -229,7 +228,7 @@ describe('Task Integration Tests', () => {
         taskRecords: [],
         meta: {
           page: 1,
-          limit: 0,
+          limit: 20,
           total_items: 0
         }
       });
@@ -238,8 +237,7 @@ describe('Task Integration Tests', () => {
         .get('/api/task-records/client')
         .expect(200);
 
-      expect(response.body.data.taskRecords).toEqual([]);
-      expect(response.body.data.count).toBe(0);
+      expect(response.body.data).toEqual([]);
     });
   });
 
@@ -265,19 +263,149 @@ describe('Task Integration Tests', () => {
     });
   });
 
+  describe('PATCH /api/task-records/:recordId/rating', () => {
+    const recordId = 'task-record-id';
+    const validRatingData = { rating: 5, comment: 'Excellent work!' };
+
+    const mockRatedTaskRecord: TaskRecord = {
+      ...mockTaskRecord,
+      rating: 5,
+      rating_comment: 'Excellent work!',
+    };
+
+    it('should update task rating successfully', async () => {
+      mockTaskService.updateTaskRating.mockResolvedValue(mockRatedTaskRecord);
+
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send(validRatingData)
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        success: true,
+        message: 'Task rating updated successfully',
+        data: {
+          taskRecord: mockRatedTaskRecord
+        }
+      });
+
+      expect(mockTaskService.updateTaskRating).toHaveBeenCalledWith(
+        recordId,
+        validRatingData,
+        mockUser.id
+      );
+    });
+
+    it('should return 422 for missing rating field', async () => {
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send({ comment: 'No rating provided' })
+        .expect(422);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error.message).toContain('Validation failed');
+    });
+
+    it('should return 422 for rating below 1', async () => {
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send({ rating: 0 })
+        .expect(422);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 422 for rating above 5', async () => {
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send({ rating: 6 })
+        .expect(422);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 422 for non-integer rating', async () => {
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send({ rating: 3.5 })
+        .expect(422);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 422 for comment over 500 characters', async () => {
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send({ rating: 4, comment: 'a'.repeat(501) })
+        .expect(422);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 404 when task record not found', async () => {
+      mockTaskService.updateTaskRating.mockRejectedValue(
+        new NotFoundError('Task record not found')
+      );
+
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send(validRatingData)
+        .expect(404);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 403 when requester is not the task client', async () => {
+      mockTaskService.updateTaskRating.mockRejectedValue(
+        new AuthorizationError('Only the project client can rate the task')
+      );
+
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send(validRatingData)
+        .expect(403);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 409 when task is already rated', async () => {
+      mockTaskService.updateTaskRating.mockRejectedValue(
+        new ConflictError('Task rating has already been set and cannot be changed')
+      );
+
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send(validRatingData)
+        .expect(409);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should accept rating without comment', async () => {
+      const ratedWithoutComment = { ...mockTaskRecord, rating: 3, rating_comment: undefined };
+      mockTaskService.updateTaskRating.mockResolvedValue(ratedWithoutComment);
+
+      const response = await request(app)
+        .patch(`/api/task-records/${recordId}/rating`)
+        .send({ rating: 3 })
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.taskRecord.rating).toBe(3);
+    });
+  });
+
   describe('Authentication', () => {
     beforeEach(() => {
-      // Mock authentication middleware to reject requests
-      mockAuthenticateToken.mockImplementation(() => {
-        return async (req: any, res: any, next: any) => {
-          res.status(401).json({
-            success: false,
-            error: {
-              message: 'Authentication required'
-            }
-          });
-        };
-      });
+      // Override auth middleware to reject requests
+      authMiddleware = (_req: any, res: any, _next: any) => {
+        res.status(401).json({
+          success: false,
+          error: {
+            message: 'Authentication required'
+          }
+        });
+      };
     });
 
     it('should require authentication for POST /api/task-records', async () => {
@@ -300,6 +428,13 @@ describe('Task Integration Tests', () => {
 
       await request(app)
         .get('/api/task-records/project/some-id')
+        .expect(401);
+    });
+
+    it('should require authentication for PATCH rating endpoint', async () => {
+      await request(app)
+        .patch('/api/task-records/some-id/rating')
+        .send({ rating: 5 })
         .expect(401);
     });
   });
