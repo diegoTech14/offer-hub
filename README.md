@@ -1,121 +1,52 @@
-# 🌟 OfferHub - Decentralized Freelance Platform
+# Offer Hub
 
-OfferHub is a decentralized freelance marketplace built on Stellar blockchain, featuring smart contract-based escrow, user registry, and fee management.
+A new beginning.
 
-## 🚀 Quick Start
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18.18.0+
-- pnpm 9.15.4+
-- Stellar CLI
-- Rust & Cargo (for contract building)
+- Node.js 20+
+- npm
 
-### Installation
+### Frontend
 
 ```bash
-# Clone repository
-git clone <your-repo-url>
-cd offer-hub-monorepo
-
-# Install dependencies
-pnpm install
+npm install
+npm run dev
 ```
 
-### Configuration
-
-1. **Backend Setup**:
-   ```bash
-   cd backend
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-2. **Add Contract IDs**:
-   After deploying your Stellar contracts, add their IDs to `backend/.env`:
-   ```bash
-   ESCROW_FACTORY_CONTRACT_ID=CXXXXXX...
-   FEE_MANAGER_CONTRACT_ID=CXXXXXX...
-   USER_REGISTRY_CONTRACT_ID=CXXXXXX...
-   ```
-
-3. **Generate TypeScript Bindings**:
-   ```bash
-   pnpm run bindings:generate
-   ```
-
-4. **Start Development**:
-   ```bash
-   # Backend
-   cd backend && pnpm run dev
-   
-   # Frontend
-   pnpm run dev
-   ```
-
-## 📂 Project Structure
-
-```
-offer-hub-monorepo/
-├── backend/              # Node.js/Express backend
-├── src/                  # Next.js frontend
-├── contracts-offerhub/   # Stellar smart contracts (Rust)
-├── packages/             # Generated TypeScript bindings
-├── docs/                 # Documentation
-└── scripts/              # Build and deployment scripts
-```
-
-## 🔧 Smart Contracts Integration
-
-This project uses TypeScript bindings for type-safe smart contract interactions.
-
-### Contract IDs Configuration
-
-Contract IDs are configured in `backend/src/config/contract-ids.ts` and loaded from environment variables.
-
-### Generating Bindings
-
-```bash
-# Generate all bindings
-pnpm run bindings:generate
-
-# Generate specific contract
-pnpm run bindings:generate -- --contract escrow-factory
-
-# Test setup
-cd backend && ./test-contracts.sh
-```
-
-📖 **Full Guide**: [Generate Bindings Documentation](./docs/GENERATE_BINDINGS.md)
-
-## 📚 Documentation
-
-- [Generate Bindings Guide](./docs/GENERATE_BINDINGS.md) - TypeScript bindings for Stellar contracts
-- [Backend Documentation](./backend/README.md) - Backend API documentation
-- [Stellar Bindings Reference](./docs/STELLAR_BINDINGS.md) - Complete reference guide
-
-## 🛠️ Available Scripts
-
-### Root Level
-```bash
-pnpm run dev              # Start frontend dev server
-pnpm run build            # Build frontend
-pnpm run bindings:generate # Generate contract bindings
-pnpm run bindings:build   # Build bindings packages
-```
+Open [http://localhost:3000](http://localhost:3000)
 
 ### Backend
+
 ```bash
 cd backend
-pnpm run dev              # Start backend dev server
-pnpm run build            # Build backend
-pnpm run test             # Run tests
+npm install
+npm run dev
 ```
 
-## 🤝 Contributing
+API runs on [http://localhost:4000](http://localhost:4000)
 
-Please read our contributing guidelines before submitting PRs.
+## Project Structure
 
-## 📄 License
+```
+offer-hub/
+├── src/app/            # Frontend (Next.js 15)
+├── backend/src/        # Backend (Express)
+├── public/             # Static assets
+└── package.json
+```
 
-[Your License Here]
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## Maintainers
+
+- [@Josue19-08](https://github.com/Josue19-08)
+- [@KevinMB0220](https://github.com/KevinMB0220)

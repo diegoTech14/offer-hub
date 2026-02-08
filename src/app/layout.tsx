@@ -1,125 +1,17 @@
-/**
- * @fileoverview Root layout component for the Next.js application
- * @author Offer Hub Team
- */
-
-import './globals.css';
-
-import { Geist, Geist_Mono } from 'next/font/google';
-
-import { EscrowProvider } from '@/providers/scrow.provider';
-import type { Metadata } from 'next';
-import { Toaster } from 'sonner';
-import { TrustlessWorkProvider } from '@/providers/TrustlessWorkProvider';
-import { WalletProvider } from '@/components/onboarding/WalletContext';
-import ErrorBoundary from '@/components/common/error-boundary';
-import { NotificationProvider } from '@/lib/contexts/NotificatonContext';
-import { TalentProvider } from '@/lib/contexts/TalentContext';
-import { OfferProvider } from '@/lib/contexts/OfferContext';
-import { Suspense } from 'react';
-import NotificationToast from '@/components/shared/NotificationToast';
-import LoadingIndicator from '@/components/navigation/loading-indicator';
-import { MessageProvider } from '@/lib/contexts/MessageContext';
-import { KeyboardShortcutsProvider } from '@/components/common/keyboard-shortcuts-provider';
-import { ThemeProvider } from '@/providers/theme-provider';
-import { AuthProvider } from '@/providers/auth-provider';
-import { RoleProvider } from '@/lib/contexts/RoleContext';
-
-import { ScrollToTop } from '@/components/common/scroll-to-top';
-import { TanStackQueryProvider } from '@/providers/query-client-provider';
-
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Offer Hub',
-  description: 'Connect freelancers and clients around the world',
-  icons: {
-    icon: '/offer_hub_logo.png',
-    apple: '/offer_hub_logo.png',
-  },
+  title: "Offer Hub",
+  description: "A new beginning",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="light" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning
-      >
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  // Force light theme as default
-                  var savedTheme = localStorage.getItem('offer-hub-theme');
-                  var zustandTheme = localStorage.getItem('theme-storage');
-                  var theme = 'light';
-                  
-                  if (savedTheme === 'dark' || (zustandTheme && JSON.parse(zustandTheme).state?.theme === 'dark')) {
-                    theme = 'dark';
-                  }
-                  
-                  document.documentElement.classList.remove('light', 'dark');
-                  document.documentElement.classList.add(theme);
-                } catch (e) {
-                  document.documentElement.classList.add('light');
-                }
-              })();
-            `,
-          }}
-        />
-        <TanStackQueryProvider>
-          <AuthProvider>
-            <RoleProvider>
-              <ThemeProvider>
-                <TrustlessWorkProvider>
-                  <ErrorBoundary>
-                    <NotificationProvider>
-                      <TalentProvider>
-                        <MessageProvider>
-                          <OfferProvider>
-                            <WalletProvider>
-                              <EscrowProvider>
-                                <KeyboardShortcutsProvider>
-                                  {/* LoadingIndicator agregado según rama secundaria */}
-                                  <LoadingIndicator />
-                                  <Suspense fallback={null}>
-                                    <main>
-                                      {children}
-                                    </main>
-                                    <NotificationToast />
-                                    {/* ScrollToTop agregado según rama secundaria */}
-                                    <ScrollToTop />
-                                  </Suspense>
-                                  <Toaster position="top-right" />
-                                </KeyboardShortcutsProvider>
-                              </EscrowProvider>
-                            </WalletProvider>
-                          </OfferProvider>
-                        </MessageProvider>
-                      </TalentProvider>
-                    </NotificationProvider>
-                  </ErrorBoundary>
-                </TrustlessWorkProvider>
-              </ThemeProvider>
-            </RoleProvider>
-          </AuthProvider>
-        </TanStackQueryProvider>
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }
