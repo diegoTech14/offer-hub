@@ -164,7 +164,3 @@ Built with ❤️ for the decentralized marketplace future.
 </p>
 
 ---
-
-**Status**: Active Development (MVP Phase)
-**Version**: 0.1.0
-**Last Updated**: February 2026
