@@ -1,0 +1,83 @@
+---
+title: Installation
+description: Set up OFFER-HUB locally with Node.js and Supabase.
+order: 2
+section: Getting Started
+---
+
+This guide walks you through cloning the repository, installing dependencies, and running the development server.
+
+## Prerequisites
+
+- **Node.js** v18 or later
+- **npm** v9 or later
+- A [Supabase](https://supabase.com) account (free tier works)
+
+## Clone the Repository
+
+<CommandLine>git clone https://github.com/OFFER-HUB/offer-hub.git && cd offer-hub</CommandLine>
+
+## Install Dependencies
+
+Install both frontend and backend dependencies:
+
+<CommandLine>npm install</CommandLine>
+
+For the backend:
+
+<CommandLine>cd backend && npm install</CommandLine>
+
+## Set Up Environment Variables
+
+Copy the example env file and fill in your values:
+
+<CommandLine>cp backend/.env.example backend/.env</CommandLine>
+
+The key variables you need to set are:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+JWT_SECRET=your-jwt-secret
+PORT=4000
+```
+
+## Run Database Migrations
+
+Apply the Supabase migrations to create the required tables and RPC functions:
+
+<CommandLine>cd backend && npx supabase db push</CommandLine>
+
+<Callout variant="warning">
+  Make sure you have the Supabase CLI installed and are logged in before running migrations.
+</Callout>
+
+## Start Development Servers
+
+**Frontend** (Next.js on port 3000):
+
+<CommandLine>npm run dev</CommandLine>
+
+**Backend** (Express on port 4000):
+
+<CommandLine>cd backend && npm run dev</CommandLine>
+
+## Verify the Setup
+
+Open [http://localhost:3000](http://localhost:3000) in your browser. The API health check is available at:
+
+<CommandLine>curl http://localhost:4000/health</CommandLine>
+
+You should see:
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-01T00:00:00.000Z"
+}
+```
+
+<Callout variant="tip">
+  Continue to [Configuration](/docs/configuration) to learn about all available environment variables and Supabase setup.
+</Callout>
