@@ -25,6 +25,7 @@ assignees: ''
 ## 🔧 Context AI
 
 - [DOCS](https://github.com/OFFER-HUB/offer-hub/tree/main/docs)
+- [DOCS](https://github.com/OFFER-HUB/offer-hub-monorepo/tree/main/docs)
 
 ## 📋 Additional Notes
 
