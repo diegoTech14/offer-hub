@@ -1,7 +1,7 @@
 "use client";
 
-import Navbar from "@/components/layout/navbar";
-import Footer from "@/components/layout/footer";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 import DocsSearchBar from "@/components/docs/DocsSearchBar";
 import { Book, Code, Shield, LifeBuoy, Terminal, Zap } from "lucide-react";
 import Link from "next/link";
