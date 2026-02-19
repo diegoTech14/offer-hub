@@ -1,0 +1,1738 @@
+[
+  {
+    "id": "api-responses-0",
+    "title": "API Response Standards",
+    "section": "API Response Standards",
+    "content": "This document defines the standard format for all API responses, both successful and error responses.",
+    "link": "/docs/api-responses"
+  },
+  {
+    "id": "api-responses-1",
+    "title": "API Response Standards",
+    "section": "General Structure",
+    "content": "All API responses follow a consistent structure: typescript interface ApiResponse<T> { success: boolean; message: string; data?: T; pagination?: PaginationInfo; }",
+    "link": "/docs/api-responses#general-structure"
+  },
+  {
+    "id": "api-responses-3",
+    "title": "API Response Standards",
+    "section": "Simple Response (200 OK)",
+    "content": "json { \"success\": true, \"message\": \"Operation successful\", \"data\": { \"id\": \"123\", \"name\": \"John Doe\" } }",
+    "link": "/docs/api-responses#simple-response-00-ok-"
+  },
+  {
+    "id": "api-responses-4",
+    "title": "API Response Standards",
+    "section": "Creation Response (201 Created)",
+    "content": "json { \"success\": true, \"message\": \"User created successfully\", \"data\": { \"id\": \"123\", \"email\": \"user@example.com\", \"created_at\": \"2025-12-16T10:30:00.000Z\" } }",
+    "link": "/docs/api-responses#creation-response-0-created-"
+  },
+  {
+    "id": "api-responses-5",
+    "title": "API Response Standards",
+    "section": "List Response",
+    "content": "json { \"success\": true, \"message\": \"Users retrieved successfully\", \"data\": [ { \"id\": \"123\", \"name\": \"John Doe\" }, { \"id\": \"456\", \"name\": \"Jane Smith\" } ] }",
+    "link": "/docs/api-responses#list-response"
+  },
+  {
+    "id": "api-responses-6",
+    "title": "API Response Standards",
+    "section": "Paginated Response",
+    "content": "json { \"success\": true, \"message\": \"Users retrieved successfully\", \"data\": [ { \"id\": \"123\", \"name\": \"John Doe\" } ], \"pagination\": { \"current_page\": 1, \"total_pages\": 10, \"total_items\": 100, \"per_page\": 10 } }",
+    "link": "/docs/api-responses#paginated-response"
+  },
+  {
+    "id": "api-responses-7",
+    "title": "API Response Standards",
+    "section": "Error Responses",
+    "content": "See complete documentation in ERROR_HANDLING.md",
+    "link": "/docs/api-responses#error-responses"
+  },
+  {
+    "id": "api-responses-8",
+    "title": "API Response Standards",
+    "section": "Error Structure",
+    "content": "json { \"success\": false, \"error\": { \"type\": \"USER_NOT_FOUND\", \"message\": \"User not found\", \"details\": { \"userId\": \"123\" }, \"code\": \"USER_NOT_FOUND\", \"timestamp\": \"2025-12-16T10:30:00.000Z\" } }",
+    "link": "/docs/api-responses#error-structure"
+  },
+  {
+    "id": "api-responses-10",
+    "title": "API Response Standards",
+    "section": "buildSuccessResponse",
+    "content": "For simple successful responses: typescript import { buildSuccessResponse } from '@/utils/responseBuilder'; // In controller return res.status(200).json( buildSuccessResponse(user, 'User retrieved successfully') );",
+    "link": "/docs/api-responses#buildsuccessresponse"
+  },
+  {
+    "id": "api-responses-11",
+    "title": "API Response Standards",
+    "section": "buildListResponse",
+    "content": "For lists of items: typescript import { buildListResponse } from '@/utils/responseBuilder'; return res.status(200).json( buildListResponse(users, 'Users retrieved successfully') );",
+    "link": "/docs/api-responses#buildlistresponse"
+  },
+  {
+    "id": "api-responses-12",
+    "title": "API Response Standards",
+    "section": "buildPaginatedResponse",
+    "content": "For paginated responses: typescript import { buildPaginatedResponse } from '@/utils/responseBuilder'; return res.status(200).json( buildPaginatedResponse( users, 'Users retrieved successfully', { current_page: 1, total_pages: 10, total_items: 100, per_page: 10 } ) );",
+    "link": "/docs/api-responses#buildpaginatedresponse"
+  },
+  {
+    "id": "api-responses-14",
+    "title": "API Response Standards",
+    "section": "Success",
+    "content": "| Code | Usage | Example | |------|-------|---------| | 200 | OK - Successful operation | Successful GET, PUT, PATCH | | 201 | Created - Resource created | Successful POST | | 204 | No Content - No content | Successful DELETE |",
+    "link": "/docs/api-responses#success"
+  },
+  {
+    "id": "api-responses-15",
+    "title": "API Response Standards",
+    "section": "Error",
+    "content": "| Code | Usage | Example | |------|-------|---------| | 400 | Bad Request | Invalid data | | 401 | Unauthorized | Invalid token | | 403 | Forbidden | No permissions | | 404 | Not Found | Resource doesn't exist | | 409 | Conflict | Duplicate | | 422 | Unprocessable Entity | Validation failed | | 500 ",
+    "link": "/docs/api-responses#error"
+  },
+  {
+    "id": "api-responses-17",
+    "title": "API Response Standards",
+    "section": "GET /api/users/:id",
+    "content": "Success (200): json { \"success\": true, \"message\": \"User retrieved successfully\", \"data\": { \"id\": \"123\", \"email\": \"user@example.com\", \"username\": \"johndoe\", \"created_at\": \"2025-12-16T10:30:00.000Z\" } } Error (404): json { \"success\": false, \"error\": { \"type\": \"USER_NOT_FOUND\", \"message\": \"User not fou",
+    "link": "/docs/api-responses#get-api-users-id"
+  },
+  {
+    "id": "api-responses-18",
+    "title": "API Response Standards",
+    "section": "POST /api/users",
+    "content": "Success (201): json { \"success\": true, \"message\": \"User created successfully\", \"data\": { \"id\": \"123\", \"email\": \"user@example.com\", \"username\": \"johndoe\", \"created_at\": \"2025-12-16T10:30:00.000Z\" } } Error (400 - Validation): json { \"success\": false, \"error\": { \"type\": \"VALIDATION_ERROR\", \"message\": ",
+    "link": "/docs/api-responses#post-api-users"
+  },
+  {
+    "id": "api-responses-19",
+    "title": "API Response Standards",
+    "section": "GET /api/users (Paginated List)",
+    "content": "Success (200): json { \"success\": true, \"message\": \"Users retrieved successfully\", \"data\": [ { \"id\": \"123\", \"email\": \"user1@example.com\", \"username\": \"user1\" }, { \"id\": \"456\", \"email\": \"user2@example.com\", \"username\": \"user2\" } ], \"pagination\": { \"current_page\": 1, \"total_pages\": 5, \"total_items\": 50",
+    "link": "/docs/api-responses#get-api-users-paginated-list-"
+  },
+  {
+    "id": "api-responses-20",
+    "title": "API Response Standards",
+    "section": "PUT /api/users/:id",
+    "content": "Success (200): json { \"success\": true, \"message\": \"User updated successfully\", \"data\": { \"id\": \"123\", \"email\": \"updated@example.com\", \"username\": \"updateduser\", \"updated_at\": \"2025-12-16T11:00:00.000Z\" } }",
+    "link": "/docs/api-responses#put-api-users-id"
+  },
+  {
+    "id": "api-responses-21",
+    "title": "API Response Standards",
+    "section": "DELETE /api/users/:id",
+    "content": "Success (200): json { \"success\": true, \"message\": \"User deleted successfully\" } Or with 204 (No Content) status code without body.",
+    "link": "/docs/api-responses#delete-api-users-id"
+  },
+  {
+    "id": "api-responses-23",
+    "title": "API Response Standards",
+    "section": "Message Conventions",
+    "content": "- Clear and specific: \"User created successfully\" instead of \"OK\" - In English: All messages in English - Consistent: Use the same format for similar operations - Actionable: In errors, indicate what can be done",
+    "link": "/docs/api-responses#message-conventions"
+  },
+  {
+    "id": "api-responses-24",
+    "title": "API Response Standards",
+    "section": "Message Templates",
+    "content": "| Operation | Success Message | |-----------|----------------| | Create | \"{Resource} created successfully\" | | Get | \"{Resource} retrieved successfully\" | | List | \"{Resources} retrieved successfully\" | | Update | \"{Resource} updated successfully\" | | Delete | \"{Resource} deleted successfully\" |",
+    "link": "/docs/api-responses#message-templates"
+  },
+  {
+    "id": "api-responses-26",
+    "title": "API Response Standards",
+    "section": "In Development",
+    "content": "In development mode, error responses include additional information: json { \"success\": false, \"error\": { \"type\": \"USER_NOT_FOUND\", \"message\": \"User not found\", \"code\": \"USER_NOT_FOUND\", \"timestamp\": \"2025-12-16T10:30:00.000Z\", \"stack\": \"Error: User not found\\n at UserService.getUserById...\", \"url\": ",
+    "link": "/docs/api-responses#in-development"
+  },
+  {
+    "id": "api-responses-27",
+    "title": "API Response Standards",
+    "section": "In Production",
+    "content": "In production, sensitive information is hidden: json { \"success\": false, \"error\": { \"type\": \"USER_NOT_FOUND\", \"message\": \"User not found\", \"code\": \"USER_NOT_FOUND\", \"timestamp\": \"2025-12-16T10:30:00.000Z\" } }",
+    "link": "/docs/api-responses#in-production"
+  },
+  {
+    "id": "api-responses-28",
+    "title": "API Response Standards",
+    "section": "Best Practices",
+    "content": "1. Always use helpers: Use buildSuccessResponse, buildListResponse, etc. 2. Consistent messages: Maintain the same format across the project 3. Correct HTTP codes: Use the appropriate code for each operation 4. Consistent structure: All responses must follow the same format 5. Don't expose internal ",
+    "link": "/docs/api-responses#best-practices"
+  },
+  {
+    "id": "architecture-0",
+    "title": "Project Architecture",
+    "section": "Project Architecture",
+    "content": "This document describes the architecture and structure of the Offer Hub project.",
+    "link": "/docs/architecture"
+  },
+  {
+    "id": "architecture-1",
+    "title": "Project Architecture",
+    "section": "Table of Contents",
+    "content": "- Overview - Technology Stack - Project Structure - Backend Architecture - Frontend Architecture - Database Design - API Design",
+    "link": "/docs/architecture#table-of-contents"
+  },
+  {
+    "id": "architecture-2",
+    "title": "Project Architecture",
+    "section": "Overview",
+    "content": "Offer Hub is a decentralized freelance platform built with modern web technologies and blockchain integration. The system follows a layered architecture with clear separation of concerns. ┌─────────────────────────────────────────────────────────────────┐ │ Frontend (Next.js) │ │ React + TypeScript ",
+    "link": "/docs/architecture#overview"
+  },
+  {
+    "id": "architecture-4",
+    "title": "Project Architecture",
+    "section": "Frontend",
+    "content": "- Framework: Next.js 14 (App Router) - Language: TypeScript - Styling: TailwindCSS - State Management: React Context + Custom Hooks - HTTP Client: Axios",
+    "link": "/docs/architecture#frontend"
+  },
+  {
+    "id": "architecture-5",
+    "title": "Project Architecture",
+    "section": "Backend",
+    "content": "- Runtime: Node.js - Framework: Express.js - Language: TypeScript - Authentication: JWT (Access + Refresh Tokens) - Database Client: Supabase Client",
+    "link": "/docs/architecture#backend"
+  },
+  {
+    "id": "architecture-6",
+    "title": "Project Architecture",
+    "section": "Database",
+    "content": "- Provider: Supabase - Engine: PostgreSQL - Migrations: SQL files with Supabase CLI",
+    "link": "/docs/architecture#database"
+  },
+  {
+    "id": "architecture-7",
+    "title": "Project Architecture",
+    "section": "Blockchain",
+    "content": "- Network: Stellar - Smart Contracts: Soroban (Rust)",
+    "link": "/docs/architecture#blockchain"
+  },
+  {
+    "id": "architecture-8",
+    "title": "Project Architecture",
+    "section": "Project Structure",
+    "content": "offer-hub/ ├── src/ Frontend source code │ ├── app/ Next.js App Router pages │ ├── components/ React components │ ├── hooks/ Custom React hooks │ ├── services/ API service clients │ ├── providers/ React context providers │ ├── stores/ State management │ ├── types/ TypeScript type definitions │ ├── u",
+    "link": "/docs/architecture#project-structure"
+  },
+  {
+    "id": "architecture-9",
+    "title": "Project Architecture",
+    "section": "Backend Architecture",
+    "content": "The backend follows a layered architecture pattern: Request → Routes → Middleware → Controller → Service → Database ↓ Response Builder ↓ Response",
+    "link": "/docs/architecture#backend-architecture"
+  },
+  {
+    "id": "architecture-10",
+    "title": "Project Architecture",
+    "section": "Routes",
+    "content": "Routes define API endpoints and connect them to controllers. Location: /backend/src/routes/ Naming: <resource>.routes.ts typescript // user.routes.ts import { Router } from 'express'; import { UserController } from '../controllers/user.controller'; import { authenticateToken } from '../middlewares/a",
+    "link": "/docs/architecture#routes"
+  },
+  {
+    "id": "architecture-11",
+    "title": "Project Architecture",
+    "section": "Controllers",
+    "content": "Controllers handle HTTP requests and responses. Location: /backend/src/controllers/ Naming: <resource>.controller.ts typescript // user.controller.ts import { Request, Response, NextFunction } from 'express'; import { UserService } from '../services/user.service'; import { buildSuccessResponse } fro",
+    "link": "/docs/architecture#controllers"
+  },
+  {
+    "id": "architecture-12",
+    "title": "Project Architecture",
+    "section": "Services",
+    "content": "Services contain all business logic. Location: /backend/src/services/ Naming: <resource>.service.ts typescript // user.service.ts import { supabase } from '../lib/supabase/supabase'; import { NotFoundError, ConflictError } from '../utils/AppError'; import { User, CreateUserDTO, UpdateUserDTO } from ",
+    "link": "/docs/architecture#services"
+  },
+  {
+    "id": "architecture-13",
+    "title": "Project Architecture",
+    "section": "Middlewares",
+    "content": "Middlewares process requests before they reach controllers. Location: /backend/src/middlewares/ Naming: <purpose>.middleware.ts typescript // auth.middleware.ts import { Request, Response, NextFunction } from 'express'; import { verifyAccessToken } from '../utils/jwt.utils'; import { AuthenticationE",
+    "link": "/docs/architecture#middlewares"
+  },
+  {
+    "id": "architecture-14",
+    "title": "Project Architecture",
+    "section": "Error Handling Middleware",
+    "content": "The error handler middleware catches all errors and formats responses consistently. typescript // errorHandler.middleware.ts export const errorHandler = ( error: Error, req: Request, res: Response, next: NextFunction ) => { // Log error logger.error({ message: error.message, stack: error.stack, url:",
+    "link": "/docs/architecture#error-handling-middleware"
+  },
+  {
+    "id": "architecture-15",
+    "title": "Project Architecture",
+    "section": "Logging Standards",
+    "content": "All logs should follow this format: typescript import { logger } from '../utils/logger'; // Information logs logger.info('User registered successfully', { userId: user.id }); // Warning logs logger.warn('Rate limit approaching', { ip: req.ip, count: requestCount }); // Error logs logger.error('Datab",
+    "link": "/docs/architecture#logging-standards"
+  },
+  {
+    "id": "architecture-17",
+    "title": "Project Architecture",
+    "section": "Component Structure",
+    "content": "src/components/ ├── ui/ Reusable UI components (buttons, inputs, etc.) ├── layout/ Layout components (header, footer, sidebar) ├── forms/ Form components └── features/ Feature-specific components └── auth/ Authentication components",
+    "link": "/docs/architecture#component-structure"
+  },
+  {
+    "id": "architecture-18",
+    "title": "Project Architecture",
+    "section": "Custom Hooks",
+    "content": "Hooks encapsulate reusable logic. Location: /src/hooks/ Naming: use-<purpose>.ts typescript // use-user-data.ts export const useUserData = (userId: string) => { const [user, setUser] = useState<User | null>(null); const [loading, setLoading] = useState(true); const [error, setError] = useState<Error",
+    "link": "/docs/architecture#custom-hooks"
+  },
+  {
+    "id": "architecture-19",
+    "title": "Project Architecture",
+    "section": "Services (Frontend)",
+    "content": "Frontend services handle API communication. Location: /src/services/ typescript // user.service.ts import { api } from '@/lib/axios'; import { User, UpdateUserDTO } from '@/types/user'; export const UserService = { async getUser(id: string): Promise<User> { const response = await api.get(/users/${id",
+    "link": "/docs/architecture#services-frontend-"
+  },
+  {
+    "id": "architecture-20",
+    "title": "Project Architecture",
+    "section": "Providers",
+    "content": "Providers manage global state using React Context. Location: /src/providers/ typescript // auth-provider.tsx export const AuthProvider = ({ children }: { children: ReactNode }) => { const [user, setUser] = useState<User | null>(null); const [loading, setLoading] = useState(true); // ... authenticati",
+    "link": "/docs/architecture#providers"
+  },
+  {
+    "id": "architecture-22",
+    "title": "Project Architecture",
+    "section": "Table Naming",
+    "content": "- Use snake_case for table names - Use plural form (e.g., users, not user) - Use descriptive names",
+    "link": "/docs/architecture#table-naming"
+  },
+  {
+    "id": "architecture-23",
+    "title": "Project Architecture",
+    "section": "Column Naming",
+    "content": "- Use snake_case for column names - Use id for primary keys - Use <table>_id for foreign keys - Use created_at and updated_at for timestamps",
+    "link": "/docs/architecture#column-naming"
+  },
+  {
+    "id": "architecture-24",
+    "title": "Project Architecture",
+    "section": "Index Naming",
+    "content": "Format: idx_<table>_<columns> sql CREATE INDEX idx_users_email ON users(email); CREATE INDEX idx_contracts_user_id_status ON contracts(user_id, status);",
+    "link": "/docs/architecture#index-naming"
+  },
+  {
+    "id": "architecture-25",
+    "title": "Project Architecture",
+    "section": "Example Schema",
+    "content": "sql -- Users table CREATE TABLE users ( id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), email VARCHAR(255) UNIQUE NOT NULL, password_hash VARCHAR(255), email_verified BOOLEAN DEFAULT FALSE, status VARCHAR(50) DEFAULT 'active', created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW() );",
+    "link": "/docs/architecture#example-schema"
+  },
+  {
+    "id": "architecture-27",
+    "title": "Project Architecture",
+    "section": "URL Structure",
+    "content": "/api/v1/<resource> /api/v1/<resource>/:id /api/v1/<resource>/:id/<sub-resource>",
+    "link": "/docs/architecture#url-structure"
+  },
+  {
+    "id": "architecture-28",
+    "title": "Project Architecture",
+    "section": "HTTP Methods",
+    "content": "| Method | Usage | Example | |--------|-------|---------| | GET | Retrieve resource(s) | GET /api/v1/users | | POST | Create resource | POST /api/v1/users | | PUT | Replace resource | PUT /api/v1/users/:id | | PATCH | Partial update | PATCH /api/v1/users/:id | | DELETE | Delete resource | DELETE /ap",
+    "link": "/docs/architecture#http-methods"
+  },
+  {
+    "id": "architecture-29",
+    "title": "Project Architecture",
+    "section": "Response Format",
+    "content": "All responses follow the standard format defined in API_RESPONSES.md. json { \"success\": true, \"message\": \"User retrieved successfully\", \"data\": { \"id\": \"123\", \"email\": \"user@example.com\" } }",
+    "link": "/docs/architecture#response-format"
+  },
+  {
+    "id": "architecture-30",
+    "title": "Project Architecture",
+    "section": "Error Responses",
+    "content": "All errors follow the format defined in ERROR_HANDLING.md. json { \"success\": false, \"error\": { \"type\": \"USER_NOT_FOUND\", \"message\": \"User not found\", \"code\": \"USER_NOT_FOUND\", \"timestamp\": \"2025-01-07T10:30:00.000Z\" } }",
+    "link": "/docs/architecture#error-responses"
+  },
+  {
+    "id": "architecture-31",
+    "title": "Project Architecture",
+    "section": "Data Flow Example",
+    "content": "Here's how a typical request flows through the system: 1. Client sends: GET /api/v1/users/123 ↓ 2. Router matches route and applies middleware ↓ 3. Auth middleware validates token ↓ 4. Controller receives request - Validates parameters - Calls UserService.getUserById('123') ↓ 5. Service executes bus",
+    "link": "/docs/architecture#data-flow-example"
+  },
+  {
+    "id": "architecture-32",
+    "title": "Project Architecture",
+    "section": "Best Practices",
+    "content": "1. Keep layers separate - Don't mix responsibilities between layers 2. Use TypeScript - Type everything for better maintainability 3. Handle errors consistently - Always use AppError subclasses 4. Log appropriately - Use correct log levels 5. Validate early - Validate input at controller level 6. Ke",
+    "link": "/docs/architecture#best-practices"
+  },
+  {
+    "id": "authentication-system-0",
+    "title": "Authentication System",
+    "section": "Authentication System",
+    "content": "This document describes the architecture, flows, and technical specifications of the Offer Hub authentication system.",
+    "link": "/docs/authentication-system"
+  },
+  {
+    "id": "authentication-system-1",
+    "title": "Authentication System",
+    "section": "Table of Contents",
+    "content": "- System Architecture - Authentication Flows - Token Management - Data Model - Security Measures - Implementation Details",
+    "link": "/docs/authentication-system#table-of-contents"
+  },
+  {
+    "id": "authentication-system-2",
+    "title": "Authentication System",
+    "section": "System Architecture",
+    "content": "The system uses a hybrid architecture that combines traditional authentication (Email/Password), OAuth (Social Login), and Web3 technologies (Stellar Wallets).",
+    "link": "/docs/authentication-system#system-architecture"
+  },
+  {
+    "id": "authentication-system-3",
+    "title": "Authentication System",
+    "section": "Main Components",
+    "content": "┌──────────────────────────────────────────────────────────────────────┐ │ Frontend (Next.js) │ │ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ │ │ │ AuthProvider │ │ WalletProvider │ │ OAuth Buttons │ │ │ └─────────────────┘ └─────────────────┘ └─────────────────┘ │ └─────────────────",
+    "link": "/docs/authentication-system#main-components"
+  },
+  {
+    "id": "authentication-system-4",
+    "title": "Authentication System",
+    "section": "Backend Components",
+    "content": "| Component | Location | Responsibility | |-----------|----------|----------------| | AuthService | /backend/src/services/auth.service.ts | Main authentication logic | | WalletService | /backend/src/services/wallet.service.ts | Stellar wallet management | | OAuthService | /backend/src/services/oauth",
+    "link": "/docs/authentication-system#backend-components"
+  },
+  {
+    "id": "authentication-system-5",
+    "title": "Authentication System",
+    "section": "Frontend Components",
+    "content": "| Component | Location | Responsibility | |-----------|----------|----------------| | AuthProvider | /src/providers/ | Global authentication context | | WalletProvider | /src/providers/ | Wallet connection context | | Auth Hooks | /src/hooks/ | Authentication-related hooks |",
+    "link": "/docs/authentication-system#frontend-components"
+  },
+  {
+    "id": "authentication-system-7",
+    "title": "Authentication System",
+    "section": "Registration (Email/Password)",
+    "content": "┌──────┐ ┌──────────┐ ┌─────┐ ┌────┐ ┌─────────┐ │ User │ │ Frontend │ │ API │ │ DB │ │ Stellar │ └──┬───┘ └────┬─────┘ └──┬──┘ └─┬──┘ └────┬────┘ │ │ │ │ │ │ Fill form │ │ │ │ │─────────────>│ │ │ │ │ │ │ │ │ │ │ POST /auth/register │ │ │ │─────────────>│ │ │ │ │ │ │ │ │ │ │ Check email unique │ │ ",
+    "link": "/docs/authentication-system#registration-email-password-"
+  },
+  {
+    "id": "authentication-system-8",
+    "title": "Authentication System",
+    "section": "Login (Email/Password)",
+    "content": "┌──────┐ ┌──────────┐ ┌─────┐ ┌────┐ │ User │ │ Frontend │ │ API │ │ DB │ └──┬───┘ └────┬─────┘ └──┬──┘ └─┬──┘ │ │ │ │ │ Enter creds │ │ │ │─────────────>│ │ │ │ │ │ │ │ │ POST /auth/login │ │ │─────────────>│ │ │ │ │ │ │ │ │ Find user by email │ │ │─────────>│ │ │ │ │ │ │ │ Verify password (bcrypt)",
+    "link": "/docs/authentication-system#login-email-password-"
+  },
+  {
+    "id": "authentication-system-9",
+    "title": "Authentication System",
+    "section": "OAuth Login (Google/GitHub/etc.)",
+    "content": "┌──────┐ ┌──────────┐ ┌─────┐ ┌──────────┐ ┌────┐ │ User │ │ Frontend │ │ API │ │ Provider │ │ DB │ └──┬───┘ └────┬─────┘ └──┬──┘ └────┬─────┘ └─┬──┘ │ │ │ │ │ │ Click OAuth │ │ │ │ │─────────────>│ │ │ │ │ │ │ │ │ │ │ GET /auth/google │ │ │ │─────────────>│ │ │ │ │ │ │ │ │ │ Redirect URL │ │ │ │ │<",
+    "link": "/docs/authentication-system#oauth-login-google-github-etc-"
+  },
+  {
+    "id": "authentication-system-10",
+    "title": "Authentication System",
+    "section": "Password Recovery",
+    "content": "Step 1: Request Reset http POST /api/v1/auth/forgot-password Content-Type: application/json { \"email\": \"user@example.com\" } Response: json { \"success\": true, \"message\": \"If the email exists, a reset link has been sent\" } Step 2: Reset Password http POST /api/v1/auth/reset-password Content-Type: appl",
+    "link": "/docs/authentication-system#password-recovery"
+  },
+  {
+    "id": "authentication-system-11",
+    "title": "Authentication System",
+    "section": "Token Refresh",
+    "content": "http POST /api/v1/auth/refresh Content-Type: application/json { \"refreshToken\": \"current-refresh-token\" } Response: json { \"success\": true, \"message\": \"Token refreshed successfully\", \"data\": { \"accessToken\": \"new-access-token\", \"refreshToken\": \"new-refresh-token\" } }",
+    "link": "/docs/authentication-system#token-refresh"
+  },
+  {
+    "id": "authentication-system-13",
+    "title": "Authentication System",
+    "section": "Access Token",
+    "content": "| Property | Value | |----------|-------| | Format | JWT (HS256) | | Lifetime | 15 minutes | | Storage | Memory (Frontend) | | Transport | Authorization: Bearer <token> | Payload: json { \"sub\": \"user-uuid\", \"email\": \"user@example.com\", \"roles\": [\"user\"], \"iat\": 1704614400, \"exp\": 1704615300 }",
+    "link": "/docs/authentication-system#access-token"
+  },
+  {
+    "id": "authentication-system-14",
+    "title": "Authentication System",
+    "section": "Refresh Token",
+    "content": "| Property | Value | |----------|-------| | Format | Opaque string or JWT | | Lifetime | 7 days | | Storage | HttpOnly Secure Cookie (recommended) | | Rotation | Each use invalidates previous token |",
+    "link": "/docs/authentication-system#refresh-token"
+  },
+  {
+    "id": "authentication-system-15",
+    "title": "Authentication System",
+    "section": "Token Rotation",
+    "content": "For enhanced security, refresh tokens are rotated on each use: 1. Client sends refresh token 2. Server validates and invalidates the old token 3. Server generates new access and refresh tokens 4. Server stores new refresh token hash 5. Client receives new tokens This prevents token reuse attacks.",
+    "link": "/docs/authentication-system#token-rotation"
+  },
+  {
+    "id": "authentication-system-17",
+    "title": "Authentication System",
+    "section": "Users Table",
+    "content": "sql CREATE TABLE users ( id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), email VARCHAR(255) UNIQUE NOT NULL, password_hash VARCHAR(255), -- NULL for OAuth-only users username VARCHAR(100), email_verified BOOLEAN DEFAULT FALSE, status VARCHAR(50) DEFAULT 'active', -- active, suspended, locked failed_",
+    "link": "/docs/authentication-system#users-table"
+  },
+  {
+    "id": "authentication-system-18",
+    "title": "Authentication System",
+    "section": "Wallets Table",
+    "content": "sql CREATE TABLE wallets ( id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), user_id UUID REFERENCES users(id) ON DELETE CASCADE, public_key VARCHAR(56) NOT NULL, -- Stellar public key type VARCHAR(50) NOT NULL, -- 'invisible' or 'external' enc_private_key TEXT, -- Encrypted private key (invisible onl",
+    "link": "/docs/authentication-system#wallets-table"
+  },
+  {
+    "id": "authentication-system-19",
+    "title": "Authentication System",
+    "section": "Refresh Tokens Table",
+    "content": "sql CREATE TABLE refresh_tokens ( id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), user_id UUID REFERENCES users(id) ON DELETE CASCADE, token_hash VARCHAR(255) NOT NULL, device_info JSONB, expires_at TIMESTAMP NOT NULL, revoked BOOLEAN DEFAULT FALSE, revoked_at TIMESTAMP, created_at TIMESTAMP DEFAULT",
+    "link": "/docs/authentication-system#refresh-tokens-table"
+  },
+  {
+    "id": "authentication-system-20",
+    "title": "Authentication System",
+    "section": "OAuth Providers Table",
+    "content": "sql CREATE TABLE oauth_providers ( id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), user_id UUID REFERENCES users(id) ON DELETE CASCADE, provider VARCHAR(50) NOT NULL, -- 'google', 'github', etc. provider_user_id VARCHAR(255) NOT NULL, access_token TEXT, refresh_token TEXT, created_at TIMESTAMP DEFAU",
+    "link": "/docs/authentication-system#oauth-providers-table"
+  },
+  {
+    "id": "authentication-system-22",
+    "title": "Authentication System",
+    "section": "Password Requirements",
+    "content": "- Minimum 8 characters - At least one uppercase letter - At least one lowercase letter - At least one number - At least one special character",
+    "link": "/docs/authentication-system#password-requirements"
+  },
+  {
+    "id": "authentication-system-23",
+    "title": "Authentication System",
+    "section": "Rate Limiting",
+    "content": "| Endpoint | Limit | Window | |----------|-------|--------| | /auth/login | 5 attempts | 15 minutes | | /auth/register | 3 attempts | 1 hour | | /auth/forgot-password | 3 attempts | 1 hour | | /auth/refresh | 10 attempts | 1 minute |",
+    "link": "/docs/authentication-system#rate-limiting"
+  },
+  {
+    "id": "authentication-system-24",
+    "title": "Authentication System",
+    "section": "Account Lockout",
+    "content": "- Account locked after 5 failed login attempts - Lockout duration: 30 minutes - Lockout cleared on successful password reset",
+    "link": "/docs/authentication-system#account-lockout"
+  },
+  {
+    "id": "authentication-system-25",
+    "title": "Authentication System",
+    "section": "CSRF Protection",
+    "content": "- CSRF tokens required for state-changing operations - Token validated on server-side - Double-submit cookie pattern",
+    "link": "/docs/authentication-system#csrf-protection"
+  },
+  {
+    "id": "authentication-system-26",
+    "title": "Authentication System",
+    "section": "Secure Headers",
+    "content": "typescript // Applied via helmet middleware { contentSecurityPolicy: true, crossOriginEmbedderPolicy: true, crossOriginOpenerPolicy: true, crossOriginResourcePolicy: true, dnsPrefetchControl: true, frameguard: true, hidePoweredBy: true, hsts: true, ieNoOpen: true, noSniff: true, originAgentCluster: ",
+    "link": "/docs/authentication-system#secure-headers"
+  },
+  {
+    "id": "authentication-system-28",
+    "title": "Authentication System",
+    "section": "Password Hashing",
+    "content": "typescript import bcrypt from 'bcrypt'; const SALT_ROUNDS = 12; export const hashPassword = async (password: string): Promise<string> => { return bcrypt.hash(password, SALT_ROUNDS); }; export const verifyPassword = async ( password: string, hash: string ): Promise<boolean> => { return bcrypt.compare",
+    "link": "/docs/authentication-system#password-hashing"
+  },
+  {
+    "id": "authentication-system-29",
+    "title": "Authentication System",
+    "section": "JWT Generation",
+    "content": "typescript import jwt from 'jsonwebtoken'; export const generateAccessToken = (user: User): string => { return jwt.sign( { sub: user.id, email: user.email, roles: user.roles, }, process.env.JWT_SECRET!, { expiresIn: '15m' } ); }; export const generateRefreshToken = (user: User): string => { return j",
+    "link": "/docs/authentication-system#jwt-generation"
+  },
+  {
+    "id": "authentication-system-30",
+    "title": "Authentication System",
+    "section": "Wallet Encryption",
+    "content": "Private keys for invisible wallets are encrypted using AES-256-GCM: typescript import crypto from 'crypto'; export const encryptPrivateKey = ( privateKey: string, encryptionKey: string ): string => { const iv = crypto.randomBytes(16); const cipher = crypto.createCipheriv( 'aes-256-gcm', Buffer.from(",
+    "link": "/docs/authentication-system#wallet-encryption"
+  },
+  {
+    "id": "authentication-system-31",
+    "title": "Authentication System",
+    "section": "Error Codes",
+    "content": "| Code | HTTP Status | Description | |------|-------------|-------------| | INVALID_CREDENTIALS | 401 | Email or password incorrect | | EMAIL_NOT_VERIFIED | 401 | Email verification required | | ACCOUNT_LOCKED | 423 | Account temporarily locked | | TOKEN_EXPIRED | 401 | Access or refresh token expir",
+    "link": "/docs/authentication-system#error-codes"
+  },
+  {
+    "id": "authentication-system-32",
+    "title": "Authentication System",
+    "section": "Best Practices",
+    "content": "1. Never log sensitive data - Passwords, tokens, private keys 2. Use HTTPS only - All authentication endpoints 3. Validate all inputs - Email format, password strength 4. Sanitize user data - Prevent XSS and injection attacks 5. Use secure cookies - HttpOnly, Secure, SameSite flags 6. Implement logo",
+    "link": "/docs/authentication-system#best-practices"
+  },
+  {
+    "id": "code-style-0",
+    "title": "Code Style Standards",
+    "section": "Code Style Standards",
+    "content": "This document defines code style standards and best practices for the Offer Hub project.",
+    "link": "/docs/code-style"
+  },
+  {
+    "id": "code-style-2",
+    "title": "Code Style Standards",
+    "section": "Comments",
+    "content": "- Language: All code comments must be in English - Purpose: Explain the \"why\", not the \"what\" (code already does that) - Format: Use // for line comments and / / for blocks typescript // Validate user authentication before processing if (!user.isAuthenticated) { throw new AuthenticationError('User n",
+    "link": "/docs/code-style#comments"
+  },
+  {
+    "id": "code-style-3",
+    "title": "Code Style Standards",
+    "section": "Imports",
+    "content": "- Order: External libraries → Internal → Relative - Grouping: Separate with blank line between groups - Absolute paths: Prefer @/ over relative paths when possible typescript // External libraries import express from 'express'; import { Request, Response } from 'express'; // Internal modules import ",
+    "link": "/docs/code-style#imports"
+  },
+  {
+    "id": "code-style-5",
+    "title": "Code Style Standards",
+    "section": "Types and Interfaces",
+    "content": "- Interfaces: For objects that can be extended - Types: For unions, intersections, and more complex types - Names: PascalCase typescript // Interface for objects interface User { id: string; email: string; name: string; } // Type for unions type UserRole = 'freelancer' | 'client' | 'admin'; // Type ",
+    "link": "/docs/code-style#types-and-interfaces"
+  },
+  {
+    "id": "code-style-6",
+    "title": "Code Style Standards",
+    "section": "Functions",
+    "content": "- Arrow functions: For short functions and callbacks - Function declarations: For main and exported functions - Async/await: Prefer over Promises with .then() typescript // Arrow function for callback const handleClick = (event: MouseEvent) => { console.log('Clicked'); }; // Function declaration for",
+    "link": "/docs/code-style#functions"
+  },
+  {
+    "id": "code-style-7",
+    "title": "Code Style Standards",
+    "section": "Variables",
+    "content": "- const: By default, use const - let: Only when variable needs reassignment - Avoid var: Never use var typescript const userName = 'john_doe'; let counter = 0; counter++; // OK, using let",
+    "link": "/docs/code-style#variables"
+  },
+  {
+    "id": "code-style-9",
+    "title": "Code Style Standards",
+    "section": "Components",
+    "content": "- Functional Components: Always use functional components - Hooks: Use custom hooks for reusable logic - Props: Define types/interfaces for props typescript interface UserProfileProps { userId: string; showEmail?: boolean; } export const UserProfile = ({ userId, showEmail = false }: UserProfileProps",
+    "link": "/docs/code-style#components"
+  },
+  {
+    "id": "code-style-10",
+    "title": "Code Style Standards",
+    "section": "Custom Hooks",
+    "content": "- Prefix: Always start with use - Single purpose: Each hook should have a clear responsibility - Consistent return: Return object with named properties typescript // use-user-data.ts export const useUserData = (userId: string) => { const [user, setUser] = useState<User | null>(null); const [loading,",
+    "link": "/docs/code-style#custom-hooks"
+  },
+  {
+    "id": "code-style-12",
+    "title": "Code Style Standards",
+    "section": "Controllers",
+    "content": "- Single responsibility: Each method should do one thing - Early validation: Validate inputs at the start - Delegate logic: Business logic goes in services typescript export class UserController { async getUser(req: Request, res: Response) { const { id } = req.params; // Validate early if (!id) { th",
+    "link": "/docs/code-style#controllers"
+  },
+  {
+    "id": "code-style-13",
+    "title": "Code Style Standards",
+    "section": "Services",
+    "content": "- Static methods: For stateless services - Classes: For services with state or dependency injection - Pure functions: When possible, use pure functions typescript export class UserService { static async getUserById(id: string): Promise<User> { // Business logic here const user = await supabase .from",
+    "link": "/docs/code-style#services"
+  },
+  {
+    "id": "code-style-15",
+    "title": "Code Style Standards",
+    "section": "Organization",
+    "content": "src/ ├── components/ React components │ └── user-profile/ Component with multiple files │ ├── user-profile.tsx │ └── user-profile.styles.ts ├── hooks/ Custom hooks │ └── use-user-data.ts ├── pages/ Pages (orchestration only) │ └── user-page.tsx └── types/ TypeScript types └── user-types.ts",
+    "link": "/docs/code-style#organization"
+  },
+  {
+    "id": "code-style-16",
+    "title": "Code Style Standards",
+    "section": "Separation of Concerns",
+    "content": "- Logic: In hooks (/src/hooks) - UI: In components (/src/components) - Types: In types (/src/types) - Pages: Orchestration only (/src/pages)",
+    "link": "/docs/code-style#separation-of-concerns"
+  },
+  {
+    "id": "code-style-17",
+    "title": "Code Style Standards",
+    "section": "Error Handling",
+    "content": "See complete documentation in ERROR_HANDLING.md - Always use AppError: Don't throw generic errors - Try/catch: In async/await functions - Clear messages: Errors should be understandable typescript try { const user = await UserService.getUserById(id); return res.json(buildSuccessResponse(user, 'User ",
+    "link": "/docs/code-style#error-handling"
+  },
+  {
+    "id": "code-style-19",
+    "title": "Code Style Standards",
+    "section": "Test Names",
+    "content": "- Format: describe for groups, it or test for cases - Clear description: Should explain what is being tested typescript describe('UserService', () => { describe('getUserById', () => { it('should return user when id exists', async () => { // Test implementation }); it('should throw NotFoundError when",
+    "link": "/docs/code-style#test-names"
+  },
+  {
+    "id": "code-style-20",
+    "title": "Code Style Standards",
+    "section": "Linting and Formatting",
+    "content": "- ESLint: Configured in the project - Prettier: For consistent formatting (if configured) - Pre-commit hooks: Run lint before commit",
+    "link": "/docs/code-style#linting-and-formatting"
+  },
+  {
+    "id": "code-style-21",
+    "title": "Code Style Standards",
+    "section": "Best Practices",
+    "content": "1. DRY (Don't Repeat Yourself): Avoid duplicate code 2. KISS (Keep It Simple, Stupid): Keep code simple 3. Single Responsibility: Each function/class should do one thing 4. Descriptive names: Variables and functions with clear names 5. Useful comments: Only when code is not self-explanatory 6. Consi",
+    "link": "/docs/code-style#best-practices"
+  },
+  {
+    "id": "contributing-0",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "Welcome to Offer Hub! This guide will help you set up the project and understand our contribution workflow.",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-1",
+    "title": "Contributing Guide",
+    "section": "Table of Contents",
+    "content": "- Prerequisites - Repository Setup - Environment Configuration - Branch Naming Convention - Commit Standards - Pull Request Guidelines - Code Review Process - Important Rules",
+    "link": "/docs/contributing#table-of-contents"
+  },
+  {
+    "id": "contributing-2",
+    "title": "Contributing Guide",
+    "section": "Prerequisites",
+    "content": "Before starting, ensure you have the following installed: - Node.js: v23.3.0 or higher - npm: v10 or higher - Git: Latest version - Supabase CLI: For local database development bash",
+    "link": "/docs/contributing#prerequisites"
+  },
+  {
+    "id": "contributing-3",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "node --version Should be v23.3.0+ npm --version Should be v10+ git --version",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-5",
+    "title": "Contributing Guide",
+    "section": "1. Fork the Repository",
+    "content": "1. Go to OFFER-HUB/offer-hub 2. Click the \"Fork\" button in the top right corner 3. This creates your own copy of the repository",
+    "link": "/docs/contributing#-fork-the-repository"
+  },
+  {
+    "id": "contributing-7",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git clone https://github.com/YOUR_USERNAME/offer-hub.git",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-9",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git remote add upstream https://github.com/OFFER-HUB/offer-hub.git",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-17",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "cd backend npm install cd ..",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-21",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git merge upstream/main",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-24",
+    "title": "Contributing Guide",
+    "section": "Frontend Environment",
+    "content": "Create a .env.local file in the root directory: env",
+    "link": "/docs/contributing#frontend-environment"
+  },
+  {
+    "id": "contributing-25",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "NEXT_PUBLIC_SUPABASE_URL=your_supabase_url NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-26",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "NEXT_PUBLIC_API_URL=http://localhost:4000",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-27",
+    "title": "Contributing Guide",
+    "section": "Backend Environment",
+    "content": "Create a .env file in the /backend directory: env",
+    "link": "/docs/contributing#backend-environment"
+  },
+  {
+    "id": "contributing-28",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "PORT=4000 NODE_ENV=development",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-29",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "SUPABASE_URL=your_supabase_url SUPABASE_ANON_KEY=your_supabase_anon_key SUPABASE_SERVICE_ROLE_KEY=your_service_role_key",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-30",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "JWT_SECRET=your_jwt_secret JWT_REFRESH_SECRET=your_refresh_secret",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-31",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "GOOGLE_CLIENT_ID=your_google_client_id GOOGLE_CLIENT_SECRET=your_google_client_secret GITHUB_CLIENT_ID=your_github_client_id GITHUB_CLIENT_SECRET=your_github_client_secret",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-32",
+    "title": "Contributing Guide",
+    "section": "Local Supabase Setup",
+    "content": "For local development with Supabase: bash",
+    "link": "/docs/contributing#local-supabase-setup"
+  },
+  {
+    "id": "contributing-35",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "npx supabase db reset",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-38",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "cd backend npm run dev",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-39",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "npm run dev The application will be available at: - Frontend: http://localhost:3000 - Backend API: http://localhost:4000",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-40",
+    "title": "Contributing Guide",
+    "section": "Branch Naming Convention",
+    "content": "All branches must follow this naming convention: <type>/<descriptive-name>",
+    "link": "/docs/contributing#branch-naming-convention"
+  },
+  {
+    "id": "contributing-41",
+    "title": "Contributing Guide",
+    "section": "Branch Types",
+    "content": "| Type | Description | Example | |------|-------------|---------| | feat | New feature | feat/user-profile-page | | fix | Bug fix | fix/login-validation-error | | docs | Documentation changes | docs/api-documentation | | refactor | Code refactoring | refactor/auth-service | | test | Adding or updati",
+    "link": "/docs/contributing#branch-types"
+  },
+  {
+    "id": "contributing-42",
+    "title": "Contributing Guide",
+    "section": "Branch Naming Rules",
+    "content": "- Use lowercase letters only - Use hyphens (-) to separate words - Be descriptive but concise - Include issue number if applicable bash",
+    "link": "/docs/contributing#branch-naming-rules"
+  },
+  {
+    "id": "contributing-43",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "feat/password-recovery fix/oauth-callback-redirect docs/contributing-guide feat/issue-123-user-dashboard",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-44",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "Feature/UserProfile Wrong: uppercase, no hyphen fix_login Wrong: underscore instead of hyphen newfeature Wrong: missing type prefix feat/a Wrong: not descriptive",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-46",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git checkout main git pull upstream main",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-47",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git checkout -b feat/your-feature-name",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-49",
+    "title": "Contributing Guide",
+    "section": "Atomic Commits",
+    "content": "Each commit should represent one logical change. This makes it easier to: - Review changes - Revert specific changes if needed - Understand project history bash",
+    "link": "/docs/contributing#atomic-commits"
+  },
+  {
+    "id": "contributing-50",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git commit -m \"Add login form validation\" git commit -m \"Add password strength indicator\" git commit -m \"Add form error messages\"",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-51",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git commit -m \"Add login validation, update styles, fix typo in readme\"",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-52",
+    "title": "Contributing Guide",
+    "section": "Commit Message Format",
+    "content": "<type>(<scope>): <description> [optional body]",
+    "link": "/docs/contributing#commit-message-format"
+  },
+  {
+    "id": "contributing-53",
+    "title": "Contributing Guide",
+    "section": "Commit Types",
+    "content": "| Type | Description | |------|-------------| | feat | New feature | | fix | Bug fix | | docs | Documentation only | | style | Formatting (no code change) | | refactor | Code restructuring | | test | Adding/updating tests | | chore | Maintenance tasks |",
+    "link": "/docs/contributing#commit-types"
+  },
+  {
+    "id": "contributing-54",
+    "title": "Contributing Guide",
+    "section": "Commit Message Rules",
+    "content": "1. Use English for all commit messages 2. Use imperative mood (\"Add feature\" not \"Added feature\") 3. Keep subject line under 72 characters 4. Do not end subject with a period 5. Capitalize the first letter of the description bash",
+    "link": "/docs/contributing#commit-message-rules"
+  },
+  {
+    "id": "contributing-55",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git commit -m \"feat(auth): add password recovery flow\" git commit -m \"fix(api): resolve null pointer in user service\" git commit -m \"docs(readme): update installation instructions\" git commit -m \"test(auth): add unit tests for login service\"",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-56",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git commit -m \"fixed stuff\" Not descriptive git commit -m \"feat(auth): Added new feature.\" Past tense, ends with period git commit -m \"WIP\" Not descriptive",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-57",
+    "title": "Contributing Guide",
+    "section": "Commit Frequently",
+    "content": "Make small, frequent commits rather than large commits with many changes: bash",
+    "link": "/docs/contributing#commit-frequently"
+  },
+  {
+    "id": "contributing-58",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "git commit -m \"feat(profile): add profile page skeleton\" git commit -m \"feat(profile): implement user data fetching\" git commit -m \"feat(profile): add profile edit form\" git commit -m \"test(profile): add profile page tests\"",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-60",
+    "title": "Contributing Guide",
+    "section": "Before Creating a PR",
+    "content": "1. Ensure your branch is up to date: bash git fetch upstream git rebase upstream/main 2. Run tests and linting: bash npm run lint npm run test npm run build 3. Review your changes: bash git diff upstream/main",
+    "link": "/docs/contributing#before-creating-a-pr"
+  },
+  {
+    "id": "contributing-61",
+    "title": "Contributing Guide",
+    "section": "Creating a Pull Request",
+    "content": "1. Push your branch to your fork: bash git push origin feat/your-feature-name 2. Go to GitHub and click \"Compare & pull request\" 3. Fill in the PR template: markdown",
+    "link": "/docs/contributing#creating-a-pull-request"
+  },
+  {
+    "id": "contributing-62",
+    "title": "Contributing Guide",
+    "section": "Summary",
+    "content": "Brief description of what this PR does.",
+    "link": "/docs/contributing#summary"
+  },
+  {
+    "id": "contributing-63",
+    "title": "Contributing Guide",
+    "section": "Changes",
+    "content": "- List of specific changes made - Another change - Another change",
+    "link": "/docs/contributing#changes"
+  },
+  {
+    "id": "contributing-64",
+    "title": "Contributing Guide",
+    "section": "Testing",
+    "content": "How was this tested? - [ ] Unit tests added/updated - [ ] Manual testing performed - [ ] All existing tests pass",
+    "link": "/docs/contributing#testing"
+  },
+  {
+    "id": "contributing-65",
+    "title": "Contributing Guide",
+    "section": "Screenshots (if applicable)",
+    "content": "Add screenshots for UI changes.",
+    "link": "/docs/contributing#screenshots-if-applicable-"
+  },
+  {
+    "id": "contributing-67",
+    "title": "Contributing Guide",
+    "section": "PR Title Format",
+    "content": "Follow the same format as commit messages: feat(auth): add password recovery flow fix(api): resolve user service null pointer docs(contributing): add branch naming conventions",
+    "link": "/docs/contributing#pr-title-format"
+  },
+  {
+    "id": "contributing-69",
+    "title": "Contributing Guide",
+    "section": "For Authors",
+    "content": "1. Respond to all comments - Address or discuss every review comment 2. Keep PRs focused - One feature/fix per PR 3. Update your PR - Push additional commits to address feedback 4. Be patient - Reviews take time",
+    "link": "/docs/contributing#for-authors"
+  },
+  {
+    "id": "contributing-70",
+    "title": "Contributing Guide",
+    "section": "For Reviewers",
+    "content": "1. Be constructive - Suggest improvements, don't just criticize 2. Be specific - Point to exact lines/files 3. Approve when ready - Don't block PRs unnecessarily",
+    "link": "/docs/contributing#for-reviewers"
+  },
+  {
+    "id": "contributing-72",
+    "title": "Contributing Guide",
+    "section": "What You MUST Do",
+    "content": "- Write all code, comments, and documentation in English - Follow the naming conventions - Follow the code style guide - Follow the error handling standards - Make atomic commits (one logical change per commit) - Keep your branch up to date with main - Test your changes before creating a PR - Write ",
+    "link": "/docs/contributing#what-you-must-do"
+  },
+  {
+    "id": "contributing-73",
+    "title": "Contributing Guide",
+    "section": "What You MUST NOT Do",
+    "content": "- DO NOT modify files that are not related to your issue/task - DO NOT add unnecessary refactoring or \"improvements\" - DO NOT change code formatting (quotes, spacing, indentation) in files you didn't modify - DO NOT remove or add blank lines in unrelated code - DO NOT make changes that don't affect ",
+    "link": "/docs/contributing#what-you-must-not-do"
+  },
+  {
+    "id": "contributing-74",
+    "title": "Contributing Guide",
+    "section": "Code Quality Standards",
+    "content": "Your PR will be rejected if it contains: 1. Unrelated changes - Changes to files not related to your task 2. Formatting-only changes - Changing \" to ' or vice versa, adding/removing spaces 3. Unnecessary refactoring - Renaming variables, extracting functions without reason 4. Dead code - Commented-o",
+    "link": "/docs/contributing#code-quality-standards"
+  },
+  {
+    "id": "contributing-76",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "+ export const validateEmail = (email: string): boolean => { + const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/; + return emailRegex.test(email); + }; diff",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-77",
+    "title": "Contributing Guide",
+    "section": "Contributing Guide",
+    "content": "- import { UserService } from \"@/services/user.service\"; + import { UserService } from '@/services/user.service'; // Changed quotes - NOT ALLOWED export const validateEmail = (email: string): boolean => { const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/; return emailRegex.test(email); }; - // Removed",
+    "link": "/docs/contributing"
+  },
+  {
+    "id": "contributing-78",
+    "title": "Contributing Guide",
+    "section": "Getting Help",
+    "content": "If you have questions: 1. Check existing documentation in /docs 2. Search existing issues and PRs 3. Ask in the project's communication channels 4. Create an issue with the question label Thank you for contributing to Offer Hub!",
+    "link": "/docs/contributing#getting-help"
+  },
+  {
+    "id": "database-migrations-0",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "This document explains how to create and manage database migrations for the Offer Hub project using Supabase.",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-1",
+    "title": "Database Migrations Guide",
+    "section": "Table of Contents",
+    "content": "- Overview - Migration File Structure - Creating Migrations - Running Migrations - Migration Best Practices - Common Patterns - Troubleshooting",
+    "link": "/docs/database-migrations#table-of-contents"
+  },
+  {
+    "id": "database-migrations-2",
+    "title": "Database Migrations Guide",
+    "section": "Overview",
+    "content": "Offer Hub uses Supabase for database management. All database changes are tracked through SQL migration files located in /backend/supabase/migrations/.",
+    "link": "/docs/database-migrations#overview"
+  },
+  {
+    "id": "database-migrations-3",
+    "title": "Database Migrations Guide",
+    "section": "Migration Directory Structure",
+    "content": "backend/ └── supabase/ ├── config.toml Supabase configuration └── migrations/ ├── 20250101000001_enable_extensions_and_types.sql ├── 20250101000002_create_users_table.sql ├── 20250101000003_create_refresh_tokens_table.sql ├── 20250101000004_create_functions_and_triggers.sql └── ...",
+    "link": "/docs/database-migrations#migration-directory-structure"
+  },
+  {
+    "id": "database-migrations-5",
+    "title": "Database Migrations Guide",
+    "section": "Naming Convention",
+    "content": "Migration files follow this pattern: <YYYYMMDDHHMMSS>_<descriptive_name>.sql | Component | Description | Example | |-----------|-------------|---------| | Timestamp | Year, month, day, hour, minute, second | 20250107120000 | | Separator | Underscore | _ | | Name | Descriptive, snake_case | create_us",
+    "link": "/docs/database-migrations#naming-convention"
+  },
+  {
+    "id": "database-migrations-6",
+    "title": "Database Migrations Guide",
+    "section": "File Content Structure",
+    "content": "Each migration file should include: sql -- Migration: create_users_table -- Description: Creates the users table with authentication fields -- Author: Your Name -- Date: 2025-01-07 -- ============================================ -- UP MIGRATION -- ============================================ CREATE ",
+    "link": "/docs/database-migrations#file-content-structure"
+  },
+  {
+    "id": "database-migrations-10",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase migration new <migration_name>",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-11",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase migration new create_payments_table This creates a new file: supabase/migrations/<timestamp>_create_payments_table.sql",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-12",
+    "title": "Database Migrations Guide",
+    "section": "Manual Creation",
+    "content": "1. Navigate to /backend/supabase/migrations/ 2. Create a new file with the correct naming convention 3. Write your SQL migration bash",
+    "link": "/docs/database-migrations#manual-creation"
+  },
+  {
+    "id": "database-migrations-15",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "touch backend/supabase/migrations/20250107153045_create_payments_table.sql",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-16",
+    "title": "Database Migrations Guide",
+    "section": "Migration Template",
+    "content": "sql -- Migration: <name> -- Description: <what this migration does> -- Author: <your name> -- Date: <YYYY-MM-DD> -- ============================================ -- CHANGES -- ============================================ -- Your SQL statements here -- ============================================ -- R",
+    "link": "/docs/database-migrations#migration-template"
+  },
+  {
+    "id": "database-migrations-21",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase db reset",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-22",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase migration list",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-25",
+    "title": "Database Migrations Guide",
+    "section": "Production Deployment",
+    "content": "Migrations are applied automatically during deployment. For manual application: bash",
+    "link": "/docs/database-migrations#production-deployment"
+  },
+  {
+    "id": "database-migrations-26",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase link --project-ref <project-ref>",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-29",
+    "title": "Database Migrations Guide",
+    "section": "1. One Change Per Migration",
+    "content": "Each migration should do one thing: sql -- Good: Single responsibility -- 20250107120000_create_users_table.sql CREATE TABLE users (...); -- 20250107120001_add_email_index_to_users.sql CREATE INDEX idx_users_email ON users(email); sql -- Bad: Multiple unrelated changes CREATE TABLE users (...); CREA",
+    "link": "/docs/database-migrations#-one-change-per-migration"
+  },
+  {
+    "id": "database-migrations-30",
+    "title": "Database Migrations Guide",
+    "section": "2. Make Migrations Idempotent",
+    "content": "Use IF NOT EXISTS and IF EXISTS: sql -- Good: Can run multiple times without error CREATE TABLE IF NOT EXISTS users ( id UUID PRIMARY KEY DEFAULT uuid_generate_v4() ); DROP INDEX IF EXISTS idx_users_email; CREATE INDEX idx_users_email ON users(email);",
+    "link": "/docs/database-migrations#-make-migrations-idempotent"
+  },
+  {
+    "id": "database-migrations-31",
+    "title": "Database Migrations Guide",
+    "section": "3. Never Modify Existing Migrations",
+    "content": "Once a migration is committed and pushed: - DO NOT modify its contents - Create a new migration for corrections sql -- Wrong: Modifying existing migration -- 20250101_create_users.sql (modified) -- Correct: New migration to fix issue -- 20250107_add_missing_column_to_users.sql ALTER TABLE users ADD ",
+    "link": "/docs/database-migrations#-never-modify-existing-migrations"
+  },
+  {
+    "id": "database-migrations-32",
+    "title": "Database Migrations Guide",
+    "section": "4. Include Down Migrations",
+    "content": "Always document how to rollback (commented): sql -- UP ALTER TABLE users ADD COLUMN phone VARCHAR(20); -- DOWN (for reference) -- ALTER TABLE users DROP COLUMN phone;",
+    "link": "/docs/database-migrations#-include-down-migrations"
+  },
+  {
+    "id": "database-migrations-33",
+    "title": "Database Migrations Guide",
+    "section": "5. Use Transactions for Data Migrations",
+    "content": "sql BEGIN; -- Update data UPDATE users SET status = 'active' WHERE status IS NULL; -- Verify DO $$ BEGIN IF EXISTS (SELECT 1 FROM users WHERE status IS NULL) THEN RAISE EXCEPTION 'Migration failed: NULL status still exists'; END IF; END $$; COMMIT;",
+    "link": "/docs/database-migrations#-use-transactions-for-data-migrations"
+  },
+  {
+    "id": "database-migrations-35",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase db reset",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-38",
+    "title": "Database Migrations Guide",
+    "section": "Creating Tables",
+    "content": "sql -- Create table with common fields CREATE TABLE IF NOT EXISTS contracts ( id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, title VARCHAR(255) NOT NULL, description TEXT, status VARCHAR(50) DEFAULT 'draft', amount DECIMAL(12, 2), create",
+    "link": "/docs/database-migrations#creating-tables"
+  },
+  {
+    "id": "database-migrations-39",
+    "title": "Database Migrations Guide",
+    "section": "Adding Columns",
+    "content": "sql -- Add nullable column (safe) ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT; -- Add NOT NULL column with default ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'user' NOT NULL; -- Add column and backfill data ALTER TABLE users ADD COLUMN IF NOT EXISTS display_na",
+    "link": "/docs/database-migrations#adding-columns"
+  },
+  {
+    "id": "database-migrations-40",
+    "title": "Database Migrations Guide",
+    "section": "Creating Indexes",
+    "content": "sql -- Single column index CREATE INDEX IF NOT EXISTS idx_users_email ON users(email); -- Composite index CREATE INDEX IF NOT EXISTS idx_contracts_user_status ON contracts(user_id, status); -- Partial index CREATE INDEX IF NOT EXISTS idx_contracts_active ON contracts(created_at) WHERE status = 'acti",
+    "link": "/docs/database-migrations#creating-indexes"
+  },
+  {
+    "id": "database-migrations-41",
+    "title": "Database Migrations Guide",
+    "section": "Adding Foreign Keys",
+    "content": "sql -- Add foreign key constraint ALTER TABLE contracts ADD CONSTRAINT fk_contracts_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;",
+    "link": "/docs/database-migrations#adding-foreign-keys"
+  },
+  {
+    "id": "database-migrations-42",
+    "title": "Database Migrations Guide",
+    "section": "Creating Functions and Triggers",
+    "content": "sql -- Function to update updated_at timestamp CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = NOW(); RETURN NEW; END; $$ LANGUAGE plpgsql; -- Trigger to call the function DROP TRIGGER IF EXISTS set_updated_at ON contracts; CREATE TRIGGER set_update",
+    "link": "/docs/database-migrations#creating-functions-and-triggers"
+  },
+  {
+    "id": "database-migrations-43",
+    "title": "Database Migrations Guide",
+    "section": "Enabling Extensions",
+    "content": "sql -- Enable UUID extension CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; -- Enable pgcrypto for encryption CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";",
+    "link": "/docs/database-migrations#enabling-extensions"
+  },
+  {
+    "id": "database-migrations-44",
+    "title": "Database Migrations Guide",
+    "section": "Creating Enums",
+    "content": "sql -- Create enum type DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'contract_status') THEN CREATE TYPE contract_status AS ENUM ( 'draft', 'pending', 'active', 'completed', 'cancelled' ); END IF; END $$; -- Use enum in table ALTER TABLE contracts ALTER COLUMN status TYPE contrac",
+    "link": "/docs/database-migrations#creating-enums"
+  },
+  {
+    "id": "database-migrations-45",
+    "title": "Database Migrations Guide",
+    "section": "Data Migrations",
+    "content": "sql -- Migrate data from one structure to another BEGIN; -- Create new column ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(200); -- Migrate data UPDATE users SET full_name = CONCAT(first_name, ' ', last_name) WHERE full_name IS NULL; -- Optionally drop old columns (in separate migrat",
+    "link": "/docs/database-migrations#data-migrations"
+  },
+  {
+    "id": "database-migrations-47",
+    "title": "Database Migrations Guide",
+    "section": "Migration Failed",
+    "content": "If a migration fails: 1. Check the error message 2. Fix the SQL 3. If local: Reset the database bash npx supabase db reset 4. If production: Create a new migration to fix the issue",
+    "link": "/docs/database-migrations#migration-failed"
+  },
+  {
+    "id": "database-migrations-48",
+    "title": "Database Migrations Guide",
+    "section": "Duplicate Migration Error",
+    "content": "If you see \"migration already exists\": 1. Check supabase/migrations/ for duplicate timestamps 2. Rename the newer file with a new timestamp",
+    "link": "/docs/database-migrations#duplicate-migration-error"
+  },
+  {
+    "id": "database-migrations-49",
+    "title": "Database Migrations Guide",
+    "section": "Foreign Key Constraint Errors",
+    "content": "If you get constraint errors: 1. Ensure referenced table exists 2. Check that referenced column exists 3. Ensure data types match sql -- Check if table exists before adding FK DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'users') THEN ALTER TABLE contracts ADD CO",
+    "link": "/docs/database-migrations#foreign-key-constraint-errors"
+  },
+  {
+    "id": "database-migrations-52",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "psql -h localhost -p 54322 -U postgres -d postgres -c \"\\d+ users\"",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-53",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase migration list",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-55",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase db reset",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-56",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "rm backend/supabase/migrations/<latest_migration>.sql",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-57",
+    "title": "Database Migrations Guide",
+    "section": "Database Migrations Guide",
+    "content": "npx supabase db reset",
+    "link": "/docs/database-migrations"
+  },
+  {
+    "id": "database-migrations-58",
+    "title": "Database Migrations Guide",
+    "section": "Migration Checklist",
+    "content": "Before committing a migration: - [ ] File named correctly: <timestamp>_<descriptive_name>.sql - [ ] Includes header comment with description - [ ] Uses IF NOT EXISTS / IF EXISTS for idempotency - [ ] Down migration documented (commented) - [ ] Tested locally with npx supabase db reset - [ ] No sensi",
+    "link": "/docs/database-migrations#migration-checklist"
+  },
+  {
+    "id": "error-handling-0",
+    "title": "Error Handling Standards",
+    "section": "Error Handling Standards",
+    "content": "This document defines how to handle errors consistently across the Offer Hub project.",
+    "link": "/docs/error-handling"
+  },
+  {
+    "id": "error-handling-2",
+    "title": "Error Handling Standards",
+    "section": "Base Class: AppError",
+    "content": "All errors must extend from AppError: typescript import { AppError } from '@/utils/AppError'; // Usage example throw new AppError( 'User not found', 404, 'USER_NOT_FOUND', { userId: '123' } );",
+    "link": "/docs/error-handling#base-class-apperror"
+  },
+  {
+    "id": "error-handling-3",
+    "title": "Error Handling Standards",
+    "section": "AppError Properties",
+    "content": "- message: Human-readable message for the user - statusCode: HTTP status code (400, 404, 500, etc.) - errorCode: Unique error code (string in UPPER_SNAKE_CASE) - details: Optional object with additional information - timestamp: Automatic timestamp in ISO 8601 format",
+    "link": "/docs/error-handling#apperror-properties"
+  },
+  {
+    "id": "error-handling-5",
+    "title": "Error Handling Standards",
+    "section": "ValidationError",
+    "content": "For data validation errors: typescript import { ValidationError } from '@/utils/AppError'; throw new ValidationError( 'The provided data is invalid', [ { field: 'email', message: 'Invalid email' }, { field: 'password', message: 'Password too short' } ] );",
+    "link": "/docs/error-handling#validationerror"
+  },
+  {
+    "id": "error-handling-6",
+    "title": "Error Handling Standards",
+    "section": "AuthenticationError",
+    "content": "For authentication errors: typescript import { AuthenticationError } from '@/utils/AppError'; throw new AuthenticationError('Invalid or expired token');",
+    "link": "/docs/error-handling#authenticationerror"
+  },
+  {
+    "id": "error-handling-7",
+    "title": "Error Handling Standards",
+    "section": "AuthorizationError",
+    "content": "For authorization errors: typescript import { AuthorizationError } from '@/utils/AppError'; throw new AuthorizationError('You do not have permission for this action');",
+    "link": "/docs/error-handling#authorizationerror"
+  },
+  {
+    "id": "error-handling-8",
+    "title": "Error Handling Standards",
+    "section": "NotFoundError",
+    "content": "For resources not found: typescript import { NotFoundError } from '@/utils/AppError'; throw new NotFoundError('User', { userId: '123' });",
+    "link": "/docs/error-handling#notfounderror"
+  },
+  {
+    "id": "error-handling-9",
+    "title": "Error Handling Standards",
+    "section": "ConflictError",
+    "content": "For conflicts (duplicates, invalid states): typescript import { ConflictError } from '@/utils/AppError'; throw new ConflictError('Email is already registered');",
+    "link": "/docs/error-handling#conflicterror"
+  },
+  {
+    "id": "error-handling-10",
+    "title": "Error Handling Standards",
+    "section": "Error Codes",
+    "content": "Use the codes defined in backend/src/types/errors.types.ts:",
+    "link": "/docs/error-handling#error-codes"
+  },
+  {
+    "id": "error-handling-11",
+    "title": "Error Handling Standards",
+    "section": "Validation",
+    "content": "- VALIDATION_ERROR - REQUIRED_FIELD - INVALID_EMAIL - INVALID_UUID",
+    "link": "/docs/error-handling#validation"
+  },
+  {
+    "id": "error-handling-12",
+    "title": "Error Handling Standards",
+    "section": "Database",
+    "content": "- DATABASE_ERROR - DUPLICATE_ENTRY - REFERENCE_NOT_FOUND",
+    "link": "/docs/error-handling#database"
+  },
+  {
+    "id": "error-handling-13",
+    "title": "Error Handling Standards",
+    "section": "Business Logic",
+    "content": "- USER_NOT_FOUND - CONTRACT_NOT_FOUND - INSUFFICIENT_FUNDS - INVALID_STATUS_TRANSITION",
+    "link": "/docs/error-handling#business-logic"
+  },
+  {
+    "id": "error-handling-14",
+    "title": "Error Handling Standards",
+    "section": "Authentication/Authorization",
+    "content": "- AUTHENTICATION_ERROR - TOKEN_EXPIRED - TOKEN_INVALID - AUTHORIZATION_ERROR - INSUFFICIENT_PERMISSIONS",
+    "link": "/docs/error-handling#authentication-authorization"
+  },
+  {
+    "id": "error-handling-16",
+    "title": "Error Handling Standards",
+    "section": "Recommended Pattern",
+    "content": "typescript import { Request, Response } from 'express'; import { AppError } from '@/utils/AppError'; import { UserService } from '@/services/user.service'; export class UserController { async getUser(req: Request, res: Response) { try { const { id } = req.params; if (!id) { throw new AppError('User ",
+    "link": "/docs/error-handling#recommended-pattern"
+  },
+  {
+    "id": "error-handling-18",
+    "title": "Error Handling Standards",
+    "section": "Input Validation",
+    "content": "typescript export class UserService { static async createUser(data: CreateUserDTO) { // Validate required data if (!data.email) { throw new AppError('Email is required', 400, 'REQUIRED_FIELD'); } if (!isValidEmail(data.email)) { throw new AppError('Invalid email', 400, 'INVALID_EMAIL'); } // Busines",
+    "link": "/docs/error-handling#input-validation"
+  },
+  {
+    "id": "error-handling-19",
+    "title": "Error Handling Standards",
+    "section": "Error Middleware",
+    "content": "The ErrorHandlerMiddleware captures all errors and formats them consistently: typescript // backend/src/middlewares/errorHandler.middleware.ts // Already implemented - no additional action needed",
+    "link": "/docs/error-handling#error-middleware"
+  },
+  {
+    "id": "error-handling-20",
+    "title": "Error Handling Standards",
+    "section": "Standard Error Response",
+    "content": "All error responses follow this format: json { \"success\": false, \"error\": { \"type\": \"USER_NOT_FOUND\", \"message\": \"User not found\", \"details\": { \"userId\": \"123\" }, \"code\": \"USER_NOT_FOUND\", \"timestamp\": \"2025-12-16T10:30:00.000Z\" } }",
+    "link": "/docs/error-handling#standard-error-response"
+  },
+  {
+    "id": "error-handling-21",
+    "title": "Error Handling Standards",
+    "section": "In Development",
+    "content": "In development mode, additional information is included: json { \"success\": false, \"error\": { \"type\": \"USER_NOT_FOUND\", \"message\": \"User not found\", \"details\": { \"userId\": \"123\" }, \"code\": \"USER_NOT_FOUND\", \"timestamp\": \"2025-12-16T10:30:00.000Z\", \"stack\": \"Error: User not found\\n at ...\", \"url\": \"/a",
+    "link": "/docs/error-handling#in-development"
+  },
+  {
+    "id": "error-handling-22",
+    "title": "Error Handling Standards",
+    "section": "HTTP Status Codes",
+    "content": "| Code | Usage | Example | |------|-------|---------| | 400 | Bad Request - Invalid data | VALIDATION_ERROR | | 401 | Unauthorized - Not authenticated | TOKEN_EXPIRED | | 403 | Forbidden - No permissions | INSUFFICIENT_PERMISSIONS | | 404 | Not Found - Resource doesn't exist | USER_NOT_FOUND | | 409",
+    "link": "/docs/error-handling#http-status-codes"
+  },
+  {
+    "id": "error-handling-23",
+    "title": "Error Handling Standards",
+    "section": "Best Practices",
+    "content": "1. Always use AppError: Don't throw generic JavaScript errors 2. Clear messages: Messages should be understandable for end users 3. Unique codes: Use consistent and documented error codes 4. Don't expose sensitive details: In production, don't include stack traces or internal information 5. Logging:",
+    "link": "/docs/error-handling#best-practices"
+  },
+  {
+    "id": "error-handling-25",
+    "title": "Error Handling Standards",
+    "section": "Log Levels",
+    "content": "Use appropriate log levels for different situations: | Level | Usage | Example | |-------|-------|---------| | error | Application errors that need immediate attention | Database connection failed, unhandled exceptions | | warn | Potential issues or unusual behavior | Rate limit approaching, depreca",
+    "link": "/docs/error-handling#log-levels"
+  },
+  {
+    "id": "error-handling-26",
+    "title": "Error Handling Standards",
+    "section": "Logging in Controllers",
+    "content": "typescript import { logger } from '@/utils/logger'; export class UserController { async createUser(req: Request, res: Response) { logger.info('Creating new user', { email: req.body.email }); try { const user = await UserService.createUser(req.body); logger.info('User created successfully', { userId:",
+    "link": "/docs/error-handling#logging-in-controllers"
+  },
+  {
+    "id": "error-handling-27",
+    "title": "Error Handling Standards",
+    "section": "Logging in Services",
+    "content": "typescript import { logger } from '@/utils/logger'; export class UserService { static async getUserById(id: string) { logger.debug('Fetching user by ID', { userId: id }); const { data, error } = await supabase .from('users') .select('') .eq('id', id) .single(); if (error) { logger.error('Database er",
+    "link": "/docs/error-handling#logging-in-services"
+  },
+  {
+    "id": "error-handling-28",
+    "title": "Error Handling Standards",
+    "section": "What to Log",
+    "content": "DO log: - User actions (login, logout, registration) - Business events (payment, order creation) - Error details (message, stack in dev) - Request metadata (method, path, duration) - System events (startup, shutdown) DO NOT log: - Passwords or secrets - Full credit card numbers - Personal identifiab",
+    "link": "/docs/error-handling#what-to-log"
+  },
+  {
+    "id": "error-handling-29",
+    "title": "Error Handling Standards",
+    "section": "Log Format",
+    "content": "All logs should include contextual information: typescript // Good: Includes context logger.info('User login successful', { userId: user.id, method: 'email', ip: req.ip }); // Bad: No context logger.info('Login successful');",
+    "link": "/docs/error-handling#log-format"
+  },
+  {
+    "id": "error-handling-31",
+    "title": "Error Handling Standards",
+    "section": "Request Validation Middleware",
+    "content": "typescript import { Request, Response, NextFunction } from 'express'; import { ValidationError } from '@/utils/AppError'; export const validateRequest = (schema: Schema) => { return (req: Request, res: Response, next: NextFunction) => { const { error } = schema.validate(req.body); if (error) { const",
+    "link": "/docs/error-handling#request-validation-middleware"
+  },
+  {
+    "id": "error-handling-32",
+    "title": "Error Handling Standards",
+    "section": "Authentication Middleware Errors",
+    "content": "typescript import { AuthenticationError, AuthorizationError } from '@/utils/AppError'; export const authenticateToken = async (req, res, next) => { const token = req.headers.authorization?.split(' ')[1]; if (!token) { throw new AuthenticationError('Access token required'); } try { const payload = aw",
+    "link": "/docs/error-handling#authentication-middleware-errors"
+  },
+  {
+    "id": "error-handling-33",
+    "title": "Error Handling Standards",
+    "section": "Warnings and Non-Critical Errors",
+    "content": "For issues that don't require stopping execution: typescript import { logger } from '@/utils/logger'; export class PaymentService { static async processPayment(data: PaymentData) { // Log warning for unusual but valid scenarios if (data.amount > 10000) { logger.warn('Large payment detected', { userI",
+    "link": "/docs/error-handling#warnings-and-non-critical-errors"
+  },
+  {
+    "id": "error-handling-34",
+    "title": "Error Handling Standards",
+    "section": "Warning Scenarios",
+    "content": "- Approaching rate limits - Deprecated feature usage - Unusual but valid user behavior - Performance degradation - Configuration issues that don't prevent operation",
+    "link": "/docs/error-handling#warning-scenarios"
+  },
+  {
+    "id": "error-handling-36",
+    "title": "Error Handling Standards",
+    "section": "Retry with Backoff",
+    "content": "typescript async function withRetry<T>( operation: () => Promise<T>, maxRetries: number = 3 ): Promise<T> { let lastError: Error; for (let attempt = 1; attempt <= maxRetries; attempt++) { try { return await operation(); } catch (error) { lastError = error; logger.warn(Operation failed, attempt ${att",
+    "link": "/docs/error-handling#retry-with-backoff"
+  },
+  {
+    "id": "error-handling-37",
+    "title": "Error Handling Standards",
+    "section": "Graceful Degradation",
+    "content": "typescript async function getUser(id: string): Promise<User | null> { try { // Try primary database return await UserService.getUserById(id); } catch (error) { logger.error('Primary DB failed, trying cache', { error: error.message }); try { // Fallback to cache return await CacheService.getUser(id);",
+    "link": "/docs/error-handling#graceful-degradation"
+  },
+  {
+    "id": "error-handling-39",
+    "title": "Error Handling Standards",
+    "section": "Create User with Validation",
+    "content": "typescript export class UserController { async createUser(req: Request, res: Response) { try { const { email, password, username } = req.body; // Validations if (!email) { throw new AppError('Email is required', 400, 'REQUIRED_FIELD'); } if (!isValidEmail(email)) { throw new AppError('Invalid email'",
+    "link": "/docs/error-handling#create-user-with-validation"
+  },
+  {
+    "id": "error-handling-40",
+    "title": "Error Handling Standards",
+    "section": "Database Error Handling",
+    "content": "typescript export class UserService { static async getUserById(id: string) { try { const { data, error } = await supabase .from('users') .select('') .eq('id', id) .single(); if (error) { if (error.code === 'PGRST116') { // No rows returned throw new NotFoundError('User', { userId: id }); } throw new",
+    "link": "/docs/error-handling#database-error-handling"
+  },
+  {
+    "id": "naming-conventions-0",
+    "title": "Naming Conventions",
+    "section": "Naming Conventions",
+    "content": "This document defines naming conventions to maintain consistency across the Offer Hub project.",
+    "link": "/docs/naming-conventions"
+  },
+  {
+    "id": "naming-conventions-2",
+    "title": "Naming Conventions",
+    "section": "Files",
+    "content": "- Format: kebab-case (lowercase with hyphens) - Examples: - ✅ user-service.ts - ✅ auth-controller.ts - ✅ error-handler.middleware.ts - ❌ UserService.ts - ❌ authController.ts - ❌ error_handler.middleware.ts",
+    "link": "/docs/naming-conventions#files"
+  },
+  {
+    "id": "naming-conventions-3",
+    "title": "Naming Conventions",
+    "section": "Folders",
+    "content": "- Format: kebab-case (lowercase with hyphens) - Examples: - ✅ src/components/user-profile/ - ✅ backend/src/middlewares/ - ✅ src/hooks/use-auth/ - ❌ src/components/UserProfile/ - ❌ backend/src/Middlewares/",
+    "link": "/docs/naming-conventions#folders"
+  },
+  {
+    "id": "naming-conventions-4",
+    "title": "Naming Conventions",
+    "section": "Exceptions",
+    "content": "- React Components: Use PascalCase for component files - ✅ UserProfile.tsx - ✅ LoginForm.tsx - ❌ user-profile.tsx",
+    "link": "/docs/naming-conventions#exceptions"
+  },
+  {
+    "id": "naming-conventions-6",
+    "title": "Naming Conventions",
+    "section": "Variables and Functions",
+    "content": "- Format: camelCase - Examples: typescript const userName = 'john_doe'; const getUserData = () => {}; const isAuthenticated = true;",
+    "link": "/docs/naming-conventions#variables-and-functions"
+  },
+  {
+    "id": "naming-conventions-7",
+    "title": "Naming Conventions",
+    "section": "Constants",
+    "content": "- Format: UPPER_SNAKE_CASE - Examples: typescript const MAX_RETRY_ATTEMPTS = 3; const API_BASE_URL = 'https://api.offer-hub.org'; const DEFAULT_TIMEOUT = 5000;",
+    "link": "/docs/naming-conventions#constants"
+  },
+  {
+    "id": "naming-conventions-8",
+    "title": "Naming Conventions",
+    "section": "Classes and Interfaces",
+    "content": "- Format: PascalCase - Examples: typescript class UserService {} interface ApiResponse {} type UserRole = 'freelancer' | 'client';",
+    "link": "/docs/naming-conventions#classes-and-interfaces"
+  },
+  {
+    "id": "naming-conventions-9",
+    "title": "Naming Conventions",
+    "section": "Types and Enums",
+    "content": "- Format: PascalCase - Examples: typescript enum UserStatus { ACTIVE = 'active', INACTIVE = 'inactive' } type UserId = string;",
+    "link": "/docs/naming-conventions#types-and-enums"
+  },
+  {
+    "id": "naming-conventions-10",
+    "title": "Naming Conventions",
+    "section": "React Components",
+    "content": "- Format: PascalCase - Examples: typescript export const UserProfile = () => {}; export default function LoginForm() {};",
+    "link": "/docs/naming-conventions#react-components"
+  },
+  {
+    "id": "naming-conventions-11",
+    "title": "Naming Conventions",
+    "section": "Custom Hooks",
+    "content": "- Format: camelCase with use- prefix - File: kebab-case with use- prefix - Examples: - File: use-user-data.ts - Hook: useUserData() - File: use-auth-state.ts - Hook: useAuthState()",
+    "link": "/docs/naming-conventions#custom-hooks"
+  },
+  {
+    "id": "naming-conventions-13",
+    "title": "Naming Conventions",
+    "section": "Controllers",
+    "content": "- File: kebab-case with .controller.ts suffix - Class: PascalCase with Controller suffix - Examples: - File: user.controller.ts - Class: UserController",
+    "link": "/docs/naming-conventions#controllers"
+  },
+  {
+    "id": "naming-conventions-14",
+    "title": "Naming Conventions",
+    "section": "Services",
+    "content": "- File: kebab-case with .service.ts suffix - Class: PascalCase with Service suffix - Examples: - File: auth.service.ts - Class: AuthService",
+    "link": "/docs/naming-conventions#services"
+  },
+  {
+    "id": "naming-conventions-15",
+    "title": "Naming Conventions",
+    "section": "Middlewares",
+    "content": "- File: kebab-case with .middleware.ts suffix - Function/Class: camelCase or PascalCase as appropriate - Examples: - File: auth.middleware.ts - Function: authenticateToken",
+    "link": "/docs/naming-conventions#middlewares"
+  },
+  {
+    "id": "naming-conventions-16",
+    "title": "Naming Conventions",
+    "section": "Routes",
+    "content": "- File: kebab-case with .routes.ts suffix - Variable: camelCase with Routes suffix - Examples: - File: user.routes.ts - Variable: userRoutes",
+    "link": "/docs/naming-conventions#routes"
+  },
+  {
+    "id": "naming-conventions-17",
+    "title": "Naming Conventions",
+    "section": "Types",
+    "content": "- File: kebab-case with .types.ts suffix - Interfaces/Types: PascalCase - Examples: - File: user.types.ts - Interface: UserData, CreateUserRequest",
+    "link": "/docs/naming-conventions#types"
+  },
+  {
+    "id": "naming-conventions-19",
+    "title": "Naming Conventions",
+    "section": "Components",
+    "content": "- File: PascalCase.tsx for main components - Folder: kebab-case for components with multiple files - Examples: - UserProfile.tsx (simple component) - user-profile/ (folder with multiple files) - user-profile.tsx - user-profile.styles.ts - user-profile.test.tsx",
+    "link": "/docs/naming-conventions#components"
+  },
+  {
+    "id": "naming-conventions-20",
+    "title": "Naming Conventions",
+    "section": "Pages (Next.js App Router)",
+    "content": "- File: kebab-case with page.tsx or layout.tsx - Examples: - src/app/login/page.tsx - src/app/user-profile/page.tsx",
+    "link": "/docs/naming-conventions#pages-next-js-app-router-"
+  },
+  {
+    "id": "naming-conventions-21",
+    "title": "Naming Conventions",
+    "section": "Hooks",
+    "content": "- File: kebab-case with use- prefix and .ts suffix - Examples: - use-user-data.ts - use-auth-state.ts",
+    "link": "/docs/naming-conventions#hooks"
+  },
+  {
+    "id": "naming-conventions-23",
+    "title": "Naming Conventions",
+    "section": "Tables",
+    "content": "- Format: snake_case (plural) - Examples: - ✅ users - ✅ refresh_tokens - ✅ service_requests - ❌ Users - ❌ refreshTokens",
+    "link": "/docs/naming-conventions#tables"
+  },
+  {
+    "id": "naming-conventions-24",
+    "title": "Naming Conventions",
+    "section": "Columns",
+    "content": "- Format: snake_case - Examples: - ✅ user_id - ✅ created_at - ✅ email_verified - ❌ userId - ❌ createdAt",
+    "link": "/docs/naming-conventions#columns"
+  },
+  {
+    "id": "naming-conventions-25",
+    "title": "Naming Conventions",
+    "section": "Indexes",
+    "content": "- Format: idx_<table>_<columns> - Examples: - idx_users_email - idx_contracts_user_id",
+    "link": "/docs/naming-conventions#indexes"
+  },
+  {
+    "id": "naming-conventions-26",
+    "title": "Naming Conventions",
+    "section": "Environment Variables",
+    "content": "- Format: UPPER_SNAKE_CASE - Examples: - SUPABASE_URL - JWT_SECRET - NEXT_PUBLIC_API_URL",
+    "link": "/docs/naming-conventions#environment-variables"
+  },
+  {
+    "id": "naming-conventions-27",
+    "title": "Naming Conventions",
+    "section": "Comments and Documentation",
+    "content": "- Code comments: English - Commit messages: English (unless otherwise specified) - Documentation: English",
+    "link": "/docs/naming-conventions#comments-and-documentation"
+  },
+  {
+    "id": "readme-0",
+    "title": "Offer Hub Documentation",
+    "section": "Offer Hub Documentation",
+    "content": "This directory contains all documentation for the Offer Hub project.",
+    "link": "/docs/readme"
+  },
+  {
+    "id": "readme-1",
+    "title": "Offer Hub Documentation",
+    "section": "Getting Started",
+    "content": "- Contributing Guide - Complete guide for contributors (repository setup, branches, commits, PRs)",
+    "link": "/docs/readme#getting-started"
+  },
+  {
+    "id": "readme-2",
+    "title": "Offer Hub Documentation",
+    "section": "Project Architecture",
+    "content": "- Architecture Overview - Project structure, backend patterns, and system design",
+    "link": "/docs/readme#project-architecture"
+  },
+  {
+    "id": "readme-3",
+    "title": "Offer Hub Documentation",
+    "section": "Standards and Conventions",
+    "content": "- Naming Conventions - Conventions for file names, variables, functions, etc. - Code Style - General style standards and best practices - Error Handling - How to handle errors consistently - API Responses - Standard format for successful and error responses",
+    "link": "/docs/readme#standards-and-conventions"
+  },
+  {
+    "id": "readme-4",
+    "title": "Offer Hub Documentation",
+    "section": "Technical Documentation",
+    "content": "- Authentication System - Architecture and flows of the authentication system - Database Migrations - How to create and manage database migrations",
+    "link": "/docs/readme#technical-documentation"
+  }
+]

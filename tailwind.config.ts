@@ -119,6 +119,9 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         progress: "progress 1s infinite linear",
       },
+      boxShadow: {
+        "raised": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
