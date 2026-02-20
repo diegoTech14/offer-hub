@@ -1,0 +1,42 @@
+---
+title: Getting Started
+description: Learn how OFFER-HUB works and how to integrate it into your marketplace in minutes.
+order: 1
+section: Getting Started
+---
+
+OFFER-HUB is a non-custodial escrow payment layer for modern marketplaces. It enables secure, trustless transactions between buyers and sellers without requiring you to build complex payment infrastructure.
+
+<Callout variant="tip">
+  If you just want to run the project locally, jump straight to the [Installation](/docs/installation) guide.
+</Callout>
+
+## How It Works
+
+OFFER-HUB uses a **balance-based ledger** and **smart-contract escrow** to protect every transaction:
+
+1. **Buyer deposits funds** — USDC is detected on-chain and credited to the buyer's available balance.
+2. **Buyer initiates an order** — funds are moved from `available` to `held` (escrow).
+3. **Seller delivers** — on approval, held funds are settled to the seller's available balance.
+4. **Withdrawal** — either party can withdraw their available balance at any time.
+
+## Balance States
+
+Every user has two balance columns:
+
+| State | Description |
+|-------|-------------|
+| `available` | Spendable funds — can be withdrawn or used to create orders |
+| `held` | Locked in active escrow — released on settlement or cancellation |
+
+## Supported Currencies
+
+<Badge variant="primary">USDC</Badge> <Badge variant="default">XLM</Badge>
+
+Both USD and XLM are supported natively. The currency is tracked per-balance record.
+
+## Next Steps
+
+- [Installation](/docs/installation) — set up the project locally
+- [Configuration](/docs/configuration) — environment variables and Supabase setup
+- [API Reference](/docs/api-reference/overview) — explore the REST API

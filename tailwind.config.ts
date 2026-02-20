@@ -5,6 +5,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./content/**/*.{md,mdx}",
   ],
   theme: {
     extend: {
@@ -39,9 +40,15 @@ const config: Config = {
         fadeInUp: "fadeInUp 400ms ease-out both",
         fadeIn: "fadeIn 300ms ease-out both",
       },
+      boxShadow: {
+        raised: "6px 6px 12px #d1d5db, -6px -6px 12px #ffffff",
+        "raised-sm": "3px 3px 6px #d1d5db, -3px -3px 6px #ffffff",
+        sunken: "inset 4px 4px 8px #d1d5db, inset -4px -4px 8px #ffffff",
+        "sunken-subtle": "inset 2px 2px 4px #d1d5db, inset -2px -2px 4px #ffffff",
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };
 
 export default config;
