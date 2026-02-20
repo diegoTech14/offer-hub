@@ -31,7 +31,7 @@ files.forEach(file => {
 
         if (isSectionHeader) {
             sectionTitle = headerLine.replace(/^##?#? /, '').trim();
-            sectionId = '#' + sectionTitle.toLowerCase().replace(/[^a-z0-0]/g, '-').replace(/-+/g, '-');
+            sectionId = '#' + sectionTitle.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
         }
 
         const sectionContent = lines.slice(1).join(' ')

@@ -17,7 +17,7 @@ interface SearchResult {
 export default function DocsSearchBar() {
     const [query, setQuery] = useState("");
     const [debounceQuery, setDebounceQuery] = useState("");
-    const [results, setResults] = useState<any[]>([]);
+    const [results, setResults] = useState<Fuse.FuseResult<SearchResult>[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
     const searchRef = useRef<HTMLDivElement>(null);
