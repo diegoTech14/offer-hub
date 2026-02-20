@@ -9,15 +9,6 @@ const stats = [
   { value: "50+", label: "Countries" },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.55, ease: "easeOut" },
-  }),
-};
-
 export default function StatsSection() {
   return (
     <section className="py-20">
@@ -26,10 +17,9 @@ export default function StatsSection() {
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              custom={i}
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.55, ease: "easeOut" }}
               viewport={{ once: true, margin: "-80px" }}
               className="flex flex-col items-center text-center p-8 rounded-2xl shadow-raised"
               style={{ background: "#F1F3F7" }}
