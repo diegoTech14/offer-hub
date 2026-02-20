@@ -26,7 +26,7 @@ const OpenIssuesSection = () => {
         <SectionHeading
           eyebrow="Open Issues"
           title="Help unblock active workstreams"
-          subtitle="Placeholder board for issue #1029. This section is scaffolded for labels, priority and ownership."
+          subtitle="Active workstreams where your help makes a difference."
         />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

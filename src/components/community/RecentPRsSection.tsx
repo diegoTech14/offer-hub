@@ -34,7 +34,7 @@ const RecentPRsSection = () => {
         <SectionHeading
           eyebrow="Recent Pull Requests"
           title="Latest community contributions"
-          subtitle="Placeholder feed for issue #1028. Replace with live GitHub PR activity and review states."
+          subtitle="The latest contributions from our open source community."
         />
 
         <div className="space-y-4">

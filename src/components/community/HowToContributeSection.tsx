@@ -18,7 +18,7 @@ const HowToContributeSection = () => {
         <SectionHeading
           eyebrow="How to Contribute"
           title="A quick path from first issue to first merge"
-          subtitle="Placeholder guide for issue #1030. Replace with full contribution docs, templates, and automation links."
+          subtitle="Everything you need to go from first issue to first merge."
         />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

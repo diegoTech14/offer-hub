@@ -20,7 +20,7 @@ const ContributorsSection = () => {
         <SectionHeading
           eyebrow="Contributors"
           title="Meet the people shipping OFFER-HUB"
-          subtitle="Placeholder grid for issue #1027. Swap mock profiles for live contributor data and GitHub avatars."
+          subtitle="Meet the developers shipping OFFER-HUB every day."
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

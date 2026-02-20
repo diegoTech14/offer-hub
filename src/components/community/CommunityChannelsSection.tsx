@@ -5,8 +5,8 @@ import {
   ArrowUpRight,
   Disc3,
   Linkedin,
-  MessageCircle,
   Send,
+  Twitter,
 } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
 
@@ -28,7 +28,7 @@ const channels = [
     name: "X",
     description: "Community highlights, release threads, and ecosystem news.",
     href: "https://x.com",
-    icon: MessageCircle,
+    icon: Twitter,
   },
   {
     name: "LinkedIn",
@@ -45,7 +45,7 @@ const CommunityChannelsSection = () => {
         <SectionHeading
           eyebrow="Community Channels"
           title="Join conversations across every channel"
-          subtitle="Placeholder cards for issue #1031. Keep channel cards as shared entry points for the community."
+          subtitle="Find us where the conversation is happening."
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -57,7 +57,7 @@ const CommunityChannelsSection = () => {
                 href={channel.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-2xl bg-background p-6 shadow-raised transition-transform duration-300 hover:-translate-y-1"
+                className="flex h-full flex-col rounded-2xl bg-background p-6 shadow-raised transition-transform duration-300 hover:-translate-y-1"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{
@@ -74,7 +74,7 @@ const CommunityChannelsSection = () => {
                 <p className="mt-2 text-sm font-light leading-relaxed text-text-secondary">
                   {channel.description}
                 </p>
-                <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-text-primary">
+                <span className="mt-auto pt-6 inline-flex items-center gap-2 text-sm font-semibold text-text-primary">
                   Join channel <ArrowUpRight size={16} />
                 </span>
               </motion.a>
