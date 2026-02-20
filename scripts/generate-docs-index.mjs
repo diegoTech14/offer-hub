@@ -19,16 +19,32 @@ if (!fs.existsSync(DOCS_DIR)) {
     process.exit(1);
 }
 
-const files = fs.readdirSync(DOCS_DIR).filter(f => f.endsWith('.mdx'));
+/**
+ * Recursively collects all MDX files in a directory
+ */
+function collectMdxFiles(dir, base = '') {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const results = [];
+    for (const entry of entries) {
+        const rel = base ? `${base}/${entry.name}` : entry.name;
+        if (entry.isDirectory()) {
+            results.push(...collectMdxFiles(path.join(dir, entry.name), rel));
+        } else if (entry.isFile() && entry.name.endsWith('.mdx')) {
+            results.push(rel);
+        }
+    }
+    return results;
+}
 
+const files = collectMdxFiles(DOCS_DIR);
 const index = [];
 
-files.forEach(file => {
-    const content = fs.readFileSync(path.join(DOCS_DIR, file), 'utf8');
-    const filename = file.replace('.mdx', '').toLowerCase().replace(/_/g, '-');
+files.forEach(relativePath => {
+    const content = fs.readFileSync(path.join(DOCS_DIR, relativePath), 'utf8');
+    const slug = relativePath.replace('.mdx', '').toLowerCase().replace(/_/g, '-');
 
     // Attempt to extract title from markdown or frontmatter
-    let docTitle = filename;
+    let docTitle = slug.split('/').pop();
     const titleMatch = content.match(/^#\s+(.+)$/m);
     if (titleMatch) {
         docTitle = titleMatch[1].trim();
@@ -67,11 +83,11 @@ files.forEach(file => {
 
         if (sectionContent.length > 20) {
             index.push({
-                id: `${filename}-${idx}`,
+                id: `${slug.replace(/\//g, '-')}-${idx}`,
                 title: docTitle,
                 section: sectionTitle,
                 content: sectionContent,
-                link: `/docs/${filename}${sectionId}`
+                link: `/docs/${slug}${sectionId}`
             });
         }
     });
