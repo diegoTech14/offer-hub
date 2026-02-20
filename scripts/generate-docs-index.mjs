@@ -12,6 +12,12 @@ const files = fs.readdirSync(DOCS_DIR).filter(f => f.endsWith('.md'));
 
 const index = [];
 
+// Ensure output directory exists
+const outputDir = path.dirname(OUTPUT_FILE);
+if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+}
+
 files.forEach(file => {
     const content = fs.readFileSync(path.join(DOCS_DIR, file), 'utf8');
     const filename = file.replace('.md', '').toLowerCase().replace(/_/g, '-');
