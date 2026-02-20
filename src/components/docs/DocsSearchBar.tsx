@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, FileText, ChevronRight, X } from "lucide-react";
-import Fuse from "fuse.js";
+import Fuse, { type FuseResult } from "fuse.js";
 import { useRouter } from "next/navigation";
 import docsIndex from "@/data/docs-index.json";
 
@@ -17,13 +17,13 @@ interface SearchResult {
 export default function DocsSearchBar() {
     const [query, setQuery] = useState("");
     const [debounceQuery, setDebounceQuery] = useState("");
-    const [results, setResults] = useState<Fuse.FuseResult<SearchResult>[]>([]);
+    const [results, setResults] = useState<FuseResult<SearchResult>[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
     const searchRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
-    const fuse = useMemo(() => new Fuse(docsIndex, {
+    const fuse = useMemo(() => new Fuse(docsIndex as SearchResult[], {
         keys: ["title", "section", "content"],
         threshold: 0.3,
         includeMatches: true,
