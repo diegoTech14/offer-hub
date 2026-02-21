@@ -4,6 +4,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllDocSlugs, getDocBySlug, extractHeadings } from "@/lib/mdx";
 import { MDX_COMPONENTS } from "@/components/docs/mdx-components";
 import { TableOfContents } from "@/components/docs/TableOfContents";
+import { DocPageActions } from "@/components/docs/DocPageActions";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -39,18 +40,30 @@ export default async function DocPage({ params }: PageProps) {
       <article className="flex-1 min-w-0">
         {/* Page header */}
         <div className="mb-8 pb-6 border-b" style={{ borderColor: "#d1d5db" }}>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: "#19213D" }}>
-            {doc.frontmatter.title}
-          </h1>
-          {doc.frontmatter.description && (
-            <p className="text-base leading-relaxed" style={{ color: "#6D758F" }}>
-              {doc.frontmatter.description}
-            </p>
-          )}
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold mb-2" style={{ color: "#19213D" }}>
+                {doc.frontmatter.title}
+              </h1>
+              {doc.frontmatter.description && (
+                <p className="text-base leading-relaxed" style={{ color: "#6D758F" }}>
+                  {doc.frontmatter.description}
+                </p>
+              )}
+            </div>
+
+            <DocPageActions
+              slug={doc.slug}
+              title={doc.frontmatter.title}
+              description={doc.frontmatter.description}
+              markdownContent={doc.content}
+              frontmatter={doc.frontmatter}
+            />
+          </div>
         </div>
 
         {/* MDX content */}
-        <div className="max-w-none">
+        <div className="max-w-none" id="doc-page-export-content">
           <MDXRemote source={doc.content} components={MDX_COMPONENTS} />
         </div>
       </article>
