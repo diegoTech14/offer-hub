@@ -37,7 +37,7 @@ export default function AuthenticationPage() {
         style={{ background: "#19213D", color: "#F1F3F7" }}
       >
         <code>{`curl https://api.offerhub.io/orders \\
-  -H "Authorization: Bearer sk_live_abc123xyz"`}</code>
+  -H "Authorization: Bearer YOUR_API_KEY_HERE"`}</code>
       </pre>
 
       <div
