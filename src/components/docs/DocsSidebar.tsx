@@ -6,23 +6,14 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/cn";
+import type { SidebarSection } from "@/lib/mdx";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-interface NavSection {
-  label: string;
-  links: NavLink[];
-}
-
 interface DocsSidebarProps {
-  navItems: NavSection[];
+  nav: SidebarSection[];
   className?: string;
 }
 
@@ -30,7 +21,7 @@ interface DocsSidebarProps {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function DocsSidebar({ navItems, className }: DocsSidebarProps) {
+export function DocsSidebar({ nav, className }: DocsSidebarProps) {
   const pathname = usePathname();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set()
@@ -38,20 +29,20 @@ export function DocsSidebar({ navItems, className }: DocsSidebarProps) {
 
   // Auto-expand section containing active page on mount and pathname change
   useEffect(() => {
-    if (!navItems || navItems.length === 0) return;
+    if (!nav || nav.length === 0) return;
 
     // Find section containing active page
-    const activeSectionLabel = navItems.find((section) =>
-      section.links.some((link) => link.href === pathname)
-    )?.label;
+    const activeSectionLabel = nav.find((section) =>
+      section.links.some((link) => pathname === `/docs/${link.slug}`)
+    )?.section;
 
     // If found, expand only that section. Otherwise, expand first section.
-    const sectionToExpand = activeSectionLabel || navItems[0]?.label;
+    const sectionToExpand = activeSectionLabel || nav[0]?.section;
 
     if (sectionToExpand) {
       setExpandedSections(new Set([sectionToExpand]));
     }
-  }, [pathname, navItems]);
+  }, [pathname, nav]);
 
   // Toggle section expand/collapse
   const toggleSection = (sectionLabel: string) => {
@@ -66,8 +57,8 @@ export function DocsSidebar({ navItems, className }: DocsSidebarProps) {
     });
   };
 
-  // Handle empty or missing navItems
-  if (!navItems || navItems.length === 0) {
+  // Handle empty or missing nav
+  if (!nav || nav.length === 0) {
     return null;
   }
 
@@ -78,23 +69,23 @@ export function DocsSidebar({ navItems, className }: DocsSidebarProps) {
       style={{ background: "#F1F3F7" }}
     >
       <div className="space-y-6">
-        {navItems.map((section) => {
+        {nav.map((section) => {
           // Skip empty sections
           if (!section.links || section.links.length === 0) {
             return null;
           }
 
-          const isExpanded = expandedSections.has(section.label);
-          const sectionId = `section-${section.label.toLowerCase().replace(/\s+/g, "-")}`;
+          const isExpanded = expandedSections.has(section.section);
+          const sectionId = `section-${section.section.toLowerCase().replace(/\s+/g, "-")}`;
 
           return (
-            <div key={section.label}>
+            <div key={section.section}>
               {/* Section Header Button */}
               <button
-                onClick={() => toggleSection(section.label)}
+                onClick={() => toggleSection(section.section)}
                 aria-expanded={isExpanded}
                 aria-controls={sectionId}
-                aria-label={`${isExpanded ? "Collapse" : "Expand"} ${section.label} section`}
+                aria-label={`${isExpanded ? "Collapse" : "Expand"} ${section.section} section`}
                 className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-[400ms] ease-out hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#149A9B] focus-visible:ring-offset-2"
                 style={{ background: "transparent" }}
               >
@@ -102,7 +93,7 @@ export function DocsSidebar({ navItems, className }: DocsSidebarProps) {
                   className="text-xs font-semibold uppercase tracking-widest"
                   style={{ color: "#19213D" }}
                 >
-                  {section.label}
+                  {section.section}
                 </span>
                 <ChevronDown
                   size={16}
@@ -130,13 +121,14 @@ export function DocsSidebar({ navItems, className }: DocsSidebarProps) {
                     className="overflow-hidden mt-2 space-y-1"
                   >
                     {section.links.map((link) => {
-                      const isActive = pathname === link.href;
-                      const linkKey = `${section.label}-${link.href}`;
+                      const href = `/docs/${link.slug}`;
+                      const isActive = pathname === href;
+                      const linkKey = `${section.section}-${link.slug}`;
 
                       return (
                         <li key={linkKey} role="listitem">
                           <Link
-                            href={link.href}
+                            href={href}
                             aria-current={isActive ? "page" : undefined}
                             className={cn(
                               "block text-sm py-1.5 px-3 rounded-lg transition-all duration-[400ms] ease-out",
@@ -161,7 +153,7 @@ export function DocsSidebar({ navItems, className }: DocsSidebarProps) {
                               }
                             }}
                           >
-                            {link.label}
+                            {link.title}
                           </Link>
                         </li>
                       );
