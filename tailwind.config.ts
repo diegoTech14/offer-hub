@@ -41,7 +41,7 @@ const config: Config = {
         fadeIn: "fadeIn 300ms ease-out both",
       },
       boxShadow: {
-        raised: "6px 6px 12px #d1d5db, -6px -6px 12px #ffffff",
+        raised: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         "raised-sm": "3px 3px 6px #d1d5db, -3px -3px 6px #ffffff",
         sunken: "inset 4px 4px 8px #d1d5db, inset -4px -4px 8px #ffffff",
         "sunken-subtle": "inset 2px 2px 4px #d1d5db, inset -2px -2px 4px #ffffff",
