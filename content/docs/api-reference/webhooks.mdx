@@ -1,0 +1,118 @@
+---
+title: Webhooks
+description: Receive real-time event notifications from OFFER-HUB via HTTP webhooks.
+order: 2
+section: API Reference
+---
+
+Webhooks let your application receive real-time notifications when events occur in OFFER-HUB — order updates, balance credits, escrow state changes, and more.
+
+## Registering a Webhook
+
+<CommandLine>POST /api/v1/webhooks</CommandLine>
+
+```json
+{
+  "url": "https://your-app.com/webhooks/offerhub",
+  "events": ["balance.credited", "escrow.released", "order.completed"],
+  "secret": "your-signing-secret"
+}
+```
+
+A successful response returns the webhook object with its `id`:
+
+```json
+{
+  "code": 201,
+  "ok": true,
+  "data": {
+    "id": "wh_01ABCDEF",
+    "url": "https://your-app.com/webhooks/offerhub",
+    "events": ["balance.credited", "escrow.released", "order.completed"],
+    "created_at": "2026-01-01T00:00:00.000Z"
+  }
+}
+```
+
+## Event Payload
+
+All webhook events share a common envelope:
+
+```json
+{
+  "id": "evt_01XYZ",
+  "type": "balance.credited",
+  "created_at": "2026-01-01T12:00:00.000Z",
+  "data": {
+    "user_id": "uuid-here",
+    "currency": "USD",
+    "amount": 100.00,
+    "balance_after": 250.00
+  }
+}
+```
+
+## Available Events
+
+| Event | Trigger |
+|-------|---------|
+| `balance.credited` | Funds added to available balance |
+| `balance.debited` | Funds removed from available balance |
+| `balance.held` | Funds moved to held (escrow initiated) |
+| `balance.released` | Held funds returned to available |
+| `escrow.created` | New escrow contract deployed |
+| `escrow.funded` | Escrow received on-chain funds |
+| `escrow.released` | Seller paid on contract completion |
+| `escrow.disputed` | Dispute opened on an escrow |
+| `order.created` | New order placed |
+| `order.completed` | Order marked as complete |
+| `order.cancelled` | Order cancelled |
+
+## Verifying Signatures
+
+Every webhook request includes an `X-OfferHub-Signature` header. Verify it to confirm the payload came from OFFER-HUB:
+
+```typescript
+import crypto from "crypto";
+
+function verifyWebhook(payload: string, signature: string, secret: string): boolean {
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("hex");
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from("sha256=" + expected)
+  );
+}
+```
+
+<Callout variant="danger">
+  Always verify the signature before processing a webhook payload. Skipping this step exposes your application to spoofed events.
+</Callout>
+
+## Retries
+
+OFFER-HUB retries failed webhook deliveries with exponential back-off:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | 30 seconds |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+| 4th retry | 2 hours |
+| 5th retry | 24 hours |
+
+After 5 failed attempts the webhook is disabled. Re-enable it from your dashboard.
+
+<Callout variant="note">
+  Your endpoint must respond with a `2xx` status code within **10 seconds**. Long-running processing should be handled asynchronously.
+</Callout>
+
+## Testing Webhooks Locally
+
+Use a tunnel to expose your local server:
+
+<CommandLine>npx localtunnel --port 3000</CommandLine>
+
+Then register the tunnel URL as your webhook endpoint.

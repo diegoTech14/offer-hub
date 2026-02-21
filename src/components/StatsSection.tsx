@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 const stats = [
   { value: "10K+", label: "Active Merchants" },
@@ -8,6 +8,15 @@ const stats = [
   { value: "99.9%", label: "Uptime SLA" },
   { value: "50+", label: "Countries" },
 ];
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.55, ease: "easeOut" as const },
+  }),
+};
 
 export default function StatsSection() {
   return (
@@ -17,9 +26,10 @@ export default function StatsSection() {
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.55, ease: "easeOut" }}
+              custom={i}
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true, margin: "-80px" }}
               className="flex flex-col items-center text-center p-8 rounded-2xl shadow-raised"
               style={{ background: "#F1F3F7" }}
