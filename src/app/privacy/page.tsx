@@ -20,7 +20,7 @@ const features = [
     large: false,
     gradient:
       "radial-gradient(ellipse 85% 80% at 92% 88%, rgba(10,98,101,0.15) 0%, rgba(10,98,101,0.04) 50%, transparent 75%), #F1F3F7",
-    iconColor: "#0d7377",
+    iconColor: "#149A9B",
   },
   {
     icon: Cookie,
@@ -30,7 +30,7 @@ const features = [
     large: false,
     gradient:
       "radial-gradient(ellipse 85% 80% at 12% 80%, rgba(20,154,155,0.13) 0%, rgba(21,148,156,0.04) 50%, transparent 75%), #F1F3F7",
-    iconColor: "#15949C",
+    iconColor: "#149A9B",
   },
   {
     icon: Link2,
@@ -60,23 +60,19 @@ export default function PrivacyPage() {
           viewport={{ once: true, margin: "-80px" }}
         >
           <p
-            className="text-xs font-medium uppercase tracking-[0.4em] mb-4"
-            style={{ color: "#149A9B" }}
-          >
+            className="text-xs font-medium uppercase tracking-[0.4em] mb-4 text-primary">
             Privacy Policy
           </p>
           <h1
-            className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight"
-            style={{ color: "#19213D" }}
+            className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-text-primary"
           >
             Your privacy, our commitment.
           </h1>
           <p
-            className="mt-4 text-base sm:text-lg font-light max-w-xl mx-auto px-2"
-            style={{ color: "#6D758F" }}
+            className="mt-4 text-base sm:text-lg font-light max-w-xl mx-auto px-2 text-secondary"
           >
             We believe in full transparency about how we handle your data.{" "}
-            <span style={{ color: "#149A9B" }}>Last updated: February 21, 2026.</span>
+            <span className="text-primary">Last updated: February 21, 2026.</span>
           </p>
         </motion.div>
 
@@ -97,20 +93,17 @@ export default function PrivacyPage() {
                 viewport={{ once: true, margin: "-60px" }}
               >
                 <div
-                  className="w-10 h-10 rounded-xl shadow-raised-sm flex items-center justify-center shrink-0"
-                  style={{ background: "#F1F3F7" }}
+                  className="w-10 h-10 rounded-xl shadow-raised-sm flex items-center justify-center shrink-0 bg-background"
                 >
                   <Icon size={18} style={{ color: feature.iconColor }} />
                 </div>
                 <h3
-                  className={`font-bold ${feature.large ? "text-2xl" : "text-lg"}`}
-                  style={{ color: "#19213D" }}
+                  className={`font-bold ${feature.large ? "text-2xl" : "text-lg"} text-primary`}
                 >
                   {feature.title}
                 </h3>
                 <p
-                  className={`font-light leading-relaxed ${feature.large ? "text-base" : "text-sm"}`}
-                  style={{ color: "#6D758F" }}
+                  className={`font-light leading-relaxed ${feature.large ? "text-base" : "text-sm"} text-text-secondary`}
                 >
                   {feature.description}
                 </p>
@@ -141,12 +134,11 @@ export default function PrivacyPage() {
                   "3px 3px 6px rgba(0,0,0,0.3), -3px -3px 6px rgba(255,255,255,0.05)",
               }}
             >
-              <Mail size={18} style={{ color: "#1bc8ca" }} />
+              <Mail size={18} className="text-primary" />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-white">Get in Touch</h2>
             <p
-              className="font-light leading-relaxed text-sm"
-              style={{ color: "#8A93B0" }}
+              className="font-light leading-relaxed text-sm text-text-secondary"
             >
               Questions about this policy or how we handle your data? Our privacy
               team is here to help. We aim to respond to all inquiries within 2
@@ -182,10 +174,10 @@ export default function PrivacyPage() {
                   el.style.background = "rgba(241,243,247,0.06)";
                 }}
               >
-                <span className="text-xs font-medium" style={{ color: "#8A93B0" }}>
+                <span className="text-xs font-medium text-text-secondary">
                   {label}
                 </span>
-                <span className="text-sm font-medium" style={{ color: "#1bc8ca" }}>
+                <span className="text-sm font-medium text-primary">
                   {email}
                 </span>
               </a>
@@ -199,7 +191,7 @@ export default function PrivacyPage() {
                   "inset 2px 2px 4px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.03)",
               }}
             >
-              <p className="text-xs leading-relaxed" style={{ color: "#6D758F" }}>
+              <p className="text-xs leading-relaxed text-text-secondary">
                 Offer Hub Inc.
                 <br />
                 123 Market Street, Suite 400
