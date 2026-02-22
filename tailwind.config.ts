@@ -18,7 +18,7 @@ const config: Config = {
           hover: "#0d7377",
         },
         secondary: "#002333",
-        accent: "#15949C",
+        "accent": "#15949C",
         background: "#F1F3F7",
         "text-primary": "#19213D",
         "text-secondary": "#6D758F",
