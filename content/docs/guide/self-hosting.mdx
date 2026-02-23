@@ -41,7 +41,7 @@ Create a deployment directory and add the required files:
 
 Create a `docker-compose.yml` file with the following content:
 
-<CodeBlock language="yaml">
+```yaml
 version: "3.9"
 
 services:
@@ -93,7 +93,7 @@ services:
 networks:
   offerhub:
     driver: bridge
-</CodeBlock>
+```
 
 <Callout variant="warning">
   The `nginx` service is optional but strongly recommended for production. It handles TLS termination and reverse-proxying.
@@ -139,7 +139,7 @@ Create a `.env` file in the same directory as your `docker-compose.yml`. The tab
 
 ### Example .env File
 
-<CodeBlock language="bash">
+```bash
 # Supabase
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
@@ -160,7 +160,7 @@ STELLAR_HORIZON_URL=https://horizon.stellar.org
 # Frontend
 NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 NEXT_PUBLIC_STELLAR_NETWORK=mainnet
-</CodeBlock>
+```
 
 ## Running in Production
 
@@ -210,12 +210,12 @@ The backend exposes a `/health` endpoint that returns the current service status
 
 Expected response:
 
-<CodeBlock language="json">
+```json
 {
   "status": "ok",
   "timestamp": "2026-02-23T12:00:00.000Z"
 }
-</CodeBlock>
+```
 
 ### Container Health Status
 
@@ -254,7 +254,7 @@ The recommended update procedure:
 3. Run migrations.
 4. Restart the stack.
 
-<CodeBlock language="bash">
+```bash
 # 1. Pull latest images
 docker compose pull
 
@@ -266,17 +266,17 @@ docker compose exec backend npx supabase db push
 
 # 4. Verify health
 curl http://localhost:4000/health
-</CodeBlock>
+```
 
 ### Rolling Back
 
 If something goes wrong, roll back to a specific image tag:
 
-<CodeBlock language="yaml">
+```yaml
 services:
   backend:
     image: offerhub/backend:1.2.0   # pin to a known-good version
-</CodeBlock>
+```
 
 Then restart:
 
