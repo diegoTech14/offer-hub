@@ -1,4 +1,0 @@
-warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
-package:   /home/wilfrid_k/projects/onlydust/offer-hub-monorepo/contracts-offerhub/contracts/emergency-contract/Cargo.toml
-workspace: /home/wilfrid_k/projects/onlydust/offer-hub-monorepo/contracts-offerhub/Cargo.toml
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.48s
