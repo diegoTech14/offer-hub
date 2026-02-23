@@ -11,6 +11,8 @@ const navColumns = [
       { href: "#features", label: "Marketplace" },
       { href: "/register", label: "Get Started" },
       { href: "/login", label: "Sign In" },
+      { href: "/docs", label: "Docs" },
+      { href: "/use-cases", label: "Use Cases" },
     ],
   },
   {
@@ -19,12 +21,13 @@ const navColumns = [
       { href: "#about", label: "About" },
       { href: "#contact", label: "Contact" },
       { href: "/changelog", label: "Changelog" },
+      { href: "/community", label: "Community" },
     ],
   },
   {
     heading: "Legal",
     links: [
-      { href: "#terms", label: "Terms of Service" },
+      { href: "/terms", label: "Terms of Service" },
       { href: "/privacy", label: "Privacy Policy" },
     ],
   },
@@ -105,12 +108,12 @@ export function Footer() {
                     className="transition-colors duration-200"
                     style={{ color: "#6D758F" }}
                     onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color =
-                        "#19213D")
+                    ((e.currentTarget as HTMLAnchorElement).style.color =
+                      "#19213D")
                     }
                     onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLAnchorElement).style.color =
-                        "#6D758F")
+                    ((e.currentTarget as HTMLAnchorElement).style.color =
+                      "#6D758F")
                     }
                   >
                     <s.icon size={18} />
@@ -140,14 +143,14 @@ export function Footer() {
                           className="text-sm transition-colors duration-200"
                           style={{ color: "#6D758F" }}
                           onMouseEnter={(e) =>
-                            ((
-                              e.currentTarget as HTMLAnchorElement
-                            ).style.color = "#19213D")
+                          ((
+                            e.currentTarget as HTMLAnchorElement
+                          ).style.color = "#19213D")
                           }
                           onMouseLeave={(e) =>
-                            ((
-                              e.currentTarget as HTMLAnchorElement
-                            ).style.color = "#6D758F")
+                          ((
+                            e.currentTarget as HTMLAnchorElement
+                          ).style.color = "#6D758F")
                           }
                         >
                           {link.label}
