@@ -2,14 +2,24 @@
 
 import { motion } from "framer-motion";
 
-const repoStats = [
-  { label: "Stars", value: "4.8k" },
-  { label: "Forks", value: "1.2k" },
-  { label: "Contributors", value: "182" },
-  { label: "Open Issues", value: "74" },
-];
+interface RepoStats {
+  stars: string;
+  forks: string;
+  contributors: string;
+  openIssues: string;
+}
 
-const HeroRepoStatsSection = () => {
+interface HeroRepoStatsSectionProps {
+  stats: RepoStats;
+}
+
+const HeroRepoStatsSection = ({ stats }: HeroRepoStatsSectionProps) => {
+  const repoStats = [
+    { label: "Stars", value: stats.stars },
+    { label: "Forks", value: stats.forks },
+    { label: "Contributors", value: stats.contributors },
+    { label: "Open Issues", value: stats.openIssues },
+  ];
   return (
     <section id="hero-repo-stats" className="py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

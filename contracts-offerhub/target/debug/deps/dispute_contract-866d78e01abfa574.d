@@ -1,0 +1,13 @@
+/home/wilfrid_k/projects/onlydust/offer-hub-monorepo/contracts-offerhub/target/debug/deps/dispute_contract-866d78e01abfa574.d: contracts/dispute-contract/src/lib.rs contracts/dispute-contract/src/access.rs contracts/dispute-contract/src/contract.rs contracts/dispute-contract/src/storage.rs contracts/dispute-contract/src/test.rs contracts/dispute-contract/src/validation_test.rs contracts/dispute-contract/src/types.rs contracts/dispute-contract/src/validation.rs contracts/dispute-contract/src/error.rs
+
+/home/wilfrid_k/projects/onlydust/offer-hub-monorepo/contracts-offerhub/target/debug/deps/libdispute_contract-866d78e01abfa574.rmeta: contracts/dispute-contract/src/lib.rs contracts/dispute-contract/src/access.rs contracts/dispute-contract/src/contract.rs contracts/dispute-contract/src/storage.rs contracts/dispute-contract/src/test.rs contracts/dispute-contract/src/validation_test.rs contracts/dispute-contract/src/types.rs contracts/dispute-contract/src/validation.rs contracts/dispute-contract/src/error.rs
+
+contracts/dispute-contract/src/lib.rs:
+contracts/dispute-contract/src/access.rs:
+contracts/dispute-contract/src/contract.rs:
+contracts/dispute-contract/src/storage.rs:
+contracts/dispute-contract/src/test.rs:
+contracts/dispute-contract/src/validation_test.rs:
+contracts/dispute-contract/src/types.rs:
+contracts/dispute-contract/src/validation.rs:
+contracts/dispute-contract/src/error.rs:

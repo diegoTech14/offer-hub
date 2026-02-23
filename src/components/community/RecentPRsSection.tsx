@@ -4,30 +4,20 @@ import { motion } from "framer-motion";
 import { GitPullRequest } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
 
-const recentPrs = [
-  {
-    title: "feat: add account-level escrow analytics",
-    number: 1042,
-    status: "Merged",
-  },
-  {
-    title: "refactor: simplify wallet sync flow",
-    number: 1039,
-    status: "Reviewing",
-  },
-  {
-    title: "fix: resolve pagination edge case in jobs feed",
-    number: 1036,
-    status: "Merged",
-  },
-  {
-    title: "docs: add validator onboarding guide",
-    number: 1033,
-    status: "Draft",
-  },
-];
+interface PullRequestData {
+  number: number;
+  title: string;
+  author: string;
+  mergedAt: string;
+  url: string;
+  status: string;
+}
 
-const RecentPRsSection = () => {
+interface RecentPRsSectionProps {
+  pullRequests: PullRequestData[];
+}
+
+const RecentPRsSection = ({ pullRequests }: RecentPRsSectionProps) => {
   return (
     <section id="recent-prs" className="py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -38,7 +28,7 @@ const RecentPRsSection = () => {
         />
 
         <div className="space-y-4">
-          {recentPrs.map((pr, index) => (
+          {pullRequests.map((pr, index) => (
             <motion.article
               key={pr.number}
               className="flex flex-col gap-4 rounded-2xl bg-background p-6 shadow-raised sm:flex-row sm:items-center sm:justify-between"
@@ -54,11 +44,16 @@ const RecentPRsSection = () => {
               <div className="flex items-start gap-3">
                 <GitPullRequest size={18} className="mt-1 text-primary" />
                 <div>
-                  <h3 className="text-base font-bold text-text-primary md:text-lg">
+                  <a
+                    href={pr.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-base font-bold text-text-primary hover:text-primary md:text-lg"
+                  >
                     {pr.title}
-                  </h3>
+                  </a>
                   <p className="mt-1 text-sm text-text-secondary">
-                    #{pr.number}
+                    #{pr.number} by @{pr.author} · {pr.mergedAt}
                   </p>
                 </div>
               </div>
