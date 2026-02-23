@@ -1,0 +1,287 @@
+---
+title: Self-Hosting
+description: Complete instructions for deploying OFFER-HUB on your own infrastructure using Docker.
+order: 4
+section: Guides
+---
+
+Run OFFER-HUB on your own server with full control over data, uptime, and configuration. This guide covers everything from initial setup to ongoing maintenance using Docker.
+
+<Callout variant="tip">
+  If you haven't configured your environment variables yet, review the [Configuration](/docs/configuration) page first.
+</Callout>
+
+## Prerequisites
+
+Before you begin, make sure your host machine meets the following requirements:
+
+- **Docker** v20.10 or later
+- **Docker Compose** v2.0 or later
+- A registered domain name (recommended for production)
+- At least **2 GB of RAM** and **10 GB of disk space**
+- A [Supabase](https://supabase.com) project (cloud or self-hosted)
+
+Verify that Docker is installed and running:
+
+<CommandLine>docker --version && docker compose version</CommandLine>
+
+<Callout variant="note">
+  On older installations you may need to use `docker-compose` (with a hyphen) instead of `docker compose`.
+</Callout>
+
+## Docker Setup
+
+### Project Structure
+
+Create a deployment directory and add the required files:
+
+<CommandLine>mkdir offer-hub-deploy && cd offer-hub-deploy</CommandLine>
+
+### docker-compose.yml
+
+Create a `docker-compose.yml` file with the following content:
+
+<CodeBlock language="yaml">
+version: "3.9"
+
+services:
+  frontend:
+    image: offerhub/frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:4000
+      - NEXT_PUBLIC_STELLAR_NETWORK=${STELLAR_NETWORK:-testnet}
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - offerhub
+
+  backend:
+    image: offerhub/backend:latest
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - offerhub
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - offerhub
+
+networks:
+  offerhub:
+    driver: bridge
+</CodeBlock>
+
+<Callout variant="warning">
+  The `nginx` service is optional but strongly recommended for production. It handles TLS termination and reverse-proxying.
+</Callout>
+
+### Building from Source
+
+If you prefer to build the images locally instead of pulling pre-built ones, clone the repository and use the provided Dockerfiles:
+
+<CommandLine>git clone https://github.com/OFFER-HUB/offer-hub.git && cd offer-hub</CommandLine>
+
+<CommandLine>docker compose build</CommandLine>
+
+## Environment Variables
+
+Create a `.env` file in the same directory as your `docker-compose.yml`. The table below lists every variable the backend container accepts.
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `SUPABASE_URL` | Your Supabase project URL | <Badge variant="danger">Required</Badge> | — |
+| `SUPABASE_ANON_KEY` | Supabase anonymous / public key | <Badge variant="danger">Required</Badge> | — |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service-role key (server-side only) | <Badge variant="danger">Required</Badge> | — |
+| `JWT_SECRET` | Secret used to sign and verify JWTs (min 32 chars) | <Badge variant="danger">Required</Badge> | — |
+| `PORT` | HTTP port the backend listens on | <Badge variant="default">Optional</Badge> | `4000` |
+| `NODE_ENV` | Runtime environment (`development` or `production`) | <Badge variant="default">Optional</Badge> | `development` |
+| `STELLAR_NETWORK` | Stellar network to connect to (`testnet` or `mainnet`) | <Badge variant="default">Optional</Badge> | `testnet` |
+| `STELLAR_RPC_URL` | Soroban RPC endpoint | <Badge variant="default">Optional</Badge> | Testnet default |
+| `STELLAR_HORIZON_URL` | Horizon API endpoint | <Badge variant="default">Optional</Badge> | Testnet default |
+| `SMTP_HOST` | SMTP server hostname for transactional emails | <Badge variant="default">Optional</Badge> | — |
+| `SMTP_PORT` | SMTP server port | <Badge variant="default">Optional</Badge> | `587` |
+| `SMTP_USER` | SMTP authentication username | <Badge variant="default">Optional</Badge> | — |
+| `SMTP_PASS` | SMTP authentication password | <Badge variant="default">Optional</Badge> | — |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | <Badge variant="default">Optional</Badge> | — |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | <Badge variant="default">Optional</Badge> | — |
+| `GITHUB_CLIENT_ID` | GitHub OAuth client ID | <Badge variant="default">Optional</Badge> | — |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth client secret | <Badge variant="default">Optional</Badge> | — |
+| `NEXT_PUBLIC_API_URL` | Backend API URL exposed to the browser | <Badge variant="danger">Required</Badge> | — |
+| `NEXT_PUBLIC_STELLAR_NETWORK` | Stellar network exposed to the browser | <Badge variant="default">Optional</Badge> | `testnet` |
+
+<Callout variant="danger">
+  Never commit your `.env` file to version control. Treat every value as a secret.
+</Callout>
+
+### Example .env File
+
+<CodeBlock language="bash">
+# Supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Auth
+JWT_SECRET=your-secret-key-at-least-32-characters-long
+
+# Server
+PORT=4000
+NODE_ENV=production
+
+# Stellar
+STELLAR_NETWORK=mainnet
+STELLAR_RPC_URL=https://soroban-rpc.mainnet.stellar.gateway.fm
+STELLAR_HORIZON_URL=https://horizon.stellar.org
+
+# Frontend
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXT_PUBLIC_STELLAR_NETWORK=mainnet
+</CodeBlock>
+
+## Running in Production
+
+### Starting the Stack
+
+Once your `.env` file is ready, bring everything up in detached mode:
+
+<CommandLine>docker compose up -d</CommandLine>
+
+Watch the logs to confirm all services start cleanly:
+
+<CommandLine>docker compose logs -f</CommandLine>
+
+### Setting NODE_ENV
+
+Make sure `NODE_ENV=production` is set in your `.env` file. This enables:
+
+- Optimised builds and minification
+- Stricter error handling
+- Disabled development-only logging
+
+### TLS / HTTPS
+
+For production deployments you should terminate TLS at the reverse proxy. If you use the `nginx` service from the Compose file above, place your certificate and key in the `certs/` directory and update `nginx.conf` accordingly.
+
+<Callout variant="tip">
+  [Let's Encrypt](https://letsencrypt.org) with [Certbot](https://certbot.eff.org) is the easiest way to obtain free TLS certificates.
+</Callout>
+
+### Running Database Migrations
+
+Apply migrations before the first launch (or after pulling a new version):
+
+<CommandLine>docker compose exec backend npx supabase db push</CommandLine>
+
+<Callout variant="warning">
+  Always back up your database before running migrations in production.
+</Callout>
+
+## Health Checks
+
+The backend exposes a `/health` endpoint that returns the current service status. The Docker Compose file already configures a health check against it.
+
+### Manual Check
+
+<CommandLine>curl http://localhost:4000/health</CommandLine>
+
+Expected response:
+
+<CodeBlock language="json">
+{
+  "status": "ok",
+  "timestamp": "2026-02-23T12:00:00.000Z"
+}
+</CodeBlock>
+
+### Container Health Status
+
+Docker reports health status directly:
+
+<CommandLine>docker compose ps</CommandLine>
+
+A healthy deployment shows `(healthy)` next to the backend service. If a service is `(unhealthy)`, inspect its logs:
+
+<CommandLine>docker compose logs backend --tail 50</CommandLine>
+
+### Monitoring Tips
+
+- Point an uptime monitor (e.g. UptimeRobot, Betterstack) at `/health`.
+- Set up alerts for non-`200` responses or response times above **2 seconds**.
+- Monitor disk usage — logs and Docker images can accumulate over time.
+
+## Updating
+
+### Pulling the Latest Images
+
+<CommandLine>docker compose pull</CommandLine>
+
+### Applying the Update
+
+<CommandLine>docker compose up -d --remove-orphans</CommandLine>
+
+This pulls the newest images, recreates only the containers that changed, and removes any services no longer defined in the Compose file.
+
+### Full Update Workflow
+
+The recommended update procedure:
+
+1. **Back up your database** before any update.
+2. Pull the latest images.
+3. Run migrations.
+4. Restart the stack.
+
+<CodeBlock language="bash">
+# 1. Pull latest images
+docker compose pull
+
+# 2. Restart with new images
+docker compose up -d --remove-orphans
+
+# 3. Run any new migrations
+docker compose exec backend npx supabase db push
+
+# 4. Verify health
+curl http://localhost:4000/health
+</CodeBlock>
+
+### Rolling Back
+
+If something goes wrong, roll back to a specific image tag:
+
+<CodeBlock language="yaml">
+services:
+  backend:
+    image: offerhub/backend:1.2.0   # pin to a known-good version
+</CodeBlock>
+
+Then restart:
+
+<CommandLine>docker compose up -d</CommandLine>
+
+<Callout variant="note">
+  Check the [GitHub Releases](https://github.com/OFFER-HUB/offer-hub/releases) page for available tags and changelogs.
+</Callout>
