@@ -4,22 +4,19 @@ import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
 
-const openIssues = [
-  {
-    title: "Improve CI cache invalidation strategy",
-    priority: "Medium",
-    id: 1055,
-  },
-  {
-    title: "Add e2e tests for payout cancellation",
-    priority: "High",
-    id: 1051,
-  },
-  { title: "Expose webhook replay in dashboard", priority: "Low", id: 1048 },
-  { title: "Polish mobile nav focus styles", priority: "Low", id: 1046 },
-];
+interface IssueData {
+  number: number;
+  title: string;
+  priority: string;
+  url: string;
+  labels: string[];
+}
 
-const OpenIssuesSection = () => {
+interface OpenIssuesSectionProps {
+  issues: IssueData[];
+}
+
+const OpenIssuesSection = ({ issues }: OpenIssuesSectionProps) => {
   return (
     <section id="open-issues" className="py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -30,9 +27,9 @@ const OpenIssuesSection = () => {
         />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {openIssues.map((issue, index) => (
+          {issues.map((issue, index) => (
             <motion.article
-              key={issue.id}
+              key={issue.number}
               className="rounded-2xl bg-background p-6 shadow-raised"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -44,14 +41,35 @@ const OpenIssuesSection = () => {
               viewport={{ once: true }}
             >
               <div className="flex items-start justify-between gap-4">
-                <h3 className="text-lg font-bold text-text-primary">
+                <a
+                  href={issue.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-bold text-text-primary hover:text-primary"
+                >
                   {issue.title}
-                </h3>
-                <AlertCircle size={18} className="text-primary" />
+                </a>
+                <AlertCircle size={18} className="text-primary flex-shrink-0" />
               </div>
+              {issue.labels.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {issue.labels.slice(0, 3).map((label) => (
+                    <span
+                      key={label}
+                      className="inline-block rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="mt-4 flex items-center justify-between text-sm">
-                <span className="text-text-secondary">Issue #{issue.id}</span>
-                <span className="font-semibold text-text-primary">
+                <span className="text-text-secondary">Issue #{issue.number}</span>
+                <span className={`font-semibold ${
+                  issue.priority === 'High' ? 'text-red-600' :
+                  issue.priority === 'Low' ? 'text-green-600' :
+                  'text-text-primary'
+                }`}>
                   {issue.priority}
                 </span>
               </div>

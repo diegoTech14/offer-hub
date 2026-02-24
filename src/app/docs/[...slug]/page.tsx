@@ -4,6 +4,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllDocSlugs, getDocBySlug } from "@/lib/mdx";
 import { MDX_COMPONENTS } from "@/components/docs/mdx-components";
 import { DocPageActions } from "@/components/docs/DocPageActions";
+import { EditOnGitHub } from "@/components/docs/EditOnGitHub";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -60,6 +61,11 @@ export default async function DocPage({ params }: PageProps) {
       {/* MDX content */}
       <div className="max-w-none" id="doc-page-export-content">
         <MDXRemote source={doc.content} components={MDX_COMPONENTS} />
+      </div>
+
+      {/* Edit on GitHub link */}
+      <div className="mt-8 pt-6 border-t" style={{ borderColor: "#d1d5db" }}>
+        <EditOnGitHub filePath={`content/docs/${doc.slug}.mdx`} />
       </div>
     </article>
   );
