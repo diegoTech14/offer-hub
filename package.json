@@ -20,7 +20,8 @@
     "next": "^15.1.0",
     "next-mdx-remote": "^6.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "shiki": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
