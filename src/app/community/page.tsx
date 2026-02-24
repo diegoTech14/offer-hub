@@ -46,6 +46,32 @@ interface IssueData {
   labels: string[];
 }
 
+interface GitHubRepo {
+  stargazers_count: number;
+  forks_count: number;
+  open_issues_count: number;
+}
+
+interface GitHubPullRequest {
+  number: number;
+  title: string;
+  html_url: string;
+  merged_at: string | null;
+  user: {
+    login: string;
+  } | null;
+}
+
+interface GitHubIssue {
+  number: number;
+  title: string;
+  html_url: string;
+  pull_request?: object;
+  labels: Array<{
+    name: string;
+  }>;
+}
+
 const formatNumber = (num: number): string => {
   if (num >= 1000) {
     return `${(num / 1000).toFixed(1)}k`;
@@ -89,10 +115,10 @@ async function fetchGitHubData() {
       throw new Error('Failed to fetch repo data');
     }
 
-    const repoData = await repoResponse.json();
+    const repoData: GitHubRepo = await repoResponse.json();
     const contributorsData: Contributor[] = await contributorsResponse.json();
-    const pullRequestsData = await pullRequestsResponse.json();
-    const issuesData = await issuesResponse.json();
+    const pullRequestsData: GitHubPullRequest[] = await pullRequestsResponse.json();
+    const issuesData: GitHubIssue[] = await issuesResponse.json();
 
     const stats: RepoStats = {
       stars: formatNumber(repoData.stargazers_count),
@@ -110,22 +136,22 @@ async function fetchGitHubData() {
     }));
 
     const mergedPRs = pullRequestsData
-      .filter((pr: any) => pr.merged_at !== null);
+      .filter((pr) => pr.merged_at !== null);
 
-    const pullRequests: PullRequestData[] = mergedPRs.map((pr: any) => ({
+    const pullRequests: PullRequestData[] = mergedPRs.map((pr) => ({
       number: pr.number,
       title: pr.title,
       author: pr.user?.login || "Unknown",
-      mergedAt: formatTimeAgo(pr.merged_at),
+      mergedAt: formatTimeAgo(pr.merged_at!),
       url: pr.html_url,
       status: "Merged",
     }));
 
     const actualIssues = issuesData
-      .filter((issue: any) => !issue.pull_request);
+      .filter((issue) => !issue.pull_request)
 
-    const issues: IssueData[] = actualIssues.map((issue: any) => {
-      const priorityLabel = issue.labels.find((label: any) => 
+    const issues: IssueData[] = actualIssues.map((issue) => {
+      const priorityLabel = issue.labels.find((label) => 
         label.name.toLowerCase().includes('priority')
       );
       
@@ -144,7 +170,7 @@ async function fetchGitHubData() {
         title: issue.title,
         priority,
         url: issue.html_url,
-        labels: issue.labels.map((label: any) => label.name),
+        labels: issue.labels.map((label) => label.name),
       };
     });
 
