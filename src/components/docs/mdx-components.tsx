@@ -79,7 +79,7 @@ export const MDX_COMPONENTS: MDXComponents = {
   },
 
   // Blockquote → Callout note
-  blockquote: ({ children }) => <Callout variant="note">{children}</Callout>,
+  blockquote: ({ children }) => <Callout type="note">{children}</Callout>,
 
   // Unordered list
   ul: ({ children }) => (
