@@ -87,7 +87,7 @@ function verifyWebhook(payload: string, signature: string, secret: string): bool
 }
 ```
 
-<Callout variant="danger">
+<Callout type="danger">
   Always verify the signature before processing a webhook payload. Skipping this step exposes your application to spoofed events.
 </Callout>
 
@@ -105,7 +105,7 @@ OFFER-HUB retries failed webhook deliveries with exponential back-off:
 
 After 5 failed attempts the webhook is disabled. Re-enable it from your dashboard.
 
-<Callout variant="note">
+<Callout type="note">
   Your endpoint must respond with a `2xx` status code within **10 seconds**. Long-running processing should be handled asynchronously.
 </Callout>
 
