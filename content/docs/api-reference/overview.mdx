@@ -73,7 +73,7 @@ Errors also use the same envelope format:
 | `422` | Validation Error |
 | `500` | Internal Server Error |
 
-<Callout variant="note">
+<Callout type="note">
   All error messages are safe to display to end users. Internal details are logged server-side only.
 </Callout>
 
@@ -81,7 +81,7 @@ Errors also use the same envelope format:
 
 The API enforces rate limits per IP address. Exceeding the limit returns `429 Too Many Requests`.
 
-<Callout variant="warning">
+<Callout type="warning">
   Default limits: **100 requests / 15 minutes** for public endpoints, **300 / 15 min** for authenticated endpoints.
 </Callout>
 
