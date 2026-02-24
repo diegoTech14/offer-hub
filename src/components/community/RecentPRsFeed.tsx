@@ -1,0 +1,295 @@
+"use client";
+
+import { motion, type Variants } from "framer-motion";
+import { ArrowRight, GitMerge, Plus, Minus } from "lucide-react";
+
+export interface PullRequest {
+  number: number;
+  title: string;
+  author: string;
+  mergedAt: string;
+  additions: number;
+  deletions: number;
+  labels: string[];
+  url: string;
+  repository?: string;
+}
+
+// Inline card — will be replaced by <PRCard> once issue #1016 is merged
+const AVATAR_COLORS = [
+  "#149A9B",
+  "#0d7377",
+  "#15944C",
+  "#002333",
+  "#1bc8ca",
+  "#0d9fa0",
+];
+
+function PRCardInline({ pr }: { pr: PullRequest }) {
+  const initials = pr.author.slice(0, 2).toUpperCase();
+  const avatarColor =
+    AVATAR_COLORS[pr.author.charCodeAt(0) % AVATAR_COLORS.length];
+
+  return (
+    <a
+      href={pr.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block p-5 rounded-2xl shadow-raised transition-shadow duration-[400ms] ease-out hover:shadow-raised-hover active:shadow-sunken-subtle h-full"
+      style={{ background: "#F1F3F7" }}
+    >
+      {/* Header: PR number + Merged badge */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-semibold" style={{ color: "#149A9B" }}>
+          #{pr.number}
+          {pr.repository && (
+            <span className="ml-1 font-normal" style={{ color: "#6D758F" }}>
+              · {pr.repository}
+            </span>
+          )}
+        </span>
+        <span
+          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold shadow-raised-sm"
+          style={{ background: "#dcfce7", color: "#15803d" }}
+        >
+          <GitMerge size={11} />
+          Merged
+        </span>
+      </div>
+
+      {/* Title */}
+      <h3
+        className="text-sm font-semibold leading-snug mb-3"
+        style={{ color: "#19213D" }}
+      >
+        {pr.title}
+      </h3>
+
+      {/* Labels */}
+      {pr.labels.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {pr.labels.map((label) => (
+            <span
+              key={label}
+              className="px-2 py-0.5 rounded-full text-[11px] font-medium shadow-raised-sm"
+              style={{
+                background: "#F1F3F7",
+                color: "#6D758F",
+                border: "1px solid #d1d5db",
+              }}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Footer: author avatar + name + line stats + date */}
+      <div className="flex items-center justify-between mt-auto pt-1">
+        <div className="flex items-center gap-2">
+          <div
+            className="w-7 h-7 rounded-full shadow-raised-sm flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0 select-none"
+            style={{ background: avatarColor }}
+            aria-label={`Avatar for ${pr.author}`}
+          >
+            {initials}
+          </div>
+          <span className="text-xs font-medium" style={{ color: "#6D758F" }}>
+            {pr.author}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2.5 text-xs font-semibold">
+          <span
+            className="flex items-center gap-0.5"
+            style={{ color: "#16a34a" }}
+            title={`${pr.additions} additions`}
+          >
+            <Plus size={11} strokeWidth={2.5} />
+            {pr.additions}
+          </span>
+          <span
+            className="flex items-center gap-0.5"
+            style={{ color: "#dc2626" }}
+            title={`${pr.deletions} deletions`}
+          >
+            <Minus size={11} strokeWidth={2.5} />
+            {pr.deletions}
+          </span>
+          <span style={{ color: "#6D758F" }} className="font-normal">
+            {pr.mergedAt}
+          </span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+const MOCK_PRS: PullRequest[] = [
+  {
+    number: 1053,
+    title: "feat: build MDX documentation system with sidebar and table-of-contents navigation",
+    author: "akintewe",
+    mergedAt: "2 days ago",
+    additions: 847,
+    deletions: 12,
+    labels: ["enhancement", "frontend", "docs"],
+    url: "https://github.com/OFFER-HUB/offer-hub-monorepo/pull/1053",
+    repository: "offer-hub-monorepo",
+  },
+  {
+    number: 1045,
+    title: "fix: resolve Stellar SDK escrow release logic for dispute resolution edge cases",
+    author: "DiegoERS",
+    mergedAt: "4 days ago",
+    additions: 213,
+    deletions: 58,
+    labels: ["bug", "backend", "stellar"],
+    url: "https://github.com/OFFER-HUB/offer-hub-monorepo/pull/1045",
+    repository: "offer-hub-monorepo",
+  },
+  {
+    number: 1038,
+    title: "feat: implement multi-currency support for stablecoin settlements on checkout",
+    author: "lunavera",
+    mergedAt: "1 week ago",
+    additions: 512,
+    deletions: 34,
+    labels: ["enhancement", "payments"],
+    url: "https://github.com/OFFER-HUB/offer-hub-monorepo/pulls",
+    repository: "offer-hub-monorepo",
+  },
+  {
+    number: 1031,
+    title: "chore: upgrade Stellar SDK to v11.3 and resolve breaking API changes",
+    author: "stellardev",
+    mergedAt: "1 week ago",
+    additions: 189,
+    deletions: 201,
+    labels: ["chore", "dependencies"],
+    url: "https://github.com/OFFER-HUB/offer-hub-monorepo/pulls",
+    repository: "offer-hub-monorepo",
+  },
+  {
+    number: 1024,
+    title: "feat: add real-time transaction status feed with WebSocket event streaming",
+    author: "opendev42",
+    mergedAt: "2 weeks ago",
+    additions: 634,
+    deletions: 22,
+    labels: ["enhancement", "frontend", "real-time"],
+    url: "https://github.com/OFFER-HUB/offer-hub-monorepo/pulls",
+    repository: "offer-hub-monorepo",
+  },
+  {
+    number: 1018,
+    title: "docs: improve API reference for webhook endpoints, event types and retry policies",
+    author: "techwriter_k",
+    mergedAt: "3 weeks ago",
+    additions: 298,
+    deletions: 45,
+    labels: ["docs", "api"],
+    url: "https://github.com/OFFER-HUB/offer-hub-monorepo/pulls",
+    repository: "offer-hub-monorepo",
+  },
+];
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.08,
+      duration: 0.55,
+      ease: "easeOut" as const,
+    },
+  }),
+};
+
+interface RecentPRsFeedProps {
+  pullRequests?: PullRequest[];
+}
+
+export default function RecentPRsFeed({ pullRequests }: RecentPRsFeedProps) {
+  const prs = pullRequests ?? MOCK_PRS;
+
+  return (
+    <section id="recent-prs" className="py-24">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Section header */}
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-80px" }}
+        >
+          <p
+            className="text-xs font-medium uppercase tracking-[0.4em] mb-4"
+            style={{ color: "#149A9B" }}
+          >
+            Open Source · Community
+          </p>
+          <h2
+            className="text-4xl md:text-5xl font-black tracking-tight"
+            style={{ color: "#19213D" }}
+          >
+            Recent Contributions
+          </h2>
+          <p
+            className="mt-4 text-lg font-light max-w-xl mx-auto"
+            style={{ color: "#6D758F" }}
+          >
+            The community ships fast. See the latest merged pull requests
+            driving OFFER HUB forward.
+          </p>
+        </motion.div>
+
+        {/* PR grid — 1 col mobile, 2 col desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {prs.map((pr, i) => (
+            <motion.div
+              key={pr.number}
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+            >
+              <PRCardInline pr={pr} />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* View all PRs CTA */}
+        <motion.div
+          className="flex justify-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.5, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-60px" }}
+        >
+          <a
+            href="https://github.com/OFFER-HUB/offer-hub-monorepo/pulls?q=is%3Apr+is%3Amerged"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-semibold text-white transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle"
+            style={{ background: "#149A9B" }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLAnchorElement).style.background =
+                "#0d7377")
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLAnchorElement).style.background =
+                "#149A9B")
+            }
+          >
+            View all PRs
+            <ArrowRight size={15} />
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
