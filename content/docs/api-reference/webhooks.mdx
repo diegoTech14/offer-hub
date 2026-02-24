@@ -23,11 +23,28 @@ Register a webhook by creating a subscription with your URL, the events you want
 
 Request body:
 
-<CodeBlock language="json">{ "url": "https://your-app.com/webhooks/offerhub", "events": ["escrow.created", "escrow.funded", "escrow.released", "escrow.disputed", "escrow.refunded"], "secret": "your-signing-secret" }</CodeBlock>
+```json
+{
+  "url": "https://your-app.com/webhooks/offerhub",
+  "events": ["escrow.created", "escrow.funded", "escrow.released", "escrow.disputed", "escrow.refunded"],
+  "secret": "your-signing-secret"
+}
+```
 
 A successful response returns the webhook object with its `id`:
 
-<CodeBlock language="json">{ "code": 201, "ok": true, "data": { "id": "wh_01ABCDEF", "url": "https://your-app.com/webhooks/offerhub", "events": ["escrow.created", "escrow.funded", "escrow.released", "escrow.disputed", "escrow.refunded"], "created_at": "2026-01-01T00:00:00.000Z" } }</CodeBlock>
+```json
+{
+  "code": 201,
+  "ok": true,
+  "data": {
+    "id": "wh_01ABCDEF",
+    "url": "https://your-app.com/webhooks/offerhub",
+    "events": ["escrow.created", "escrow.funded", "escrow.released", "escrow.disputed", "escrow.refunded"],
+    "created_at": "2026-01-01T00:00:00.000Z"
+  }
+}
+```
 
 ## Event Types
 
@@ -47,37 +64,121 @@ All webhook events share a common envelope: `id`, `type`, `created_at`, and `dat
 
 ### Common envelope
 
-<CodeBlock language="json">{ "id": "evt_01XYZ", "type": "escrow.created", "created_at": "2026-01-01T12:00:00.000Z", "data": {} }</CodeBlock>
+```json
+{
+  "id": "evt_01XYZ",
+  "type": "escrow.created",
+  "created_at": "2026-01-01T12:00:00.000Z",
+  "data": {}
+}
+```
 
 ### escrow.created
 
 Emitted when a new escrow is created.
 
-<CodeBlock language="json">{ "id": "evt_01ABC", "type": "escrow.created", "created_at": "2026-01-01T12:00:00.000Z", "data": { "escrow_id": "esc_01XYZ", "contract_id": "abc123...", "buyer_id": "user_01", "seller_id": "user_02", "amount": "100.00", "currency": "XLM", "order_id": "ord_01", "status": "pending" } }</CodeBlock>
+```json
+{
+  "id": "evt_01ABC",
+  "type": "escrow.created",
+  "created_at": "2026-01-01T12:00:00.000Z",
+  "data": {
+    "escrow_id": "esc_01XYZ",
+    "contract_id": "abc123...",
+    "buyer_id": "user_01",
+    "seller_id": "user_02",
+    "amount": "100.00",
+    "currency": "XLM",
+    "order_id": "ord_01",
+    "status": "pending"
+  }
+}
+```
 
 ### escrow.funded
 
 Emitted when the escrow has received funds on-chain.
 
-<CodeBlock language="json">{ "id": "evt_02DEF", "type": "escrow.funded", "created_at": "2026-01-01T12:05:00.000Z", "data": { "escrow_id": "esc_01XYZ", "contract_id": "abc123...", "amount": "100.00", "currency": "XLM", "funded_at": "2026-01-01T12:05:00.000Z", "status": "funded" } }</CodeBlock>
+```json
+{
+  "id": "evt_02DEF",
+  "type": "escrow.funded",
+  "created_at": "2026-01-01T12:05:00.000Z",
+  "data": {
+    "escrow_id": "esc_01XYZ",
+    "contract_id": "abc123...",
+    "amount": "100.00",
+    "currency": "XLM",
+    "funded_at": "2026-01-01T12:05:00.000Z",
+    "status": "funded"
+  }
+}
+```
 
 ### escrow.released
 
 Emitted when the escrow is released and the seller is paid.
 
-<CodeBlock language="json">{ "id": "evt_03GHI", "type": "escrow.released", "created_at": "2026-01-01T14:00:00.000Z", "data": { "escrow_id": "esc_01XYZ", "contract_id": "abc123...", "seller_id": "user_02", "amount": "100.00", "currency": "XLM", "released_at": "2026-01-01T14:00:00.000Z", "status": "released", "order_id": "ord_01" } }</CodeBlock>
+```json
+{
+  "id": "evt_03GHI",
+  "type": "escrow.released",
+  "created_at": "2026-01-01T14:00:00.000Z",
+  "data": {
+    "escrow_id": "esc_01XYZ",
+    "contract_id": "abc123...",
+    "seller_id": "user_02",
+    "amount": "100.00",
+    "currency": "XLM",
+    "released_at": "2026-01-01T14:00:00.000Z",
+    "status": "released",
+    "order_id": "ord_01"
+  }
+}
+```
 
 ### escrow.disputed
 
 Emitted when a dispute is opened on the escrow.
 
-<CodeBlock language="json">{ "id": "evt_04JKL", "type": "escrow.disputed", "created_at": "2026-01-01T13:00:00.000Z", "data": { "escrow_id": "esc_01XYZ", "contract_id": "abc123...", "dispute_id": "dsp_01", "opened_by": "user_01", "reason": "Item not received", "status": "disputed", "order_id": "ord_01" } }</CodeBlock>
+```json
+{
+  "id": "evt_04JKL",
+  "type": "escrow.disputed",
+  "created_at": "2026-01-01T13:00:00.000Z",
+  "data": {
+    "escrow_id": "esc_01XYZ",
+    "contract_id": "abc123...",
+    "dispute_id": "dsp_01",
+    "opened_by": "user_01",
+    "reason": "Item not received",
+    "status": "disputed",
+    "order_id": "ord_01"
+  }
+}
+```
 
 ### escrow.refunded
 
 Emitted when the escrow is refunded to the buyer.
 
-<CodeBlock language="json">{ "id": "evt_05MNO", "type": "escrow.refunded", "created_at": "2026-01-01T15:00:00.000Z", "data": { "escrow_id": "esc_01XYZ", "contract_id": "abc123...", "buyer_id": "user_01", "amount": "100.00", "currency": "XLM", "refunded_at": "2026-01-01T15:00:00.000Z", "status": "refunded", "order_id": "ord_01" } }</CodeBlock>
+```json
+{
+  "id": "evt_05MNO",
+  "type": "escrow.refunded",
+  "created_at": "2026-01-01T15:00:00.000Z",
+  "data": {
+    "escrow_id": "esc_01XYZ",
+    "contract_id": "abc123...",
+    "buyer_id": "user_01",
+    "amount": "100.00",
+    "currency": "XLM",
+    "refunded_at": "2026-01-01T15:00:00.000Z",
+    "status": "refunded",
+    "order_id": "ord_01"
+  }
+}
+```
 
 ## Signature Verification
 
@@ -85,7 +186,8 @@ Every webhook request includes an `X-OfferHub-Signature` header. Verify it using
 
 The signature is the HMAC SHA-256 of the raw body, prefixed with `sha256=`.
 
-<CodeBlock language="ts">import crypto from "crypto";
+```ts
+import crypto from "crypto";
 
 function verifyWebhookSignature(
   rawBody: string,
@@ -106,7 +208,7 @@ function verifyWebhookSignature(
 
 // Usage: read raw body before JSON parsing, then:
 // const isValid = verifyWebhookSignature(req.rawBody, req.headers["x-offerhub-signature"], secret);
-</CodeBlock>
+```
 
 <Callout type="danger">
   Always verify the signature before processing a webhook payload. Skipping this step exposes your application to spoofed events.
