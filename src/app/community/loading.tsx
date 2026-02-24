@@ -131,7 +131,6 @@ export default function CommunityLoading() {
         <ContributorsSkeleton />
         <RecentPRsSkeleton />
         <OpenIssuesSkeleton />
-        {/* HowToContributeSection and CommunityChannelsSection don't need skeletons as they're static */}
       </main>
       <Footer />
     </>

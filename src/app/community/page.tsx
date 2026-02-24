@@ -101,7 +101,6 @@ async function fetchGitHubData() {
       openIssues: formatNumber(repoData.open_issues_count),
     };
 
-    // const contributors: ContributorData[] = contributorsData.slice(0, 12).map((contributor) => ({
     const contributors: ContributorData[] = contributorsData.map((contributor) => ({
       name: contributor.login,
       username: contributor.login,
@@ -110,10 +109,8 @@ async function fetchGitHubData() {
       profileUrl: contributor.html_url,
     }));
 
-    // Filter only merged PRs and take the first 6
     const mergedPRs = pullRequestsData
-      .filter((pr: any) => pr.merged_at !== null)
-      .slice(0, 6);
+      .filter((pr: any) => pr.merged_at !== null);
 
     const pullRequests: PullRequestData[] = mergedPRs.map((pr: any) => ({
       number: pr.number,
@@ -124,19 +121,15 @@ async function fetchGitHubData() {
       status: "Merged",
     }));
 
-    // Filter out PRs from issues (GitHub API returns PRs in issues endpoint)
-    // and take the first 4
     const actualIssues = issuesData
       .filter((issue: any) => !issue.pull_request);
-      // .slice(0, 4);
 
     const issues: IssueData[] = actualIssues.map((issue: any) => {
-      // Extract priority from labels
       const priorityLabel = issue.labels.find((label: any) => 
         label.name.toLowerCase().includes('priority')
       );
       
-      let priority = "Medium"; // Default priority
+      let priority = "Medium";
       if (priorityLabel) {
         const labelName = priorityLabel.name.toLowerCase();
         if (labelName.includes('high') || labelName.includes('critical')) {
@@ -158,7 +151,6 @@ async function fetchGitHubData() {
     return { stats, contributors, pullRequests, issues };
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
-    // Fallback to mock data
     return {
       stats: {
         stars: "4.8k",
