@@ -19,7 +19,9 @@ Register a webhook by creating a subscription with your URL, the events you want
 
 <Badge variant="primary">POST</Badge> `/api/v1/webhooks`
 
-<CommandLine>curl -X POST http://localhost:4000/api/v1/webhooks -H "Content-Type: application/json" -d "{\"url\": \"https://your-app.com/webhooks/offerhub\", \"events\": [\"escrow.created\", \"escrow.released\"], \"secret\": \"your-signing-secret\"}"</CommandLine>
+```bash
+curl -X POST http://localhost:4000/api/v1/webhooks -H "Content-Type: application/json" -d '{"url": "https://your-app.com/webhooks/offerhub", "events": ["escrow.created", "escrow.released"], "secret": "your-signing-secret"}'
+```
 
 Request body:
 
@@ -246,7 +248,9 @@ Your development server is not reachable from the internet. Use a tunnel to expo
 
 Use the provided URL (e.g. `https://random-subdomain.loca.lt`) as your webhook URL when registering:
 
-<CommandLine>curl -X POST http://localhost:4000/api/v1/webhooks -H "Content-Type: application/json" -d "{\"url\": \"https://your-tunnel.loca.lt/webhooks\", \"events\": [\"escrow.released\"], \"secret\": \"test-secret\"}"</CommandLine>
+```bash
+curl -X POST http://localhost:4000/api/v1/webhooks -H "Content-Type: application/json" -d '{"url": "https://your-tunnel.loca.lt/webhooks", "events": ["escrow.released"], "secret": "test-secret"}'
+```
 
 ### Alternative tools
 
