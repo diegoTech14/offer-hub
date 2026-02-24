@@ -34,7 +34,7 @@ const ecommerceBenefits = [
 
 export default function EcommerceSection() {
   return (
-    <section id="ecommerce" className="py-16 md:py-20 bg-white">
+    <section id="ecommerce" className="py-16 md:py-20 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <motion.div
           className="max-w-3xl mb-14"
