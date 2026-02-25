@@ -30,7 +30,7 @@ export function CodeBlock({
       try {
         const html = await codeToHtml(rawCode, {
           lang: language,
-          theme: "one-dark-pro", // Tema con mejor contraste y colores más vibrantes
+          theme: "one-dark-pro",
         });
         if (isMounted) {
           setHighlightedCode(html);
@@ -61,23 +61,20 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        "relative rounded-xl overflow-hidden my-6 border border-white/10 group shadow-2xl",
+        "relative rounded-xl overflow-hidden my-6 border border-white/10 group shadow-2xl bg-[#0f172a]",
         className
       )}
-      style={{ background: "#0f172a" }}
     >
       {/* Header bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
-        <span
-          className="text-xs font-semibold uppercase tracking-wider font-mono"
-          style={{ color: "#6D758F" }}
-        >
+        <span className="text-xs font-semibold uppercase tracking-wider font-mono text-text-secondary">
           {language}
         </span>
         <button
+          type="button"
           onClick={handleCopy}
           aria-label={copied ? "Copied" : "Copy code"}
-          className="relative flex items-center justify-center p-1.5 rounded-lg transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#149A9B]/50"
+          className="relative flex items-center justify-center p-1.5 rounded-lg transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <AnimatePresence mode="wait" initial={false}>
             {copied ? (
@@ -100,8 +97,7 @@ export function CodeBlock({
               >
                 <Copy
                   size={14}
-                  className="transition-colors duration-200"
-                  style={{ color: "#149A9B" }}
+                  className="text-primary transition-colors duration-200"
                 />
               </motion.div>
             )}
@@ -114,7 +110,7 @@ export function CodeBlock({
         {highlightedCode ? (
           <div
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
-            className="shiki-container [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!outline-none [&_span]:!text-[inherit] shiki-vibrant"
+            className="shiki-container [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!outline-none shiki-vibrant"
           />
         ) : (
           <pre className="text-slate-400 animate-pulse">
@@ -125,10 +121,10 @@ export function CodeBlock({
 
       <style jsx global>{`
         .shiki-container pre {
-          color: #e2e8f0; /* Color base claro por si el tema falla */
+          color: #e2e8f0;
         }
         .shiki-vibrant span {
-          filter: brightness(1.2); /* Aumenta ligeramente el brillo de los tokens */
+          filter: brightness(1.2);
         }
       `}</style>
     </div>
