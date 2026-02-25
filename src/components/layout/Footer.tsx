@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Twitter, Instagram, Linkedin, Github } from "lucide-react";
 
 const navColumns = [
@@ -80,7 +81,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row gap-10 md:gap-16">
             {/* Left — logo + desc + socials */}
             <div className="flex flex-col gap-5 md:w-64 flex-shrink-0">
-              <a href="/" className="flex items-center gap-2.5">
+              <Link href="/" className="flex items-center gap-2.5">
                 <Image
                   src="/OFFER-HUB-logo.png"
                   alt="OFFER-HUB"
@@ -88,7 +89,7 @@ export function Footer() {
                   height={32}
                   className="h-7 w-auto object-contain"
                 />
-              </a>
+              </Link>
               <p
                 className="text-sm leading-relaxed"
                 style={{ color: "#6D758F" }}

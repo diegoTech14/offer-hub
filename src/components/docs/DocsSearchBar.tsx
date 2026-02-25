@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, FileText, ChevronRight, X } from "lucide-react";
-import Fuse, { type FuseResult } from "fuse.js";
+import Fuse, { type FuseResult, type FuseResultMatch } from "fuse.js";
 import { useRouter } from "next/navigation";
 import docsIndex from "@/data/docs-index.json";
 
@@ -78,9 +78,9 @@ export default function DocsSearchBar() {
         }
     };
 
-    const highlightMatch = (text: string, matches: any, key: string) => {
+    const highlightMatch = (text: string, matches: readonly FuseResultMatch[] | undefined, key: string) => {
         if (!matches) return text;
-        const match = matches.find((m: any) => m.key === key);
+        const match = matches.find((m: FuseResultMatch) => m.key === key);
         if (!match) return text;
 
         const indices = match.indices;
@@ -178,7 +178,7 @@ export default function DocsSearchBar() {
 
             {isOpen && query.length > 1 && results.length === 0 && (
                 <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-raised p-8 text-center z-50 animate-in fade-in slide-in-from-top-2">
-                    <p className="text-gray-500">No results found for "<span className="font-semibold">{query}</span>"</p>
+                    <p className="text-gray-500">No results found for &quot;<span className="font-semibold">{query}</span>&quot;</p>
                     <p className="text-sm text-gray-400 mt-1">Try a different search term</p>
                 </div>
             )}

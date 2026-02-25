@@ -115,7 +115,7 @@ export default function FeaturesSection() {
             className="mt-4 text-lg font-light max-w-xl mx-auto"
             style={{ color: "#6D758F" }}
           >
-            Everything you need to orchestrate payments — nothing you don't.
+            Everything you need to orchestrate payments — nothing you don&apos;t.
           </p>
         </motion.div>
 
