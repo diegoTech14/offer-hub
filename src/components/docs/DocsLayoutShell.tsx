@@ -13,6 +13,9 @@ import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { Navbar } from "@/components/layout/Navbar";
 
+// Use production URL for AI assistant links
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://offer-hub.tech";
+
 interface DocsLayoutShellProps {
   nav: SidebarSection[];
   children: React.ReactNode;
@@ -272,7 +275,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
         </svg>
       ),
       external: true,
-      onClick: () => window.open(`https://chatgpt.com/?q=${encodeURIComponent("Please help me with this documentation page: " + window.location.href)}`, "_blank")
+      onClick: () => window.open(`https://chatgpt.com/?q=${encodeURIComponent("Please help me with this documentation page: " + SITE_URL + "/docs/" + slug)}`, "_blank")
     },
     {
       label: "Ask Claude",
@@ -283,7 +286,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
         </svg>
       ),
       external: true,
-      onClick: () => window.open(`https://claude.ai/new?q=${encodeURIComponent("Please help me with this documentation page: " + window.location.href)}`, "_blank")
+      onClick: () => window.open(`https://claude.ai/new?q=${encodeURIComponent("Please help me with this documentation page: " + SITE_URL + "/docs/" + slug)}`, "_blank")
     },
     {
       type: "divider"
@@ -298,7 +301,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
           <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
         </svg>
       ),
-      onClick: () => navigator.clipboard.writeText(`${window.location.origin}/api/mcp`)
+      onClick: () => navigator.clipboard.writeText(`${SITE_URL}/api/mcp`)
     },
     {
       label: "Export PDF",
