@@ -306,7 +306,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
           format: "a4" as const,
           orientation: "portrait" as const
         },
-        pagebreak: { mode: ["avoid-all", "css", "legacy"] }
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] as ("avoid-all" | "css" | "legacy")[] }
       };
 
       await html2pdf().set(opt).from(clone).save();
