@@ -104,114 +104,98 @@ const REPOS = [
   'OFFER-HUB/OFFER-HUB-Frontend'
 ];
 
-async function fetchGitHubData() {
-  try {
-    const allPills = await Promise.all(REPOS.map(async (repo) => {
-      const [repoRes, contribRes, prRes, issueRes] = await Promise.all([
-        fetch(`https://api.github.com/repos/${repo}`, { next: { revalidate: 3600 } }),
-        fetch(`https://api.github.com/repos/${repo}/contributors?per_page=100`, { next: { revalidate: 3600 } }),
-        fetch(`https://api.github.com/repos/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=20`, { next: { revalidate: 3600 } }),
-        fetch(`https://api.github.com/repos/${repo}/issues?state=open&sort=created&direction=desc&per_page=50`, { next: { revalidate: 3600 } }),
-      ]);
+// In-memory cache for GitHub data (survives hot reloads in dev)
+let githubCache: { data: ReturnType<typeof processGitHubData> | null; timestamp: number } = {
+  data: null,
+  timestamp: 0,
+};
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-      if (!repoRes.ok || !contribRes.ok || !prRes.ok || !issueRes.ok) {
-        return null;
+function processGitHubData(validData: NonNullable<Awaited<ReturnType<typeof fetchRepoData>>>[]) {
+  const totalStars = validData.reduce((acc, d) => acc + d.repo.stargazers_count, 0);
+  const totalForks = validData.reduce((acc, d) => acc + d.repo.forks_count, 0);
+  const totalOpenIssues = validData.reduce((acc, d) => acc + d.repo.open_issues_count, 0);
+
+  const contribMap = new Map<string, ContributorData>();
+  validData.forEach(d => {
+    d.contributors.forEach(c => {
+      const existing = contribMap.get(c.login);
+      if (existing) {
+        existing.commits += c.contributions;
+      } else {
+        contribMap.set(c.login, {
+          name: c.login, username: c.login, avatar: c.avatar_url,
+          commits: c.contributions, profileUrl: c.html_url
+        });
       }
+    });
+  });
+  const contributors = Array.from(contribMap.values()).sort((a, b) => b.commits - a.commits);
 
-      return {
-        repo: await repoRes.json() as GitHubRepo,
-        contributors: await contribRes.json() as Contributor[],
-        pullRequests: await prRes.json() as GitHubPullRequest[],
-        issues: await issueRes.json() as GitHubIssue[],
-      };
-    }));
+  const stats: RepoStats = {
+    stars: formatNumber(totalStars), forks: formatNumber(totalForks),
+    contributors: formatNumber(contributors.length), openIssues: formatNumber(totalOpenIssues),
+  };
+
+  const allPRs = validData.flatMap(d => d.pullRequests)
+    .filter(pr => pr.merged_at !== null)
+    .map(pr => ({ number: pr.number, title: pr.title, author: pr.user?.login || "Unknown", mergedAt: pr.merged_at!, url: pr.html_url, status: "Merged" }))
+    .sort((a, b) => new Date(b.mergedAt).getTime() - new Date(a.mergedAt).getTime());
+  const pullRequests: PullRequestData[] = allPRs.slice(0, 30).map(pr => ({ ...pr, mergedAt: formatTimeAgo(pr.mergedAt) }));
+
+  const allIssues = validData.flatMap(d => d.issues)
+    .filter(issue => !issue.pull_request)
+    .map(issue => {
+      const priorityLabel = issue.labels.find(label => label.name.toLowerCase().includes('priority'));
+      let priority = "Medium";
+      if (priorityLabel) {
+        const labelName = priorityLabel.name.toLowerCase();
+        if (labelName.includes('high') || labelName.includes('critical')) priority = "High";
+        else if (labelName.includes('low')) priority = "Low";
+      }
+      return { number: issue.number, title: issue.title, priority, url: issue.html_url, labels: issue.labels.map(l => l.name), createdAt: issue.created_at || "" };
+    })
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const issues: IssueData[] = allIssues.slice(0, 50).map(({ createdAt: _, ...rest }) => rest);
+
+  return { stats, contributors, pullRequests, issues };
+}
+
+async function fetchRepoData(repo: string) {
+  const cacheOpts = { next: { revalidate: 7200 } };
+  const [repoRes, contribRes, prRes, issueRes] = await Promise.all([
+    fetch(`https://api.github.com/repos/${repo}`, cacheOpts),
+    fetch(`https://api.github.com/repos/${repo}/contributors?per_page=100`, cacheOpts),
+    fetch(`https://api.github.com/repos/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=10`, cacheOpts),
+    fetch(`https://api.github.com/repos/${repo}/issues?state=open&sort=created&direction=desc&per_page=20`, cacheOpts),
+  ]);
+
+  if (!repoRes.ok || !contribRes.ok || !prRes.ok || !issueRes.ok) return null;
+
+  return {
+    repo: await repoRes.json() as GitHubRepo,
+    contributors: await contribRes.json() as Contributor[],
+    pullRequests: await prRes.json() as GitHubPullRequest[],
+    issues: await issueRes.json() as GitHubIssue[],
+  };
+}
+
+async function fetchGitHubData() {
+  // Return cached data if still fresh
+  if (githubCache.data && Date.now() - githubCache.timestamp < CACHE_TTL) {
+    return githubCache.data;
+  }
+
+  try {
+    const allPills = await Promise.all(REPOS.map(fetchRepoData));
 
     const validData = allPills.filter((d): d is NonNullable<typeof d> => d !== null);
 
     if (validData.length === 0) throw new Error('Failed to fetch any repo data');
 
-    // Aggregate Stats
-    const totalStars = validData.reduce((acc, d) => acc + d.repo.stargazers_count, 0);
-    const totalForks = validData.reduce((acc, d) => acc + d.repo.forks_count, 0);
-    const totalOpenIssues = validData.reduce((acc, d) => acc + d.repo.open_issues_count, 0);
-
-    // Merge Contributors (by login)
-    const contribMap = new Map<string, ContributorData>();
-    validData.forEach(d => {
-      d.contributors.forEach(c => {
-        const existing = contribMap.get(c.login);
-        if (existing) {
-          existing.commits += c.contributions;
-        } else {
-          contribMap.set(c.login, {
-            name: c.login,
-            username: c.login,
-            avatar: c.avatar_url,
-            commits: c.contributions,
-            profileUrl: c.html_url
-          });
-        }
-      });
-    });
-    const contributors = Array.from(contribMap.values()).sort((a, b) => b.commits - a.commits);
-
-    const stats: RepoStats = {
-      stars: formatNumber(totalStars),
-      forks: formatNumber(totalForks),
-      contributors: formatNumber(contributors.length),
-      openIssues: formatNumber(totalOpenIssues),
-    };
-
-    // Merge Pull Requests
-    const allPRs = validData.flatMap(d => d.pullRequests)
-      .filter(pr => pr.merged_at !== null)
-      .map(pr => ({
-        number: pr.number,
-        title: pr.title,
-        author: pr.user?.login || "Unknown",
-        mergedAt: pr.merged_at!,
-        url: pr.html_url,
-        status: "Merged",
-      }))
-      .sort((a, b) => new Date(b.mergedAt).getTime() - new Date(a.mergedAt).getTime());
-
-    const pullRequests: PullRequestData[] = allPRs.slice(0, 30).map(pr => ({
-      ...pr,
-      mergedAt: formatTimeAgo(pr.mergedAt)
-    }));
-
-    // Merge Issues
-    const allIssues = validData.flatMap(d => d.issues)
-      .filter(issue => !issue.pull_request)
-      .map(issue => {
-        const priorityLabel = issue.labels.find((label) =>
-          label.name.toLowerCase().includes('priority')
-        );
-
-        let priority = "Medium";
-        if (priorityLabel) {
-          const labelName = priorityLabel.name.toLowerCase();
-          if (labelName.includes('high') || labelName.includes('critical')) {
-            priority = "High";
-          } else if (labelName.includes('low')) {
-            priority = "Low";
-          }
-        }
-
-        return {
-          number: issue.number,
-          title: issue.title,
-          priority,
-          url: issue.html_url,
-          labels: issue.labels.map((label) => label.name),
-          createdAt: issue.created_at || ""
-        };
-      })
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    const issues: IssueData[] = allIssues.slice(0, 50).map(({ createdAt: _, ...rest }) => rest);
-
-    return { stats, contributors, pullRequests, issues };
+    const result = processGitHubData(validData);
+    githubCache = { data: result, timestamp: Date.now() };
+    return result;
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
     return {

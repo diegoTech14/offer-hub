@@ -43,10 +43,11 @@ export function Footer() {
   const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const wrap = wrapRef.current;
+    const text = textRef.current;
+    if (!wrap || !text) return;
+
     const fit = () => {
-      const wrap = wrapRef.current;
-      const text = textRef.current;
-      if (!wrap || !text) return;
       text.style.fontSize = "200px";
       text.style.width = "fit-content";
       const textWidth = text.offsetWidth;
@@ -55,9 +56,11 @@ export function Footer() {
       if (textWidth === 0) return;
       text.style.fontSize = `${200 * (wrapWidth / textWidth) * 0.88}px`;
     };
+
     document.fonts.ready.then(fit);
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
+    const ro = new ResizeObserver(fit);
+    ro.observe(wrap);
+    return () => ro.disconnect();
   }, []);
 
   return (

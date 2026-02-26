@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import {
   Server,
   Lock,
@@ -92,13 +89,7 @@ export default function FeaturesSection() {
     <section id="features" className="py-24">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Heading */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-80px" }}
-        >
+        <div className="text-center mb-16 animate-fadeInUp">
           <p
             className="text-xs font-medium uppercase tracking-[0.4em] mb-4"
             style={{ color: "#149A9B" }}
@@ -117,23 +108,19 @@ export default function FeaturesSection() {
           >
             Everything you need to orchestrate payments — nothing you don&apos;t.
           </p>
-        </motion.div>
+        </div>
 
         {/* Bento grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature, i) => {
+          {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <motion.div
+              <div
                 key={feature.title}
                 className={`${
                   feature.large ? "md:col-span-2" : ""
                 } p-8 rounded-2xl shadow-raised flex flex-col gap-4`}
                 style={{ background: feature.gradient }}
-                initial={{ opacity: 0, y: 36 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08, duration: 0.55, ease: "easeOut" }}
-                viewport={{ once: true, margin: "-60px" }}
               >
                 <div
                   className="w-10 h-10 rounded-xl shadow-raised-sm flex items-center justify-center"
@@ -153,7 +140,7 @@ export default function FeaturesSection() {
                 >
                   {feature.description}
                 </p>
-              </motion.div>
+              </div>
             );
           })}
         </div>

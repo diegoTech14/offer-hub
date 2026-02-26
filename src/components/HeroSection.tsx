@@ -18,45 +18,32 @@ export default function HeroSection() {
 
     let frame: number;
     let t = 0;
+    let paused = false;
 
     const animate = () => {
-      // Slow, organic speed — feels like molten liquid
+      if (paused) return;
       t += 0.022;
 
-      // Each blob orbits independently with different frequencies & amplitudes
       const b1x = 50 + 28 * Math.sin(t * 0.70);
       const b1y = 50 + 22 * Math.cos(t * 0.50);
-
       const b2x = 50 + 22 * Math.sin(t * 0.40 + 2.0);
       const b2y = 50 + 28 * Math.cos(t * 0.60 + 1.2);
-
       const b3x = 50 + 32 * Math.sin(t * 0.85 + 4.2);
       const b3y = 50 + 18 * Math.cos(t * 0.75 + 3.0);
-
       const b4x = 50 + 18 * Math.sin(t * 1.10 + 1.0);
       const b4y = 50 + 30 * Math.cos(t * 0.95 + 5.1);
-
       const b5x = 50 + 38 * Math.sin(t * 0.55 + 5.5);
       const b5y = 50 + 24 * Math.cos(t * 0.42 + 4.0);
-
       const b6x = 50 + 14 * Math.sin(t * 1.30 + 3.0);
       const b6y = 50 + 14 * Math.cos(t * 1.15 + 2.0);
 
-      // Teal variation blobs + subtle mist blobs.
-      // The mist blobs (page bg color, semi-transparent) recreate the soft nebula
-      // look from before — but now the solid backgroundColor underneath means
-      // letters never disappear, the mist only brightens areas slightly.
       el.style.backgroundImage = [
-        // Teal liquid blobs
         `radial-gradient(ellipse 48% 55% at ${b1x}% ${b1y}%, #1bc8ca 0%, #149A9B 45%, rgba(20,154,155,0) 82%)`,
         `radial-gradient(ellipse 38% 46% at ${b2x}% ${b2y}%, #22e0e2 0%, #1bc8ca 40%, rgba(27,200,202,0) 80%)`,
         `radial-gradient(ellipse 32% 42% at ${b3x}% ${b3y}%, #15949C 0%, rgba(21,148,156,0) 78%)`,
         `radial-gradient(ellipse 28% 38% at ${b4x}% ${b4y}%, #0d7377 0%, rgba(13,115,119,0) 78%)`,
         `radial-gradient(ellipse 44% 52% at ${b5x}% ${b5y}%, #149A9B 0%, rgba(20,154,155,0) 82%)`,
         `radial-gradient(ellipse 20% 26% at ${b6x}% ${b6y}%, #22e0e2 0%, rgba(34,224,226,0) 72%)`,
-        // Nebula/mist blobs — page bg color at higher opacity partially "covers"
-        // the letters, like fog obscuring parts of the text. The solid
-        // backgroundColor beneath ensures letters never fully vanish.
         `radial-gradient(ellipse 62% 72% at ${b3x}% ${b2y}%, rgba(241,243,247,0.90) 0%, rgba(241,243,247,0.50) 40%, rgba(241,243,247,0) 78%)`,
         `radial-gradient(ellipse 52% 62% at ${b5x}% ${b4y}%, rgba(241,243,247,0.80) 0%, rgba(241,243,247,0.38) 38%, rgba(241,243,247,0) 72%)`,
         `radial-gradient(ellipse 42% 50% at ${b1x}% ${b6y}%, rgba(241,243,247,0.65) 0%, rgba(241,243,247,0.20) 45%, rgba(241,243,247,0) 70%)`,
@@ -65,8 +52,24 @@ export default function HeroSection() {
       frame = requestAnimationFrame(animate);
     };
 
+    // Pause animation when tab is hidden to save CPU
+    const onVisibility = () => {
+      if (document.hidden) {
+        paused = true;
+        cancelAnimationFrame(frame);
+      } else {
+        paused = false;
+        frame = requestAnimationFrame(animate);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
     frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   return (

@@ -8,12 +8,8 @@ export default function Analytics() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Track page view on mount and when pathname changes
-    const track = async () => {
-      await trackPageView(pathname);
-    };
-
-    track();
+    // Fire-and-forget: don't block rendering/navigation
+    trackPageView(pathname);
   }, [pathname]);
 
   // This component renders nothing

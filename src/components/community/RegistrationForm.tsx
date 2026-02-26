@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Send, User, Mail, MessageSquare, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -65,13 +64,9 @@ export default function RegistrationForm() {
     if (isSubmitted) {
         return (
             <div className="py-24 bg-transparent flex flex-col items-center justify-center text-center px-6">
-                <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="w-20 h-20 rounded-3xl bg-[#F1F3F7] shadow-raised flex items-center justify-center mb-8"
-                >
+                <div className="w-20 h-20 rounded-3xl bg-[#F1F3F7] shadow-raised flex items-center justify-center mb-8 animate-fadeInScale">
                     <CheckCircle2 size={40} className="text-[#149A9B]" />
-                </motion.div>
+                </div>
                 <h2 className="text-3xl font-black text-[#19213D] tracking-tight mb-4">You&apos;re on the list!</h2>
                 <p className="text-[#6D758F] max-w-sm font-medium">We&apos;ll reach out shortly to discuss your integration with Offer Hub.</p>
             </div>
@@ -91,93 +86,46 @@ export default function RegistrationForm() {
                     </p>
                 </div>
 
-                <motion.form
+                <form
                     onSubmit={handleSubmit}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
                     className="p-10 rounded-[2.5rem] bg-[#F1F3F7] shadow-raised flex flex-col gap-8"
                 >
-                    {/* Error Message */}
                     {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="p-4 rounded-2xl bg-red-50 border border-red-200 flex items-start gap-3"
-                        >
+                        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 flex items-start gap-3 animate-fadeIn">
                             <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
                             <p className="text-sm text-red-700 font-medium">{error}</p>
-                        </motion.div>
+                        </div>
                     )}
 
-                    {/* Name Field */}
                     <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-[#6D758F] ml-2">Full Name</label>
                         <div className="relative group">
                             <User size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#6D758F]/40 group-focus-within:text-[#149A9B] transition-colors" />
-                            <input
-                                required
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                placeholder="John Doe"
-                                disabled={isLoading}
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
+                            <input required type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="John Doe" disabled={isLoading} className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed" />
                         </div>
                     </div>
 
-                    {/* Email Field */}
                     <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-[#6D758F] ml-2">Email Address</label>
                         <div className="relative group">
                             <Mail size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#6D758F]/40 group-focus-within:text-[#149A9B] transition-colors" />
-                            <input
-                                required
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                placeholder="john@example.com"
-                                disabled={isLoading}
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
+                            <input required type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="john@example.com" disabled={isLoading} className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed" />
                         </div>
                     </div>
 
-                    {/* Purpose Field */}
                     <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-[#6D758F] ml-2">For what would you use Offer Hub?</label>
                         <div className="relative group">
                             <MessageSquare size={16} className="absolute left-5 top-6 text-[#6D758F]/40 group-focus-within:text-[#149A9B] transition-colors" />
-                            <textarea
-                                required
-                                rows={3}
-                                name="purpose"
-                                value={formData.purpose}
-                                onChange={handleInputChange}
-                                placeholder="Tell us about your marketplace or project..."
-                                disabled={isLoading}
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
+                            <textarea required rows={3} name="purpose" value={formData.purpose} onChange={handleInputChange} placeholder="Tell us about your marketplace or project..." disabled={isLoading} className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium resize-none disabled:opacity-50 disabled:cursor-not-allowed" />
                         </div>
                     </div>
 
-                    {/* Referral Field */}
                     <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-[#6D758F] ml-2">How did you hear about us?</label>
                         <div className="relative group">
                             <Send size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#6D758F]/40 group-focus-within:text-[#149A9B] transition-colors" />
-                            <input
-                                required
-                                type="text"
-                                name="referral"
-                                value={formData.referral}
-                                onChange={handleInputChange}
-                                placeholder="X, Telegram, Friend, etc."
-                                disabled={isLoading}
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                            />
+                            <input required type="text" name="referral" value={formData.referral} onChange={handleInputChange} placeholder="X, Telegram, Friend, etc." disabled={isLoading} className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed" />
                         </div>
                     </div>
 
@@ -189,7 +137,7 @@ export default function RegistrationForm() {
                         {isLoading ? 'Submitting...' : 'Submit Application'}
                         <Send size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </button>
-                </motion.form>
+                </form>
             </div>
         </section>
     );

@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import SectionHeading from "@/components/community/SectionHeading";
 
 interface Contributor {
@@ -47,15 +44,11 @@ export default function ContributorGrid({ contributors }: ContributorGridProps) 
         />
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {data.map((contributor, i) => (
-            <motion.article
+          {data.map((contributor) => (
+            <article
               key={contributor.username}
               className="rounded-2xl p-6 shadow-raised flex flex-col items-center text-center"
               style={{ background: "#F1F3F7" }}
-              initial={{ opacity: 0, y: 36 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06, duration: 0.5, ease: "easeOut" }}
-              viewport={{ once: true, margin: "-60px" }}
             >
               <div
                 className="w-16 h-16 rounded-full shadow-raised-sm flex items-center justify-center text-lg font-bold text-white"
@@ -81,17 +74,11 @@ export default function ContributorGrid({ contributors }: ContributorGridProps) 
               >
                 {contributor.commits} commits
               </p>
-            </motion.article>
+            </article>
           ))}
         </div>
 
-        <motion.div
-          className="mt-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          viewport={{ once: true }}
-        >
+        <div className="mt-12 text-center">
           <a
             href="https://github.com/OFFER-HUB/offer-hub-monorepo/graphs/contributors"
             target="_blank"
@@ -101,7 +88,7 @@ export default function ContributorGrid({ contributors }: ContributorGridProps) 
           >
             View all on GitHub
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

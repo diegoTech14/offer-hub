@@ -58,12 +58,19 @@ export function DocsLayoutShell({ nav, children }: DocsLayoutShellProps) {
   }, [pathname]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setHeadings(collectHeadingsFromPage());
-    }, 50);
+    // Collect headings immediately
+    setHeadings(collectHeadingsFromPage());
 
-    return () => window.clearTimeout(timeoutId);
-  }, [pathname, children]);
+    // Watch for content changes (e.g. lazy-loaded MDX)
+    const root = document.getElementById("doc-page-export-content");
+    if (!root) return;
+
+    const observer = new MutationObserver(() => {
+      setHeadings(collectHeadingsFromPage());
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-transparent">

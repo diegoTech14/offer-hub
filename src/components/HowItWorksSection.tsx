@@ -1,7 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 const steps = [
   {
     number: "01",
@@ -28,13 +24,7 @@ export default function HowItWorksSection() {
     <section id="how-it-works" className="py-24">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Heading */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-80px" }}
-        >
+        <div className="text-center mb-16 animate-fadeInUp">
           <p
             className="text-xs font-medium uppercase tracking-[0.4em] mb-4"
             style={{ color: "#149A9B" }}
@@ -47,7 +37,7 @@ export default function HowItWorksSection() {
           >
             Up and running in three steps
           </h2>
-        </motion.div>
+        </div>
 
         {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
@@ -58,13 +48,9 @@ export default function HowItWorksSection() {
           />
 
           {steps.map((step, i) => (
-            <motion.div
+            <div
               key={step.number}
               className="flex flex-col items-center text-center gap-6"
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.15, duration: 0.55, ease: "easeOut" }}
-              viewport={{ once: true, margin: "-80px" }}
             >
               <div
                 className="w-24 h-24 rounded-full shadow-raised flex items-center justify-center flex-shrink-0 relative z-10"
@@ -89,7 +75,7 @@ export default function HowItWorksSection() {
                   {step.description}
                 </p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

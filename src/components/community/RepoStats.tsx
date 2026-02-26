@@ -1,6 +1,3 @@
-"use client";
-
-import { motion, type Variants } from "framer-motion";
 import { Star, GitFork, Eye, AlertCircle } from "lucide-react";
 
 interface RepoStatsProps {
@@ -9,15 +6,6 @@ interface RepoStatsProps {
      watchers?: number;
      openIssues?: number;
 }
-
-const fadeUp: Variants = {
-     hidden: { opacity: 0, y: 28 },
-     visible: (i: number) => ({
-          opacity: 1,
-          y: 0,
-          transition: { delay: i * 0.1, duration: 0.55, ease: "easeOut" as const },
-     }),
-};
 
 const mockStats = {
      stars: 2547,
@@ -57,16 +45,11 @@ export default function RepoStats({
 
      return (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-               {stats.map((stat, i) => {
+               {stats.map((stat) => {
                     const Icon = stat.icon;
                     return (
-                         <motion.div
+                         <div
                               key={stat.label}
-                              custom={i}
-                              variants={fadeUp}
-                              initial="hidden"
-                              whileInView="visible"
-                              viewport={{ once: true, margin: "-80px" }}
                               className="flex flex-col items-center text-center p-6 rounded-2xl shadow-raised"
                               style={{ background: "#F1F3F7" }}
                          >
@@ -83,7 +66,7 @@ export default function RepoStats({
                               >
                                    {stat.label}
                               </span>
-                         </motion.div>
+                         </div>
                     );
                })}
           </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FileText, Shield, Scale, HelpCircle } from "lucide-react";
@@ -13,11 +12,7 @@ export default function TermsOfServicePage() {
       <main className="flex-grow pt-32 pb-24 px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <motion.header
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-20"
-          >
+          <header className="text-center mb-20 animate-fadeInUp">
             <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#149A9B] mb-4">Legal Framework</p>
             <h1 className="text-4xl md:text-6xl font-black text-[#19213D] tracking-tighter leading-none mb-6">
               Platform <span className="text-[#149A9B]">Terms</span>
@@ -29,7 +24,7 @@ export default function TermsOfServicePage() {
             <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F1F3F7] shadow-raised-sm text-xs font-bold text-[#6D758F]">
               Last updated: <span className="text-[#149A9B]">February 25, 2026</span>
             </div>
-          </motion.header>
+          </header>
 
           <div className="space-y-12">
             {[
@@ -79,15 +74,11 @@ export default function TermsOfServicePage() {
                   { label: "Legal or compliance", address: "legal@offerhub.io" }
                 ]
               }
-            ].map((section, idx) => {
+            ].map((section) => {
               const Icon = section.icon;
               return (
-                <motion.section
+                <section
                   key={section.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  viewport={{ once: true }}
                   className="p-8 md:p-12 rounded-[2.5rem] bg-[#F1F3F7] shadow-raised"
                 >
                   <div className="flex items-center gap-5 mb-8">
@@ -122,7 +113,7 @@ export default function TermsOfServicePage() {
                       <span className="text-sm font-bold text-[#149A9B] group-hover:text-[#19213D] transition-colors">{email.address}</span>
                     </a>
                   )))}
-                </motion.section>
+                </section>
               );
             })}
           </div>
@@ -133,4 +124,3 @@ export default function TermsOfServicePage() {
     </div>
   );
 }
-

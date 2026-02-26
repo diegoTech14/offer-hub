@@ -1,8 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 const partners = [
   {
@@ -25,12 +22,7 @@ export default function SupportedBySection() {
   return (
     <section className="py-8 bg-transparent">
       <div className="container mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col items-center gap-4"
-        >
+        <div className="flex flex-col items-center gap-4 animate-fadeIn">
           {/* Small Label */}
           <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#6D758F]/60">
             Supported by
@@ -57,7 +49,7 @@ export default function SupportedBySection() {
               </Link>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

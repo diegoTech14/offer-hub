@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   Disc3,
@@ -48,23 +45,15 @@ const CommunityChannelsSection = () => {
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {channels.map((channel, index) => {
+          {channels.map((channel) => {
             const Icon = channel.icon;
             return (
-              <motion.a
+              <a
                 key={channel.name}
                 href={channel.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-full flex-col rounded-2xl bg-background p-6 shadow-raised transition-transform duration-300 hover:-translate-y-1"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: index * 0.06,
-                  duration: 0.5,
-                  ease: "easeOut",
-                }}
-                viewport={{ once: true }}
               >
                 <Icon size={18} className="text-primary" />
                 <h3 className="mt-4 text-xl font-bold text-text-primary">
@@ -76,7 +65,7 @@ const CommunityChannelsSection = () => {
                 <span className="mt-auto pt-6 inline-flex items-center gap-2 text-sm font-semibold text-text-primary">
                   Join channel <ArrowUpRight size={16} />
                 </span>
-              </motion.a>
+              </a>
             );
           })}
         </div>

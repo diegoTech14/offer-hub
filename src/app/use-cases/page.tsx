@@ -2,7 +2,6 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
     Users,
@@ -44,13 +43,20 @@ export default function UseCasesPage() {
             if (element) observer.observe(element);
         });
 
+        let ticking = false;
         const handleScroll = () => {
-            if (navRef.current) {
-                setIsNavPinned(navRef.current.getBoundingClientRect().top <= 81);
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(() => {
+                    if (navRef.current) {
+                        setIsNavPinned(navRef.current.getBoundingClientRect().top <= 81);
+                    }
+                    ticking = false;
+                });
             }
         };
 
-        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("scroll", handleScroll, { passive: true });
         return () => {
             observer.disconnect();
             window.removeEventListener("scroll", handleScroll);
@@ -80,42 +86,34 @@ export default function UseCasesPage() {
                 {/* ── Hero / Overview Section ── */}
                 <section id="overview" className="pt-40 pb-20 relative overflow-hidden bg-transparent">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.8),inset_-2px_-2px_5px_rgba(0,0,0,0.05),4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
+                        <div
+                            className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.8),inset_-2px_-2px_5px_rgba(0,0,0,0.05),4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff] animate-fadeIn"
                             style={{ color: "#149A9B", background: "#F1F3F7" }}
                         >
                             <Users size={14} className="inline mr-2.5 mb-0.5" />
                             Freelance Marketplace
-                        </motion.div>
+                        </div>
 
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="text-5xl md:text-7xl font-black tracking-tight mb-8"
+                        <h1
+                            className="text-5xl md:text-7xl font-black tracking-tight mb-8 animate-fadeInUp"
                             style={{ color: "#19213D" }}
                         >
                             Powering the Future of <br className="hidden md:block" /> Independent Work
-                        </motion.h1>
+                        </h1>
 
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed mb-12"
-                            style={{ color: "#6D758F" }}
+                        <p
+                            className="text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed mb-12 animate-fadeInUp"
+                            style={{ color: "#6D758F", animationDelay: "0.1s" }}
                         >
                             Build a global, trustless freelance platform. Escrow funds in smart contracts, release payments upon milestone completion, and pay talent instantly across borders on Stellar.
-                        </motion.p>
+                        </p>
                     </div>
                 </section>
 
                 {/* ── Sticky Navigation (Neumorphic Pill) ── */}
                 <div ref={navRef} className="sticky top-[80px] z-40 py-6 pointer-events-none">
                     <div className="max-w-3xl mx-auto px-6 flex justify-center">
-                        <motion.div
+                        <div
                             className={cn(
                                 "pointer-events-auto flex items-center p-2 rounded-2xl transition-all duration-500",
                                 isNavPinned ? "shadow-nav-scrolled" : "shadow-nav"
@@ -140,7 +138,7 @@ export default function UseCasesPage() {
                                     </a>
                                 ))}
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
 
@@ -205,12 +203,8 @@ export default function UseCasesPage() {
                             A simplified view of the smart contract interactions orchestrated by OFFER HUB APIs.
                         </p>
 
-                        <motion.div
-                            className="relative overflow-hidden h-[400px] md:h-[550px] rounded-[3rem] shadow-[inset_8px_8px_16px_#d1d5db,inset_-8px_-8px_16px_#ffffff] w-full max-w-5xl mx-auto bg-[#F1F3F7] flex flex-col items-center justify-center"
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            viewport={{ once: true }}
+                        <div
+                            className="relative overflow-hidden h-[400px] md:h-[550px] rounded-[3rem] shadow-[inset_8px_8px_16px_#d1d5db,inset_-8px_-8px_16px_#ffffff] w-full max-w-5xl mx-auto bg-[#F1F3F7] flex flex-col items-center justify-center animate-fadeInScale"
                         >
                             {/* Inner UI mock */}
                             <div className="relative text-center p-8 w-full max-w-lg">
@@ -234,7 +228,7 @@ export default function UseCasesPage() {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
                 </section>
             </main>

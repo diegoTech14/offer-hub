@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
 import IssueCard, { type Difficulty, type IssueCardProps } from "@/components/community/IssueCard";
@@ -128,15 +127,10 @@ export default function IssueBoard({ issues = MOCK_ISSUES }: IssueBoardProps) {
 
         {/* Issue grid */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {filtered.map((issue, i) => (
-            <motion.div
-              key={issue.number}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06, duration: 0.4, ease: "easeOut" }}
-            >
+          {filtered.map((issue) => (
+            <div key={issue.number}>
               <IssueCard {...issue} />
-            </motion.div>
+            </div>
           ))}
         </div>
 

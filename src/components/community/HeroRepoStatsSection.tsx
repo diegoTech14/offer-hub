@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Star, GitFork, Users, AlertCircle } from "lucide-react";
 
 interface RepoStats {
@@ -26,13 +23,7 @@ const HeroRepoStatsSection = ({ stats }: HeroRepoStatsSectionProps) => {
     <section id="hero-repo-stats" className="py-20 overflow-hidden bg-transparent">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-center">
-          <motion.div
-            className="lg:col-span-7"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
+          <div className="lg:col-span-7">
             <p className="mb-6 text-[11px] font-black uppercase tracking-[0.4em] text-[#149A9B]">
               Community Network
             </p>
@@ -54,22 +45,14 @@ const HeroRepoStatsSection = ({ stats }: HeroRepoStatsSectionProps) => {
                 Star on GitHub
               </a>
             </div>
-          </motion.div>
+          </div>
 
           <div className="lg:col-span-5 relative">
             <div className="grid grid-cols-2 gap-6">
-              {repoStats.map((stat, index) => (
-                <motion.div
+              {repoStats.map((stat) => (
+                <div
                   key={stat.label}
                   className="group rounded-3xl bg-[#F1F3F7] p-6 shadow-raised transition-all duration-500 hover:scale-[1.02]"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: index * 0.1,
-                    duration: 0.6,
-                    ease: "easeOut",
-                  }}
-                  viewport={{ once: true }}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="p-2.5 rounded-xl bg-[#F1F3F7] shadow-sunken-subtle">
@@ -83,7 +66,7 @@ const HeroRepoStatsSection = ({ stats }: HeroRepoStatsSectionProps) => {
                   <p className="mt-1 text-3xl font-black text-[#19213D] tracking-tight">
                     {stats[stat.label.toLowerCase().replace(" ", "") as keyof typeof stats] || stat.value}
                   </p>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>

@@ -40,16 +40,21 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
       if (el) observer.observe(el);
     });
 
+    let scrollTimeout: ReturnType<typeof setTimeout>;
     const handleScroll = () => {
-      const isAtBottom =
-        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
-      if (isAtBottom && headings.length > 0) {
-        setActiveId(headings[headings.length - 1].id);
-      }
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const isAtBottom =
+          window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
+        if (isAtBottom && headings.length > 0) {
+          setActiveId(headings[headings.length - 1].id);
+        }
+      }, 100);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
+      clearTimeout(scrollTimeout);
       observer.disconnect();
       window.removeEventListener("scroll", handleScroll);
     };

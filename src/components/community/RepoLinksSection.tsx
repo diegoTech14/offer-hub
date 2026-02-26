@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Github, FolderGit2 } from "lucide-react";
 
 const repos = [
@@ -29,16 +26,12 @@ export default function RepoLinksSection() {
                     <div className="w-12 h-1 rounded-full bg-[#149A9B]/20 mb-12" />
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-                        {repos.map((repo, index) => (
-                            <motion.a
+                        {repos.map((repo) => (
+                            <a
                                 key={repo.name}
                                 href={repo.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1, duration: 0.5 }}
-                                viewport={{ once: true }}
                                 className="group relative flex items-center gap-5 p-6 rounded-3xl bg-[#F1F3F7] shadow-raised transition-all duration-300 active:shadow-sunken hover:scale-[1.02]"
                             >
                                 <div className="w-14 h-14 rounded-2xl bg-[#F1F3F7] shadow-raised-sm flex items-center justify-center flex-shrink-0 group-hover:shadow-sunken transition-all duration-500">
@@ -56,7 +49,7 @@ export default function RepoLinksSection() {
                                 </div>
 
                                 <div className="absolute top-4 right-4 w-1.5 h-1.5 rounded-full bg-[#149A9B] opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </motion.a>
+                            </a>
                         ))}
                     </div>
                 </div>

@@ -59,22 +59,20 @@ export default function DocsPage() {
 
         let frame: number;
         let t = 0;
+        let paused = false;
 
         const animate = () => {
+            if (paused) return;
             t += 0.022;
 
             const b1x = 50 + 28 * Math.sin(t * 0.70);
             const b1y = 50 + 22 * Math.cos(t * 0.50);
-
             const b2x = 50 + 22 * Math.sin(t * 0.40 + 2.0);
             const b2y = 50 + 28 * Math.cos(t * 0.60 + 1.2);
-
             const b3x = 50 + 32 * Math.sin(t * 0.85 + 4.2);
             const b3y = 50 + 18 * Math.cos(t * 0.75 + 3.0);
-
             const b4x = 50 + 18 * Math.sin(t * 1.10 + 1.0);
             const b4y = 50 + 30 * Math.cos(t * 0.95 + 5.1);
-
             const b5x = 50 + 38 * Math.sin(t * 0.55 + 5.5);
             const b5y = 50 + 24 * Math.cos(t * 0.42 + 4.0);
 
@@ -90,8 +88,22 @@ export default function DocsPage() {
             frame = requestAnimationFrame(animate);
         };
 
+        const onVisibility = () => {
+            if (document.hidden) {
+                paused = true;
+                cancelAnimationFrame(frame);
+            } else {
+                paused = false;
+                frame = requestAnimationFrame(animate);
+            }
+        };
+
+        document.addEventListener("visibilitychange", onVisibility);
         frame = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(frame);
+        return () => {
+            cancelAnimationFrame(frame);
+            document.removeEventListener("visibilitychange", onVisibility);
+        };
     }, []);
 
     return (

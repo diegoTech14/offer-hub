@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
 
@@ -22,18 +19,10 @@ const HowToContributeSection = () => {
         />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {contributionSteps.map((step, index) => (
-            <motion.article
+          {contributionSteps.map((step) => (
+            <article
               key={step}
               className="rounded-2xl bg-background p-6 shadow-raised"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: index * 0.06,
-                duration: 0.5,
-                ease: "easeOut",
-              }}
-              viewport={{ once: true }}
             >
               <div className="flex items-start gap-3">
                 <CheckCircle2 size={18} className="mt-1 text-primary" />
@@ -41,7 +30,7 @@ const HowToContributeSection = () => {
                   {step}
                 </p>
               </div>
-            </motion.article>
+            </article>
           ))}
         </div>
       </div>

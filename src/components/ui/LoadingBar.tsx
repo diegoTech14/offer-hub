@@ -1,34 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 
 export default function LoadingBar() {
-    const { scrollYProgress } = useScroll();
+    const [progress, setProgress] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-
-    // GitHub-style loading bar that fills once on mount and then follows scroll
-    const scaleX = useSpring(0, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
+    const ticking = useRef(false);
 
     useEffect(() => {
-        // Initial "loading" animation
-        scaleX.set(0.3);
+        setProgress(0.3);
         const timer = setTimeout(() => {
-            scaleX.set(1);
+            setProgress(1);
             setTimeout(() => setIsLoading(false), 500);
         }, 800);
-
         return () => clearTimeout(timer);
-    }, [scaleX]);
+    }, []);
+
+    useEffect(() => {
+        if (isLoading) return;
+
+        const onScroll = () => {
+            if (!ticking.current) {
+                ticking.current = true;
+                requestAnimationFrame(() => {
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    setProgress(docHeight > 0 ? window.scrollY / docHeight : 0);
+                    ticking.current = false;
+                });
+            }
+        };
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, [isLoading]);
 
     return (
-        <motion.div
+        <div
             className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#149A9B] to-[#22e0e2] z-[9999] origin-left"
-            style={{ scaleX: isLoading ? scaleX : scrollYProgress }}
+            style={{ transform: `scaleX(${progress})`, transition: isLoading ? "transform 0.4s ease" : "none" }}
         />
     );
 }

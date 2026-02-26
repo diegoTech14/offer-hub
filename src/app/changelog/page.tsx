@@ -2,7 +2,6 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
 
 const changelogEntries = [
   {
@@ -57,11 +56,7 @@ export default function ChangelogPage() {
       <main className="flex-grow pt-32 pb-24 px-6 md:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <motion.header
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-24"
-          >
+          <header className="text-center mb-24 animate-fadeInUp">
             <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#149A9B] mb-4">Evolution</p>
             <h1 className="text-4xl md:text-6xl font-black text-[#19213D] tracking-tighter leading-none mb-6">
               Platform <span className="text-[#149A9B]">Updates</span>
@@ -69,7 +64,7 @@ export default function ChangelogPage() {
             <p className="text-lg text-[#6D758F] font-medium max-w-2xl mx-auto leading-relaxed">
               Tracking the progress of the Offer Hub ecosystem as we build the foundations of trustless commerce.
             </p>
-          </motion.header>
+          </header>
 
           {/* Timeline Wrapper */}
           <div className="relative">
@@ -78,12 +73,8 @@ export default function ChangelogPage() {
 
             <div className="space-y-16 md:space-y-24">
               {changelogEntries.map((entry, index) => (
-                <motion.div
+                <div
                   key={entry.version}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
                   className={`relative flex flex-col md:flex-row items-start md:items-center md:justify-between ${index % 2 === 0 ? "md:flex-row-reverse" : ""
                     }`}
                 >
@@ -140,7 +131,7 @@ export default function ChangelogPage() {
                       </ul>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>

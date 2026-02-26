@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Copy, Check, Code2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
-import { codeToHtml } from "shiki";
 
 interface CodeBlockProps {
   code?: string;
@@ -13,7 +11,6 @@ interface CodeBlockProps {
   className?: string;
 }
 
-// Map unsupported languages to supported Shiki languages
 const LANGUAGE_ALIASES: Record<string, string> = {
   env: "bash",
   dotenv: "bash",
@@ -23,42 +20,64 @@ const LANGUAGE_ALIASES: Record<string, string> = {
   config: "ini",
 };
 
+// Global cache — persists across renders and component instances
+const highlightCache = new Map<string, string>();
+
 export function CodeBlock({
   code: codeProp,
   children,
   language = "typescript",
   className
 }: CodeBlockProps) {
-  // Normalize the language using aliases
   const normalizedLang = LANGUAGE_ALIASES[language] || language;
   const [copied, setCopied] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState<string>("");
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const rawCode = (codeProp || children || "").trim();
+  const cacheKey = `${normalizedLang}:${rawCode}`;
 
   useEffect(() => {
-    let isMounted = true;
-    async function highlight() {
-      try {
-        const html = await codeToHtml(rawCode, {
-          lang: normalizedLang,
-          theme: "github-light",
-        });
-        if (isMounted) {
-          setHighlightedCode(html);
-        }
-      } catch (error) {
-        console.error("Shiki highlighting failed:", error);
-        if (isMounted) {
-          setHighlightedCode(`<pre><code>${rawCode}</code></pre>`);
-        }
-      }
+    // Return cached result immediately — no Shiki load needed
+    const cached = highlightCache.get(cacheKey);
+    if (cached) {
+      setHighlightedCode(cached);
+      return;
     }
-    highlight();
+
+    let isMounted = true;
+
+    // Lazy-load Shiki only when code block is near the viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          observer.disconnect();
+          import("shiki").then(({ codeToHtml }) => {
+            codeToHtml(rawCode, { lang: normalizedLang, theme: "github-light" })
+              .then((html) => {
+                highlightCache.set(cacheKey, html);
+                if (isMounted) setHighlightedCode(html);
+              })
+              .catch(() => {
+                const fallback = `<pre><code>${rawCode}</code></pre>`;
+                highlightCache.set(cacheKey, fallback);
+                if (isMounted) setHighlightedCode(fallback);
+              });
+          });
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
     return () => {
       isMounted = false;
+      observer.disconnect();
     };
-  }, [rawCode, normalizedLang]);
+  }, [cacheKey, rawCode, normalizedLang]);
 
   async function handleCopy() {
     try {
@@ -72,6 +91,7 @@ export function CodeBlock({
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "relative rounded-3xl overflow-hidden my-10 border border-[#D1D5DB]/30 shadow-[0_15px_40px_rgba(0,0,0,0.02)] bg-white group transition-all duration-300 hover:shadow-xl hover:border-[#D1D5DB]/50",
         className
@@ -96,37 +116,16 @@ export function CodeBlock({
           onClick={handleCopy}
           aria-label={copied ? "Copied" : "Copy code"}
           className={cn(
-            "relative flex items-center gap-2.5 px-4 py-2 rounded-xl text-[10.5px] font-black uppercase tracking-widest transition-all duration-500",
+            "relative flex items-center gap-2.5 px-4 py-2 rounded-xl text-[10.5px] font-black uppercase tracking-widest transition-all duration-300",
             copied
-              ? "text-white bg-[#149A9B] shadow-lg shadow-[#149A9B]/20 transform scale-105"
+              ? "text-white bg-[#149A9B] shadow-lg shadow-[#149A9B]/20"
               : "text-[#6D758F] bg-white border border-[#D1D5DB]/50 shadow-sm hover:text-[#19213D] hover:border-[#D1D5DB]/80 hover:shadow-md active:scale-95"
           )}
         >
-          <AnimatePresence mode="wait" initial={false}>
-            {copied ? (
-              <motion.div
-                key="check"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                className="flex items-center gap-2"
-              >
-                <Check size={14} className="stroke-[3.5]" />
-                <span>Copied</span>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="copy"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                className="flex items-center gap-2"
-              >
-                <Copy size={14} className="stroke-[2.5]" />
-                <span>Copy</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <span className="flex items-center gap-2">
+            {copied ? <Check size={14} className="stroke-[3.5]" /> : <Copy size={14} className="stroke-[2.5]" />}
+            <span>{copied ? "Copied" : "Copy"}</span>
+          </span>
         </button>
       </div>
 
@@ -138,7 +137,7 @@ export function CodeBlock({
             className="shiki-container [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!outline-none"
           />
         ) : (
-          <pre className="text-[#6D758F]/20 animate-pulse font-mono font-medium">
+          <pre className="text-[#6D758F]/40 font-mono font-medium">
             <code>{rawCode}</code>
           </pre>
         )}

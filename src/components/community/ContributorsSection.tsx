@@ -91,14 +91,18 @@ const ContributorsSection = ({ contributors }: ContributorsSectionProps) => {
         </div>
 
         {hasMore && (
-          <div className="mt-16 text-center">
+          <div className="mt-12 text-center">
             <button
               onClick={handleLoadMore}
-              className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#149A9B] hover:gap-3 transition-all"
+              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-300 shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle"
+              style={{ background: "#149A9B" }}
             >
-              Load more contributors
-              <ChevronDown size={14} />
+              Show more ({totalContributors - displayCount} remaining)
+              <ChevronDown size={16} />
             </button>
+            <p className="mt-3 text-xs text-[#6D758F]">
+              Showing {displayCount} of {totalContributors} contributors
+            </p>
           </div>
         )}
       </div>

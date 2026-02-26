@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClientBackground } from "@/components/layout/ClientBackground";
 import Analytics from "@/components/Analytics";
+import { ClientBackground } from "@/components/layout/ClientBackground";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "700", "900"],
   variable: "--font-inter",
 });
 
@@ -25,16 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className={`${inter.className} antialiased relative min-h-screen`}>
-        {/* Analytics Tracking (Invisible) */}
         <Analytics />
-
-        {/* Global Interactive Background */}
         <ClientBackground />
-
-        {/* Main Application Content */}
-        <div className="relative z-10 w-full h-full">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );

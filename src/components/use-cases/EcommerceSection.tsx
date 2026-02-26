@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 
 const ecommerceSteps = [
@@ -36,13 +33,7 @@ export default function EcommerceSection() {
   return (
     <section id="ecommerce" className="py-16 md:py-20 bg-background">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          className="max-w-3xl mb-14"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-80px" }}
-        >
+        <div className="max-w-3xl mb-14 animate-fadeInUp">
           <p className="text-xs font-medium uppercase tracking-[0.4em] mb-4 text-primary">
             Use case
           </p>
@@ -53,22 +44,13 @@ export default function EcommerceSection() {
             OFFER-HUB adds buyer and seller protection to your store. The buyer pays into escrow,
             and the seller gets paid after the order is delivered.
           </p>
-        </motion.div>
+        </div>
 
-        {/* How it works — 3 step cards at top */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mb-12">
-          {ecommerceSteps.map((step, index) => (
-            <motion.article
+          {ecommerceSteps.map((step) => (
+            <article
               key={step.number}
               className="rounded-2xl p-6 shadow-raised bg-background"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: index * 0.12,
-                duration: 0.45,
-                ease: "easeOut",
-              }}
-              viewport={{ once: true, margin: "-80px" }}
             >
               <p className="text-sm font-black tracking-wide mb-3 text-primary">
                 {step.number}
@@ -79,44 +61,26 @@ export default function EcommerceSection() {
               <p className="text-sm font-light leading-relaxed text-text-secondary">
                 {step.description}
               </p>
-            </motion.article>
+            </article>
           ))}
         </div>
 
-        {/* Key benefits */}
-        <motion.div
-          className="rounded-2xl p-6 md:p-8 shadow-raised bg-background"
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.55, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-80px" }}
-        >
+        <div className="rounded-2xl p-6 md:p-8 shadow-raised bg-background">
           <h3 className="text-2xl md:text-3xl font-bold mb-6 text-text-primary">
             Key benefits
           </h3>
 
           <ul className="space-y-4">
-            {ecommerceBenefits.map((benefit, index) => (
-              <motion.li
-                key={benefit}
-                className="flex items-start gap-3"
-                initial={{ opacity: 0, x: 12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{
-                  delay: index * 0.08 + 0.1,
-                  duration: 0.4,
-                  ease: "easeOut",
-                }}
-                viewport={{ once: true, margin: "-80px" }}
-              >
+            {ecommerceBenefits.map((benefit) => (
+              <li key={benefit} className="flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 mt-0.5 flex-shrink-0 text-primary" />
                 <span className="text-sm md:text-base font-light leading-relaxed text-text-secondary">
                   {benefit}
                 </span>
-              </motion.li>
+              </li>
             ))}
           </ul>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

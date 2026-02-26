@@ -2,7 +2,6 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
 
 import {
   Mail,
@@ -18,8 +17,6 @@ const features = [
     description:
       "We collect information you voluntarily provide when creating an account, setting up your marketplace, or contacting support — including your name, email address, business details, and payment information. We also automatically collect technical data such as IP addresses, browser type, device identifiers, and interaction logs to ensure the stability, security, and performance of Offer Hub.",
     large: false,
-    gradient:
-      "radial-gradient(ellipse 85% 80% at 92% 88%, rgba(10,98,101,0.15) 0%, rgba(10,98,101,0.04) 50%, transparent 75%), #F1F3F7",
     iconColor: "#149A9B",
   },
   {
@@ -28,8 +25,6 @@ const features = [
     description:
       "We use essential cookies to keep you logged in and maintain your session. With your consent, we may use analytics cookies to understand how users navigate the platform. These are never used for advertising. You can manage your preferences at any time via your browser settings or our cookie preference center.",
     large: false,
-    gradient:
-      "radial-gradient(ellipse 85% 80% at 12% 80%, rgba(20,154,155,0.13) 0%, rgba(21,148,156,0.04) 50%, transparent 75%), #F1F3F7",
     iconColor: "#149A9B",
   },
   {
@@ -38,8 +33,6 @@ const features = [
     description:
       "Offer Hub integrates with carefully selected third-party services. Payment processing is handled by PCI-compliant providers — we never store raw card data. Infrastructure providers may process your data under strict agreements aligned with GDPR. We do not sell your data to third parties, nor share it with advertisers.",
     large: false,
-    gradient:
-      "radial-gradient(ellipse 80% 85% at 85% 50%, rgba(21,148,156,0.15) 0%, rgba(20,154,155,0.04) 50%, transparent 75%), #F1F3F7",
     iconColor: "#149A9B",
   },
 ];
@@ -52,13 +45,7 @@ export default function PrivacyPage() {
       <main className="flex-grow pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20 px-4 sm:px-8 md:px-12 lg:px-24">
 
         {/* Heading */}
-        <motion.div
-          className="text-center mb-20 md:mb-28"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-80px" }}
-        >
+        <div className="text-center mb-20 md:mb-28 animate-fadeInUp">
           <p
             className="text-[11px] font-black uppercase tracking-[0.4em] mb-4 text-[#149A9B]">
             Data Governance
@@ -77,22 +64,18 @@ export default function PrivacyPage() {
           <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F1F3F7] shadow-raised-sm text-xs font-bold text-[#6D758F]">
             Last updated: <span className="text-[#149A9B]">February 25, 2026</span>
           </div>
-        </motion.div>
+        </div>
 
         {/* Bento grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-5">
-          {features.map((feature, i) => {
+          {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <motion.div
+              <div
                 key={feature.title}
                 className={`${feature.large ? "sm:col-span-2 md:col-span-2" : ""
                   } p-10 rounded-[2.5rem] shadow-raised flex flex-col gap-6 group hover:shadow-raised-hover transition-all duration-500`}
                 style={{ background: "#F1F3F7" }}
-                initial={{ opacity: 0, y: 36 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08, duration: 0.55, ease: "easeOut" }}
-                viewport={{ once: true, margin: "-60px" }}
               >
                 <div
                   className="w-14 h-14 rounded-2xl shadow-sunken-subtle flex items-center justify-center shrink-0 bg-[#F1F3F7] group-hover:shadow-sunken transition-all duration-300"
@@ -111,18 +94,14 @@ export default function PrivacyPage() {
                     {feature.description}
                   </p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
 
         {/* Contact card */}
-        <motion.div
+        <div
           className="p-8 sm:p-12 md:p-14 rounded-[3rem] shadow-raised flex flex-col md:flex-row md:items-center md:justify-between gap-10 md:gap-14 mt-16 bg-[#F1F3F7]"
-          initial={{ opacity: 0, y: 36 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.32, duration: 0.55, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-60px" }}
         >
           {/* Left: copy */}
           <div className="flex flex-col gap-6 md:max-w-md">
@@ -175,7 +154,7 @@ export default function PrivacyPage() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
       </main>
 
       <Footer />

@@ -90,14 +90,30 @@ export function getUTMParams() {
   };
 }
 
-// Get geolocation data from IP
+// Get geolocation data from IP (cached per session)
+const emptyGeo = {
+  ip: undefined,
+  country: undefined,
+  country_code: undefined,
+  city: undefined,
+  region: undefined,
+  timezone: undefined,
+};
+
 export async function getGeolocation() {
+  const CACHE_KEY = 'geo_cache';
+
   try {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
     const response = await fetch('https://ipapi.co/json/');
     if (!response.ok) throw new Error('Failed to fetch geolocation');
 
     const data = await response.json();
-    return {
+    const geo = {
       ip: data.ip,
       country: data.country_name,
       country_code: data.country_code,
@@ -105,16 +121,13 @@ export async function getGeolocation() {
       region: data.region,
       timezone: data.timezone,
     };
-  } catch (error) {
-    console.error('Error fetching geolocation:', error);
-    return {
-      ip: undefined,
-      country: undefined,
-      country_code: undefined,
-      city: undefined,
-      region: undefined,
-      timezone: undefined,
-    };
+
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(geo));
+    return geo;
+  } catch {
+    // Cache the empty result so we don't retry on every navigation
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(emptyGeo));
+    return emptyGeo;
   }
 }
 
@@ -128,19 +141,15 @@ export async function trackPageView(pagePath: string, pageTitle?: string) {
   try {
     const visitorId = generateVisitorId();
     const sessionId = getSessionId();
-    const geo = await getGeolocation();
     const utm = getUTMParams();
 
+    // Send page view immediately without waiting for geolocation
     const pageViewData = {
       visitor_id: visitorId,
       page_path: pagePath,
       page_title: pageTitle || document.title,
       referrer: document.referrer || undefined,
       session_id: sessionId,
-      ip_address: geo.ip,
-      country: geo.country,
-      country_code: geo.country_code,
-      city: geo.city,
       user_agent: navigator.userAgent,
       browser: getBrowserName(),
       device: getDeviceType(),
@@ -150,44 +159,20 @@ export async function trackPageView(pagePath: string, pageTitle?: string) {
       ...utm,
     };
 
-    // Insert page view
-    const { error: pageViewError } = await supabase
+    supabase
       .from('page_views')
-      .insert([pageViewData]);
+      .insert([pageViewData])
+      .then(({ error }) => {
+        if (error) console.error('Error tracking page view:', error);
+      });
 
-    if (pageViewError) {
-      console.error('Error tracking page view:', pageViewError);
-      return;
-    }
-
-    // Update or create visitor record
-    const { data: existingVisitor } = await supabase
-      .from('visitors')
-      .select('*')
-      .eq('visitor_id', visitorId)
-      .single();
-
-    if (existingVisitor) {
-      // Update existing visitor
-      await supabase
+    // Fetch geolocation in background and update visitor separately
+    getGeolocation().then(geo => {
+      supabase
         .from('visitors')
-        .update({
-          last_seen: new Date().toISOString(),
-          total_visits: existingVisitor.total_visits + 1,
-          ip_address: geo.ip,
-          country: geo.country,
-          country_code: geo.country_code,
-          city: geo.city,
-          region: geo.region,
-          timezone: geo.timezone,
-        })
-        .eq('visitor_id', visitorId);
-    } else {
-      // Create new visitor
-      await supabase
-        .from('visitors')
-        .insert([{
+        .upsert([{
           visitor_id: visitorId,
+          last_seen: new Date().toISOString(),
           ip_address: geo.ip,
           country: geo.country,
           country_code: geo.country_code,
@@ -198,8 +183,11 @@ export async function trackPageView(pagePath: string, pageTitle?: string) {
           browser: getBrowserName(),
           device: getDeviceType(),
           os: getOSName(),
-        }]);
-    }
+        }], { onConflict: 'visitor_id' })
+        .then(({ error }) => {
+          if (error) console.error('Error upserting visitor:', error);
+        });
+    });
   } catch (error) {
     console.error('Error in trackPageView:', error);
   }

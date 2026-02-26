@@ -1,6 +1,3 @@
-"use client";
-
-import { motion, type Variants } from "framer-motion";
 import { ArrowRight, GitMerge, Plus, Minus } from "lucide-react";
 
 export interface PullRequest {
@@ -194,19 +191,6 @@ const MOCK_PRS: PullRequest[] = [
   },
 ];
 
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.55,
-      ease: "easeOut" as const,
-    },
-  }),
-};
-
 interface RecentPRsFeedProps {
   pullRequests?: PullRequest[];
 }
@@ -218,13 +202,7 @@ export default function RecentPRsFeed({ pullRequests }: RecentPRsFeedProps) {
     <section id="recent-prs" className="py-24">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Section header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-80px" }}
-        >
+        <div className="text-center mb-16 animate-fadeInUp">
           <p
             className="text-xs font-medium uppercase tracking-[0.4em] mb-4"
             style={{ color: "#149A9B" }}
@@ -244,32 +222,19 @@ export default function RecentPRsFeed({ pullRequests }: RecentPRsFeedProps) {
             The community ships fast. See the latest merged pull requests
             driving OFFER HUB forward.
           </p>
-        </motion.div>
+        </div>
 
         {/* PR grid — 1 col mobile, 2 col desktop */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {prs.map((pr, i) => (
-            <motion.div
-              key={pr.number}
-              custom={i}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-60px" }}
-            >
+          {prs.map((pr) => (
+            <div key={pr.number}>
               <PRCardInline pr={pr} />
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* View all PRs CTA */}
-        <motion.div
-          className="flex justify-center mt-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.5, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-60px" }}
-        >
+        <div className="flex justify-center mt-12">
           <a
             href="https://github.com/OFFER-HUB/offer-hub-monorepo/pulls?q=is%3Apr+is%3Amerged"
             target="_blank"
@@ -288,7 +253,7 @@ export default function RecentPRsFeed({ pullRequests }: RecentPRsFeedProps) {
             View all PRs
             <ArrowRight size={15} />
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
