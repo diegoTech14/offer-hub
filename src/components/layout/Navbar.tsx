@@ -8,10 +8,12 @@ import { Menu, X, Send } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const navLinks = [
+  { href: "/#features", label: "Features" },
+  { href: "/#how-it-works", label: "How it Works" },
   { href: "/use-cases", label: "Use Cases" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/docs", label: "Docs" },
   { href: "/community", label: "Community" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export function Navbar() {
@@ -65,8 +67,8 @@ export function Navbar() {
                 "px-3 py-2 rounded-full text-[13px] xl:text-sm font-medium",
                 "transition-all duration-300 ease-out bg-[#F1F3F7]",
                 pathname === "/"
-                  ? "text-[#149A9B] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
-                  : "text-[#6D758F] hover:text-[#149A9B] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                  ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                  : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
               )}
             >
               Home
@@ -84,8 +86,8 @@ export function Navbar() {
                     "px-3 py-2 rounded-full text-[13px] xl:text-sm font-medium",
                     "transition-all duration-300 ease-out bg-[#F1F3F7]",
                     isActive
-                      ? "text-[#149A9B] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
-                      : "text-[#6D758F] hover:text-[#149A9B] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                      ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                      : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
                   )}
                 >
                   {link.label}
@@ -128,8 +130,8 @@ export function Navbar() {
               className={cn(
                 "px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 ease-out bg-[#F1F3F7]",
                 pathname === "/"
-                  ? "text-[#149A9B] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
-                  : "text-[#6D758F] hover:text-[#149A9B] hover:shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
+                  ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                  : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
               )}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -147,8 +149,8 @@ export function Navbar() {
                   className={cn(
                     "px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 ease-out bg-[#F1F3F7]",
                     isActive
-                      ? "text-[#149A9B] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
-                      : "text-[#6D758F] hover:text-[#149A9B] hover:shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
+                      ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                      : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
