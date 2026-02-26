@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Search, FileText, ChevronRight, X } from "lucide-react";
 import Fuse, { type FuseResult, type FuseResultMatch } from "fuse.js";
 import { useRouter } from "next/navigation";
 import docsIndex from "@/data/docs-index.json";
+import { Input } from "@/components/ui/Input";
 
 interface SearchResult {
     id: string;
@@ -103,30 +104,39 @@ export default function DocsSearchBar() {
 
     return (
         <div className="relative w-full max-w-2xl mx-auto" ref={searchRef}>
-            <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <Search size={20} />
-                </div>
-                <input
+            <div className="relative w-full">
+                <Input
                     type="text"
-                    placeholder="Search documentation..."
+                    placeholder="Ask or search..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    className="w-full pl-12 pr-12 py-4 rounded-xl shadow-raised bg-[#F1F3F7] border-none focus:ring-2 focus:ring-[#149A9B] text-gray-800 placeholder-gray-500 transition-all outline-none"
+                    icon={<Search size={20} />}
+                    iconPosition="left"
+                    rightElement={
+                        query ? (
+                            <button
+                                onClick={() => { setQuery(""); setResults([]); setIsOpen(false); }}
+                                className="text-[#6D758F] hover:text-[#19213D] transition-colors flex items-center justify-center h-full px-2"
+                            >
+                                <X size={18} />
+                            </button>
+                        ) : (
+                            <div className="flex items-center gap-1.5 pr-2 pointer-events-none text-[#6D758F]">
+                                <kbd className="flex items-center justify-center min-w-[24px] h-[24px] text-[11px] font-sans font-medium rounded-md shadow-[2px_2px_4px_#d1d5db,-2px_-2px_4px_#ffffff] bg-[#F1F3F7]">
+                                    ⌘
+                                </kbd>
+                                <kbd className="flex items-center justify-center min-w-[24px] h-[24px] text-[11px] font-sans font-medium rounded-md shadow-[2px_2px_4px_#d1d5db,-2px_-2px_4px_#ffffff] bg-[#F1F3F7]">
+                                    K
+                                </kbd>
+                            </div>
+                        )
+                    }
                 />
-                {query && (
-                    <button
-                        onClick={() => { setQuery(""); setResults([]); setIsOpen(false); }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                        <X size={18} />
-                    </button>
-                )}
             </div>
 
             {isOpen && results.length > 0 && (
-                <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-raised border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full mt-3 w-full rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200" style={{ background: "rgba(255, 255, 255, 0.95)", backdropFilter: "blur(12px)" }}>
                     <div className="max-h-[450px] overflow-y-auto">
                         {results.map((result, idx) => (
                             <div
@@ -137,13 +147,14 @@ export default function DocsSearchBar() {
                                     setIsOpen(false);
                                     setQuery("");
                                 }}
-                                className={`
-                  p-4 flex items-start gap-4 cursor-pointer transition-colors
-                  ${activeIndex === idx ? "bg-gray-50 text-[#149A9B]" : "text-gray-600 hover:bg-gray-50"}
-                `}
+                                className="p-4 flex items-start gap-4 cursor-pointer transition-colors"
+                                style={{
+                                    backgroundColor: activeIndex === idx ? "rgba(20, 154, 155, 0.08)" : "transparent",
+                                    color: activeIndex === idx ? "#149A9B" : "#6D758F"
+                                }}
                             >
-                                <div className={`mt-1 p-2 rounded-lg ${activeIndex === idx ? "bg-[#149A9B]/10" : "bg-gray-100"}`}>
-                                    <FileText size={18} className={activeIndex === idx ? "text-[#149A9B]" : "text-gray-500"} />
+                                <div className="mt-1 p-2 rounded-lg" style={{ background: activeIndex === idx ? "rgba(20, 154, 155, 0.12)" : "rgba(241, 243, 247, 0.8)" }}>
+                                    <FileText size={18} style={{ color: activeIndex === idx ? "#149A9B" : "#9CA3AF" }} />
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
@@ -162,14 +173,14 @@ export default function DocsSearchBar() {
                             </div>
                         ))}
                     </div>
-                    <div className="p-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-[10px] font-bold text-gray-400 tracking-wider uppercase">
+                    <div className="p-3 flex justify-between items-center text-[10px] font-bold tracking-wider uppercase" style={{ background: "rgba(241, 243, 247, 0.6)", color: "#9CA3AF", borderTop: "1px solid rgba(209, 213, 219, 0.3)" }}>
                         <span>{results.length} results found</span>
                         <div className="flex gap-3">
                             <span className="flex items-center gap-1">
-                                <kbd className="px-1 py-0.5 rounded bg-white border border-gray-200">↑↓</kbd> Navigate
+                                <kbd className="px-1 py-0.5 rounded" style={{ background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(209, 213, 219, 0.3)" }}>↑↓</kbd> Navigate
                             </span>
                             <span className="flex items-center gap-1">
-                                <kbd className="px-1 py-0.5 rounded bg-white border border-gray-200">↵</kbd> Select
+                                <kbd className="px-1 py-0.5 rounded" style={{ background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(209, 213, 219, 0.3)" }}>↵</kbd> Select
                             </span>
                         </div>
                     </div>
@@ -177,9 +188,9 @@ export default function DocsSearchBar() {
             )}
 
             {isOpen && query.length > 1 && results.length === 0 && (
-                <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-raised p-8 text-center z-50 animate-in fade-in slide-in-from-top-2">
-                    <p className="text-gray-500">No results found for &quot;<span className="font-semibold">{query}</span>&quot;</p>
-                    <p className="text-sm text-gray-400 mt-1">Try a different search term</p>
+                <div className="absolute top-full mt-3 w-full rounded-2xl p-8 text-center z-50 animate-in fade-in slide-in-from-top-2" style={{ background: "rgba(255, 255, 255, 0.95)", backdropFilter: "blur(12px)" }}>
+                    <p style={{ color: "#6D758F" }}>No results found for &quot;<span className="font-semibold">{query}</span>&quot;</p>
+                    <p className="text-sm mt-1" style={{ color: "#9CA3AF" }}>Try a different search term</p>
                 </div>
             )}
         </div>

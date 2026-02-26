@@ -3,19 +3,23 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, X, Send } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const navLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How it Works" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "/#features", label: "Features" },
+  { href: "/#how-it-works", label: "How it Works" },
+  { href: "/use-cases", label: "Use Cases" },
   { href: "/docs", label: "Docs" },
+  { href: "/community", label: "Community" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 12);
@@ -33,13 +37,15 @@ export function Navbar() {
      */
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-[500] transition-all duration-[400ms] ease-out",
-        isScrolled ? "shadow-nav-scrolled" : "shadow-nav"
+        "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-6xl xl:max-w-7xl md:w-full z-[500] transition-all duration-300 ease-out rounded-full",
+        isScrolled
+          ? "shadow-[8px_8px_16px_#d1d5db,-8px_-8px_16px_#ffffff] py-1"
+          : "shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff] py-2"
       )}
       style={{ background: "#F1F3F7" }}
     >
-      <nav className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <nav className="px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14">
 
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
@@ -54,65 +60,59 @@ export function Navbar() {
           </Link>
 
           {/* ── Desktop nav links ── */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-4 py-2 rounded-xl text-sm font-medium",
-                  "transition-all duration-[400ms] ease-out",
-                  "hover:shadow-raised-sm"
-                )}
-                style={{ color: "#6D758F", background: "#F1F3F7" }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.color =
-                    "#19213D")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.color =
-                    "#6D758F")
-                }
-              >
-                {link.label}
-              </a>
-            ))}
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2">
+            <Link
+              href="/"
+              className={cn(
+                "px-3 py-2 rounded-full text-[13px] xl:text-sm font-medium",
+                "transition-all duration-300 ease-out bg-[#F1F3F7]",
+                pathname === "/"
+                  ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                  : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+              )}
+            >
+              Home
+            </Link>
+            {navLinks.map((link) => {
+              const isActive = link.href.startsWith("/") && link.href.length > 1
+                ? pathname.startsWith(link.href)
+                : pathname === link.href;
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "px-3 py-2 rounded-full text-[13px] xl:text-sm font-medium",
+                    "transition-all duration-300 ease-out bg-[#F1F3F7]",
+                    isActive
+                      ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                      : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
 
           {/* ── Desktop CTAs ── */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* Sign In — neumorphic raised on same background */}
+          <div className="hidden lg:flex items-center gap-3">
             <a
-              href="/login"
-              className="px-5 py-2 rounded-xl text-sm font-medium transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle"
-              style={{ color: "#19213D", background: "#F1F3F7" }}
+              href="#waitlist-form"
+              className="px-6 py-2 rounded-full text-sm font-semibold btn-neumorphic-primary flex items-center gap-2 group"
             >
-              Sign In
-            </a>
-
-            {/* Get Started — primary teal, raised */}
-            <a
-              href="/register"
-              className="px-5 py-2 rounded-xl text-sm font-semibold text-white transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle"
-              style={{ background: "#149A9B" }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLAnchorElement).style.background =
-                  "#0d7377")
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLAnchorElement).style.background =
-                  "#149A9B")
-              }
-            >
-              Get Started
+              Join Waitlist
+              <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </a>
           </div>
+
 
           {/* ── Mobile hamburger ── */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-xl transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle"
-            style={{ background: "#F1F3F7", color: "#19213D" }}
+            className="lg:hidden p-2 rounded-full transition-all duration-300 ease-out shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+            style={{ background: "#F1F3F7", color: "#6D758F" }}
             aria-label="Toggle menu"
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -122,37 +122,50 @@ export function Navbar() {
         {/* ── Mobile menu ── */}
         {isMenuOpen && (
           <div
-            className="md:hidden py-4 flex flex-col gap-1 animate-fadeInUp border-t"
-            style={{ borderColor: "#d1d5db" }}
+            className="lg:hidden py-6 mt-4 flex flex-col gap-2 animate-fadeInUp rounded-3xl shadow-[inset_4px_4px_8px_#d1d5db,inset_-4px_-4px_8px_#ffffff] px-4"
+            style={{ background: "#F1F3F7" }}
           >
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="px-4 py-3 rounded-xl text-sm font-medium transition-all duration-[400ms] ease-out hover:shadow-raised-sm"
-                style={{ color: "#6D758F", background: "#F1F3F7" }}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
-            <div
-              className="flex flex-col gap-3 pt-4 mt-2 border-t"
-              style={{ borderColor: "#d1d5db" }}
+            <Link
+              href="/"
+              className={cn(
+                "px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 ease-out bg-[#F1F3F7]",
+                pathname === "/"
+                  ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                  : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
+              )}
+              onClick={() => setIsMenuOpen(false)}
             >
+              Home
+            </Link>
+            {navLinks.map((link) => {
+              const isActive = link.href.startsWith("/") && link.href.length > 1
+                ? pathname.startsWith(link.href)
+                : pathname === link.href;
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 ease-out bg-[#F1F3F7]",
+                    isActive
+                      ? "text-[#19213D] shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
+                      : "text-[#6D758F] hover:text-[#19213D] hover:shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
+                  )}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            <div className="pt-6 mt-2">
               <a
-                href="/login"
-                className="px-5 py-2.5 rounded-xl text-sm font-medium text-center transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover"
-                style={{ color: "#19213D", background: "#F1F3F7" }}
+                href="#waitlist-form"
+                onClick={() => setIsMenuOpen(false)}
+                className="px-5 py-4 flex justify-center items-center gap-2 rounded-2xl text-sm font-bold btn-neumorphic-primary"
               >
-                Sign In
-              </a>
-              <a
-                href="/register"
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover"
-                style={{ background: "#149A9B" }}
-              >
-                Get Started
+                Join Waitlist
+                <Send size={14} />
               </a>
             </div>
           </div>

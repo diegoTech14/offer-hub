@@ -13,7 +13,7 @@ const contributionSteps = [
 
 const HowToContributeSection = () => {
   return (
-    <section id="how-to-contribute" className="py-24">
+    <section id="how-to-contribute" className="py-24 bg-transparent">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <SectionHeading
           eyebrow="How to Contribute"

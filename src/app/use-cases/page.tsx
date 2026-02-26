@@ -6,39 +6,40 @@ import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import {
     Users,
-    ShoppingBag,
-    Gavel,
-    Layers,
-    Home
+    ShieldCheck,
+    Zap,
+    Globe
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-const USE_CASES = [
-    { id: "freelance", label: "Freelance", title: "Freelance Marketplace", icon: Users, issue: "1021" },
-    { id: "ecommerce", label: "eCommerce", title: "Global eCommerce", icon: ShoppingBag, issue: "1022" },
-    { id: "dao-payroll", label: "DAO Payroll", title: "DAO & Web3 Payroll", icon: Gavel, issue: "1023" },
-    { id: "service-platforms", label: "Service Platforms", title: "Service Platforms", icon: Layers, issue: "1024" },
-    { id: "real-estate", label: "Real Estate", title: "Real Estate Platforms", icon: Home, issue: "1025" },
+const PAGE_SECTIONS = [
+    { id: "overview", label: "Overview" },
+    { id: "features", label: "Features" },
+    { id: "architecture", label: "Architecture" },
 ];
 
 export default function UseCasesPage() {
-    const [activeSection, setActiveSection] = useState("");
+    const [activeSection, setActiveSection] = useState("overview");
     const [isNavPinned, setIsNavPinned] = useState(false);
     const navRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
+                let mostVisibleEntry = entries[0];
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveSection(entry.target.id);
+                    if (entry.intersectionRatio > mostVisibleEntry.intersectionRatio) {
+                        mostVisibleEntry = entry;
                     }
                 });
+                if (mostVisibleEntry.isIntersecting) {
+                    setActiveSection(mostVisibleEntry.target.id);
+                }
             },
-            { threshold: 0.3, rootMargin: "-20% 0px -50% 0px" }
+            { threshold: [0.1, 0.5, 0.9], rootMargin: "-20% 0px -20% 0px" }
         );
 
-        USE_CASES.forEach((section) => {
+        PAGE_SECTIONS.forEach((section) => {
             const element = document.getElementById(section.id);
             if (element) observer.observe(element);
         });
@@ -72,28 +73,22 @@ export default function UseCasesPage() {
     };
 
     return (
-        <div className="bg-[#F1F3F7] min-h-screen">
+        <div className="bg-transparent min-h-[100dvh]">
             <Navbar />
 
             <main>
-                {/* ── Hero Section ── */}
-                <section className="pt-40 pb-24 relative overflow-hidden">
-                    <div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            background: "radial-gradient(circle at 50% 30%, rgba(20,154,155,0.08) 0%, transparent 70%)",
-                        }}
-                    />
-
-                    <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
-                        <motion.p
+                {/* ── Hero / Overview Section ── */}
+                <section id="overview" className="pt-40 pb-20 relative overflow-hidden bg-transparent">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
+                        <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-xs font-medium uppercase tracking-[0.4em] mb-6"
-                            style={{ color: "#149A9B" }}
+                            className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.8),inset_-2px_-2px_5px_rgba(0,0,0,0.05),4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
+                            style={{ color: "#149A9B", background: "#F1F3F7" }}
                         >
-                            Industry Solutions
-                        </motion.p>
+                            <Users size={14} className="inline mr-2.5 mb-0.5" />
+                            Freelance Marketplace
+                        </motion.div>
 
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
@@ -102,56 +97,44 @@ export default function UseCasesPage() {
                             className="text-5xl md:text-7xl font-black tracking-tight mb-8"
                             style={{ color: "#19213D" }}
                         >
-                            Orchestrating Every <br className="hidden md:block" /> Payment Workflow
+                            Powering the Future of <br className="hidden md:block" /> Independent Work
                         </motion.h1>
 
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed mb-12"
+                            className="text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed mb-12"
                             style={{ color: "#6D758F" }}
                         >
-                            Whether you&apos;re building a global marketplace or a decentralized payroll system,
-                            OFFER HUB provides the non-custodial rails to move funds securely on Stellar.
+                            Build a global, trustless freelance platform. Escrow funds in smart contracts, release payments upon milestone completion, and pay talent instantly across borders on Stellar.
                         </motion.p>
-
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.5 }}
-                            className="flex flex-col items-center gap-2"
-                        >
-                            <div className="w-px h-12 bg-gradient-to-b from-[#149A9B]/40 to-transparent" />
-                        </motion.div>
                     </div>
                 </section>
 
                 {/* ── Sticky Navigation (Neumorphic Pill) ── */}
                 <div ref={navRef} className="sticky top-[80px] z-40 py-6 pointer-events-none">
-                    <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-center">
+                    <div className="max-w-3xl mx-auto px-6 flex justify-center">
                         <motion.div
                             className={cn(
-                                "pointer-events-auto flex items-center p-1.5 rounded-2xl transition-all duration-500",
+                                "pointer-events-auto flex items-center p-2 rounded-2xl transition-all duration-500",
                                 isNavPinned ? "shadow-nav-scrolled" : "shadow-nav"
                             )}
                             style={{ background: "#F1F3F7" }}
                         >
-                            <div className="flex items-center gap-1">
-                                {USE_CASES.map((section) => (
+                            <div className="flex items-center gap-2">
+                                {PAGE_SECTIONS.map((section) => (
                                     <a
                                         key={section.id}
+                                        id={`nav-link-${section.id}`}
                                         href={`#${section.id}`}
                                         onClick={(e) => handleNavClick(e, section.id)}
                                         className={cn(
-                                            "relative px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all duration-300",
+                                            "relative px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300",
                                             activeSection === section.id
-                                                ? "text-white shadow-raised-sm"
-                                                : "text-[#6D758F] hover:text-[#19213D] hover:bg-white/50"
+                                                ? "btn-neumorphic-primary"
+                                                : "text-[#6D758F] hover:shadow-[inset_2px_2px_5px_#d1d5db,inset_-2px_-2px_5px_#ffffff]"
                                         )}
-                                        style={{
-                                            backgroundColor: activeSection === section.id ? "#149A9B" : "transparent",
-                                        }}
                                     >
                                         {section.label}
                                     </a>
@@ -161,90 +144,99 @@ export default function UseCasesPage() {
                     </div>
                 </div>
 
-                {/* ── Use Case Sections ── */}
-                <div className="relative">
-                    {USE_CASES.map((section, index) => {
-                        const Icon = section.icon;
-                        return (
-                            <section
-                                key={section.id}
-                                id={section.id}
-                                className={cn(
-                                    "py-32 scroll-mt-24 relative overflow-hidden",
-                                    index % 2 === 0 ? "bg-white" : "bg-[#F1F3F7]"
-                                )}
-                            >
-                                {/* Visual accent for background separation */}
-                                {index % 2 !== 0 && (
-                                    <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#d1d5db]/30 to-transparent" />
-                                )}
+                {/* ── Features Section ── */}
+                <section id="features" className="py-24 scroll-mt-24 relative bg-transparent">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {/* Feature 1 */}
+                            <div className="flex flex-col items-center text-center p-10 rounded-[2rem] bg-[#F1F3F7] shadow-raised hover:shadow-raised-hover transition-all duration-300 ease-out group">
+                                <div className="w-16 h-16 rounded-2xl shadow-sunken-subtle bg-[#F1F3F7] flex items-center justify-center mb-8 group-hover:shadow-sunken transition-all duration-300">
+                                    <ShieldCheck size={28} style={{ color: "#149A9B" }} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-4" style={{ color: "#19213D" }}>Trustless Escrow</h3>
+                                <p className="text-sm font-medium leading-relaxed" style={{ color: "#6D758F" }}>
+                                    Lock client funds into secure smart contracts at project kick-off. Funds are guaranteed to exist, protecting both the freelancer and the client.
+                                </p>
+                            </div>
 
-                                <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-                                    <div className="grid grid-cols-1 gap-16 items-center">
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 40 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.7, ease: "easeOut" }}
-                                            viewport={{ once: true, margin: "-100px" }}
-                                            className="text-center"
-                                        >
-                                            <div
-                                                className="w-14 h-14 rounded-2xl shadow-raised mx-auto mb-8 flex items-center justify-center transition-transform duration-500 hover:scale-110"
-                                                style={{ background: "#F1F3F7" }}
-                                            >
-                                                <Icon size={20} style={{ color: "#149A9B" }} />
-                                            </div>
+                            {/* Feature 2 */}
+                            <div className="flex flex-col items-center text-center p-10 rounded-[2rem] bg-[#F1F3F7] shadow-raised hover:shadow-raised-hover transition-all duration-300 ease-out group">
+                                <div className="w-16 h-16 rounded-2xl shadow-sunken-subtle bg-[#F1F3F7] flex items-center justify-center mb-8 group-hover:shadow-sunken transition-all duration-300">
+                                    <Zap size={28} style={{ color: "#149A9B" }} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-4" style={{ color: "#19213D" }}>Milestone Automation</h3>
+                                <p className="text-sm font-medium leading-relaxed" style={{ color: "#6D758F" }}>
+                                    Trigger partial or full payments automatically when APIs dictate completion of deliverables, removing manual invoice friction.
+                                </p>
+                            </div>
 
-                                            <h2
-                                                className="text-4xl md:text-5xl font-black mb-6 tracking-tight"
-                                                style={{ color: "#19213D" }}
-                                            >
-                                                {section.title}
-                                            </h2>
+                            {/* Feature 3 */}
+                            <div className="flex flex-col items-center text-center p-10 rounded-[2rem] bg-[#F1F3F7] shadow-raised hover:shadow-raised-hover transition-all duration-300 ease-out group">
+                                <div className="w-16 h-16 rounded-2xl shadow-sunken-subtle bg-[#F1F3F7] flex items-center justify-center mb-8 group-hover:shadow-sunken transition-all duration-300">
+                                    <Globe size={28} style={{ color: "#149A9B" }} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-4" style={{ color: "#19213D" }}>Global Payouts</h3>
+                                <p className="text-sm font-medium leading-relaxed" style={{ color: "#6D758F" }}>
+                                    Settle funds instantly in USDC or fiat-backed stablecoins directly to the freelancer&apos;s wallet, bypassing multi-day bank transfer delays and high FX fees.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                                            <p
-                                                className="text-lg font-light max-w-2xl mx-auto mb-16 leading-relaxed"
-                                                style={{ color: "#6D758F" }}
-                                            >
-                                                Secure, programmable fund flows tailor-made for {section.label.toLowerCase()} applications.
-                                                Minimize counterparty risk while maximizing operational efficiency with automated on-chain settlement.
-                                            </p>
+                {/* ── Architecture Section ── */}
+                <section id="architecture" className="py-24 scroll-mt-24 relative bg-transparent">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
+                        <div className="w-16 h-16 rounded-2xl shadow-raised bg-[#F1F3F7] mx-auto mb-8 flex items-center justify-center">
+                            <Users size={24} style={{ color: "#149A9B" }} />
+                        </div>
 
-                                            {/* Placeholder Content Area */}
-                                            <motion.div
-                                                className="relative overflow-hidden h-[400px] md:h-[550px] rounded-[2.5rem] shadow-sunken w-full max-w-5xl mx-auto bg-[#F1F3F7]/50 flex items-center justify-center border border-white/40 group"
-                                                initial={{ opacity: 0, scale: 0.98 }}
-                                                whileInView={{ opacity: 1, scale: 1 }}
-                                                transition={{ duration: 0.8, delay: 0.2 }}
-                                                viewport={{ once: true }}
-                                            >
-                                                <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+                        <h2
+                            className="text-4xl md:text-5xl font-black mb-6 tracking-tight"
+                            style={{ color: "#19213D" }}
+                        >
+                            How it works under the hood
+                        </h2>
 
-                                                <div className="relative text-center p-8">
-                                                    <div className="w-20 h-20 rounded-3xl bg-white shadow-raised mx-auto mb-6 flex items-center justify-center">
-                                                        <div className="w-8 h-8 rounded-full border-2 border-dashed border-[#149A9B]/30 animate-spin" style={{ animationDuration: '8s' }} />
-                                                    </div>
-                                                    <h3 className="text-[#19213D]/40 font-bold tracking-widest uppercase text-xs">
-                                                        Case Study: {section.label} Architecture
-                                                    </h3>
-                                                    <div className="mt-8 flex justify-center gap-4">
-                                                        <div className="w-12 h-2 rounded-full bg-[#149A9B]/5" />
-                                                        <div className="w-24 h-2 rounded-full bg-[#149A9B]/10" />
-                                                        <div className="w-12 h-2 rounded-full bg-[#149A9B]/5" />
-                                                    </div>
-                                                </div>
+                        <p
+                            className="text-lg font-medium max-w-2xl mx-auto mb-16 leading-relaxed"
+                            style={{ color: "#6D758F" }}
+                        >
+                            A simplified view of the smart contract interactions orchestrated by OFFER HUB APIs.
+                        </p>
 
-                                                <div className="absolute bottom-8 right-8 text-[10px] font-bold tracking-widest text-[#149A9B]/30 uppercase">
-                                                    Ref: Issue #{section.issue}
-                                                </div>
-                                            </motion.div>
-                                        </motion.div>
+                        <motion.div
+                            className="relative overflow-hidden h-[400px] md:h-[550px] rounded-[3rem] shadow-[inset_8px_8px_16px_#d1d5db,inset_-8px_-8px_16px_#ffffff] w-full max-w-5xl mx-auto bg-[#F1F3F7] flex flex-col items-center justify-center"
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            viewport={{ once: true }}
+                        >
+                            {/* Inner UI mock */}
+                            <div className="relative text-center p-8 w-full max-w-lg">
+                                <div className="w-24 h-24 rounded-3xl bg-[#F1F3F7] shadow-raised mx-auto mb-8 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full border-4 border-t-[#149A9B] border-r-transparent border-b-[#149A9B]/20 border-l-transparent animate-spin" style={{ animationDuration: '3s' }} />
+                                </div>
+                                <h3 className="text-[#19213D]/50 font-black tracking-widest uppercase text-sm mb-6">
+                                    Awaiting Milestone Validation
+                                </h3>
+
+                                {/* Fake contract parameters */}
+                                <div className="w-full bg-[#e7edf4] rounded-2xl p-6 shadow-sunken-subtle flex flex-col gap-4 text-left">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-bold text-[#6D758F] uppercase tracking-wider">Escrow Balance</span>
+                                        <span className="text-sm font-black text-[#149A9B]">5,000.00 USDC</span>
+                                    </div>
+                                    <div className="w-full h-px bg-[#d1d5db]/50" />
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-bold text-[#6D758F] uppercase tracking-wider">Status</span>
+                                        <span className="text-xs font-bold text-white bg-[#19213D] px-3 py-1 rounded-full shadow-raised-sm">LOCKED</span>
                                     </div>
                                 </div>
-                            </section>
-                        );
-                    })}
-                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
             </main>
 
             <Footer />

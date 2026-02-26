@@ -78,19 +78,22 @@ const tiers: PricingTier[] = [
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-transparent">
       <Navbar />
 
       <main className="flex-grow pt-28 pb-20">
-        <section className="max-w-5xl mx-auto px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto">
-            <p className="text-xs font-medium uppercase tracking-[0.36em] text-[#149A9B]">
+        <section className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto flex flex-col items-center">
+            <div
+              className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-[inset_2px_2px_5px_rgba(255,255,255,0.8),inset_-2px_-2px_5px_rgba(0,0,0,0.05),4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff]"
+              style={{ color: "#149A9B", background: "#F1F3F7" }}
+            >
               Pricing
-            </p>
-            <h1 className="mt-4 text-4xl md:text-5xl font-black tracking-tight text-[#19213D]">
-              Open by default. Scalable by design.
+            </div>
+            <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-8" style={{ color: "#19213D" }}>
+              Open by default. <br className="hidden md:block" /> Scalable by design.
             </h1>
-            <p className="mt-5 text-base md:text-lg leading-relaxed text-[#6D758F]">
+            <p className="text-lg md:text-xl font-medium leading-relaxed" style={{ color: "#6D758F" }}>
               OFFER-HUB keeps core access free for builders and lets teams self-host without
               licensing fees. If you need enterprise-level support, our team can tailor a
               support model around your rollout.
@@ -102,16 +105,16 @@ export default function PricingPage() {
               const Icon = tier.icon;
               const ctaClassName =
                 tier.ctaStyle === "primary"
-                  ? "bg-[#149A9B] text-white border border-[#149A9B] hover:bg-[#0d7377]"
-                  : "bg-[#F1F3F7] text-[#149A9B] border border-[#149A9B] hover:bg-[#e7edf4]";
+                  ? "btn-neumorphic-primary"
+                  : "btn-neumorphic-secondary text-[#149A9B]";
 
               return (
                 <article
                   key={tier.name}
-                  className="rounded-2xl p-7 bg-[#F1F3F7] shadow-raised hover:shadow-raised-hover transition-all duration-[400ms] ease-out flex flex-col"
+                  className="rounded-[2.5rem] p-10 bg-[#F1F3F7] shadow-raised hover:shadow-raised-hover transition-all duration-[400ms] ease-out flex flex-col group"
                 >
-                  <div className="w-11 h-11 rounded-xl shadow-raised-sm bg-[#F1F3F7] flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-[#149A9B]" />
+                  <div className="w-16 h-16 rounded-2xl shadow-sunken-subtle bg-[#F1F3F7] flex items-center justify-center mb-2 group-hover:shadow-sunken transition-all duration-300">
+                    <Icon className="w-7 h-7 text-[#149A9B]" />
                   </div>
 
                   <h2 className="mt-5 text-2xl font-bold text-[#19213D]">{tier.name}</h2>
@@ -133,7 +136,7 @@ export default function PricingPage() {
                     href={tier.ctaHref}
                     target={tier.external ? "_blank" : undefined}
                     rel={tier.external ? "noopener noreferrer" : undefined}
-                    className={`mt-8 w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle transition-all duration-[400ms] ease-out ${ctaClassName}`}
+                    className={`mt-8 w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold ${ctaClassName}`}
                   >
                     <span>{tier.ctaLabel}</span>
                     <ArrowUpRight className="w-4 h-4" />

@@ -45,6 +45,8 @@ const config: Config = {
         "raised-sm": "3px 3px 6px #d1d5db, -3px -3px 6px #ffffff",
         sunken: "inset 4px 4px 8px #d1d5db, inset -4px -4px 8px #ffffff",
         "sunken-subtle": "inset 2px 2px 4px #d1d5db, inset -2px -2px 4px #ffffff",
+        neu: "4px 4px 8px #d1d5db, -4px -4px 8px #ffffff",
+        "neu-inset": "inset 4px 4px 8px #d1d5db, inset -4px -4px 8px #ffffff",
       },
     },
   },

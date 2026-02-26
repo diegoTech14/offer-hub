@@ -10,7 +10,7 @@ const changelogEntries = [
     date: "March 2024",
     title: "New UI Components",
     badge: "Feature",
-    badgeColor: "bg-primary text-white",
+    badgeColor: "bg-[#149A9B] text-white",
     description:
       "Introduced a new set of neumorphic UI components, improved accessibility, and updated the brand palette for better consistency.",
     changes: [
@@ -24,7 +24,7 @@ const changelogEntries = [
     date: "February 2024",
     title: "Performance Updates",
     badge: "Fix",
-    badgeColor: "bg-warning text-white",
+    badgeColor: "bg-[#19213D] text-white",
     description:
       "Optimized bundle size and improved page load times by implementing better code splitting and image optimization strategies.",
     changes: [
@@ -38,7 +38,7 @@ const changelogEntries = [
     date: "January 2024",
     title: "Initial Launch",
     badge: "Breaking",
-    badgeColor: "bg-error text-white",
+    badgeColor: "bg-red-500 text-white",
     description:
       "The first official release of Offer Hub, featuring secure escrow payments and marketplace integration tools.",
     changes: [
@@ -51,92 +51,89 @@ const changelogEntries = [
 
 export default function ChangelogPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#F1F3F7]">
       <Navbar />
 
-      <main className="flex-grow pt-32 pb-20 px-6">
-        <div className="max-w-3xl mx-auto">
+      <main className="flex-grow pt-32 pb-24 px-6 md:px-8">
+        <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16 px-4">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-4xl md:text-5xl font-bold text-text-primary mb-4"
-            >
-              Changelog
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-text-secondary text-lg"
-            >
-              Keep track of our latest updates and improvements.
-            </motion.p>
-          </div>
+          <motion.header
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-24"
+          >
+            <p className="text-[11px] font-black uppercase tracking-[0.4em] text-[#149A9B] mb-4">Evolution</p>
+            <h1 className="text-4xl md:text-6xl font-black text-[#19213D] tracking-tighter leading-none mb-6">
+              Platform <span className="text-[#149A9B]">Updates</span>
+            </h1>
+            <p className="text-lg text-[#6D758F] font-medium max-w-2xl mx-auto leading-relaxed">
+              Tracking the progress of the Offer Hub ecosystem as we build the foundations of trustless commerce.
+            </p>
+          </motion.header>
 
-          {/* Timeline */}
+          {/* Timeline Wrapper */}
           <div className="relative">
-            {/* Vertical Line */}
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-primary transform md:-translate-x-1/2 hidden sm:block opacity-20" />
+            {/* Improved Timeline Line */}
+            <div className="absolute left-6 md:left-1/2 top-4 bottom-4 w-1 transform md:-translate-x-1/2 bg-[#149A9B]/10 rounded-full" />
 
-            <div className="space-y-12">
+            <div className="space-y-16 md:space-y-24">
               {changelogEntries.map((entry, index) => (
                 <motion.div
                   key={entry.version}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className={`relative flex flex-col md:flex-row items-center md:justify-between ${
-                    index % 2 === 0 ? "md:flex-row-reverse" : ""
-                  }`}
+                  className={`relative flex flex-col md:flex-row items-start md:items-center md:justify-between ${index % 2 === 0 ? "md:flex-row-reverse" : ""
+                    }`}
                 >
-                  {/* Dot on timeline */}
-                  <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-background z-10 hidden sm:block" />
+                  {/* Neumorphic Dot on timeline */}
+                  <div className="absolute left-6 md:left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-[#F1F3F7] shadow-raised-sm z-10 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-[#149A9B]" />
+                  </div>
 
                   {/* Date (for desktop, alternates side) */}
                   <div
                     className={`hidden md:block w-5/12 ${index % 2 === 0 ? "text-left" : "text-right"}`}
                   >
-                    <span className="text-sm font-semibold text-primary uppercase tracking-wider">
+                    <span className="text-sm font-black text-[#19213D] uppercase tracking-widest opacity-40">
                       {entry.date}
                     </span>
                   </div>
 
-                  {/* Card content */}
-                  <div className="w-full md:w-5/12">
-                    <div className="bg-background rounded-2xl p-6 shadow-raised hover:shadow-raised-hover transition-shadow duration-300">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                  {/* Enhanced Card content */}
+                  <div className="w-full md:w-5/12 pl-12 md:pl-0">
+                    <div className="bg-[#F1F3F7] rounded-[2.5rem] p-8 md:p-10 shadow-raised hover:shadow-raised-hover transition-all duration-500 ease-out group">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <div className="flex items-center gap-3">
-                          <span className="text-xl font-bold text-text-primary">
+                          <span className="text-2xl font-black text-[#19213D] tracking-tight group-hover:text-[#149A9B] transition-colors">
                             {entry.version}
                           </span>
                           <span
-                            className={`${entry.badgeColor} text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full tracking-wider`}
+                            className={`${entry.badgeColor} text-[9px] uppercase font-black px-3 py-1 rounded-full tracking-widest shadow-raised-sm`}
                           >
                             {entry.badge}
                           </span>
                         </div>
-                        <span className="text-sm text-text-secondary block md:hidden">
+                        <span className="text-xs font-black text-[#6D758F] block md:hidden uppercase tracking-widest opacity-60">
                           {entry.date}
                         </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-text-primary mb-2">
+                      <h3 className="text-lg font-bold text-[#19213D] mb-4">
                         {entry.title}
                       </h3>
-                      <p className="text-text-secondary text-sm leading-relaxed mb-4">
+                      <p className="text-[#6D758F] text-sm font-medium leading-relaxed mb-6">
                         {entry.description}
                       </p>
 
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {entry.changes.map((change, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-2 text-sm text-text-secondary"
+                            className="flex items-start gap-3 text-sm font-medium text-[#19213D]/80"
                           >
-                            <span className="text-primary mt-1">•</span>
+                            <span className="mt-2 h-1 w-1 rounded-full bg-[#149A9B] shrink-0" />
                             <span>{change}</span>
                           </li>
                         ))}
