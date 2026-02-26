@@ -11,26 +11,29 @@ Orders are the core of OFFER-HUB. They represent a transaction between a buyer a
 
 Every order follows a strict state machine:
 
-```
-ORDER_CREATED
-    ↓ (reserve funds)
-FUNDS_RESERVED
-    ↓ (create escrow on Stellar)
-ESCROW_CREATING
-    ↓
-ESCROW_CREATED
-    ↓ (fund the escrow)
-ESCROW_FUNDING
-    ↓
-ESCROW_FUNDED
-    ↓ (work begins)
-IN_PROGRESS
-    ↓                    ↓                   ↓
-RELEASE_REQUESTED   REFUND_REQUESTED    DISPUTED
-    ↓                    ↓                   ↓
-  RELEASED            REFUNDED           RESOLVED
-    ↓                    ↓                   ↓
-                      CLOSED
+```mermaid
+stateDiagram-v2
+    [*] --> ORDER_CREATED
+    ORDER_CREATED --> FUNDS_RESERVED: Reserve funds
+    FUNDS_RESERVED --> ESCROW_CREATING: Create escrow
+    ESCROW_CREATING --> ESCROW_CREATED
+    ESCROW_CREATED --> ESCROW_FUNDING: Fund escrow
+    ESCROW_FUNDING --> ESCROW_FUNDED
+    ESCROW_FUNDED --> IN_PROGRESS: Work begins
+
+    IN_PROGRESS --> RELEASE_REQUESTED: Buyer approves
+    IN_PROGRESS --> REFUND_REQUESTED: Request refund
+    IN_PROGRESS --> DISPUTED: Open dispute
+
+    RELEASE_REQUESTED --> RELEASED
+    REFUND_REQUESTED --> REFUNDED
+    DISPUTED --> RESOLVED
+
+    RELEASED --> CLOSED
+    REFUNDED --> CLOSED
+    RESOLVED --> CLOSED
+
+    CLOSED --> [*]
 ```
 
 ## Creating an Order

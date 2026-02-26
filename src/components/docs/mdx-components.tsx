@@ -3,6 +3,7 @@ import { CodeBlock } from "./CodeBlock";
 import { Callout } from "./Callout";
 import { CommandLine } from "./CommandLine";
 import { Badge } from "./Badge";
+import { MermaidDiagram } from "./MermaidDiagram";
 
 export const MDX_COMPONENTS: MDXComponents = {
   // ── Custom doc components (used directly in .mdx files) ──
@@ -10,6 +11,7 @@ export const MDX_COMPONENTS: MDXComponents = {
   Callout,
   CommandLine,
   Badge,
+  MermaidDiagram,
 
   // ── Prose element overrides ──
 
@@ -76,6 +78,12 @@ export const MDX_COMPONENTS: MDXComponents = {
     const codeEl = children as React.ReactElement<{ className?: string; children?: string }>;
     const lang = codeEl?.props?.className?.replace("language-", "") ?? undefined;
     const code = codeEl?.props?.children ?? "";
+
+    // Handle mermaid diagrams specially
+    if (lang === "mermaid") {
+      return <MermaidDiagram chart={code} />;
+    }
+
     return <CodeBlock language={lang}>{code}</CodeBlock>;
   },
 

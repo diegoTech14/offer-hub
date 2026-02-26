@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import Analytics from "@/components/Analytics";
 import { ClientBackground } from "@/components/layout/ClientBackground";
+import { NavigationProgress } from "@/components/ui/NavigationProgress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,6 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className={`${inter.className} antialiased relative min-h-screen`}>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <Analytics />
         <ClientBackground />
         {children}
