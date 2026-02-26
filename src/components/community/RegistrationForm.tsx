@@ -56,7 +56,7 @@ export default function RegistrationForm() {
             }
 
             setIsSubmitted(true);
-        } catch (err) {
+        } catch {
             setError('Network error. Please check your connection and try again.');
             setIsLoading(false);
         }

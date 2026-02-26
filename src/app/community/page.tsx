@@ -209,7 +209,7 @@ async function fetchGitHubData() {
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    const issues: IssueData[] = allIssues.slice(0, 50).map(({ createdAt: _createdAt, ...rest }) => rest);
+    const issues: IssueData[] = allIssues.slice(0, 50).map(({ createdAt: _, ...rest }) => rest);
 
     return { stats, contributors, pullRequests, issues };
   } catch (error) {
