@@ -4,9 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Menu, X, ChevronRight,
-  FileText, Code, FileDown,
-  Github, Cpu, Bot, Sparkles, Home, Box, Layers
+  Menu, X, ChevronRight, Home
 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
@@ -209,7 +207,6 @@ function DocActionsMenu({ slug }: { slug: string }) {
   };
 
   const handleExportPdf = async () => {
-    const data = getDocData();
     setIsExportingPdf(true);
     try {
       const html2pdfModule = await import("html2pdf.js");

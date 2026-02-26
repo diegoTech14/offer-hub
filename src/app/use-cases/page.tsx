@@ -8,12 +8,9 @@ import {
     Users,
     ShieldCheck,
     Zap,
-    Globe,
-    ArrowRight
+    Globe
 } from "lucide-react";
 import { cn } from "@/lib/cn";
-import Link from "next/link";
-import Image from "next/image";
 
 const PAGE_SECTIONS = [
     { id: "overview", label: "Overview" },
@@ -180,7 +177,7 @@ export default function UseCasesPage() {
                                 </div>
                                 <h3 className="text-xl font-bold mb-4" style={{ color: "#19213D" }}>Global Payouts</h3>
                                 <p className="text-sm font-medium leading-relaxed" style={{ color: "#6D758F" }}>
-                                    Settle funds instantly in USDC or fiat-backed stablecoins directly to the freelancer's wallet, bypassing multi-day bank transfer delays and high FX fees.
+                                    Settle funds instantly in USDC or fiat-backed stablecoins directly to the freelancer&apos;s wallet, bypassing multi-day bank transfer delays and high FX fees.
                                 </p>
                             </div>
                         </div>

@@ -22,8 +22,8 @@ export default function RegistrationForm() {
                 >
                     <CheckCircle2 size={40} className="text-[#149A9B]" />
                 </motion.div>
-                <h2 className="text-3xl font-black text-[#19213D] tracking-tight mb-4">You're on the list!</h2>
-                <p className="text-[#6D758F] max-w-sm font-medium">We'll reach out shortly to discuss your integration with Offer Hub.</p>
+                <h2 className="text-3xl font-black text-[#19213D] tracking-tight mb-4">You&apos;re on the list!</h2>
+                <p className="text-[#6D758F] max-w-sm font-medium">We&apos;ll reach out shortly to discuss your integration with Offer Hub.</p>
             </div>
         );
     }

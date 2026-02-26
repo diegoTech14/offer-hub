@@ -7,7 +7,7 @@ import {
   Shield, Workflow, FileText, Zap, Compass, Rocket, Home
 } from "lucide-react";
 import { cn } from "@/lib/cn";
-import type { SidebarLink, SidebarSection } from "@/lib/mdx";
+import type { SidebarSection } from "@/lib/mdx";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

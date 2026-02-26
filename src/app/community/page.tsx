@@ -4,7 +4,6 @@ import HowToContribute from "@/components/community/HowToContribute";
 import RecentPRsSection from "@/components/community/RecentPRsSection";
 import OpenIssuesSection from "@/components/community/OpenIssuesSection";
 import RepoLinksSection from "@/components/community/RepoLinksSection";
-import HowToContributeSection from "@/components/community/HowToContributeSection";
 import CommunityChannelsSection from "@/components/community/CommunityChannelsSection";
 import RegistrationForm from "@/components/community/RegistrationForm";
 import LoadingBar from "@/components/ui/LoadingBar";
@@ -71,6 +70,7 @@ interface GitHubIssue {
   title: string;
   html_url: string;
   pull_request?: object;
+  created_at?: string;
   labels: Array<{
     name: string;
   }>;
@@ -204,12 +204,12 @@ async function fetchGitHubData() {
           priority,
           url: issue.html_url,
           labels: issue.labels.map((label) => label.name),
-          createdAt: (issue as any).created_at || ""
+          createdAt: issue.created_at || ""
         };
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    const issues: IssueData[] = allIssues.slice(0, 50).map(({ createdAt, ...rest }) => rest);
+    const issues: IssueData[] = allIssues.slice(0, 50).map(({ createdAt: _createdAt, ...rest }) => rest);
 
     return { stats, contributors, pullRequests, issues };
   } catch (error) {

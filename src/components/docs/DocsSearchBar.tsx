@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Search, FileText, ChevronRight, X } from "lucide-react";
 import Fuse, { type FuseResult, type FuseResultMatch } from "fuse.js";
 import { useRouter } from "next/navigation";

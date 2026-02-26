@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, Tag, ArrowUpRight, ChevronDown } from "lucide-react";
+import { Tag, ArrowUpRight, ChevronDown } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
 import { cn } from "@/lib/cn";
 

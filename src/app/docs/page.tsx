@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import DocsSearchBar from "@/components/docs/DocsSearchBar";
-import { Book, Code, Shield, LifeBuoy, Terminal, Zap, ChevronDown } from "lucide-react";
+import { Book, Code, Shield, LifeBuoy, Terminal, Zap } from "lucide-react";
 import Link from "next/link";
 
 const docSections = [
@@ -171,7 +171,7 @@ export default function DocsPage() {
                 {/* Support Section */}
                 <div className="container mx-auto px-6 py-24 max-w-4xl text-center">
                     <p className="italic mb-6 text-sm font-medium" style={{ color: "#9CA3AF" }}>
-                        Can't find what you're looking for?
+                        Can&apos;t find what you&apos;re looking for?
                     </p>
                     <div className="flex justify-center items-center gap-8">
                         <Link href="/help" className="text-[#149A9B] font-black uppercase tracking-widest text-xs hover:tracking-[0.2em] transition-all">Help Center</Link>

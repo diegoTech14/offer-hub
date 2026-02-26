@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, GitCommit, ExternalLink, ChevronDown } from "lucide-react";
+import { Users, GitCommit, ChevronDown } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
 
 interface ContributorData {
