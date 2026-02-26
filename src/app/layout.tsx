@@ -5,6 +5,7 @@ import "./globals.css";
 import Analytics from "@/components/Analytics";
 import { ClientBackground } from "@/components/layout/ClientBackground";
 import { NavigationProgress } from "@/components/ui/NavigationProgress";
+import { FloatingCTA } from "@/components/ui/FloatingCTA";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
         <Analytics />
         <ClientBackground />
         {children}
+        <FloatingCTA />
       </body>
     </html>
   );
