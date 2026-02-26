@@ -141,6 +141,7 @@ export default function UseCasesPage() {
                                 {USE_CASES.map((section) => (
                                     <a
                                         key={section.id}
+                                        id={`nav-link-${section.id}`}
                                         href={`#${section.id}`}
                                         onClick={(e) => handleNavClick(e, section.id)}
                                         className={cn(
