@@ -2,14 +2,64 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, User, Mail, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Send, User, Mail, MessageSquare, CheckCircle2, AlertCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+interface FormData {
+    name: string;
+    email: string;
+    purpose: string;
+    referral: string;
+}
 
 export default function RegistrationForm() {
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [formData, setFormData] = useState<FormData>({
+        name: "",
+        email: "",
+        purpose: "",
+        referral: ""
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        setError(null);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitted(true);
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const { error: supabaseError } = await supabase
+                .from('waitlist')
+                .insert([
+                    {
+                        email: formData.email,
+                        name: formData.name,
+                        company: `${formData.purpose} | Source: ${formData.referral}`
+                    }
+                ]);
+
+            if (supabaseError) {
+                if (supabaseError.code === '23505') {
+                    setError('This email is already registered on our waitlist.');
+                } else {
+                    setError('Something went wrong. Please try again.');
+                }
+                setIsLoading(false);
+                return;
+            }
+
+            setIsSubmitted(true);
+        } catch (err) {
+            setError('Network error. Please check your connection and try again.');
+            setIsLoading(false);
+        }
     };
 
     if (isSubmitted) {
@@ -47,6 +97,18 @@ export default function RegistrationForm() {
                     whileInView={{ opacity: 1, y: 0 }}
                     className="p-10 rounded-[2.5rem] bg-[#F1F3F7] shadow-raised flex flex-col gap-8"
                 >
+                    {/* Error Message */}
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="p-4 rounded-2xl bg-red-50 border border-red-200 flex items-start gap-3"
+                        >
+                            <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
+                            <p className="text-sm text-red-700 font-medium">{error}</p>
+                        </motion.div>
+                    )}
+
                     {/* Name Field */}
                     <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-[#6D758F] ml-2">Full Name</label>
@@ -55,8 +117,12 @@ export default function RegistrationForm() {
                             <input
                                 required
                                 type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
                                 placeholder="John Doe"
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium"
+                                disabled={isLoading}
+                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -69,8 +135,12 @@ export default function RegistrationForm() {
                             <input
                                 required
                                 type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
                                 placeholder="john@example.com"
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium"
+                                disabled={isLoading}
+                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -83,8 +153,12 @@ export default function RegistrationForm() {
                             <textarea
                                 required
                                 rows={3}
+                                name="purpose"
+                                value={formData.purpose}
+                                onChange={handleInputChange}
                                 placeholder="Tell us about your marketplace or project..."
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium resize-none"
+                                disabled={isLoading}
+                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -97,17 +171,22 @@ export default function RegistrationForm() {
                             <input
                                 required
                                 type="text"
+                                name="referral"
+                                value={formData.referral}
+                                onChange={handleInputChange}
                                 placeholder="X, Telegram, Friend, etc."
-                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium"
+                                disabled={isLoading}
+                                className="w-full pl-12 pr-6 py-4 rounded-2xl bg-[#F1F3F7] shadow-sunken-subtle text-sm text-[#19213D] placeholder-[#6D758F]/30 focus:outline-none focus:shadow-sunken transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
 
                     <button
                         type="submit"
-                        className="mt-4 w-full py-5 rounded-2xl bg-black text-white text-[11px] font-black uppercase tracking-[0.25em] shadow-xl shadow-black/20 hover:bg-[#149A9B] hover:shadow-[#149A9B]/30 transition-all flex items-center justify-center gap-3 group"
+                        disabled={isLoading}
+                        className="mt-4 w-full py-5 rounded-2xl bg-black text-white text-[11px] font-black uppercase tracking-[0.25em] shadow-xl shadow-black/20 hover:bg-[#149A9B] hover:shadow-[#149A9B]/30 transition-all flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-black"
                     >
-                        Submit Application
+                        {isLoading ? 'Submitting...' : 'Submit Application'}
                         <Send size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </button>
                 </motion.form>
