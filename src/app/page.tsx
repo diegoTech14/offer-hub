@@ -4,17 +4,19 @@ import HeroSection from "@/components/HeroSection";
 import StatsSection from "@/components/StatsSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
-import CTASection from "@/components/CTASection";
+import RegistrationForm from "@/components/community/RegistrationForm";
+import LoadingBar from "@/components/ui/LoadingBar";
 
 export default function Home() {
   return (
     <>
+      <LoadingBar />
       <Navbar />
       <HeroSection />
       <StatsSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <CTASection />
+      <RegistrationForm />
       <Footer />
     </>
   );

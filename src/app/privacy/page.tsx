@@ -53,60 +53,64 @@ export default function PrivacyPage() {
 
         {/* Heading */}
         <motion.div
-          className="text-center mb-10 sm:mb-14 md:mb-16"
+          className="text-center mb-20 md:mb-28"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true, margin: "-80px" }}
         >
           <p
-            className="text-xs font-medium uppercase tracking-[0.4em] mb-4 text-primary">
-            Privacy Policy
+            className="text-[11px] font-black uppercase tracking-[0.4em] mb-4 text-[#149A9B]">
+            Data Governance
           </p>
           <h1
-            className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-text-primary"
+            className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-[#19213D] leading-none mb-6"
           >
-            Your privacy, our commitment.
+            Privacy & <span className="text-[#149A9B]">Transparency</span>
           </h1>
           <p
-            className="mt-4 text-base sm:text-lg font-light max-w-xl mx-auto px-2 text-secondary"
+            className="mt-4 text-lg sm:text-xl font-medium max-w-2xl mx-auto px-2 text-[#6D758F] leading-relaxed"
           >
-            We believe in full transparency about how we handle your data.{" "}
-            <span className="text-primary">Last updated: February 21, 2026.</span>
+            We believe in full transparency about how we handle your data.
+            Privacy is a feature, not an afterthought.
           </p>
+          <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F1F3F7] shadow-raised-sm text-xs font-bold text-[#6D758F]">
+            Last updated: <span className="text-[#149A9B]">February 25, 2026</span>
+          </div>
         </motion.div>
 
         {/* Bento grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 md:gap-8 lg:gap-10 mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-5">
           {features.map((feature, i) => {
             const Icon = feature.icon;
             return (
               <motion.div
                 key={feature.title}
-                className={`${
-                  feature.large ? "sm:col-span-2 md:col-span-2" : ""
-                } p-6 sm:p-7 md:p-8 rounded-2xl shadow-raised flex flex-col gap-4`}
-                style={{ background: feature.gradient }}
+                className={`${feature.large ? "sm:col-span-2 md:col-span-2" : ""
+                  } p-10 rounded-[2.5rem] shadow-raised flex flex-col gap-6 group hover:shadow-raised-hover transition-all duration-500`}
+                style={{ background: "#F1F3F7" }}
                 initial={{ opacity: 0, y: 36 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08, duration: 0.55, ease: "easeOut" }}
                 viewport={{ once: true, margin: "-60px" }}
               >
                 <div
-                  className="w-10 h-10 rounded-xl shadow-raised-sm flex items-center justify-center shrink-0 bg-background"
+                  className="w-14 h-14 rounded-2xl shadow-sunken-subtle flex items-center justify-center shrink-0 bg-[#F1F3F7] group-hover:shadow-sunken transition-all duration-300"
                 >
-                  <Icon size={18} style={{ color: feature.iconColor }} />
+                  <Icon size={24} style={{ color: "#149A9B" }} />
                 </div>
-                <h3
-                  className={`font-bold ${feature.large ? "text-2xl" : "text-lg"} text-primary`}
-                >
-                  {feature.title}
-                </h3>
-                <p
-                  className={`font-light leading-relaxed ${feature.large ? "text-base" : "text-sm"} text-text-secondary`}
-                >
-                  {feature.description}
-                </p>
+                <div>
+                  <h3
+                    className={`font-black tracking-tight mb-4 ${feature.large ? "text-2xl" : "text-xl"} text-[#19213D]`}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p
+                    className={`font-medium leading-relaxed ${feature.large ? "text-base" : "text-sm"} text-[#6D758F]`}
+                  >
+                    {feature.description}
+                  </p>
+                </div>
               </motion.div>
             );
           })}
@@ -114,40 +118,33 @@ export default function PrivacyPage() {
 
         {/* Contact card */}
         <motion.div
-          className="p-6 sm:p-8 md:p-10 rounded-2xl shadow-raised flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-10 mt-5"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 80% at 90% 50%, rgba(20,154,155,0.25) 0%, rgba(20,154,155,0.08) 50%, transparent 75%), #19213D",
-          }}
+          className="p-8 sm:p-12 md:p-14 rounded-[3rem] shadow-raised flex flex-col md:flex-row md:items-center md:justify-between gap-10 md:gap-14 mt-16 bg-[#F1F3F7]"
           initial={{ opacity: 0, y: 36 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.32, duration: 0.55, ease: "easeOut" }}
           viewport={{ once: true, margin: "-60px" }}
         >
           {/* Left: copy */}
-          <div className="flex flex-col gap-4 md:max-w-lg">
+          <div className="flex flex-col gap-6 md:max-w-md">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{
-                background: "rgba(241,243,247,0.08)",
-                boxShadow:
-                  "3px 3px 6px rgba(0,0,0,0.3), -3px -3px 6px rgba(255,255,255,0.05)",
-              }}
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sunken-subtle bg-[#F1F3F7]"
             >
-              <Mail size={18} className="text-primary" />
+              <Mail size={24} className="text-[#149A9B]" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white">Get in Touch</h2>
-            <p
-              className="font-light leading-relaxed text-sm text-text-secondary"
-            >
-              Questions about this policy or how we handle your data? Our privacy
-              team is here to help. We aim to respond to all inquiries within 2
-              business days.
-            </p>
+            <div>
+              <h2 className="text-3xl font-black text-[#19213D] tracking-tight mb-4">Get in Touch</h2>
+              <p
+                className="font-medium leading-relaxed text-base text-[#6D758F]"
+              >
+                Questions about this policy or how we handle your data? Our privacy
+                team is here to help. We aim to respond to all inquiries within 2
+                business days.
+              </p>
+            </div>
           </div>
 
           {/* Right: contacts */}
-          <div className="flex flex-col gap-3 w-full md:w-auto md:shrink-0 md:min-w-[240px]">
+          <div className="flex flex-col gap-5 w-full md:w-auto md:shrink-0 md:min-w-[280px]">
             {[
               { label: "Privacy inquiries", email: "privacy@offerhub.io" },
               { label: "General support", email: "support@offerhub.io" },
@@ -155,43 +152,21 @@ export default function PrivacyPage() {
               <a
                 key={email}
                 href={`mailto:${email}`}
-                className="flex flex-col gap-0.5 rounded-xl px-5 py-4 transition-all duration-200"
-                style={{
-                  background: "rgba(241,243,247,0.06)",
-                  boxShadow:
-                    "3px 3px 6px rgba(0,0,0,0.25), -3px -3px 6px rgba(255,255,255,0.04)",
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.boxShadow =
-                    "1px 1px 3px rgba(0,0,0,0.25), -1px -1px 3px rgba(255,255,255,0.04)";
-                  el.style.background = "rgba(241,243,247,0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.boxShadow =
-                    "3px 3px 6px rgba(0,0,0,0.25), -3px -3px 6px rgba(255,255,255,0.04)";
-                  el.style.background = "rgba(241,243,247,0.06)";
-                }}
+                className="flex flex-col gap-1 rounded-2xl px-6 py-5 transition-all duration-300 shadow-sunken-subtle bg-[#F1F3F7] hover:shadow-sunken group"
               >
-                <span className="text-xs font-medium text-text-secondary">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#6D758F]">
                   {label}
                 </span>
-                <span className="text-sm font-medium text-primary">
+                <span className="text-base font-bold text-[#149A9B] group-hover:text-[#19213D] transition-colors">
                   {email}
                 </span>
               </a>
             ))}
 
             <div
-              className="rounded-xl px-5 py-4"
-              style={{
-                background: "rgba(241,243,247,0.04)",
-                boxShadow:
-                  "inset 2px 2px 4px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.03)",
-              }}
+              className="rounded-2xl px-6 py-5 shadow-raised-sm bg-[#F1F3F7]"
             >
-              <p className="text-xs leading-relaxed text-text-secondary">
+              <p className="text-xs leading-relaxed font-medium text-[#6D758F]">
                 Offer Hub Inc.
                 <br />
                 123 Market Street, Suite 400

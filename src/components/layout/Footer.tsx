@@ -3,26 +3,23 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Twitter, Instagram, Linkedin, Github } from "lucide-react";
+import { Twitter, Send, Github, Disc3 } from "lucide-react";
 
 const navColumns = [
   {
     heading: "Platform",
     links: [
-      { href: "#features", label: "Marketplace" },
-      { href: "/register", label: "Get Started" },
-      { href: "/login", label: "Sign In" },
+      { href: "/", label: "Home" },
+      { href: "/pricing", label: "Pricing" },
       { href: "/docs", label: "Docs" },
-      { href: "/use-cases", label: "Use Cases" },
+      { href: "/community", label: "Community" },
     ],
   },
   {
-    heading: "Company",
+    heading: "Resources",
     links: [
-      { href: "#about", label: "About" },
-      { href: "#contact", label: "Contact" },
+      { href: "/use-cases", label: "Use Cases" },
       { href: "/changelog", label: "Changelog" },
-      { href: "/community", label: "Community" },
     ],
   },
   {
@@ -35,10 +32,10 @@ const navColumns = [
 ];
 
 const socialLinks = [
-  { href: "https://x.com", icon: Twitter, label: "X" },
-  { href: "https://instagram.com", icon: Instagram, label: "Instagram" },
-  { href: "https://linkedin.com", icon: Linkedin, label: "LinkedIn" },
-  { href: "https://github.com", icon: Github, label: "GitHub" },
+  { href: "https://x.com/offerhub_", icon: Twitter, label: "X" },
+  { href: "https://t.me/offer_hub_contributors", icon: Send, label: "Telegram" },
+  { href: "https://discord.gg/yH4vBNWwc", icon: Disc3, label: "Discord" },
+  { href: "https://github.com/OFFER-HUB", icon: Github, label: "GitHub" },
 ];
 
 export function Footer() {
@@ -65,8 +62,7 @@ export function Footer() {
 
   return (
     <footer
-      style={{ background: "linear-gradient(180deg, #e8eef5 0%, #F1F3F7 60%)" }}
-      className="pt-4 pb-0 relative"
+      className="bg-transparent pt-4 pb-0 relative"
     >
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         {/* ── White card ── */}

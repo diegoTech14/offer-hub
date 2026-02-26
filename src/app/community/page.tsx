@@ -1,9 +1,12 @@
-import ContributorsSection from "@/components/community/ContributorsSection";
-import CommunityChannelsSection from "@/components/community/CommunityChannelsSection";
 import HeroRepoStatsSection from "@/components/community/HeroRepoStatsSection";
+import ContributorsSection from "@/components/community/ContributorsSection";
 import HowToContribute from "@/components/community/HowToContribute";
-import OpenIssuesSection from "@/components/community/OpenIssuesSection";
 import RecentPRsSection from "@/components/community/RecentPRsSection";
+import OpenIssuesSection from "@/components/community/OpenIssuesSection";
+import RepoLinksSection from "@/components/community/RepoLinksSection";
+import CommunityChannelsSection from "@/components/community/CommunityChannelsSection";
+import RegistrationForm from "@/components/community/RegistrationForm";
+import LoadingBar from "@/components/ui/LoadingBar";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -67,6 +70,7 @@ interface GitHubIssue {
   title: string;
   html_url: string;
   pull_request?: object;
+  created_at?: string;
   labels: Array<{
     name: string;
   }>;
@@ -94,95 +98,128 @@ function formatTimeAgo(dateString: string): string {
   return `${Math.floor(diffInDays / 30)} months ago`;
 }
 
+const REPOS = [
+  'OFFER-HUB/offer-hub-monorepo',
+  'OFFER-HUB/OFFER-HUB',
+  'OFFER-HUB/OFFER-HUB-Frontend'
+];
+
 async function fetchGitHubData() {
   try {
-    const [repoResponse, contributorsResponse, pullRequestsResponse, issuesResponse] = await Promise.all([
-      fetch('https://api.github.com/repos/OFFER-HUB/offer-hub-monorepo', {
-        next: { revalidate: 3600 },
-      }),
-      fetch('https://api.github.com/repos/OFFER-HUB/offer-hub-monorepo/contributors', {
-        next: { revalidate: 3600 },
-      }),
-      fetch('https://api.github.com/repos/OFFER-HUB/offer-hub-monorepo/pulls?state=closed&sort=updated&per_page=20', {
-        next: { revalidate: 3600 },
-      }),
-      fetch('https://api.github.com/repos/OFFER-HUB/offer-hub-monorepo/issues?state=open&per_page=20', {
-        next: { revalidate: 3600 },
-      }),
-    ]);
+    const allPills = await Promise.all(REPOS.map(async (repo) => {
+      const [repoRes, contribRes, prRes, issueRes] = await Promise.all([
+        fetch(`https://api.github.com/repos/${repo}`, { next: { revalidate: 3600 } }),
+        fetch(`https://api.github.com/repos/${repo}/contributors?per_page=100`, { next: { revalidate: 3600 } }),
+        fetch(`https://api.github.com/repos/${repo}/pulls?state=closed&sort=updated&direction=desc&per_page=20`, { next: { revalidate: 3600 } }),
+        fetch(`https://api.github.com/repos/${repo}/issues?state=open&sort=created&direction=desc&per_page=50`, { next: { revalidate: 3600 } }),
+      ]);
 
-    if (!repoResponse.ok || !contributorsResponse.ok || !pullRequestsResponse.ok || !issuesResponse.ok) {
-      throw new Error('Failed to fetch repo data');
-    }
-
-    const repoData: GitHubRepo = await repoResponse.json();
-    const contributorsData: Contributor[] = await contributorsResponse.json();
-    const pullRequestsData: GitHubPullRequest[] = await pullRequestsResponse.json();
-    const issuesData: GitHubIssue[] = await issuesResponse.json();
-
-    const stats: RepoStats = {
-      stars: formatNumber(repoData.stargazers_count),
-      forks: formatNumber(repoData.forks_count),
-      contributors: formatNumber(contributorsData.length),
-      openIssues: formatNumber(repoData.open_issues_count),
-    };
-
-    const contributors: ContributorData[] = contributorsData.map((contributor) => ({
-      name: contributor.login,
-      username: contributor.login,
-      avatar: contributor.avatar_url,
-      commits: contributor.contributions,
-      profileUrl: contributor.html_url,
-    }));
-
-    const mergedPRs = pullRequestsData
-      .filter((pr) => pr.merged_at !== null);
-
-    const pullRequests: PullRequestData[] = mergedPRs.map((pr) => ({
-      number: pr.number,
-      title: pr.title,
-      author: pr.user?.login || "Unknown",
-      mergedAt: formatTimeAgo(pr.merged_at!),
-      url: pr.html_url,
-      status: "Merged",
-    }));
-
-    const actualIssues = issuesData
-      .filter((issue) => !issue.pull_request)
-
-    const issues: IssueData[] = actualIssues.map((issue) => {
-      const priorityLabel = issue.labels.find((label) =>
-        label.name.toLowerCase().includes('priority')
-      );
-
-      let priority = "Medium";
-      if (priorityLabel) {
-        const labelName = priorityLabel.name.toLowerCase();
-        if (labelName.includes('high') || labelName.includes('critical')) {
-          priority = "High";
-        } else if (labelName.includes('low')) {
-          priority = "Low";
-        }
+      if (!repoRes.ok || !contribRes.ok || !prRes.ok || !issueRes.ok) {
+        return null;
       }
 
       return {
-        number: issue.number,
-        title: issue.title,
-        priority,
-        url: issue.html_url,
-        labels: issue.labels.map((label) => label.name),
+        repo: await repoRes.json() as GitHubRepo,
+        contributors: await contribRes.json() as Contributor[],
+        pullRequests: await prRes.json() as GitHubPullRequest[],
+        issues: await issueRes.json() as GitHubIssue[],
       };
+    }));
+
+    const validData = allPills.filter((d): d is NonNullable<typeof d> => d !== null);
+
+    if (validData.length === 0) throw new Error('Failed to fetch any repo data');
+
+    // Aggregate Stats
+    const totalStars = validData.reduce((acc, d) => acc + d.repo.stargazers_count, 0);
+    const totalForks = validData.reduce((acc, d) => acc + d.repo.forks_count, 0);
+    const totalOpenIssues = validData.reduce((acc, d) => acc + d.repo.open_issues_count, 0);
+
+    // Merge Contributors (by login)
+    const contribMap = new Map<string, ContributorData>();
+    validData.forEach(d => {
+      d.contributors.forEach(c => {
+        const existing = contribMap.get(c.login);
+        if (existing) {
+          existing.commits += c.contributions;
+        } else {
+          contribMap.set(c.login, {
+            name: c.login,
+            username: c.login,
+            avatar: c.avatar_url,
+            commits: c.contributions,
+            profileUrl: c.html_url
+          });
+        }
+      });
     });
+    const contributors = Array.from(contribMap.values()).sort((a, b) => b.commits - a.commits);
+
+    const stats: RepoStats = {
+      stars: formatNumber(totalStars),
+      forks: formatNumber(totalForks),
+      contributors: formatNumber(contributors.length),
+      openIssues: formatNumber(totalOpenIssues),
+    };
+
+    // Merge Pull Requests
+    const allPRs = validData.flatMap(d => d.pullRequests)
+      .filter(pr => pr.merged_at !== null)
+      .map(pr => ({
+        number: pr.number,
+        title: pr.title,
+        author: pr.user?.login || "Unknown",
+        mergedAt: pr.merged_at!,
+        url: pr.html_url,
+        status: "Merged",
+      }))
+      .sort((a, b) => new Date(b.mergedAt).getTime() - new Date(a.mergedAt).getTime());
+
+    const pullRequests: PullRequestData[] = allPRs.slice(0, 30).map(pr => ({
+      ...pr,
+      mergedAt: formatTimeAgo(pr.mergedAt)
+    }));
+
+    // Merge Issues
+    const allIssues = validData.flatMap(d => d.issues)
+      .filter(issue => !issue.pull_request)
+      .map(issue => {
+        const priorityLabel = issue.labels.find((label) =>
+          label.name.toLowerCase().includes('priority')
+        );
+
+        let priority = "Medium";
+        if (priorityLabel) {
+          const labelName = priorityLabel.name.toLowerCase();
+          if (labelName.includes('high') || labelName.includes('critical')) {
+            priority = "High";
+          } else if (labelName.includes('low')) {
+            priority = "Low";
+          }
+        }
+
+        return {
+          number: issue.number,
+          title: issue.title,
+          priority,
+          url: issue.html_url,
+          labels: issue.labels.map((label) => label.name),
+          createdAt: issue.created_at || ""
+        };
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const issues: IssueData[] = allIssues.slice(0, 50).map(({ createdAt: _createdAt, ...rest }) => rest);
 
     return { stats, contributors, pullRequests, issues };
   } catch (error) {
     console.error('Error fetching GitHub data:', error);
     return {
       stats: {
-        stars: "4.8k",
-        forks: "1.2k",
-        contributors: "182",
-        openIssues: "74",
+        stars: "8.2k",
+        forks: "1.4k",
+        contributors: "168",
+        openIssues: "128",
       },
       contributors: [
         { name: "Ada M.", username: "ada-m", avatar: "", commits: 248, profileUrl: "" },
@@ -213,14 +250,17 @@ export default async function CommunityPage() {
 
   return (
     <>
+      <LoadingBar />
       <Navbar />
-      <main className="pt-16">
+      <main className="pt-28">
         <HeroRepoStatsSection stats={stats} />
+        <RepoLinksSection />
         <ContributorsSection contributors={contributors} />
         <RecentPRsSection pullRequests={pullRequests} />
         <OpenIssuesSection issues={issues} />
         <HowToContribute />
         <CommunityChannelsSection />
+        <RegistrationForm />
       </main>
       <Footer />
     </>
