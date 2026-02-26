@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClientBackground } from "@/components/layout/ClientBackground";
+import Analytics from "@/components/Analytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,6 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className={`${inter.className} antialiased relative min-h-screen`}>
+        {/* Analytics Tracking (Invisible) */}
+        <Analytics />
+
         {/* Global Interactive Background */}
         <ClientBackground />
 
