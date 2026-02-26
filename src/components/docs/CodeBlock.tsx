@@ -13,12 +13,24 @@ interface CodeBlockProps {
   className?: string;
 }
 
+// Map unsupported languages to supported Shiki languages
+const LANGUAGE_ALIASES: Record<string, string> = {
+  env: "bash",
+  dotenv: "bash",
+  sh: "bash",
+  zsh: "bash",
+  conf: "ini",
+  config: "ini",
+};
+
 export function CodeBlock({
   code: codeProp,
   children,
   language = "typescript",
   className
 }: CodeBlockProps) {
+  // Normalize the language using aliases
+  const normalizedLang = LANGUAGE_ALIASES[language] || language;
   const [copied, setCopied] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState<string>("");
 
@@ -29,7 +41,7 @@ export function CodeBlock({
     async function highlight() {
       try {
         const html = await codeToHtml(rawCode, {
-          lang: language,
+          lang: normalizedLang,
           theme: "github-light",
         });
         if (isMounted) {
@@ -46,7 +58,7 @@ export function CodeBlock({
     return () => {
       isMounted = false;
     };
-  }, [rawCode, language]);
+  }, [rawCode, normalizedLang]);
 
   async function handleCopy() {
     try {

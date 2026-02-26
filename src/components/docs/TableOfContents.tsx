@@ -77,9 +77,9 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
           On this page
         </p>
         <ul className="flex flex-col gap-1">
-          {headings.map((heading) => (
+          {headings.map((heading, index) => (
             <li
-              key={heading.id}
+              key={`${heading.id}-${index}`}
               className={heading.level === 3 ? "ml-4" : ""}
             >
               <a

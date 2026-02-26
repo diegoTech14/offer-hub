@@ -13,6 +13,9 @@ import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { Navbar } from "@/components/layout/Navbar";
 
+// Use production URL for AI assistant links
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://offer-hub.tech";
+
 interface DocsLayoutShellProps {
   nav: SidebarSection[];
   children: React.ReactNode;
@@ -120,8 +123,8 @@ export function DocsLayoutShell({ nav, children }: DocsLayoutShellProps) {
         <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_280px] gap-12 lg:gap-20 min-h-[calc(100vh-8rem)]">
             <aside className="hidden lg:block">
-              <div className="sticky top-40">
-                <DocsSidebar nav={nav} />
+              <div className="sticky top-40 max-h-[calc(100vh-12rem)] flex flex-col">
+                <DocsSidebar nav={nav} className="overflow-y-auto" />
               </div>
             </aside>
 
@@ -141,7 +144,7 @@ export function DocsLayoutShell({ nav, children }: DocsLayoutShellProps) {
 
             <aside className="hidden xl:block">
               {headings.length > 0 && (
-                <div className="sticky top-40">
+                <div className="sticky top-40 max-h-[calc(100vh-12rem)] overflow-y-auto scrollbar-thin">
                   <TableOfContents headings={headings} />
                 </div>
               )}
@@ -188,6 +191,7 @@ export function DocsLayoutShell({ nav, children }: DocsLayoutShellProps) {
 function DocActionsMenu({ slug }: { slug: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
   const getDocData = () => {
     const el = document.getElementById("doc-metadata-for-actions");
@@ -199,11 +203,76 @@ function DocActionsMenu({ slug }: { slug: string }) {
     };
   };
 
-  const handleCopyMarkdown = () => {
+  const getPageContent = () => {
     const data = getDocData();
-    const content = data?.markdown || document.getElementById("doc-page-export-content")?.innerText || "";
-    navigator.clipboard.writeText(content);
-    // Could add a toast here
+    // Try to get markdown from data attribute first
+    if (data?.markdown && data.markdown.length > 0) {
+      return { markdown: data.markdown, title: data.title };
+    }
+    // Fallback to extracting text from the page content
+    const contentEl = document.getElementById("doc-page-export-content");
+    if (contentEl) {
+      return {
+        markdown: contentEl.innerText || "",
+        title: data?.title || document.title
+      };
+    }
+    return { markdown: "", title: "" };
+  };
+
+  const handleCopyMarkdown = async () => {
+    try {
+      const { markdown, title } = getPageContent();
+      const fullContent = `# ${title}\n\nSource: ${SITE_URL}/docs/${slug}\n\n${markdown}`;
+      await navigator.clipboard.writeText(fullContent);
+      setCopyStatus("Copied!");
+      setTimeout(() => setCopyStatus(null), 2000);
+    } catch (err) {
+      console.error("Copy failed", err);
+      setCopyStatus("Failed to copy");
+      setTimeout(() => setCopyStatus(null), 2000);
+    }
+  };
+
+  const handleViewPlainText = () => {
+    const { markdown, title } = getPageContent();
+    const fullContent = `# ${title}\n\nSource: ${SITE_URL}/docs/${slug}\n\n${markdown}`;
+
+    // Create a new window with proper styling
+    const win = window.open("", "_blank");
+    if (win) {
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${title} - Plain Text</title>
+          <style>
+            body {
+              font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+              padding: 2rem;
+              max-width: 800px;
+              margin: 0 auto;
+              line-height: 1.6;
+              background: #f8f9fa;
+              color: #1a1a1a;
+            }
+            pre {
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              background: white;
+              padding: 1.5rem;
+              border-radius: 8px;
+              border: 1px solid #e1e4e8;
+            }
+          </style>
+        </head>
+        <body>
+          <pre>${fullContent.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
   };
 
   const handleExportPdf = async () => {
@@ -212,19 +281,38 @@ function DocActionsMenu({ slug }: { slug: string }) {
       const html2pdfModule = await import("html2pdf.js");
       const html2pdf = html2pdfModule.default;
       const source = document.getElementById("doc-page-export-content");
-      if (!source) return;
+      if (!source) {
+        throw new Error("Content not found");
+      }
+
+      // Clone the content to avoid modifying the original
+      const clone = source.cloneNode(true) as HTMLElement;
+
+      // Remove any elements that might cause issues
+      clone.querySelectorAll("button, iframe, video").forEach(el => el.remove());
 
       const opt = {
-        margin: 10,
-        filename: `${slug.replace(/\//g, "-")}-export.pdf`,
-        image: { type: "jpeg" as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "mm" as const, format: "a4" as const, orientation: "portrait" as const }
+        margin: [15, 15, 15, 15],
+        filename: `${slug.replace(/\//g, "-")}-offerhub-docs.pdf`,
+        image: { type: "jpeg" as const, quality: 0.95 },
+        html2canvas: {
+          scale: 1.5,
+          useCORS: true,
+          logging: false,
+          letterRendering: true
+        },
+        jsPDF: {
+          unit: "mm" as const,
+          format: "a4" as const,
+          orientation: "portrait" as const
+        },
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] as ("avoid-all" | "css" | "legacy")[] }
       };
 
-      await html2pdf().set(opt).from(source).save();
+      await html2pdf().set(opt).from(clone).save();
     } catch (err) {
       console.error("PDF Export failed", err);
+      alert("PDF export failed. The document might be too large. Try copying as markdown instead.");
     } finally {
       setIsExportingPdf(false);
     }
@@ -232,12 +320,18 @@ function DocActionsMenu({ slug }: { slug: string }) {
 
   const actions = [
     {
-      label: "Copy as Markdown",
-      sublabel: "Best for sharing with Claude/ChatGPT",
+      label: copyStatus || "Copy as Markdown",
+      sublabel: copyStatus ? "Ready to paste!" : "Best for sharing with Claude/ChatGPT",
       icon: (
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-          <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+          {copyStatus ? (
+            <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+          ) : (
+            <>
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+            </>
+          )}
         </svg>
       ),
       onClick: handleCopyMarkdown
@@ -252,13 +346,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
           <path d="m3 15 2 2 4-4" />
         </svg>
       ),
-      onClick: () => {
-        const data = getDocData();
-        if (data?.markdown) {
-          const win = window.open("", "_blank");
-          if (win) win.document.write(`<pre>${data.markdown}</pre>`);
-        }
-      }
+      onClick: handleViewPlainText
     },
     {
       type: "divider"
@@ -272,7 +360,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
         </svg>
       ),
       external: true,
-      onClick: () => window.open(`https://chatgpt.com/?q=${encodeURIComponent("Please help me with this documentation page: " + window.location.href)}`, "_blank")
+      onClick: () => window.open(`https://chatgpt.com/?q=${encodeURIComponent("Please help me with this documentation page: " + SITE_URL + "/docs/" + slug)}`, "_blank")
     },
     {
       label: "Ask Claude",
@@ -283,7 +371,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
         </svg>
       ),
       external: true,
-      onClick: () => window.open(`https://claude.ai/new?q=${encodeURIComponent("Please help me with this documentation page: " + window.location.href)}`, "_blank")
+      onClick: () => window.open(`https://claude.ai/new?q=${encodeURIComponent("Please help me with this documentation page: " + SITE_URL + "/docs/" + slug)}`, "_blank")
     },
     {
       type: "divider"
@@ -298,7 +386,7 @@ function DocActionsMenu({ slug }: { slug: string }) {
           <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
         </svg>
       ),
-      onClick: () => navigator.clipboard.writeText(`${window.location.origin}/api/mcp`)
+      onClick: () => navigator.clipboard.writeText(`${SITE_URL}/api/mcp`)
     },
     {
       label: "Export PDF",

@@ -8,45 +8,45 @@ import Link from "next/link";
 const docSections = [
     {
         icon: <Book className="text-[#149A9B]" />,
-        title: "Project Overview",
-        description: "Learn about the mission, architecture, and technology stack of Offer Hub.",
-        link: "/docs/architecture",
+        title: "Getting Started",
+        description: "Learn what OFFER-HUB is, how to install it, and make your first API call.",
+        link: "/docs/getting-started",
         count: "3 articles"
     },
     {
-        icon: <Code className="text-[#149A9B]" />,
-        title: "Development",
-        description: "Guides on naming conventions, code style, and how to contribute.",
-        link: "/docs/contributing",
-        count: "4 articles"
+        icon: <Zap className="text-[#149A9B]" />,
+        title: "Quick Start Guide",
+        description: "Create users, orders, and complete your first escrow transaction in minutes.",
+        link: "/docs/guide/quick-start",
+        count: "8 guides"
     },
     {
         icon: <Terminal className="text-[#149A9B]" />,
         title: "API Reference",
-        description: "Detailed documentation for all backend API endpoints and responses.",
-        link: "/docs/api-responses",
-        count: "2 articles"
+        description: "Complete REST API documentation with authentication, endpoints, and webhooks.",
+        link: "/docs/api-reference/overview",
+        count: "3 articles"
     },
     {
         icon: <Shield className="text-[#149A9B]" />,
-        title: "Security & Auth",
-        description: "Comprehensive guide to the authentication and authorization system.",
-        link: "/docs/authentication",
-        count: "1 article"
+        title: "Escrow & Payments",
+        description: "Smart contract escrow, deposits, withdrawals, and dispute resolution.",
+        link: "/docs/guide/escrow",
+        count: "5 guides"
     },
     {
-        icon: <Zap className="text-[#149A9B]" />,
-        title: "Database",
-        description: "Database schema design, migrations, and Supabase integration.",
-        link: "/docs/database",
-        count: "2 articles"
+        icon: <Code className="text-[#149A9B]" />,
+        title: "TypeScript SDK",
+        description: "Install and use the official SDK to integrate OFFER-HUB into your app.",
+        link: "/docs/sdk/quick-start",
+        count: "1 article"
     },
     {
         icon: <LifeBuoy className="text-[#149A9B]" />,
-        title: "Error Handling",
-        description: "Standard practices for error handling across the entire stack.",
-        link: "/docs/error-handling",
-        count: "1 article"
+        title: "Self-Hosting",
+        description: "Deploy OFFER-HUB on your own infrastructure with Docker and configure it.",
+        link: "/docs/guide/self-hosting",
+        count: "2 articles"
     }
 ];
 

@@ -50,11 +50,11 @@ export function DocsSidebar({ nav, className }: DocsSidebarProps) {
     <nav
       aria-label="Documentation navigation"
       className={cn(
-        "w-full rounded-3xl p-5 shadow-[8px_8px_16px_#d1d5db,-8px_-8px_16px_#ffffff] bg-[#F1F3F7] flex flex-col min-h-full",
+        "w-full rounded-3xl p-5 shadow-[8px_8px_16px_#d1d5db,-8px_-8px_16px_#ffffff] bg-[#F1F3F7] flex flex-col",
         className
       )}
     >
-      <div className="flex-1 space-y-6">
+      <div className="flex-1 space-y-6 overflow-y-auto scrollbar-thin pr-1">
         <div>
           <div className="px-5 mb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#6D758F]">
             Overview
