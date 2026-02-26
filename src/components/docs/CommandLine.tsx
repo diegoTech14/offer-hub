@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { Check, Copy, Terminal } from "lucide-react";
 
 import { cn } from "@/lib/cn";
@@ -10,7 +10,41 @@ interface CommandLineProps {
   label?: string;
   promptSymbol?: string;
   className?: string;
-  children?: string;
+  children?: ReactNode;
+}
+
+/**
+ * Recursively extract text content from React children.
+ * This handles MDX transformations that may convert URLs or text into React elements.
+ */
+function extractTextFromChildren(children: ReactNode): string {
+  if (children === null || children === undefined) {
+    return "";
+  }
+
+  if (typeof children === "string") {
+    return children;
+  }
+
+  if (typeof children === "number") {
+    return String(children);
+  }
+
+  if (Array.isArray(children)) {
+    return children.map(extractTextFromChildren).join("");
+  }
+
+  // Handle React elements (e.g., <a> tags from MDX URL processing)
+  if (typeof children === "object" && "props" in children) {
+    const element = children as { props?: { children?: ReactNode; href?: string } };
+    // For anchor tags, prefer href as it contains the actual URL
+    if (element.props?.href && !element.props?.children) {
+      return element.props.href;
+    }
+    return extractTextFromChildren(element.props?.children);
+  }
+
+  return "";
 }
 
 export function CommandLine({
@@ -22,9 +56,7 @@ export function CommandLine({
 }: CommandLineProps) {
   const [copied, setCopied] = useState(false);
 
-  const raw =
-    command ??
-    (typeof children === "string" ? children : String(children ?? ""));
+  const raw = command ?? extractTextFromChildren(children);
   const trimmed = raw.trim();
 
   async function handleCopy() {

@@ -30,15 +30,31 @@ Without the Orchestrator, building all of this could take 6-12 months. With it, 
 
 OFFER-HUB uses a **balance-based ledger** and **smart-contract escrow** to protect every transaction:
 
-```
-Your Marketplace Frontend
-         |
-Your Marketplace Backend
-         |
-  OFFER-HUB Orchestrator  <-- You deploy this
-         |              |
-   Stellar + USDC    Trustless Work
-   (blockchain)      (smart contracts)
+```mermaid
+flowchart TB
+    subgraph YM["Your Marketplace"]
+        FE["Frontend"]
+        BE["Backend"]
+    end
+
+    subgraph OH["OFFER-HUB Orchestrator"]
+        ORC["API & State Machine"]
+    end
+
+    subgraph BC["Blockchain Layer"]
+        ST["Stellar + USDC"]
+        TW["Trustless Work<br/>Smart Contracts"]
+    end
+
+    FE --> BE
+    BE --> ORC
+    ORC --> ST
+    ORC --> TW
+
+    style OH fill:#E8F7F7,stroke:#149A9B,stroke-width:2px
+    style ORC fill:#149A9B,color:#fff
+    style ST fill:#F3F4F6,stroke:#6D758F
+    style TW fill:#F3F4F6,stroke:#6D758F
 ```
 
 ### The Payment Flow

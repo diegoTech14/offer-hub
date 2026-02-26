@@ -33,30 +33,34 @@ OFFER-HUB uses [Trustless Work](https://trustlesswork.com) smart contracts on th
 
 ### State Machine
 
-```
-ORDER_CREATED
-      ↓
-FUNDS_RESERVED (off-chain balance lock)
-      ↓
-ESCROW_CREATING (initializing contract)
-      ↓
-ESCROW_CREATED (contract deployed)
-      ↓
-ESCROW_FUNDING (sending USDC on-chain)
-      ↓
-ESCROW_FUNDED (funds locked in contract)
-      ↓
-IN_PROGRESS (work being done)
-      ↓
-  ┌───┴───┐
-  ↓       ↓
-RELEASING  DISPUTING
-  ↓       ↓
-CLOSED   DISPUTED
-           ↓
-      ┌────┴────┐
-      ↓         ↓
-  REFUNDED   CLOSED
+```mermaid
+stateDiagram-v2
+    [*] --> ORDER_CREATED
+    ORDER_CREATED --> FUNDS_RESERVED: Off-chain lock
+
+    state "Contract Setup" as setup {
+        FUNDS_RESERVED --> ESCROW_CREATING: Init contract
+        ESCROW_CREATING --> ESCROW_CREATED: Deployed
+    }
+
+    state "Funding" as funding {
+        ESCROW_CREATED --> ESCROW_FUNDING: Send USDC
+        ESCROW_FUNDING --> ESCROW_FUNDED: Confirmed
+    }
+
+    ESCROW_FUNDED --> IN_PROGRESS: Work begins
+
+    state "Resolution" as resolution {
+        IN_PROGRESS --> RELEASING: Buyer approves
+        IN_PROGRESS --> DISPUTING: Open dispute
+        RELEASING --> CLOSED: Released
+        DISPUTING --> DISPUTED: Under review
+        DISPUTED --> REFUNDED: Refund
+        DISPUTED --> CLOSED: Release
+    }
+
+    CLOSED --> [*]
+    REFUNDED --> [*]
 ```
 
 ### State Descriptions
