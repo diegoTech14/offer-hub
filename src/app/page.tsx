@@ -14,8 +14,8 @@ export default function Home() {
       <LoadingBar />
       <Navbar />
       <HeroSection />
-      <StatsSection />
       <SupportedBySection />
+      <StatsSection />
       <FeaturesSection />
       <HowItWorksSection />
       <RegistrationForm />
