@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Heading } from "@/lib/mdx";
+import { cn } from "@/lib/cn";
 
 interface TableOfContentsProps {
   headings: Heading[];
@@ -13,20 +14,17 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        // Collect all intersecting entries
         const visibleEntries = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
 
         if (visibleEntries.length > 0) {
-          // If we are at the bottom of the page, the last visible entry should be active
           const isAtBottom =
             window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
 
           if (isAtBottom) {
             setActiveId(visibleEntries[visibleEntries.length - 1].target.id);
           } else {
-            // Otherwise, pick the one closest to our top margin (100px)
             setActiveId(visibleEntries[0].target.id);
           }
         }
@@ -42,7 +40,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
       if (el) observer.observe(el);
     });
 
-    // Handle scroll to bottom explicitly to catch the last items
     const handleScroll = () => {
       const isAtBottom =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
@@ -74,24 +71,26 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className="hidden md:block w-full max-w-[240px]">
+    <nav className="w-full">
       <div className="flex flex-col">
-        <p className="text-xs font-semibold uppercase tracking-widest text-text-primary mb-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.15em] mb-6 px-4 text-[#6D758F]/60">
           On this page
         </p>
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-1">
           {headings.map((heading) => (
             <li
               key={heading.id}
-              className={heading.level === 3 ? "pl-3" : ""}
+              className={heading.level === 3 ? "ml-4" : ""}
             >
               <a
                 href={`#${heading.id}`}
                 onClick={(e) => handleClick(e, heading.id)}
-                className={`text-sm transition-colors duration-200 block leading-tight ${activeId === heading.id
-                  ? "text-primary font-semibold"
-                  : "text-text-secondary hover:text-text-primary"
-                  }`}
+                className={cn(
+                  "text-[13px] transition-all duration-200 block py-1.5 px-4 rounded-lg font-medium",
+                  activeId === heading.id
+                    ? "text-[#149A9B] bg-[#149A9B]/5"
+                    : "text-[#6D758F] hover:text-[#19213D] hover:bg-[#19213D]/5"
+                )}
               >
                 {heading.text}
               </a>

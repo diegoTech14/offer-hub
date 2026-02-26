@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import {
+  Settings, Code, Box, Layers,
+  Shield, Workflow, FileText, Zap, Compass, Rocket, Home
+} from "lucide-react";
 import { cn } from "@/lib/cn";
-import type { SidebarSection } from "@/lib/mdx";
+import type { SidebarLink, SidebarSection } from "@/lib/mdx";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -17,47 +18,30 @@ interface DocsSidebarProps {
   className?: string;
 }
 
+const getIconForSlug = (slug: string, isActive: boolean) => {
+  const s = slug.toLowerCase();
+  const color = isActive ? "#149A9B" : "#6D758F";
+
+  if (s.includes("api") || s.includes("dev") || s.includes("code")) return <Code size={16} color={color} />;
+  if (s.includes("start") || s.includes("intro") || s.includes("welcome")) return <Rocket size={16} color={color} />;
+  if (s.includes("escrow") || s.includes("contract")) return <Shield size={16} color={color} />;
+  if (s.includes("sdk") || s.includes("tool")) return <Box size={16} color={color} />;
+  if (s.includes("config") || s.includes("setting")) return <Settings size={16} color={color} />;
+  if (s.includes("flow") || s.includes("lifecycle")) return <Workflow size={16} color={color} />;
+  if (s.includes("helper") || s.includes("util")) return <Zap size={16} color={color} />;
+  if (s.includes("design") || s.includes("ui") || s.includes("view")) return <Layers size={16} color={color} />;
+  if (s.includes("network") || s.includes("stellar")) return <Compass size={16} color={color} />;
+
+  return <FileText size={16} color={color} />;
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function DocsSidebar({ nav, className }: DocsSidebarProps) {
   const pathname = usePathname();
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set()
-  );
 
-  // Auto-expand section containing active page on mount and pathname change
-  useEffect(() => {
-    if (!nav || nav.length === 0) return;
-
-    // Find section containing active page
-    const activeSectionLabel = nav.find((section) =>
-      section.links.some((link) => pathname === `/docs/${link.slug}`)
-    )?.section;
-
-    // If found, expand only that section. Otherwise, expand first section.
-    const sectionToExpand = activeSectionLabel || nav[0]?.section;
-
-    if (sectionToExpand) {
-      setExpandedSections(new Set([sectionToExpand]));
-    }
-  }, [pathname, nav]);
-
-  // Toggle section expand/collapse
-  const toggleSection = (sectionLabel: string) => {
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(sectionLabel)) {
-        next.delete(sectionLabel);
-      } else {
-        next.add(sectionLabel);
-      }
-      return next;
-    });
-  };
-
-  // Handle empty or missing nav
   if (!nav || nav.length === 0) {
     return null;
   }
@@ -65,106 +49,81 @@ export function DocsSidebar({ nav, className }: DocsSidebarProps) {
   return (
     <nav
       aria-label="Documentation navigation"
-      className={cn("w-full", className)}
-      style={{ background: "#F1F3F7" }}
+      className={cn(
+        "w-full rounded-3xl p-5 shadow-[8px_8px_16px_#d1d5db,-8px_-8px_16px_#ffffff] bg-[#F1F3F7] flex flex-col min-h-full",
+        className
+      )}
     >
-      <div className="space-y-6">
+      <div className="flex-1 space-y-6">
+        <div>
+          <div className="px-5 mb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#6D758F]">
+            Overview
+          </div>
+          <ul role="list" className="space-y-1.5">
+            <SidebarItem
+              href="/docs"
+              icon={<Home size={16} />}
+              label="Home"
+              isActive={pathname === "/docs"}
+            />
+            <SidebarItem
+              href="/docs/getting-started"
+              icon={<Rocket size={16} />}
+              label="Welcome"
+              isActive={pathname === "/docs/getting-started"}
+            />
+          </ul>
+        </div>
+
         {nav.map((section) => {
-          // Skip empty sections
           if (!section.links || section.links.length === 0) {
             return null;
           }
 
-          const isExpanded = expandedSections.has(section.section);
-          const sectionId = `section-${section.section.toLowerCase().replace(/\s+/g, "-")}`;
-
           return (
-            <div key={section.section}>
-              {/* Section Header Button */}
-              <button
-                onClick={() => toggleSection(section.section)}
-                aria-expanded={isExpanded}
-                aria-controls={sectionId}
-                aria-label={`${isExpanded ? "Collapse" : "Expand"} ${section.section} section`}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-[400ms] ease-out hover:bg-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#149A9B] focus-visible:ring-offset-2"
-                style={{ background: "transparent" }}
-              >
-                <span
-                  className="text-xs font-semibold uppercase tracking-widest"
-                  style={{ color: "#19213D" }}
-                >
-                  {section.section}
-                </span>
-                <ChevronDown
-                  size={16}
-                  className="transition-transform duration-[400ms] ease-out"
-                  style={{
-                    transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
-                    color: "#6D758F",
-                  }}
-                />
-              </button>
-
-              {/* Collapsible Links */}
-              <AnimatePresence initial={false}>
-                {isExpanded && (
-                  <motion.ul
-                    id={sectionId}
-                    role="list"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      ease: [0.4, 0.0, 0.2, 1],
-                    }}
-                    className="overflow-hidden mt-2 space-y-1"
-                  >
-                    {section.links.map((link) => {
-                      const href = `/docs/${link.slug}`;
-                      const isActive = pathname === href;
-                      const linkKey = `${section.section}-${link.slug}`;
-
-                      return (
-                        <li key={linkKey} role="listitem">
-                          <Link
-                            href={href}
-                            aria-current={isActive ? "page" : undefined}
-                            className={cn(
-                              "block text-sm py-1.5 px-3 rounded-lg transition-all duration-[400ms] ease-out",
-                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#149A9B] focus-visible:ring-offset-2",
-                              isActive && "border-l-2"
-                            )}
-                            style={{
-                              color: isActive ? "#149A9B" : "#6D758F",
-                              backgroundColor: isActive
-                                ? "rgba(20, 154, 155, 0.06)"
-                                : "transparent",
-                              borderLeftColor: isActive ? "#149A9B" : "transparent",
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!isActive) {
-                                e.currentTarget.style.color = "#19213D";
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!isActive) {
-                                e.currentTarget.style.color = "#6D758F";
-                              }
-                            }}
-                          >
-                            {link.title}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </motion.ul>
-                )}
-              </AnimatePresence>
+            <div key={section.section} className="mt-6">
+              <div className="px-5 mb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#6D758F]">
+                {section.section}
+              </div>
+              <ul role="list" className="space-y-1.5">
+                {section.links.map((link) => (
+                  <SidebarItem
+                    key={link.slug}
+                    href={`/docs/${link.slug}`}
+                    icon={getIconForSlug(link.slug, pathname === `/docs/${link.slug}`)}
+                    label={link.title}
+                    isActive={pathname === `/docs/${link.slug}`}
+                  />
+                ))}
+              </ul>
             </div>
           );
         })}
       </div>
     </nav>
+  );
+}
+
+function SidebarItem({ href, icon, label, isActive }: { href: string; icon: React.ReactNode; label: string; isActive: boolean }) {
+  return (
+    <li role="listitem">
+      <Link
+        href={href}
+        aria-current={isActive ? "page" : undefined}
+        className={cn(
+          "group flex items-center gap-3.5 text-sm py-2.5 px-5 rounded-2xl transition-all duration-300 font-medium",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#149A9B] focus-visible:ring-offset-2",
+          "bg-[#F1F3F7]",
+          isActive
+            ? "shadow-[inset_4px_4px_8px_#d1d5db,inset_-4px_-4px_8px_#ffffff] text-[#149A9B]"
+            : "text-[#6D758F] shadow-none hover:shadow-[4px_4px_8px_#d1d5db,-4px_-4px_8px_#ffffff] hover:text-[#19213D]"
+        )}
+      >
+        <span className={cn("flex-shrink-0 transition-colors duration-300", isActive ? "text-[#149A9B]" : "text-[#6D758F] group-hover:text-[#19213D]")}>
+          {icon}
+        </span>
+        <span className="truncate">{label}</span>
+      </Link>
+    </li>
   );
 }

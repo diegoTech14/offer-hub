@@ -70,8 +70,7 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden select-none"
-      style={{ background: "#F1F3F7" }}
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden select-none bg-transparent"
     >
       {/* ── Subtle teal glow centered ── */}
       <div
@@ -82,18 +81,8 @@ export default function HeroSection() {
         }}
       />
 
-      {/* ── Dot-grid texture ── */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.045]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(0,35,51,0.7) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-      />
-
-      {/* ── Hero content — pt-16 clears the fixed navbar ── */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 w-full max-w-[96vw] pt-16">
+      {/* ── Hero content — pt-28 clears the fixed pill navbar ── */}
+      <div className="relative z-10 flex flex-col items-center text-center px-4 w-full pt-28">
         {/* Eyebrow — key value props from product docs */}
         <p
           className="animate-fadeIn text-xs font-medium uppercase tracking-[0.4em] mb-10"
@@ -111,9 +100,9 @@ export default function HeroSection() {
          */}
         <h1
           ref={headingRef}
-          className="font-black leading-none tracking-tighter whitespace-nowrap"
+          className="font-black leading-[1.1] tracking-tight whitespace-nowrap px-8 py-4"
           style={{
-            fontSize: "clamp(4rem, 14vw, 13rem)",
+            fontSize: "clamp(3.5rem, 13vw, 12rem)",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             color: "transparent",
@@ -143,29 +132,20 @@ export default function HeroSection() {
           style={{ animationDelay: "500ms" }}
         >
           {/* Primary — neumorphic raised, teal */}
-          <button
-            className="group flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-sm font-semibold text-white transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle"
-            style={{ background: "#149A9B" }}
-            onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.background =
-                "#0d7377")
-            }
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.background =
-                "#149A9B")
-            }
+          <a
+            href="#waitlist-form"
+            className="group flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-sm font-semibold btn-neumorphic-primary"
           >
             Get Started
             <ArrowRight
               size={15}
               className="group-hover:translate-x-0.5 transition-transform duration-[200ms]"
             />
-          </button>
+          </a>
 
           {/* Secondary — neumorphic raised, same base color as page */}
           <button
-            className="px-7 py-3.5 rounded-xl text-sm font-medium transition-all duration-[400ms] ease-out shadow-raised hover:shadow-raised-hover active:shadow-sunken-subtle"
-            style={{ color: "#19213D", background: "#F1F3F7" }}
+            className="px-7 py-3.5 rounded-xl text-sm font-medium btn-neumorphic-secondary"
           >
             View Docs
           </button>

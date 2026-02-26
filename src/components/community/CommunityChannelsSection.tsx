@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   Disc3,
-  Linkedin,
+  Github,
   Send,
   Twitter,
 } from "lucide-react";
@@ -13,34 +13,33 @@ import SectionHeading from "@/components/community/SectionHeading";
 const channels = [
   {
     name: "Discord",
-    description:
-      "Real-time discussions, pairing, and contributor office hours.",
-    href: "https://discord.com",
+    description: "Real-time discussions, pairing, and contributor office hours.",
+    href: "https://discord.gg/yH4vBNWwc",
     icon: Disc3,
   },
   {
     name: "Telegram",
     description: "Fast async updates for announcements and roadmap drops.",
-    href: "https://telegram.org",
+    href: "https://t.me/offer_hub_contributors",
     icon: Send,
   },
   {
     name: "X",
     description: "Community highlights, release threads, and ecosystem news.",
-    href: "https://x.com",
+    href: "https://x.com/offerhub_",
     icon: Twitter,
   },
   {
-    name: "LinkedIn",
-    description: "Professional updates, partnerships, and hiring stories.",
-    href: "https://linkedin.com",
-    icon: Linkedin,
+    name: "GitHub",
+    description: "Open source repositories, pull requests, and roadmap items.",
+    href: "https://github.com/OFFER-HUB",
+    icon: Github,
   },
 ];
 
 const CommunityChannelsSection = () => {
   return (
-    <section id="community-channels" className="py-24">
+    <section id="community-channels" className="py-24 bg-transparent">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <SectionHeading
           eyebrow="Community Channels"

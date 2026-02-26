@@ -1,8 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertCircle, Tag, ArrowUpRight, ChevronDown } from "lucide-react";
 import SectionHeading from "@/components/community/SectionHeading";
+import { cn } from "@/lib/cn";
 
 interface IssueData {
   number: number;
@@ -17,65 +19,120 @@ interface OpenIssuesSectionProps {
 }
 
 const OpenIssuesSection = ({ issues }: OpenIssuesSectionProps) => {
+  const [displayCount, setDisplayCount] = useState(15);
+
+  // Sort by number descending for newest first
+  const sortedIssues = [...issues].sort((a, b) => b.number - a.number);
+  const visibleIssues = sortedIssues.slice(0, displayCount);
+  const hasMore = displayCount < sortedIssues.length;
+
+  const handleLoadMore = () => {
+    setDisplayCount(prev => Math.min(prev + 15, sortedIssues.length));
+  };
+
   return (
-    <section id="open-issues" className="py-24">
+    <section id="open-issues" className="py-24 bg-transparent">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <SectionHeading
           eyebrow="Open Issues"
-          title="Help unblock active workstreams"
-          subtitle="Active workstreams where your help makes a difference."
+          title="Shape the future of the platform"
+          subtitle="Explore the latest roadmap items and help us unblock the community."
         />
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {issues.map((issue, index) => (
-            <motion.article
-              key={issue.number}
-              className="rounded-2xl bg-background p-6 shadow-raised"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: index * 0.06,
-                duration: 0.5,
-                ease: "easeOut",
-              }}
-              viewport={{ once: true }}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <a
-                  href={issue.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-lg font-bold text-text-primary hover:text-primary"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
+          <AnimatePresence mode="popLayout">
+            {visibleIssues.map((issue, index) => {
+              const isGoodFirstIssue = issue.labels.some(l => l.toLowerCase().includes('good') || l.toLowerCase().includes('help'));
+
+              return (
+                <motion.article
+                  key={issue.number}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: (index % 15) * 0.02,
+                    ease: "easeOut",
+                  }}
+                  className="group relative flex flex-col justify-between rounded-2xl bg-[#F1F3F7] p-6 shadow-raised transition-all duration-300"
                 >
-                  {issue.title}
-                </a>
-                <AlertCircle size={18} className="text-primary flex-shrink-0" />
-              </div>
-              {issue.labels.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {issue.labels.slice(0, 3).map((label) => (
-                    <span
-                      key={label}
-                      className="inline-block rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary"
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#F1F3F7] text-[10px] font-semibold text-[#6D758F] tracking-wider shadow-sunken-subtle uppercase">
+                        #{issue.number}
+                      </div>
+                      {isGoodFirstIssue && (
+                        <span className="text-[9px] font-bold text-[#149A9B] uppercase tracking-widest bg-[#DEEFE7] px-1.5 py-0.5 rounded shadow-sm">
+                          Starter
+                        </span>
+                      )}
+                    </div>
+
+                    <a
+                      href={issue.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-[15px] font-semibold text-[#19213D] hover:text-[#149A9B] transition-colors leading-snug line-clamp-2 mb-4 tracking-tight"
                     >
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <div className="mt-4 flex items-center justify-between text-sm">
-                <span className="text-text-secondary">Issue #{issue.number}</span>
-                <span className={`font-semibold ${
-                  issue.priority === 'High' ? 'text-red-600' :
-                  issue.priority === 'Low' ? 'text-green-600' :
-                  'text-text-primary'
-                }`}>
-                  {issue.priority}
-                </span>
-              </div>
-            </motion.article>
-          ))}
+                      {issue.title}
+                    </a>
+
+                    {issue.labels.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-6">
+                        {issue.labels.slice(0, 2).map((label) => (
+                          <span
+                            key={label}
+                            className="flex items-center gap-1 text-[10px] font-medium text-[#6D758F] px-2 py-1 bg-[#F1F3F7] rounded-lg shadow-raised-sm"
+                          >
+                            <Tag size={9} className="text-[#149A9B]" />
+                            {label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-[#D1D5DB]/20">
+                    <div className="flex flex-col">
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#6D758F]/60 mb-0.5">Priority</span>
+                      <span className={cn(
+                        "text-[10px] font-bold uppercase tracking-widest",
+                        issue.priority === 'High' ? 'text-red-500' :
+                          issue.priority === 'Low' ? 'text-emerald-500' :
+                            'text-[#149A9B]'
+                      )}>
+                        {issue.priority}
+                      </span>
+                    </div>
+
+                    <a
+                      href={issue.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-xl text-white transition-all btn-neumorphic-primary flex items-center justify-center"
+                    >
+                      <ArrowUpRight size={16} />
+                    </a>
+                  </div>
+                </motion.article>
+              );
+            })}
+          </AnimatePresence>
         </div>
+
+        {hasMore && (
+          <div className="mt-16 text-center">
+            <button
+              onClick={handleLoadMore}
+              className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#149A9B] hover:gap-3 transition-all group"
+            >
+              Load more issues
+              <ChevronDown size={14} className="group-hover:translate-y-1 transition-transform" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
