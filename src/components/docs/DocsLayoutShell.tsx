@@ -120,8 +120,8 @@ export function DocsLayoutShell({ nav, children }: DocsLayoutShellProps) {
         <div className="max-w-[1800px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_280px] gap-12 lg:gap-20 min-h-[calc(100vh-8rem)]">
             <aside className="hidden lg:block">
-              <div className="sticky top-40">
-                <DocsSidebar nav={nav} />
+              <div className="sticky top-40 max-h-[calc(100vh-12rem)] flex flex-col">
+                <DocsSidebar nav={nav} className="overflow-y-auto" />
               </div>
             </aside>
 
@@ -141,7 +141,7 @@ export function DocsLayoutShell({ nav, children }: DocsLayoutShellProps) {
 
             <aside className="hidden xl:block">
               {headings.length > 0 && (
-                <div className="sticky top-40">
+                <div className="sticky top-40 max-h-[calc(100vh-12rem)] overflow-y-auto scrollbar-thin">
                   <TableOfContents headings={headings} />
                 </div>
               )}
