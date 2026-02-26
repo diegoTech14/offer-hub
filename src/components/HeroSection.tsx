@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
 
 /**
@@ -144,11 +145,12 @@ export default function HeroSection() {
           </a>
 
           {/* Secondary — neumorphic raised, same base color as page */}
-          <button
+          <Link
+            href="/docs"
             className="px-7 py-3.5 rounded-xl text-sm font-medium btn-neumorphic-secondary"
           >
             View Docs
-          </button>
+          </Link>
         </div>
       </div>
 
