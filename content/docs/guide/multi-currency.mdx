@@ -28,7 +28,7 @@ The most common settlement asset is USDC, providing price stability for buyers a
 
 ### Native XLM
 
-You can also use <Badge variant="default">XLM</Badge>, the native asset of the Stellar network, which provides fast settlement and low transaction costs.
+You can also use <Badge variant="primary">XLM</Badge>, the native asset of the Stellar network, which provides fast settlement and low transaction costs.
 
 ### Custom Stellar Tokens
 
@@ -48,8 +48,7 @@ To enable specific assets or set default conversion preferences, update your con
 
 Here is an example configuring supported currencies using our SDK or API:
 
-<CodeBlock language="ts">
-```ts
+<CodeBlock language="ts">{`
 import { OfferHubClient } from '@offer-hub/sdk';
 
 const client = new OfferHubClient({
@@ -76,8 +75,7 @@ const client = new OfferHubClient({
     maxSlippageBps: 50 // 0.5% max slippage
   }
 });
-```
-</CodeBlock>
+`}</CodeBlock>
 
 <Callout variant="warning">
   Ensure that when adding `custom` tokens, the `issuer` address is completely verified and trusted to prevent spoofed tokens.
