@@ -22,7 +22,9 @@ export function CommandLine({
 }: CommandLineProps) {
   const [copied, setCopied] = useState(false);
 
-  const raw = command ?? (typeof children === "string" ? children : String(children ?? ""));
+  const raw =
+    command ??
+    (typeof children === "string" ? children : String(children ?? ""));
   const trimmed = raw.trim();
 
   async function handleCopy() {
@@ -35,7 +37,7 @@ export function CommandLine({
     <div
       className={cn(
         "my-4 rounded-xl border border-white/10 bg-[#0f172a] text-sm font-mono text-slate-100",
-        className
+        className,
       )}
     >
       {label && (
@@ -51,7 +53,9 @@ export function CommandLine({
             className="flex-shrink-0 text-primary"
             aria-hidden="true"
           />
-          <span className="text-sm text-primary flex-shrink-0">{promptSymbol}</span>
+          <span className="text-sm text-primary flex-shrink-0">
+            {promptSymbol}
+          </span>
           <div className="relative flex-1 overflow-x-auto">
             <code className="block whitespace-nowrap text-sm text-slate-100 pr-2">
               {trimmed}
@@ -66,10 +70,14 @@ export function CommandLine({
           className={cn(
             "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium flex-shrink-0",
             "transition-all duration-200",
-            copied ? "text-emerald-400" : "text-slate-300 hover:text-slate-50"
+            copied ? "text-emerald-400" : "text-slate-300 hover:text-slate-50",
           )}
         >
-          {copied ? <Check size={13} aria-hidden="true" /> : <Copy size={13} aria-hidden="true" />}
+          {copied ? (
+            <Check size={13} aria-hidden="true" />
+          ) : (
+            <Copy size={13} aria-hidden="true" />
+          )}
           <span>{copied ? "Copied" : "Copy"}</span>
         </button>
       </div>

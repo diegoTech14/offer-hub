@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Code2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { codeToHtml } from "shiki";
@@ -13,12 +13,24 @@ interface CodeBlockProps {
   className?: string;
 }
 
+// Map unsupported languages to supported Shiki languages
+const LANGUAGE_ALIASES: Record<string, string> = {
+  env: "bash",
+  dotenv: "bash",
+  sh: "bash",
+  zsh: "bash",
+  conf: "ini",
+  config: "ini",
+};
+
 export function CodeBlock({
   code: codeProp,
   children,
   language = "typescript",
   className
 }: CodeBlockProps) {
+  // Normalize the language using aliases
+  const normalizedLang = LANGUAGE_ALIASES[language] || language;
   const [copied, setCopied] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState<string>("");
 
@@ -29,8 +41,8 @@ export function CodeBlock({
     async function highlight() {
       try {
         const html = await codeToHtml(rawCode, {
-          lang: language,
-          theme: "one-dark-pro", // Tema con mejor contraste y colores más vibrantes
+          lang: normalizedLang,
+          theme: "github-light",
         });
         if (isMounted) {
           setHighlightedCode(html);
@@ -46,7 +58,7 @@ export function CodeBlock({
     return () => {
       isMounted = false;
     };
-  }, [rawCode, language]);
+  }, [rawCode, normalizedLang]);
 
   async function handleCopy() {
     try {
@@ -61,23 +73,34 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        "relative rounded-xl overflow-hidden my-6 border border-white/10 group shadow-2xl",
+        "relative rounded-3xl overflow-hidden my-10 border border-[#D1D5DB]/30 shadow-[0_15px_40px_rgba(0,0,0,0.02)] bg-white group transition-all duration-300 hover:shadow-xl hover:border-[#D1D5DB]/50",
         className
       )}
-      style={{ background: "#0f172a" }}
     >
       {/* Header bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
-        <span
-          className="text-xs font-semibold uppercase tracking-wider font-mono"
-          style={{ color: "#6D758F" }}
-        >
-          {language}
-        </span>
+      <div className="flex items-center justify-between px-6 py-4 bg-[#F9FAFB] border-b border-[#D1D5DB]/30">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-[#D1D5DB]/40 shadow-sm transition-all duration-300 group-hover:bg-[#149A9B]/5 group-hover:border-[#149A9B]/30">
+            <Code2 size={16} className="text-[#6D758F] group-hover:text-[#149A9B]" />
+          </div>
+          <div>
+            <span className="text-[11px] font-black uppercase tracking-[0.18em] font-mono text-[#6D758F]/50">
+              {language}
+            </span>
+            <div className="h-0.5 w-4 bg-[#149A9B]/40 rounded-full mt-0.5" />
+          </div>
+        </div>
+
         <button
+          type="button"
           onClick={handleCopy}
           aria-label={copied ? "Copied" : "Copy code"}
-          className="relative flex items-center justify-center p-1.5 rounded-lg transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#149A9B]/50"
+          className={cn(
+            "relative flex items-center gap-2.5 px-4 py-2 rounded-xl text-[10.5px] font-black uppercase tracking-widest transition-all duration-500",
+            copied
+              ? "text-white bg-[#149A9B] shadow-lg shadow-[#149A9B]/20 transform scale-105"
+              : "text-[#6D758F] bg-white border border-[#D1D5DB]/50 shadow-sm hover:text-[#19213D] hover:border-[#D1D5DB]/80 hover:shadow-md active:scale-95"
+          )}
         >
           <AnimatePresence mode="wait" initial={false}>
             {copied ? (
@@ -86,9 +109,10 @@ export function CodeBlock({
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ duration: 0.15 }}
+                className="flex items-center gap-2"
               >
-                <Check size={14} className="text-green-500" />
+                <Check size={14} className="stroke-[3.5]" />
+                <span>Copied</span>
               </motion.div>
             ) : (
               <motion.div
@@ -96,13 +120,10 @@ export function CodeBlock({
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ duration: 0.15 }}
+                className="flex items-center gap-2"
               >
-                <Copy
-                  size={14}
-                  className="transition-colors duration-200"
-                  style={{ color: "#149A9B" }}
-                />
+                <Copy size={14} className="stroke-[2.5]" />
+                <span>Copy</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -110,14 +131,14 @@ export function CodeBlock({
       </div>
 
       {/* Code Area */}
-      <div className="p-4 overflow-x-auto text-sm leading-relaxed min-h-[3rem]">
+      <div className="p-8 overflow-x-auto text-[14px] leading-[1.8] min-h-[5rem] scrollbar-thin scrollbar-thumb-[#D1D5DB] scrollbar-track-transparent selection:bg-[#149A9B]/10 selection:text-[#149A9B]">
         {highlightedCode ? (
           <div
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
-            className="shiki-container [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!outline-none [&_span]:!text-[inherit] shiki-vibrant"
+            className="shiki-container [&>pre]:!bg-transparent [&>pre]:!p-0 [&>pre]:!m-0 [&>pre]:!outline-none"
           />
         ) : (
-          <pre className="text-slate-400 animate-pulse">
+          <pre className="text-[#6D758F]/20 animate-pulse font-mono font-medium">
             <code>{rawCode}</code>
           </pre>
         )}
@@ -125,10 +146,19 @@ export function CodeBlock({
 
       <style jsx global>{`
         .shiki-container pre {
-          color: #e2e8f0; /* Color base claro por si el tema falla */
+          color: #19213D;
         }
-        .shiki-vibrant span {
-          filter: brightness(1.2); /* Aumenta ligeramente el brillo de los tokens */
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 8px;
+          width: 8px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: #E5E7EB;
+          border-radius: 20px;
+          border: 2px solid white;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: #D1D5DB;
         }
       `}</style>
     </div>
