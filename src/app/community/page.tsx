@@ -1,7 +1,7 @@
 import ContributorsSection from "@/components/community/ContributorsSection";
 import CommunityChannelsSection from "@/components/community/CommunityChannelsSection";
 import HeroRepoStatsSection from "@/components/community/HeroRepoStatsSection";
-import HowToContributeSection from "@/components/community/HowToContributeSection";
+import HowToContribute from "@/components/community/HowToContribute";
 import OpenIssuesSection from "@/components/community/OpenIssuesSection";
 import RecentPRsSection from "@/components/community/RecentPRsSection";
 import { Footer } from "@/components/layout/Footer";
@@ -151,10 +151,10 @@ async function fetchGitHubData() {
       .filter((issue) => !issue.pull_request)
 
     const issues: IssueData[] = actualIssues.map((issue) => {
-      const priorityLabel = issue.labels.find((label) => 
+      const priorityLabel = issue.labels.find((label) =>
         label.name.toLowerCase().includes('priority')
       );
-      
+
       let priority = "Medium";
       if (priorityLabel) {
         const labelName = priorityLabel.name.toLowerCase();
@@ -219,7 +219,7 @@ export default async function CommunityPage() {
         <ContributorsSection contributors={contributors} />
         <RecentPRsSection pullRequests={pullRequests} />
         <OpenIssuesSection issues={issues} />
-        <HowToContributeSection />
+        <HowToContribute />
         <CommunityChannelsSection />
       </main>
       <Footer />

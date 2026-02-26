@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -41,7 +42,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
 
           {/* ── Logo ── */}
-          <a href="/" className="flex items-center gap-2.5 flex-shrink-0">
+          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
             <Image
               src="/OFFER-HUB-logo.png"
               alt="OFFER-HUB"
@@ -50,7 +51,7 @@ export function Navbar() {
               className="h-8 w-auto object-contain"
               priority
             />
-          </a>
+          </Link>
 
           {/* ── Desktop nav links ── */}
           <div className="hidden md:flex items-center gap-1">

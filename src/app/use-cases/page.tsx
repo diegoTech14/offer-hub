@@ -9,8 +9,7 @@ import {
     ShoppingBag,
     Gavel,
     Layers,
-    Home,
-    ChevronDown
+    Home
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
