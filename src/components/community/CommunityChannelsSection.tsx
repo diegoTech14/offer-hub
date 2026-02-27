@@ -1,10 +1,7 @@
-import {
-  ArrowUpRight,
-  Disc3,
-  Github,
-  Send,
-  Twitter,
-} from "lucide-react";
+"use client";
+
+import { ArrowUpRight, Disc3, Github, Send, Twitter } from "lucide-react";
+import { motion } from "framer-motion";
 import SectionHeading from "@/components/community/SectionHeading";
 
 const channels = [
@@ -44,7 +41,13 @@ const CommunityChannelsSection = () => {
           subtitle="Find us where the conversation is happening."
         />
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {channels.map((channel) => {
             const Icon = channel.icon;
             return (
@@ -68,7 +71,7 @@ const CommunityChannelsSection = () => {
               </a>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
